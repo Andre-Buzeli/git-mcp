@@ -1,60 +1,54 @@
 {
-  "name": "@andrebuzeli/git-mcp",
-  "version": "1.0.5",
-  "description": "MCP server for Git operations with self-hosted Gitea and GitHub support",
-  "main": "dist/server.js",
+  "name": "@andrebuzeli/gitea-mcp-v2",
+  "version": "2.4.8",
+  "description": "MCP Server for Gitea self-hosted (multi-provider ready) - v2.4.8 com 12 tools incluindo git-sync e version-control, arquitetura multi-provider completa (GitHub + Gitea), documentação enriquecida e config genérica",
+  "main": "dist/index.js",
   "bin": {
-    "git-mcp": "./dist/server.js"
+    "gitea-mcp-v2": "dist/index.js"
   },
-  "type": "module",
   "scripts": {
     "build": "tsc",
-    "start": "node dist/server.js",
-    "lint": "eslint src/**/*.ts",
-    "lint:fix": "eslint src/**/*.ts --fix",
-    "format": "prettier --write src/**/*.ts",
-    "prepare": "npm run build",
-    "prepublishOnly": "npm run lint && npm run build",
-    "postpublish": "echo 'MCP Git Server published successfully!'"
+    "start": "node dist/index.js",
+    "dev": "ts-node src/index.ts",
+    "prepublishOnly": "npm run build",
+                    "postpublish": "echo 'Gitea MCP v2.4.8 published successfully!'"
   },
   "keywords": [
     "mcp",
-    "git",
     "gitea",
-    "github",
-    "ai-agent",
+    "git",
     "model-context-protocol",
-    "repository-management",
-    "git-operations"
+    "self-hosted",
+    "api",
+    "sync",
+    "version-control",
+    "backup"
   ],
-  "author": "andrebuzeli",
+  "author": "Andre Buzeli",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/andrebuzeli/gitea-mcp-v2.git"
+  },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^0.4.0",
     "axios": "^1.6.0",
-    "dotenv": "^16.3.1",
-    "simple-git": "^3.20.0",
-    "zod": "^3.22.4"
+    "zod": "^3.22.0"
   },
   "devDependencies": {
-    "@types/node": "^20.8.0",
-    "@typescript-eslint/eslint-plugin": "^6.21.0",
-    "@typescript-eslint/parser": "^6.21.0",
-    "eslint": "^8.51.0",
-    "eslint-config-prettier": "^9.1.2",
-    "eslint-plugin-prettier": "^9.1.2",
-    "prettier": "^3.0.3",
-    "typescript": "^5.2.2"
+    "@types/node": "^20.0.0",
+    "typescript": "15.0.0",
+    "ts-node": "^10.9.0"
   },
   "engines": {
     "node": ">=18.0.0"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/andrebuzeli/git-mcp.git"
+  "publishConfig": {
+    "access": "public"
   },
-  "bugs": {
-    "url": "https://github.com/andrebuzeli/git-mcp/issues"
-  },
-  "homepage": "https://github.com/andrebuzeli/git-mcp#readme"
+  "files": [
+    "dist/**/*",
+    "README.md",
+    "LICENSE"
+  ]
 }

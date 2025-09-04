@@ -1,0 +1,68 @@
+import { BaseVcsProvider } from './base-provider.js';
+import { VcsProvider, RepositoryInfo, BranchInfo, FileInfo, CommitInfo, IssueInfo, PullRequestInfo, ReleaseInfo, TagInfo, UserInfo, WebhookInfo } from './types.js';
+/**
+ * Provider específico para GitHub
+ * Implementa todas as operações VCS usando a API REST do GitHub
+ */
+export declare class GitHubProvider extends BaseVcsProvider {
+    constructor(config: VcsProvider);
+    protected getBaseUrl(config: VcsProvider): string;
+    protected getHeaders(config: VcsProvider): Record<string, string>;
+    protected normalizeError(error: any): Error;
+    protected normalizeRepository(data: any): RepositoryInfo;
+    protected normalizeBranch(data: any): BranchInfo;
+    protected normalizeFile(data: any): FileInfo;
+    protected normalizeCommit(data: any): CommitInfo;
+    protected normalizeIssue(data: any): IssueInfo;
+    protected normalizePullRequest(data: any): PullRequestInfo;
+    protected normalizeRelease(data: any): ReleaseInfo;
+    protected normalizeTag(data: any): TagInfo;
+    protected normalizeUser(data: any): UserInfo;
+    protected normalizeWebhook(data: any): WebhookInfo;
+    listRepositories(username?: string, page?: number, limit?: number): Promise<RepositoryInfo[]>;
+    getRepository(owner: string, repo: string): Promise<RepositoryInfo>;
+    createRepository(name: string, description?: string, privateRepo?: boolean): Promise<RepositoryInfo>;
+    updateRepository(owner: string, repo: string, updates: any): Promise<RepositoryInfo>;
+    deleteRepository(owner: string, repo: string): Promise<boolean>;
+    forkRepository(owner: string, repo: string, organization?: string): Promise<RepositoryInfo>;
+    searchRepositories(query: string, page?: number, limit?: number): Promise<RepositoryInfo[]>;
+    listBranches(owner: string, repo: string, page?: number, limit?: number): Promise<BranchInfo[]>;
+    getBranch(owner: string, repo: string, branch: string): Promise<BranchInfo>;
+    createBranch(owner: string, repo: string, branchName: string, fromBranch: string): Promise<BranchInfo>;
+    deleteBranch(owner: string, repo: string, branch: string): Promise<boolean>;
+    getFile(owner: string, repo: string, path: string, ref?: string): Promise<FileInfo>;
+    createFile(owner: string, repo: string, path: string, content: string, message: string, branch?: string): Promise<FileInfo>;
+    updateFile(owner: string, repo: string, path: string, content: string, message: string, sha: string, branch?: string): Promise<FileInfo>;
+    deleteFile(owner: string, repo: string, path: string, message: string, sha: string, branch?: string): Promise<boolean>;
+    listFiles(owner: string, repo: string, path: string, ref?: string): Promise<FileInfo[]>;
+    listCommits(owner: string, repo: string, branch?: string, page?: number, limit?: number): Promise<CommitInfo[]>;
+    getCommit(owner: string, repo: string, sha: string): Promise<CommitInfo>;
+    listIssues(owner: string, repo: string, state?: 'open' | 'closed' | 'all', page?: number, limit?: number): Promise<IssueInfo[]>;
+    getIssue(owner: string, repo: string, issueNumber: number): Promise<IssueInfo>;
+    createIssue(owner: string, repo: string, title: string, body?: string, assignees?: string[], labels?: string[]): Promise<IssueInfo>;
+    updateIssue(owner: string, repo: string, issueNumber: number, updates: any): Promise<IssueInfo>;
+    closeIssue(owner: string, repo: string, issueNumber: number): Promise<IssueInfo>;
+    listPullRequests(owner: string, repo: string, state?: 'open' | 'closed' | 'merged' | 'all', page?: number, limit?: number): Promise<PullRequestInfo[]>;
+    getPullRequest(owner: string, repo: string, pullNumber: number): Promise<PullRequestInfo>;
+    createPullRequest(owner: string, repo: string, title: string, body: string, head: string, base: string): Promise<PullRequestInfo>;
+    updatePullRequest(owner: string, repo: string, pullNumber: number, updates: any): Promise<PullRequestInfo>;
+    mergePullRequest(owner: string, repo: string, pullNumber: number, mergeMethod?: 'merge' | 'rebase' | 'squash'): Promise<boolean>;
+    listReleases(owner: string, repo: string, page?: number, limit?: number): Promise<ReleaseInfo[]>;
+    getRelease(owner: string, repo: string, releaseId: number): Promise<ReleaseInfo>;
+    createRelease(tagName: string, name: string, body?: string, draft?: boolean, prerelease?: boolean): Promise<ReleaseInfo>;
+    updateRelease(releaseId: number, updates: any): Promise<ReleaseInfo>;
+    deleteRelease(releaseId: number): Promise<boolean>;
+    listTags(owner: string, repo: string, page?: number, limit?: number): Promise<TagInfo[]>;
+    getTag(owner: string, repo: string, tag: string): Promise<TagInfo>;
+    createTag(tagName: string, message: string, target: string): Promise<TagInfo>;
+    deleteTag(owner: string, repo: string, tag: string): Promise<boolean>;
+    getUser(username: string): Promise<UserInfo>;
+    listUsers(page?: number, limit?: number): Promise<UserInfo[]>;
+    searchUsers(query: string, page?: number, limit?: number): Promise<UserInfo[]>;
+    listWebhooks(owner: string, repo: string, page?: number, limit?: number): Promise<WebhookInfo[]>;
+    getWebhook(owner: string, repo: string, webhookId: number): Promise<WebhookInfo>;
+    createWebhook(owner: string, repo: string, url: string, events: string[], secret?: string): Promise<WebhookInfo>;
+    updateWebhook(owner: string, repo: string, webhookId: number, updates: any): Promise<WebhookInfo>;
+    deleteWebhook(owner: string, repo: string, webhookId: number): Promise<boolean>;
+}
+//# sourceMappingURL=github-provider.d.ts.map
