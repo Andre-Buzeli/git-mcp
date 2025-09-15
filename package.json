@@ -1,6 +1,6 @@
 {
   "name": "@andrebuzeli/git-mcp",
-  "version": "2.12.4",
+  "version": "2.12.5",
   "description": "MCP server for Gitea and GitHub integration with 18 comprehensive DevOps tools including mandatory provider specification and auto-user detection",
   "main": "dist/index.js",
   "bin": {
