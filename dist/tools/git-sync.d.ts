@@ -65,7 +65,7 @@ declare const GitSyncInputSchema: z.ZodObject<{
         repo: string;
     } | undefined;
     include?: ("issues" | "labels" | "pulls" | "releases" | "git" | "milestones")[] | undefined;
-    strategy?: "source-wins" | "timestamp" | "skip-conflicts" | undefined;
+    strategy?: "timestamp" | "source-wins" | "skip-conflicts" | undefined;
     dry_run?: boolean | undefined;
 }, {
     action: "status" | "configure" | "one-shot";
@@ -81,7 +81,7 @@ declare const GitSyncInputSchema: z.ZodObject<{
         repo: string;
     } | undefined;
     include?: ("issues" | "labels" | "pulls" | "releases" | "git" | "milestones")[] | undefined;
-    strategy?: "source-wins" | "timestamp" | "skip-conflicts" | undefined;
+    strategy?: "timestamp" | "source-wins" | "skip-conflicts" | undefined;
     dry_run?: boolean | undefined;
 }>;
 export type GitSyncInput = z.infer<typeof GitSyncInputSchema>;
@@ -95,14 +95,14 @@ declare const GitSyncResultSchema: z.ZodObject<{
     message: string;
     action: string;
     success: boolean;
-    data?: any;
     error?: string | undefined;
+    data?: any;
 }, {
     message: string;
     action: string;
     success: boolean;
-    data?: any;
     error?: string | undefined;
+    data?: any;
 }>;
 export type GitSyncResult = z.infer<typeof GitSyncResultSchema>;
 export declare const gitSyncTool: {

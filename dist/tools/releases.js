@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.releasesTool = void 0;
 const zod_1 = require("zod");
 const index_js_1 = require("../providers/index.js");
+const user_detection_js_1 = require("../utils/user-detection.js");
 /**
  * Tool: releases
  *
@@ -49,7 +50,7 @@ const ReleasesInputSchema = zod_1.z.object({
     owner: zod_1.z.string().optional(),
     repo: zod_1.z.string().optional(),
     // Para multi-provider
-    provider: zod_1.z.enum(['gitea', 'github', 'both']).optional(), // Provider específico: gitea, github ou both
+    provider: zod_1.z.enum(['gitea', 'github']).describe('Provider to use (gitea or github)'), // Provider específico: gitea, github ou both
     // Para create
     tag_name: zod_1.z.string().optional(),
     name: zod_1.z.string().optional(),
@@ -184,7 +185,7 @@ exports.releasesTool = {
             new_target_commitish: { type: 'string', description: 'New target branch or commit' },
             latest: { type: 'boolean', description: 'Get latest release' }
         },
-        required: ['action']
+        required: ['action', 'provider']
     },
     /**
      * Handler principal da tool releases
@@ -217,28 +218,28 @@ exports.releasesTool = {
     async handler(input) {
         try {
             const validatedInput = ReleasesInputSchema.parse(input);
-            // Seleciona o provider baseado na entrada ou usa o padrão
-            const provider = validatedInput.provider
-                ? index_js_1.globalProviderFactory.getProvider(validatedInput.provider)
-                : index_js_1.globalProviderFactory.getDefaultProvider();
+            // Aplicar auto-detecção apenas para owner dentro do provider especificado
+            const processedInput = await (0, user_detection_js_1.applyAutoUserDetection)(validatedInput, validatedInput.provider);
+            // Usar o provider especificado pelo usuário
+            const provider = index_js_1.globalProviderFactory.getProvider(processedInput.provider);
             if (!provider) {
-                throw new Error('Provider não encontrado ou não configurado');
+                throw new Error(`Provider '${processedInput.provider}' não encontrado`);
             }
-            switch (validatedInput.action) {
+            switch (processedInput.action) {
                 case 'create':
-                    return await this.createRelease(validatedInput, provider);
+                    return await this.createRelease(processedInput, provider);
                 case 'list':
-                    return await this.listReleases(validatedInput, provider);
+                    return await this.listReleases(processedInput, provider);
                 case 'get':
-                    return await this.getRelease(validatedInput, provider);
+                    return await this.getRelease(processedInput, provider);
                 case 'update':
-                    return await this.updateRelease(validatedInput, provider);
+                    return await this.updateRelease(processedInput, provider);
                 case 'delete':
-                    return await this.deleteRelease(validatedInput, provider);
+                    return await this.deleteRelease(processedInput, provider);
                 case 'publish':
-                    return await this.publishRelease(validatedInput, provider);
+                    return await this.publishRelease(processedInput, provider);
                 default:
-                    throw new Error(`Ação não suportada: ${validatedInput.action}`);
+                    throw new Error(`Ação não suportada: ${processedInput.action}`);
             }
         }
         catch (error) {

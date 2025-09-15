@@ -1,17 +1,19 @@
 {
-  "name": "@andrebuzeli/gitea-mcp-v2",
-  "version": "2.4.8",
-  "description": "MCP Server for Gitea self-hosted (multi-provider ready) - v2.4.8 com 12 tools incluindo git-sync e version-control, arquitetura multi-provider completa (GitHub + Gitea), documentação enriquecida e config genérica",
+  "name": "@andrebuzeli/git-mcp",
+  "version": "2.12.0",
+  "description": "MCP server for Gitea and GitHub integration with 18 comprehensive DevOps tools including mandatory provider specification and auto-user detection",
   "main": "dist/index.js",
   "bin": {
-    "gitea-mcp-v2": "dist/index.js"
+    "git-mcp": "dist/index.js"
   },
   "scripts": {
     "build": "tsc",
     "start": "node dist/index.js",
     "dev": "ts-node src/index.ts",
+    "test": "node tests/basic.test.js",
+    "lint": "echo \"No linting configured\" && exit 0",
     "prepublishOnly": "npm run build",
-                    "postpublish": "echo 'Gitea MCP v2.4.8 published successfully!'"
+    "postpublish": "echo 'Git MCP v2.11.0 published successfully with complete auto-user detection across all tools!'"
   },
   "keywords": [
     "mcp",
@@ -22,7 +24,9 @@
     "api",
     "sync",
     "version-control",
-    "backup"
+    "backup",
+    "code-review",
+    "ci-cd"
   ],
   "author": "Andre Buzeli",
   "license": "MIT",
@@ -33,12 +37,13 @@
   "dependencies": {
     "@modelcontextprotocol/sdk": "^0.4.0",
     "axios": "^1.6.0",
+    "dotenv": "^17.2.2",
     "zod": "^3.22.0"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
-    "typescript": "15.0.0",
-    "ts-node": "^10.9.0"
+    "ts-node": "^10.9.0",
+    "typescript": "^5.0.0"
   },
   "engines": {
     "node": ">=18.0.0"

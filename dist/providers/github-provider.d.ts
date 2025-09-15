@@ -8,7 +8,6 @@ export declare class GitHubProvider extends BaseVcsProvider {
     constructor(config: VcsProvider);
     protected getBaseUrl(config: VcsProvider): string;
     protected getHeaders(config: VcsProvider): Record<string, string>;
-    protected normalizeError(error: any): Error;
     protected normalizeRepository(data: any): RepositoryInfo;
     protected normalizeBranch(data: any): BranchInfo;
     protected normalizeFile(data: any): FileInfo;
@@ -56,6 +55,7 @@ export declare class GitHubProvider extends BaseVcsProvider {
     getTag(owner: string, repo: string, tag: string): Promise<TagInfo>;
     createTag(tagName: string, message: string, target: string): Promise<TagInfo>;
     deleteTag(owner: string, repo: string, tag: string): Promise<boolean>;
+    getCurrentUser(): Promise<UserInfo>;
     getUser(username: string): Promise<UserInfo>;
     listUsers(page?: number, limit?: number): Promise<UserInfo[]>;
     searchUsers(query: string, page?: number, limit?: number): Promise<UserInfo[]>;
@@ -64,5 +64,19 @@ export declare class GitHubProvider extends BaseVcsProvider {
     createWebhook(owner: string, repo: string, url: string, events: string[], secret?: string): Promise<WebhookInfo>;
     updateWebhook(owner: string, repo: string, webhookId: number, updates: any): Promise<WebhookInfo>;
     deleteWebhook(owner: string, repo: string, webhookId: number): Promise<boolean>;
+    createCommit(owner: string, repo: string, message: string, branch: string, changes?: any): Promise<CommitInfo>;
+    listWorkflows(params: any): Promise<any>;
+    listWorkflowRuns(params: any): Promise<any>;
+    listDeployments(params: any): Promise<any>;
+    runSecurityScan(params: any): Promise<any>;
+    getTrafficStats(params: any): Promise<any>;
+    cloneRepository(params: any): Promise<any>;
+    archiveRepository(params: any): Promise<any>;
+    transferRepository(params: any): Promise<any>;
+    createFromTemplate(params: any): Promise<any>;
+    mirrorRepository(params: any): Promise<any>;
+    analyzeContributors(params: any): Promise<any>;
+    getActivityStats(params: any): Promise<any>;
+    getRepositoryInsights(params: any): Promise<any>;
 }
 //# sourceMappingURL=github-provider.d.ts.map

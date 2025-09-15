@@ -1,0 +1,112 @@
+[2025-09-15T16:53:19Z] issues.create
+INPUT: {"action":"create","provider":"gitea","owner":"andrebuzeli","repo":"git-mcp-test","title":"Suite completa de testes (Gitea)","body":"Issue para rastrear a suite completa de testes no Gitea","labels":["automation","full-suite"]}
+OUTPUT: {"success":true,"action":"create","message":"Issue 'Suite completa de testes (Gitea)' criada com sucesso","data":{"number":3,"state":"open"}}
+---
+[2025-09-15T16:53:28Z] files.create (suite.txt)
+INPUT: {"action":"create","provider":"gitea","owner":"andrebuzeli","repo":"git-mcp-test","path":"suite.txt","content":"Arquivo de suite de testes - Gitea","message":"chore: add suite file for full test suite"}
+OUTPUT: {"success":true,"action":"create","message":"Arquivo 'suite.txt' criado com sucesso"}
+---
+[2025-09-15T16:56:05Z] branches.list (sha base)
+INPUT: {"action":"list","provider":"gitea","owner":"andrebuzeli","repo":"git-mcp-test","page":1,"limit":1}
+OUTPUT: {"success":true,"action":"list","message":"1 branches encontradas","data":{"branches":[{"name":"main","commit":{"sha":"8013faed7b0cfba1cc1407c1e45d32ea7137febd"}}]}}
+---
+[2025-09-15T16:56:09Z] repositories.create (temp-gitea-suite)
+INPUT: {"action":"create","provider":"gitea","name":"temp-gitea-suite","description":"Repo temporário para suite completa Gitea","private":false}
+OUTPUT: {"success":true,"action":"create","message":"Repositório 'temp-gitea-suite' criado com sucesso"}
+---
+[2025-09-15T16:56:10Z] repositories.list (resumo)
+INPUT: {"action":"list","provider":"gitea","page":1,"limit":5}
+OUTPUT: {"success":true,"action":"list","message":"5 repositórios encontrados","data":{"total":5}}
+---
+[2025-09-15T17:00:40Z] pulls.list (all)
+INPUT: {"action":"list","provider":"gitea","owner":"andrebuzeli","repo":"git-mcp-test","state":"all","page":1,"limit":50}
+OUTPUT: {"success":true,"action":"list","message":"0 Pull Requests all encontrados","data":{"total":0}}
+---
+[2025-09-15T17:00:41Z] tags.list
+INPUT: {"action":"list","provider":"gitea","owner":"andrebuzeli","repo":"git-mcp-test","page":1,"limit":50}
+OUTPUT: {"success":true,"action":"list","message":"0 tags encontradas","data":{"total":0}}
+---
+[2025-09-15T17:00:42Z] releases.list
+INPUT: {"action":"list","provider":"gitea","owner":"andrebuzeli","repo":"git-mcp-test","page":1,"limit":50}
+OUTPUT: {"success":true,"action":"list","message":"0 releases encontrados","data":{"total":0}}
+---
+[2025-09-15T17:00:43Z] webhooks.create
+INPUT: {"action":"create","provider":"gitea","owner":"andrebuzeli","repo":"git-mcp-test","url":"http://nas-ubuntu:3000/hook-suite","content_type":"json","secret":"suite","events":["push"],"active":true}
+OUTPUT: {"success":true,"action":"create","message":"Webhook criado com sucesso para 'andrebuzeli/git-mcp-test'","data":{"id":7,"active":false}}
+---
+[2025-09-15T17:01:26Z] webhooks.update
+INPUT: {"action":"update","provider":"gitea","owner":"andrebuzeli","repo":"git-mcp-test","webhook_id":7,"new_active":true}
+OUTPUT: {"success":true,"action":"update","message":"Webhook #7 atualizado com sucesso"}
+---
+[2025-09-15T17:01:30Z] webhooks.test
+INPUT: {"action":"test","provider":"gitea","owner":"andrebuzeli","repo":"git-mcp-test","webhook_id":7}
+OUTPUT: {"success":true,"action":"test","message":"Webhook #7 testado com sucesso"}
+---
+[2025-09-15T17:02:00Z] files.get (suite.txt)
+INPUT: {"action":"get","provider":"gitea","owner":"andrebuzeli","repo":"git-mcp-test","path":"suite.txt","ref":"main"}
+OUTPUT: {"success":true,"action":"get","message":"Arquivo 'suite.txt' obtido com sucesso"}
+---
+[2025-09-15T17:02:02Z] files.update (suite.txt)
+INPUT: {"action":"update","provider":"gitea","owner":"andrebuzeli","repo":"git-mcp-test","path":"suite.txt","content":"Arquivo de suite de testes - Gitea\\nAtualizado pela suite completa.","message":"chore: update suite.txt with extra line","sha":"f664d9dd6c4b5f255121ba4bd3ba5e511d938e5f"}
+OUTPUT: {"success":true,"action":"update","message":"Arquivo 'suite.txt' atualizado com sucesso"}
+---
+[2025-09-15T17:02:05Z] files.delete (suite.txt)
+INPUT: {"action":"delete","provider":"gitea","owner":"andrebuzeli","repo":"git-mcp-test","path":"suite.txt","sha":"dfaa5d54f085f8331dd7d51ae5e4fcd10bf9c140","message":"chore: remove suite file after tests"}
+OUTPUT: {"success":true,"action":"delete","message":"Arquivo 'suite.txt' deletado com sucesso"}
+---
+[2025-09-15T17:02:06Z] webhooks.delete
+INPUT: {"action":"delete","provider":"gitea","owner":"andrebuzeli","repo":"git-mcp-test","webhook_id":7}
+OUTPUT: {"success":true,"action":"delete","message":"Webhook #7 deletado com sucesso"}
+---
+[2025-09-15T17:02:12Z] repositories.delete (temp-gitea-suite)
+INPUT: {"action":"delete","provider":"gitea","owner":"andrebuzeli","repo":"temp-gitea-suite"}
+OUTPUT: {"success":true,"action":"delete","message":"Repositório 'andrebuzeli/temp-gitea-suite' deletado com sucesso"}
+---
+[2025-09-15T17:03:00Z] workflows.list [não suportado]
+INPUT: {"action":"list","owner":"andrebuzeli","repo":"git-mcp-test","provider":"gitea"}
+OUTPUT: {"success":false,"action":"create-workflow","message":"Funcionalidade não suportada por este provider"}
+---
+[2025-09-15T17:03:05Z] actions.list-runs [não suportado]
+INPUT: {"action":"list-runs","owner":"andrebuzeli","repo":"git-mcp-test","provider":"gitea","limit":10}
+OUTPUT: {"success":false,"action":"cancel","message":"Funcionalidade não suportada por este provider"}
+---
+[2025-09-15T17:03:08Z] deployments.environments [não suportado]
+INPUT: {"action":"environments","owner":"andrebuzeli","repo":"git-mcp-test","provider":"gitea"}
+OUTPUT: {"success":false,"action":"rollback-deployment","message":"Funcionalidade não suportada por este provider"}
+---
+[2025-09-15T17:03:12Z] security.alerts [não suportado]
+INPUT: {"action":"alerts","owner":"andrebuzeli","repo":"git-mcp-test","provider":"gitea","severity":"high","state":"open","page":1,"limit":10}
+OUTPUT: {"success":false,"action":"manage-security-policies","message":"Funcionalidade não suportada por este provider"}
+---
+[2025-09-15T17:03:16Z] analytics.traffic [não suportado]
+INPUT: {"action":"traffic","owner":"andrebuzeli","repo":"git-mcp-test","provider":"gitea","period":"week","metric_type":"views"}
+OUTPUT: {"success":false,"action":"analyze-contributors","message":"Funcionalidade não suportada por este provider"}
+---
+[2025-09-15T17:03:20Z] code-review.analyze [não disponível]
+INPUT: {"action":"analyze","provider":"gitea","owner":"andrebuzeli","repo":"git-mcp-test","language":"typescript","code":"function mul(a: number, b: number) { return a * b }"}
+OUTPUT: {"success":false,"action":"analyze","message":"Code review automatizado não está disponível para o Gitea"}
+---
+[2025-09-15T17:03:22Z] version-control.history
+INPUT: {"action":"history","project":"GIT MCP"}
+OUTPUT: {"success":true,"action":"history","message":"Histórico de versões recuperado."}
+---
+[2025-09-15T17:03:44Z] version-control.version
+INPUT: {"action":"version","project":"GIT MCP","version":"2.12.0","description":"Confirmação de versão após suite completa Gitea"}
+OUTPUT: {"success":true,"action":"version","message":"Versionamento semântico executado. Nova versão criada com sucesso."}
+---
+[2025-09-15T17:03:57Z] version-control.backup
+INPUT: {"action":"backup","project":"GIT MCP","auto_backup":true,"backup_retention":30,"include_files":["**/*"],"exclude_patterns":["node_modules/**","dist/**"],"dry_run":false}
+OUTPUT: {"success":true,"action":"backup","message":"Backup automático executado. Snapshot criado com sucesso."}
+---
+[2025-09-15T17:04:02Z] version-control.track
+INPUT: {"action":"track","project":"GIT MCP","description":"Suite completa Gitea finalizada e rastreada"}
+OUTPUT: {"success":true,"action":"track","message":"Rastreio de alterações ativado. Mudanças sendo monitoradas."}
+---
+[2025-09-15T17:04:05Z] git-sync.status (dry-run)
+INPUT: {"action":"status","source":{"provider":"gitea","owner":"andrebuzeli","repo":"git-mcp-test"},"target":{"provider":"gitea","owner":"andrebuzeli","repo":"git-mcp-test"},"direction":"one-way","include":["git","issues","labels","milestones","releases","pulls"],"dry_run":true}
+OUTPUT: {"success":true,"action":"status","message":"Status coletado (placeholder)."}
+---
+[2025-09-15T17:04:08Z] git-sync.one-shot (dry-run)
+INPUT: {"action":"one-shot","source":{"provider":"gitea","owner":"andrebuzeli","repo":"git-mcp-test"},"target":{"provider":"gitea","owner":"andrebuzeli","repo":"git-mcp-test"},"direction":"one-way","include":["git","issues","labels","milestones","releases","pulls"],"dry_run":true}
+OUTPUT: {"success":true,"action":"one-shot","message":"Sincronização pontual executada (placeholder)."}
+---

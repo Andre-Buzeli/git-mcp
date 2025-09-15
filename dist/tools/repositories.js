@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.repositoriesTool = void 0;
 const zod_1 = require("zod");
 const index_js_1 = require("../providers/index.js");
+const user_detection_js_1 = require("../utils/user-detection.js");
 /**
  * Tool: repositories
  *
@@ -46,8 +47,7 @@ const RepositoriesInputSchema = zod_1.z.object({
     // Parâmetros comuns
     owner: zod_1.z.string().optional(),
     repo: zod_1.z.string().optional(),
-    provider: zod_1.z.enum(['gitea', 'github', 'both']).optional(), // Provider específico: gitea, github ou both
-    // Para create
+    provider: zod_1.z.enum(['gitea', 'github']).describe('Provider to use (gitea or github)'),
     name: zod_1.z.string().optional(),
     description: zod_1.z.string().optional(),
     private: zod_1.z.boolean().optional(),
@@ -155,7 +155,7 @@ exports.repositoriesTool = {
             },
             owner: { type: 'string', description: 'Repository owner' },
             repo: { type: 'string', description: 'Repository name' },
-            provider: { type: 'string', description: 'Specific provider (github, gitea) or use default' },
+            provider: { type: 'string', enum: ['gitea', 'github'], description: 'Provider to use (gitea or github)' },
             name: { type: 'string', description: 'Repository name for creation' },
             description: { type: 'string', description: 'Repository description' },
             private: { type: 'boolean', description: 'Private repository' },
@@ -174,7 +174,7 @@ exports.repositoriesTool = {
             organization: { type: 'string', description: 'Organization for fork' },
             query: { type: 'string', description: 'Search query' }
         },
-        required: ['action']
+        required: ['action', 'provider']
     },
     /**
      * Handler principal da tool repositories
@@ -206,30 +206,30 @@ exports.repositoriesTool = {
     async handler(input) {
         try {
             const validatedInput = RepositoriesInputSchema.parse(input);
-            // Obter o provider correto
-            const provider = validatedInput.provider
-                ? index_js_1.globalProviderFactory.getProvider(validatedInput.provider)
-                : index_js_1.globalProviderFactory.getDefaultProvider();
+            // Aplicar auto-detecção apenas para owner/username dentro do provider especificado
+            const processedInput = await (0, user_detection_js_1.applyAutoUserDetection)(validatedInput, validatedInput.provider);
+            // Usar o provider especificado pelo usuário
+            const provider = index_js_1.globalProviderFactory.getProvider(processedInput.provider);
             if (!provider) {
-                throw new Error(`Provider '${validatedInput.provider}' não encontrado`);
+                throw new Error(`Provider '${processedInput.provider}' não encontrado`);
             }
-            switch (validatedInput.action) {
+            switch (processedInput.action) {
                 case 'create':
-                    return await this.createRepository(validatedInput, provider);
+                    return await this.createRepository(processedInput, provider);
                 case 'list':
-                    return await this.listRepositories(validatedInput, provider);
+                    return await this.listRepositories(processedInput, provider);
                 case 'get':
-                    return await this.getRepository(validatedInput, provider);
+                    return await this.getRepository(processedInput, provider);
                 case 'update':
-                    return await this.updateRepository(validatedInput, provider);
+                    return await this.updateRepository(processedInput, provider);
                 case 'delete':
-                    return await this.deleteRepository(validatedInput, provider);
+                    return await this.deleteRepository(processedInput, provider);
                 case 'fork':
-                    return await this.forkRepository(validatedInput, provider);
+                    return await this.forkRepository(processedInput, provider);
                 case 'search':
-                    return await this.searchRepositories(validatedInput, provider);
+                    return await this.searchRepositories(processedInput, provider);
                 default:
-                    throw new Error(`Ação não suportada: ${validatedInput.action}`);
+                    throw new Error(`Ação não suportada: ${processedInput.action}`);
             }
         }
         catch (error) {

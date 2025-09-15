@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { globalProviderFactory, VcsOperations } from '../providers/index.js';
+import { applyAutoUserDetection } from '../utils/user-detection.js';
 
 /**
  * Tool: tags
@@ -49,7 +50,7 @@ const TagsInputSchema = z.object({
   repo: z.string().optional(),
   
   // Para multi-provider
-  provider: z.enum(['gitea', 'github', 'both']).optional(), // Provider específico: gitea, github ou both
+  provider: z.enum(['gitea', 'github']).describe('Provider to use (gitea or github)'), // Provider específico: gitea, github ou both
   
   // Para create
   tag_name: z.string().optional(),
@@ -172,7 +173,7 @@ export const tagsTool = {
       query: { type: 'string', description: 'Search query' },
       pattern: { type: 'string', description: 'Search pattern (e.g., v*.*.*)' }
     },
-    required: ['action']
+    required: ['action', 'provider']
   },
 
   /**
@@ -207,28 +208,29 @@ export const tagsTool = {
     try {
       const validatedInput = TagsInputSchema.parse(input);
       
-      // Seleciona o provider baseado na entrada ou usa o padrão
-      const provider = validatedInput.provider
-        ? globalProviderFactory.getProvider(validatedInput.provider)
-        : globalProviderFactory.getDefaultProvider();
+      // Aplicar auto-detecção apenas para owner dentro do provider especificado
+      const processedInput = await applyAutoUserDetection(validatedInput, validatedInput.provider);
+      
+      // Usar o provider especificado pelo usuário
+      const provider = globalProviderFactory.getProvider(processedInput.provider);
       
       if (!provider) {
-        throw new Error('Provider não encontrado ou não configurado');
+        throw new Error(`Provider '${processedInput.provider}' não encontrado`);
       }
       
-      switch (validatedInput.action) {
+      switch (processedInput.action) {
         case 'create':
-          return await this.createTag(validatedInput, provider);
+          return await this.createTag(processedInput, provider);
         case 'list':
-          return await this.listTags(validatedInput, provider);
+          return await this.listTags(processedInput, provider);
         case 'get':
-          return await this.getTag(validatedInput, provider);
+          return await this.getTag(processedInput, provider);
         case 'delete':
-          return await this.deleteTag(validatedInput, provider);
+          return await this.deleteTag(processedInput, provider);
         case 'search':
-          return await this.searchTags(validatedInput, provider);
+          return await this.searchTags(processedInput, provider);
         default:
-          throw new Error(`Ação não suportada: ${validatedInput.action}`);
+          throw new Error(`Ação não suportada: ${processedInput.action}`);
       }
     } catch (error) {
       return {
@@ -499,3 +501,4 @@ export const tagsTool = {
     }
   }
 };
+

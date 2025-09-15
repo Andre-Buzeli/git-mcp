@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { globalProviderFactory, VcsOperations } from '../providers/index.js';
+import { applyAutoUserDetection } from '../utils/user-detection.js';
 
 /**
  * Tool: issues
@@ -50,7 +51,7 @@ const IssuesInputSchema = z.object({
   repo: z.string().optional(),
   
   // Para multi-provider
-  provider: z.enum(['gitea', 'github', 'both']).optional(), // Provider específico: gitea, github ou both
+  provider: z.enum(['gitea', 'github']).describe('Provider to use (gitea or github)'), // Provider específico: gitea, github ou both
   
   // Para create
   title: z.string().optional(),
@@ -216,7 +217,7 @@ export const issuesTool = {
       assignee: { type: 'string', description: 'Issue assignee filter' },
       label: { type: 'string', description: 'Issue label filter' }
     },
-    required: ['action']
+    required: ['action', 'provider']
   },
 
   /**
@@ -251,32 +252,35 @@ export const issuesTool = {
     try {
       const validatedInput = IssuesInputSchema.parse(input);
       
-      // Seleciona o provider baseado na entrada ou usa o padrão
-      const provider = validatedInput.provider
-        ? globalProviderFactory.getProvider(validatedInput.provider)
+      // Aplicar auto-detecção de usuário/owner
+      const processedInput = await applyAutoUserDetection(validatedInput, validatedInput.provider);
+      
+      // Obter o provider correto
+      const provider = processedInput.provider 
+        ? globalProviderFactory.getProvider(processedInput.provider)
         : globalProviderFactory.getDefaultProvider();
       
       if (!provider) {
-        throw new Error('Provider não encontrado ou não configurado');
+        throw new Error(`Provider '${processedInput.provider}' não encontrado`);
       }
       
-      switch (validatedInput.action) {
+      switch (processedInput.action) {
         case 'create':
-          return await this.createIssue(validatedInput, provider);
+          return await this.createIssue(processedInput, provider);
         case 'list':
-          return await this.listIssues(validatedInput, provider);
+          return await this.listIssues(processedInput, provider);
         case 'get':
-          return await this.getIssue(validatedInput, provider);
+          return await this.getIssue(processedInput, provider);
         case 'update':
-          return await this.updateIssue(validatedInput, provider);
+          return await this.updateIssue(processedInput, provider);
         case 'close':
-          return await this.closeIssue(validatedInput, provider);
+          return await this.closeIssue(processedInput, provider);
         case 'comment':
-          return await this.addComment(validatedInput, provider);
+          return await this.addComment(processedInput, provider);
         case 'search':
-          return await this.searchIssues(validatedInput, provider);
+          return await this.searchIssues(processedInput, provider);
         default:
-          throw new Error(`Ação não suportada: ${validatedInput.action}`);
+          throw new Error(`Ação não suportada: ${processedInput.action}`);
       }
     } catch (error) {
       return {
@@ -321,8 +325,14 @@ export const issuesTool = {
    */
   async createIssue(params: IssuesInput, provider: VcsOperations): Promise<IssuesResult> {
     try {
-      if (!params.owner || !params.repo || !params.title) {
-        throw new Error('Owner, repo e title são obrigatórios');
+      if (!params.owner) {
+        throw new Error('Owner é obrigatório');
+      }
+      if (!params.repo) {
+        throw new Error('Repo é obrigatório');
+      }
+      if (!params.title) {
+        throw new Error('Title é obrigatório');
       }
 
       const issue = await provider.createIssue(
@@ -376,8 +386,11 @@ export const issuesTool = {
    */
   async listIssues(params: IssuesInput, provider: VcsOperations): Promise<IssuesResult> {
     try {
-      if (!params.owner || !params.repo) {
-        throw new Error('Owner e repo são obrigatórios');
+      if (!params.owner) {
+        throw new Error('Owner é obrigatório');
+      }
+      if (!params.repo) {
+        throw new Error('Repo é obrigatório');
       }
 
       const state = params.state || 'open';
@@ -429,8 +442,15 @@ export const issuesTool = {
    */
   async getIssue(params: IssuesInput, provider: VcsOperations): Promise<IssuesResult> {
     try {
-      if (!params.owner || !params.repo || !params.issue_number) {
-        throw new Error('Owner, repo e issue_number são obrigatórios');
+      // Aplicar auto-detecção se necessário
+      if (!params.owner) {
+        throw new Error('Owner é obrigatório');
+      }
+      if (!params.repo) {
+        throw new Error('Repo é obrigatório');
+      }
+      if (!params.issue_number) {
+        throw new Error('Issue_number é obrigatório');
       }
 
       const issue = await provider.getIssue(params.owner, params.repo, params.issue_number);
@@ -480,8 +500,14 @@ export const issuesTool = {
    */
   async updateIssue(params: IssuesInput, provider: VcsOperations): Promise<IssuesResult> {
     try {
-      if (!params.owner || !params.repo || !params.issue_number) {
-        throw new Error('Owner, repo e issue_number são obrigatórios');
+      if (!params.owner) {
+        throw new Error('Owner é obrigatório');
+      }
+      if (!params.repo) {
+        throw new Error('Repo é obrigatório');
+      }
+      if (!params.issue_number) {
+        throw new Error('Issue_number é obrigatório');
       }
 
       const updateData: any = {};
@@ -535,8 +561,14 @@ export const issuesTool = {
    */
   async closeIssue(params: IssuesInput, provider: VcsOperations): Promise<IssuesResult> {
     try {
-      if (!params.owner || !params.repo || !params.issue_number) {
-        throw new Error('Owner, repo e issue_number são obrigatórios');
+      if (!params.owner) {
+        throw new Error('Owner é obrigatório');
+      }
+      if (!params.repo) {
+        throw new Error('Repo é obrigatório');
+      }
+      if (!params.issue_number) {
+        throw new Error('Issue_number é obrigatório');
       }
 
       const issue = await provider.updateIssue(params.owner, params.repo, params.issue_number, { state: 'closed' });
@@ -579,8 +611,17 @@ export const issuesTool = {
    */
   async addComment(params: IssuesInput, provider: VcsOperations): Promise<IssuesResult> {
     try {
-      if (!params.owner || !params.repo || !params.issue_number || !params.comment_body) {
-        throw new Error('Owner, repo, issue_number e comment_body são obrigatórios');
+      if (!params.owner) {
+        throw new Error('Owner é obrigatório');
+      }
+      if (!params.repo) {
+        throw new Error('Repo é obrigatório');
+      }
+      if (!params.issue_number) {
+        throw new Error('Issue_number é obrigatório');
+      }
+      if (!params.comment_body) {
+        throw new Error('Comment_body é obrigatório');
       }
 
       // Implementar criação de comentário
@@ -635,8 +676,14 @@ export const issuesTool = {
    */
   async searchIssues(params: IssuesInput, provider: VcsOperations): Promise<IssuesResult> {
     try {
-      if (!params.owner || !params.repo || !params.query) {
-        throw new Error('Owner, repo e query são obrigatórios');
+      if (!params.owner) {
+        throw new Error('Owner é obrigatório');
+      }
+      if (!params.repo) {
+        throw new Error('Repo é obrigatório');
+      }
+      if (!params.query) {
+        throw new Error('Query é obrigatório');
       }
 
       if (params.query.length < 3) {
@@ -662,3 +709,4 @@ export const issuesTool = {
     }
   }
 };
+

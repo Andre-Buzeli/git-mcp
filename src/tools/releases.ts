@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { globalProviderFactory, VcsOperations } from '../providers/index.js';
+import { applyAutoUserDetection } from '../utils/user-detection.js';
 
 /**
  * Tool: releases
@@ -50,7 +51,7 @@ const ReleasesInputSchema = z.object({
   repo: z.string().optional(),
   
   // Para multi-provider
-  provider: z.enum(['gitea', 'github', 'both']).optional(), // Provider específico: gitea, github ou both
+  provider: z.enum(['gitea', 'github']).describe('Provider to use (gitea or github)'), // Provider específico: gitea, github ou both
   
   // Para create
   tag_name: z.string().optional(),
@@ -196,7 +197,7 @@ export const releasesTool = {
       new_target_commitish: { type: 'string', description: 'New target branch or commit' },
       latest: { type: 'boolean', description: 'Get latest release' }
     },
-    required: ['action']
+    required: ['action', 'provider']
   },
 
   /**
@@ -231,30 +232,31 @@ export const releasesTool = {
     try {
       const validatedInput = ReleasesInputSchema.parse(input);
       
-      // Seleciona o provider baseado na entrada ou usa o padrão
-      const provider = validatedInput.provider
-        ? globalProviderFactory.getProvider(validatedInput.provider)
-        : globalProviderFactory.getDefaultProvider();
+      // Aplicar auto-detecção apenas para owner dentro do provider especificado
+      const processedInput = await applyAutoUserDetection(validatedInput, validatedInput.provider);
+      
+      // Usar o provider especificado pelo usuário
+      const provider = globalProviderFactory.getProvider(processedInput.provider);
       
       if (!provider) {
-        throw new Error('Provider não encontrado ou não configurado');
+        throw new Error(`Provider '${processedInput.provider}' não encontrado`);
       }
       
-      switch (validatedInput.action) {
+      switch (processedInput.action) {
         case 'create':
-          return await this.createRelease(validatedInput, provider);
+          return await this.createRelease(processedInput, provider);
         case 'list':
-          return await this.listReleases(validatedInput, provider);
+          return await this.listReleases(processedInput, provider);
         case 'get':
-          return await this.getRelease(validatedInput, provider);
+          return await this.getRelease(processedInput, provider);
         case 'update':
-          return await this.updateRelease(validatedInput, provider);
+          return await this.updateRelease(processedInput, provider);
         case 'delete':
-          return await this.deleteRelease(validatedInput, provider);
+          return await this.deleteRelease(processedInput, provider);
         case 'publish':
-          return await this.publishRelease(validatedInput, provider);
+          return await this.publishRelease(processedInput, provider);
         default:
-          throw new Error(`Ação não suportada: ${validatedInput.action}`);
+          throw new Error(`Ação não suportada: ${processedInput.action}`);
       }
     } catch (error) {
       return {
@@ -579,3 +581,4 @@ export const releasesTool = {
     }
   }
 };
+

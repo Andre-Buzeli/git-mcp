@@ -22,9 +22,9 @@ export declare abstract class BaseVcsProvider implements VcsOperations {
      */
     protected abstract getHeaders(config: VcsProvider): Record<string, string>;
     /**
-     * Normaliza erros para formato unificado
+     * Normaliza erros para formato unificado usando ErrorHandler padrão
      */
-    protected abstract normalizeError(error: any): Error;
+    protected normalizeError(error: any): Error;
     /**
      * Normaliza dados de repositório para formato unificado
      */
@@ -126,6 +126,7 @@ export declare abstract class BaseVcsProvider implements VcsOperations {
     getTag(owner: string, repo: string, tag: string): Promise<any>;
     createTag(tagName: string, message: string, target: string): Promise<any>;
     deleteTag(owner: string, repo: string, tag: string): Promise<boolean>;
+    getCurrentUser(): Promise<any>;
     getUser(username: string): Promise<any>;
     listUsers(page?: number, limit?: number): Promise<any[]>;
     searchUsers(query: string, page?: number, limit?: number): Promise<any[]>;
@@ -134,5 +135,6 @@ export declare abstract class BaseVcsProvider implements VcsOperations {
     createWebhook(owner: string, repo: string, url: string, events: string[], secret?: string): Promise<any>;
     updateWebhook(owner: string, repo: string, webhookId: number, updates: any): Promise<any>;
     deleteWebhook(owner: string, repo: string, webhookId: number): Promise<boolean>;
+    createCommit(owner: string, repo: string, message: string, branch: string, changes?: any): Promise<any>;
 }
 //# sourceMappingURL=base-provider.d.ts.map

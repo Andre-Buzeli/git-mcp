@@ -18,7 +18,7 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
     for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.initializeFactoryFromEnv = exports.createProviderFromEnv = exports.globalProviderFactory = exports.ProviderFactory = exports.GitHubProvider = exports.GiteaProvider = exports.BaseVcsProvider = void 0;
+exports.ErrorHandler = exports.initializeFactoryFromEnv = exports.createProviderFromEnv = exports.globalProviderFactory = exports.ProviderFactory = exports.GitHubProvider = exports.GiteaProvider = exports.BaseVcsProvider = void 0;
 // Interfaces e tipos
 __exportStar(require("./types.js"), exports);
 // Classe base
@@ -35,4 +35,7 @@ Object.defineProperty(exports, "ProviderFactory", { enumerable: true, get: funct
 Object.defineProperty(exports, "globalProviderFactory", { enumerable: true, get: function () { return provider_factory_js_1.globalProviderFactory; } });
 Object.defineProperty(exports, "createProviderFromEnv", { enumerable: true, get: function () { return provider_factory_js_1.createProviderFromEnv; } });
 Object.defineProperty(exports, "initializeFactoryFromEnv", { enumerable: true, get: function () { return provider_factory_js_1.initializeFactoryFromEnv; } });
+// Error handling
+var error_handler_js_1 = require("./error-handler.js");
+Object.defineProperty(exports, "ErrorHandler", { enumerable: true, get: function () { return error_handler_js_1.ErrorHandler; } });
 //# sourceMappingURL=index.js.map

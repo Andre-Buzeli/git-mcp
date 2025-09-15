@@ -8,7 +8,6 @@ export declare class GiteaProvider extends BaseVcsProvider {
     constructor(config: VcsProvider);
     protected getBaseUrl(config: VcsProvider): string;
     protected getHeaders(config: VcsProvider): Record<string, string>;
-    protected normalizeError(error: any): Error;
     protected normalizeRepository(data: any): RepositoryInfo;
     protected normalizeBranch(data: any): BranchInfo;
     protected normalizeFile(data: any): FileInfo;
@@ -37,6 +36,7 @@ export declare class GiteaProvider extends BaseVcsProvider {
     listFiles(owner: string, repo: string, path: string, ref?: string): Promise<FileInfo[]>;
     listCommits(owner: string, repo: string, branch?: string, page?: number, limit?: number): Promise<CommitInfo[]>;
     getCommit(owner: string, repo: string, sha: string): Promise<CommitInfo>;
+    createCommit(owner: string, repo: string, message: string, branch: string, changes?: any): Promise<CommitInfo>;
     listIssues(owner: string, repo: string, state?: 'open' | 'closed' | 'all', page?: number, limit?: number): Promise<IssueInfo[]>;
     getIssue(owner: string, repo: string, issueNumber: number): Promise<IssueInfo>;
     createIssue(owner: string, repo: string, title: string, body?: string, assignees?: string[], labels?: string[]): Promise<IssueInfo>;
@@ -56,6 +56,7 @@ export declare class GiteaProvider extends BaseVcsProvider {
     getTag(owner: string, repo: string, tag: string): Promise<TagInfo>;
     createTag(tagName: string, message: string, target: string): Promise<TagInfo>;
     deleteTag(owner: string, repo: string, tag: string): Promise<boolean>;
+    getCurrentUser(): Promise<UserInfo>;
     getUser(username: string): Promise<UserInfo>;
     listUsers(page?: number, limit?: number): Promise<UserInfo[]>;
     searchUsers(query: string, page?: number, limit?: number): Promise<UserInfo[]>;
@@ -64,5 +65,23 @@ export declare class GiteaProvider extends BaseVcsProvider {
     createWebhook(owner: string, repo: string, url: string, events: string[], secret?: string): Promise<WebhookInfo>;
     updateWebhook(owner: string, repo: string, webhookId: number, updates: any): Promise<WebhookInfo>;
     deleteWebhook(owner: string, repo: string, webhookId: number): Promise<boolean>;
+    listWorkflows(params: any): Promise<any>;
+    listWorkflowRuns(params: any): Promise<any>;
+    listDeployments(params: any): Promise<any>;
+    runSecurityScan(params: any): Promise<any>;
+    getTrafficStats(params: any): Promise<any>;
+    cloneRepository(params: any): Promise<any>;
+    archiveRepository(params: any): Promise<any>;
+    transferRepository(params: any): Promise<any>;
+    createFromTemplate(params: any): Promise<any>;
+    getWorkflow(owner: string, repo: string, workflowId: string): Promise<any>;
+    enableWorkflow(params: any): Promise<any>;
+    disableWorkflow(params: any): Promise<any>;
+    triggerWorkflow(params: any): Promise<any>;
+    listArtifacts(params: any): Promise<any>;
+    downloadJobLogs(params: any): Promise<any>;
+    listSecrets(params: any): Promise<any>;
+    listVariables(params: any): Promise<any>;
+    mirrorRepository(params: any): Promise<any>;
 }
 //# sourceMappingURL=gitea-provider.d.ts.map

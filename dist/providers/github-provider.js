@@ -21,32 +21,7 @@ class GitHubProvider extends base_provider_js_1.BaseVcsProvider {
             'User-Agent': 'Gitea-MCP-MultiProvider/2.3.0'
         };
     }
-    normalizeError(error) {
-        if (error.response) {
-            const status = error.response.status;
-            const data = error.response.data;
-            switch (status) {
-                case 401:
-                    return new Error(`GitHub: Unauthorized - Check your token`);
-                case 403:
-                    return new Error(`GitHub: Forbidden - Insufficient permissions or rate limited`);
-                case 404:
-                    return new Error(`GitHub: Not found - Resource doesn't exist`);
-                case 422:
-                    return new Error(`GitHub: Validation error - ${data.message || 'Invalid data'}`);
-                case 429:
-                    return new Error(`GitHub: Rate limited - Too many requests. Reset at: ${error.response.headers['x-ratelimit-reset']}`);
-                case 500:
-                    return new Error(`GitHub: Internal server error`);
-                default:
-                    return new Error(`GitHub: HTTP ${status} - ${data.message || 'Unknown error'}`);
-            }
-        }
-        if (error.request) {
-            return new Error(`GitHub: Network error - No response received`);
-        }
-        return new Error(`GitHub: ${error.message || 'Unknown error'}`);
-    }
+    // Usando normalizeError padrão do BaseVcsProvider
     normalizeRepository(data) {
         return {
             id: data.id,
@@ -463,6 +438,10 @@ class GitHubProvider extends base_provider_js_1.BaseVcsProvider {
         await this.delete(`/repos/${owner}/${repo}/git/refs/tags/${tag}`);
         return true;
     }
+    async getCurrentUser() {
+        const data = await this.get('/user');
+        return this.normalizeUser(data);
+    }
     async getUser(username) {
         const data = await this.get(`/users/${username}`);
         return this.normalizeUser(data);
@@ -509,6 +488,188 @@ class GitHubProvider extends base_provider_js_1.BaseVcsProvider {
     async deleteWebhook(owner, repo, webhookId) {
         await this.delete(`/repos/${owner}/${repo}/hooks/${webhookId}`);
         return true;
+    }
+    async createCommit(owner, repo, message, branch, changes) {
+        // Para criar um commit no GitHub, precisamos:
+        // 1. Obter o último commit da branch
+        // 2. Criar uma nova árvore com as mudanças
+        // 3. Criar o commit
+        // 4. Atualizar a referência da branch
+        try {
+            // Obter informações da branch
+            const branchData = await this.getBranch(owner, repo, branch);
+            // Para simplificar, vamos usar o endpoint de criação de commit direto
+            const commitData = {
+                message,
+                tree: changes?.tree_sha || branchData.commit.sha,
+                parents: [branchData.commit.sha]
+            };
+            const data = await this.post(`/repos/${owner}/${repo}/git/commits`, commitData);
+            // Atualizar a referência da branch
+            await this.post(`/repos/${owner}/${repo}/git/refs/heads/${branch}`, {
+                sha: data.sha,
+                force: false
+            });
+            return this.normalizeCommit(data);
+        }
+        catch (error) {
+            console.error('Erro ao criar commit:', error);
+            throw new Error(`Falha ao criar commit: ${error instanceof Error ? error.message : String(error)}`);
+        }
+    }
+    // Implementações básicas para funcionalidades suportadas pelo GitHub
+    async listWorkflows(params) {
+        const { owner, repo } = params;
+        const data = await this.get(`/repos/${owner}/${repo}/actions/workflows`);
+        return data;
+    }
+    async listWorkflowRuns(params) {
+        const { owner, repo } = params;
+        const data = await this.get(`/repos/${owner}/${repo}/actions/runs`);
+        return data;
+    }
+    async listDeployments(params) {
+        const { owner, repo } = params;
+        const data = await this.get(`/repos/${owner}/${repo}/deployments`);
+        return data;
+    }
+    async runSecurityScan(params) {
+        const { owner, repo } = params;
+        // GitHub Security tab - basic implementation
+        const data = await this.get(`/repos/${owner}/${repo}`);
+        return {
+            security: {
+                enabled: data.security_and_analysis?.advanced_security?.status === 'enabled',
+                secret_scanning: data.security_and_analysis?.secret_scanning?.status === 'enabled',
+                dependabot: data.security_and_analysis?.dependabot_security_updates?.status === 'enabled'
+            }
+        };
+    }
+    async getTrafficStats(params) {
+        const { owner, repo, metricType } = params;
+        try {
+            let endpoint = '';
+            switch (metricType) {
+                case 'views':
+                    endpoint = `/repos/${owner}/${repo}/traffic/views`;
+                    break;
+                case 'clones':
+                    endpoint = `/repos/${owner}/${repo}/traffic/clones`;
+                    break;
+                case 'popular':
+                    endpoint = `/repos/${owner}/${repo}/traffic/popular/paths`;
+                    break;
+                case 'referrers':
+                    endpoint = `/repos/${owner}/${repo}/traffic/popular/referrers`;
+                    break;
+                default:
+                    endpoint = `/repos/${owner}/${repo}/traffic/views`;
+            }
+            return await this.get(endpoint);
+        }
+        catch (error) {
+            // GitHub traffic stats requer permissão especial e pode não estar disponível
+            return {
+                error: 'Traffic stats not available',
+                message: 'Repository traffic statistics require special permissions or may not be available for this repository',
+                metricType,
+                available: false
+            };
+        }
+    }
+    async cloneRepository(params) {
+        throw new Error('Funcionalidade não suportada por este provider: Provider não implementa cloneRepository');
+    }
+    async archiveRepository(params) {
+        throw new Error('Funcionalidade não suportada por este provider: Provider não implementa archiveRepository');
+    }
+    async transferRepository(params) {
+        const { owner, repo, newOwner } = params;
+        const data = await this.post(`/repos/${owner}/${repo}/transfer`, { new_owner: newOwner });
+        return data.owner.login === newOwner;
+    }
+    async createFromTemplate(params) {
+        const { templateOwner, templateRepo, name, ...options } = params;
+        const data = await this.post(`/repos/${templateOwner}/${templateRepo}/generate`, {
+            name,
+            ...options
+        });
+        return this.normalizeRepository(data);
+    }
+    async mirrorRepository(params) {
+        throw new Error('Funcionalidade não suportada por este provider: Provider não implementa mirrorRepository');
+    }
+    // Implementações para analytics e outras funcionalidades
+    async analyzeContributors(params) {
+        const { owner, repo } = params;
+        try {
+            const contributors = await this.get(`/repos/${owner}/${repo}/contributors`);
+            return {
+                totalContributors: contributors.length,
+                contributors: contributors.map(c => ({
+                    login: c.login,
+                    contributions: c.contributions,
+                    type: c.type
+                })),
+                period: 'all_time'
+            };
+        }
+        catch (error) {
+            return {
+                error: 'Contributors analysis failed',
+                message: 'Could not retrieve contributor information',
+                available: false
+            };
+        }
+    }
+    async getActivityStats(params) {
+        const { owner, repo } = params;
+        try {
+            const commits = await this.get(`/repos/${owner}/${repo}/commits?per_page=100`);
+            const issues = await this.get(`/repos/${owner}/${repo}/issues?state=all&per_page=100`);
+            return {
+                recentCommits: commits.length,
+                totalIssues: issues.length,
+                openIssues: issues.filter(i => i.state === 'open').length,
+                closedIssues: issues.filter(i => i.state === 'closed').length,
+                activity: commits.length > 10 ? 'high' : commits.length > 5 ? 'medium' : 'low'
+            };
+        }
+        catch (error) {
+            return {
+                error: 'Activity stats failed',
+                message: 'Could not retrieve activity information',
+                available: false
+            };
+        }
+    }
+    async getRepositoryInsights(params) {
+        const { owner, repo } = params;
+        try {
+            const repoData = await this.get(`/repos/${owner}/${repo}`);
+            return {
+                insights: {
+                    stars: repoData.stargazers_count,
+                    forks: repoData.forks_count,
+                    watchers: repoData.watchers_count,
+                    language: repoData.language,
+                    size: repoData.size,
+                    created: repoData.created_at,
+                    updated: repoData.updated_at,
+                    isArchived: repoData.archived,
+                    isDisabled: repoData.disabled,
+                    license: repoData.license?.name,
+                    topics: repoData.topics || []
+                }
+            };
+        }
+        catch (error) {
+            return {
+                error: 'Repository insights failed',
+                message: 'Could not retrieve repository insights',
+                available: false
+            };
+        }
     }
 }
 exports.GitHubProvider = GitHubProvider;

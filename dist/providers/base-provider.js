@@ -5,6 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.BaseVcsProvider = void 0;
 const axios_1 = __importDefault(require("axios"));
+const error_handler_js_1 = require("./error-handler.js");
 /**
  * Classe base abstrata para todos os providers VCS
  * Implementa funcionalidades comuns e define interface unificada
@@ -47,6 +48,16 @@ class BaseVcsProvider {
             console.error(`[${this.config.name}] Response error:`, error.response?.status, error.response?.data);
             return Promise.reject(this.normalizeError(error));
         });
+    }
+    /**
+     * Normaliza erros para formato unificado usando ErrorHandler padrão
+     */
+    normalizeError(error) {
+        const standardError = error_handler_js_1.ErrorHandler.normalizeError(error, this.config.name);
+        if (process.env.DEBUG === 'true') {
+            console.error('Error details:', error_handler_js_1.ErrorHandler.formatForLogging(standardError));
+        }
+        return error_handler_js_1.ErrorHandler.createError(standardError);
     }
     /**
      * Executa uma requisição HTTP com tratamento de erro
@@ -203,6 +214,9 @@ class BaseVcsProvider {
     async deleteTag(owner, repo, tag) {
         throw new Error('deleteTag not implemented');
     }
+    async getCurrentUser() {
+        throw new Error('getCurrentUser not implemented');
+    }
     async getUser(username) {
         throw new Error('getUser not implemented');
     }
@@ -226,6 +240,9 @@ class BaseVcsProvider {
     }
     async deleteWebhook(owner, repo, webhookId) {
         throw new Error('deleteWebhook not implemented');
+    }
+    async createCommit(owner, repo, message, branch, changes) {
+        throw new Error('createCommit not implemented');
     }
 }
 exports.BaseVcsProvider = BaseVcsProvider;

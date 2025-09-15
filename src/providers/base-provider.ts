@@ -1,5 +1,6 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
 import { VcsOperations, VcsProvider } from './types.js';
+import { ErrorHandler, StandardError } from './error-handler.js';
 
 /**
  * Classe base abstrata para todos os providers VCS
@@ -67,9 +68,17 @@ export abstract class BaseVcsProvider implements VcsOperations {
   protected abstract getHeaders(config: VcsProvider): Record<string, string>;
 
   /**
-   * Normaliza erros para formato unificado
+   * Normaliza erros para formato unificado usando ErrorHandler padrão
    */
-  protected abstract normalizeError(error: any): Error;
+  protected normalizeError(error: any): Error {
+    const standardError = ErrorHandler.normalizeError(error, this.config.name);
+    
+    if (process.env.DEBUG === 'true') {
+      console.error('Error details:', ErrorHandler.formatForLogging(standardError));
+    }
+    
+    return ErrorHandler.createError(standardError);
+  }
 
   /**
    * Normaliza dados de repositório para formato unificado
@@ -319,6 +328,10 @@ export abstract class BaseVcsProvider implements VcsOperations {
     throw new Error('deleteTag not implemented');
   }
 
+  async getCurrentUser(): Promise<any> {
+    throw new Error('getCurrentUser not implemented');
+  }
+
   async getUser(username: string): Promise<any> {
     throw new Error('getUser not implemented');
   }
@@ -349,5 +362,9 @@ export abstract class BaseVcsProvider implements VcsOperations {
 
   async deleteWebhook(owner: string, repo: string, webhookId: number): Promise<boolean> {
     throw new Error('deleteWebhook not implemented');
+  }
+
+  async createCommit(owner: string, repo: string, message: string, branch: string, changes?: any): Promise<any> {
+    throw new Error('createCommit not implemented');
   }
 }

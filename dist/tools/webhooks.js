@@ -3,11 +3,24 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.webhooksTool = void 0;
 const zod_1 = require("zod");
 const index_js_1 = require("../providers/index.js");
+const user_detection_js_1 = require("../utils/user-detection.js");
 /**
  * Tool: webhooks
  *
  * DESCRIÇÃO:
- * Gerenciamento completo de webhooks com suporte multi-provider (GitHub e Gitea)
+  async handler(input: WebhooksInput): Promise<WebhooksResult> {
+    try {
+      const validatedInput = WebhooksInputSchema.parse(input);
+      
+      // Aplicar auto-detecção apenas para owner dentro do provider especificado
+      const processedInput = await applyAutoUserDetection(validatedInput, validatedInput.provider);
+      
+      // Usar o provider especificado pelo usuário
+      const provider = globalProviderFactory.getProvider(processedInput.provider);
+      
+      if (!provider) {
+        throw new Error(`Provider '${processedInput.provider}' não encontrado`);
+      }o completo de webhooks com suporte multi-provider (GitHub e Gitea)
  *
  * FUNCIONALIDADES:
  * - Criação de novos webhooks
@@ -49,7 +62,7 @@ const WebhooksInputSchema = zod_1.z.object({
     owner: zod_1.z.string().optional(),
     repo: zod_1.z.string().optional(),
     // Para multi-provider
-    provider: zod_1.z.enum(['gitea', 'github', 'both']).optional(), // Provider específico: gitea, github ou both
+    provider: zod_1.z.enum(['gitea', 'github']).describe('Provider to use (gitea or github)'), // Provider específico: gitea, github ou both
     // Para create
     url: zod_1.z.string().optional(),
     content_type: zod_1.z.enum(['json', 'form']).optional(),
@@ -176,7 +189,7 @@ exports.webhooksTool = {
             new_events: { type: 'array', items: { type: 'string' }, description: 'New webhook events' },
             new_active: { type: 'boolean', description: 'New webhook active status' }
         },
-        required: ['action']
+        required: ['action', 'provider']
     },
     /**
      * Handler principal da tool webhooks
@@ -209,28 +222,30 @@ exports.webhooksTool = {
     async handler(input) {
         try {
             const validatedInput = WebhooksInputSchema.parse(input);
+            // Apply automatic user/owner detection from configured tokens
+            const processedInput = await (0, user_detection_js_1.applyAutoUserDetection)(validatedInput, validatedInput.provider || 'default');
             // Seleciona o provider baseado na entrada ou usa o padrão
-            const provider = validatedInput.provider
-                ? index_js_1.globalProviderFactory.getProvider(validatedInput.provider)
+            const provider = processedInput.provider
+                ? index_js_1.globalProviderFactory.getProvider(processedInput.provider)
                 : index_js_1.globalProviderFactory.getDefaultProvider();
             if (!provider) {
                 throw new Error('Provider não encontrado ou não configurado');
             }
-            switch (validatedInput.action) {
+            switch (processedInput.action) {
                 case 'create':
-                    return await this.createWebhook(validatedInput, provider);
+                    return await this.createWebhook(processedInput, provider);
                 case 'list':
-                    return await this.listWebhooks(validatedInput, provider);
+                    return await this.listWebhooks(processedInput, provider);
                 case 'get':
-                    return await this.getWebhook(validatedInput, provider);
+                    return await this.getWebhook(processedInput, provider);
                 case 'update':
-                    return await this.updateWebhook(validatedInput, provider);
+                    return await this.updateWebhook(processedInput, provider);
                 case 'delete':
-                    return await this.deleteWebhook(validatedInput, provider);
+                    return await this.deleteWebhook(processedInput, provider);
                 case 'test':
-                    return await this.testWebhook(validatedInput, provider);
+                    return await this.testWebhook(processedInput, provider);
                 default:
-                    throw new Error(`Ação não suportada: ${validatedInput.action}`);
+                    throw new Error(`Ação não suportada: ${processedInput.action}`);
             }
         }
         catch (error) {

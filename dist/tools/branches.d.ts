@@ -43,7 +43,7 @@ declare const BranchesInputSchema: z.ZodObject<{
     action: z.ZodEnum<["create", "list", "get", "delete", "merge", "compare"]>;
     owner: z.ZodOptional<z.ZodString>;
     repo: z.ZodOptional<z.ZodString>;
-    provider: z.ZodOptional<z.ZodEnum<["gitea", "github", "both"]>>;
+    provider: z.ZodEnum<["gitea", "github"]>;
     branch_name: z.ZodOptional<z.ZodString>;
     from_branch: z.ZodOptional<z.ZodString>;
     branch: z.ZodOptional<z.ZodString>;
@@ -55,14 +55,14 @@ declare const BranchesInputSchema: z.ZodObject<{
     base_branch: z.ZodOptional<z.ZodString>;
     head_branch: z.ZodOptional<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
+    provider: "gitea" | "github";
     action: "merge" | "delete" | "get" | "create" | "list" | "compare";
-    provider?: "gitea" | "github" | "both" | undefined;
     owner?: string | undefined;
     head?: string | undefined;
     base?: string | undefined;
+    repo?: string | undefined;
     page?: number | undefined;
     limit?: number | undefined;
-    repo?: string | undefined;
     branch_name?: string | undefined;
     from_branch?: string | undefined;
     branch?: string | undefined;
@@ -70,14 +70,14 @@ declare const BranchesInputSchema: z.ZodObject<{
     base_branch?: string | undefined;
     head_branch?: string | undefined;
 }, {
+    provider: "gitea" | "github";
     action: "merge" | "delete" | "get" | "create" | "list" | "compare";
-    provider?: "gitea" | "github" | "both" | undefined;
     owner?: string | undefined;
     head?: string | undefined;
     base?: string | undefined;
+    repo?: string | undefined;
     page?: number | undefined;
     limit?: number | undefined;
-    repo?: string | undefined;
     branch_name?: string | undefined;
     from_branch?: string | undefined;
     branch?: string | undefined;
@@ -106,14 +106,14 @@ declare const BranchesResultSchema: z.ZodObject<{
     message: string;
     action: string;
     success: boolean;
-    data?: any;
     error?: string | undefined;
+    data?: any;
 }, {
     message: string;
     action: string;
     success: boolean;
-    data?: any;
     error?: string | undefined;
+    data?: any;
 }>;
 export type BranchesResult = z.infer<typeof BranchesResultSchema>;
 /**

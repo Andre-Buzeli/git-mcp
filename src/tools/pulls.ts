@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { globalProviderFactory, VcsOperations } from '../providers/index.js';
+import { applyAutoUserDetection } from '../utils/user-detection.js';
 
 /**
  * Tool: pulls
@@ -253,7 +254,7 @@ export const pullsTool = {
       reviewer: { type: 'string', description: 'PR reviewer filter' },
       label: { type: 'string', description: 'PR label filter' }
     },
-    required: ['action']
+    required: ['action', 'provider']
   },
 
   /**
@@ -288,16 +289,19 @@ export const pullsTool = {
     try {
       const validatedInput = PullsInputSchema.parse(input);
       
-      // Seleciona o provider baseado na entrada ou usa o padrão
-      const provider = validatedInput.provider
-        ? globalProviderFactory.getProvider(validatedInput.provider)
+      // Aplicar auto-detecção de usuário/owner
+      const processedInput = await applyAutoUserDetection(validatedInput, validatedInput.provider);
+      
+      // Obter o provider correto
+      const provider = processedInput.provider 
+        ? globalProviderFactory.getProvider(processedInput.provider)
         : globalProviderFactory.getDefaultProvider();
       
       if (!provider) {
-        throw new Error('Provider não encontrado ou não configurado');
+        throw new Error(`Provider '${processedInput.provider}' não encontrado`);
       }
       
-      switch (validatedInput.action) {
+      switch (processedInput.action) {
         case 'create':
           return await this.createPullRequest(validatedInput, provider);
         case 'list':
@@ -763,3 +767,4 @@ export const pullsTool = {
     }
   }
 };
+

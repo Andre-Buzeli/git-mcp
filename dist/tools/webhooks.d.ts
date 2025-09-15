@@ -4,7 +4,19 @@ import { VcsOperations } from '../providers/index.js';
  * Tool: webhooks
  *
  * DESCRIÇÃO:
- * Gerenciamento completo de webhooks com suporte multi-provider (GitHub e Gitea)
+  async handler(input: WebhooksInput): Promise<WebhooksResult> {
+    try {
+      const validatedInput = WebhooksInputSchema.parse(input);
+      
+      // Aplicar auto-detecção apenas para owner dentro do provider especificado
+      const processedInput = await applyAutoUserDetection(validatedInput, validatedInput.provider);
+      
+      // Usar o provider especificado pelo usuário
+      const provider = globalProviderFactory.getProvider(processedInput.provider);
+      
+      if (!provider) {
+        throw new Error(`Provider '${processedInput.provider}' não encontrado`);
+      }o completo de webhooks com suporte multi-provider (GitHub e Gitea)
  *
  * FUNCIONALIDADES:
  * - Criação de novos webhooks
@@ -44,7 +56,7 @@ declare const WebhooksInputSchema: z.ZodObject<{
     action: z.ZodEnum<["create", "list", "get", "update", "delete", "test"]>;
     owner: z.ZodOptional<z.ZodString>;
     repo: z.ZodOptional<z.ZodString>;
-    provider: z.ZodOptional<z.ZodEnum<["gitea", "github", "both"]>>;
+    provider: z.ZodEnum<["gitea", "github"]>;
     url: z.ZodOptional<z.ZodString>;
     content_type: z.ZodOptional<z.ZodEnum<["json", "form"]>>;
     secret: z.ZodOptional<z.ZodString>;
@@ -59,15 +71,15 @@ declare const WebhooksInputSchema: z.ZodObject<{
     new_events: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
     new_active: z.ZodOptional<z.ZodBoolean>;
 }, "strip", z.ZodTypeAny, {
+    provider: "gitea" | "github";
     action: "delete" | "get" | "create" | "list" | "update" | "test";
-    provider?: "gitea" | "github" | "both" | undefined;
     owner?: string | undefined;
     active?: boolean | undefined;
     events?: string[] | undefined;
     url?: string | undefined;
+    repo?: string | undefined;
     page?: number | undefined;
     limit?: number | undefined;
-    repo?: string | undefined;
     content_type?: "json" | "form" | undefined;
     secret?: string | undefined;
     webhook_id?: number | undefined;
@@ -77,15 +89,15 @@ declare const WebhooksInputSchema: z.ZodObject<{
     new_events?: string[] | undefined;
     new_active?: boolean | undefined;
 }, {
+    provider: "gitea" | "github";
     action: "delete" | "get" | "create" | "list" | "update" | "test";
-    provider?: "gitea" | "github" | "both" | undefined;
     owner?: string | undefined;
     active?: boolean | undefined;
     events?: string[] | undefined;
     url?: string | undefined;
+    repo?: string | undefined;
     page?: number | undefined;
     limit?: number | undefined;
-    repo?: string | undefined;
     content_type?: "json" | "form" | undefined;
     secret?: string | undefined;
     webhook_id?: number | undefined;
@@ -116,14 +128,14 @@ declare const WebhooksResultSchema: z.ZodObject<{
     message: string;
     action: string;
     success: boolean;
-    data?: any;
     error?: string | undefined;
+    data?: any;
 }, {
     message: string;
     action: string;
     success: boolean;
-    data?: any;
     error?: string | undefined;
+    data?: any;
 }>;
 export type WebhooksResult = z.infer<typeof WebhooksResultSchema>;
 /**

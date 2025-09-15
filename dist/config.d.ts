@@ -267,6 +267,20 @@ export declare class ConfigManager {
      * - true se usando configuração legacy, false caso contrário
      */
     isLegacyGitea(): boolean;
+    /**
+     * Verifica se está em modo demo
+     *
+     * RETORNO:
+     * - true se em modo demo, false caso contrário
+     */
+    isDemoMode(): boolean;
+    /**
+     * Obtém configuração demo para testes
+     *
+     * RETORNO:
+     * - Configuração mock para modo demo
+     */
+    getDemoConfig(): MultiProviderConfig;
 }
 /**
  * Instância global do ConfigManager

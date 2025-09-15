@@ -87,9 +87,9 @@ declare const PullsInputSchema: z.ZodObject<{
     head?: string | undefined;
     base?: string | undefined;
     draft?: boolean | undefined;
+    repo?: string | undefined;
     page?: number | undefined;
     limit?: number | undefined;
-    repo?: string | undefined;
     query?: string | undefined;
     merge_method?: "merge" | "rebase" | "squash" | undefined;
     author?: string | undefined;
@@ -121,9 +121,9 @@ declare const PullsInputSchema: z.ZodObject<{
     head?: string | undefined;
     base?: string | undefined;
     draft?: boolean | undefined;
+    repo?: string | undefined;
     page?: number | undefined;
     limit?: number | undefined;
-    repo?: string | undefined;
     query?: string | undefined;
     merge_method?: "merge" | "rebase" | "squash" | undefined;
     author?: string | undefined;
@@ -165,14 +165,14 @@ declare const PullsResultSchema: z.ZodObject<{
     message: string;
     action: string;
     success: boolean;
-    data?: any;
     error?: string | undefined;
+    data?: any;
 }, {
     message: string;
     action: string;
     success: boolean;
-    data?: any;
     error?: string | undefined;
+    data?: any;
 }>;
 export type PullsResult = z.infer<typeof PullsResultSchema>;
 /**

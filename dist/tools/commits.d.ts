@@ -43,7 +43,7 @@ declare const CommitsInputSchema: z.ZodObject<{
     action: z.ZodEnum<["list", "get", "create", "compare", "search"]>;
     owner: z.ZodOptional<z.ZodString>;
     repo: z.ZodOptional<z.ZodString>;
-    provider: z.ZodOptional<z.ZodEnum<["gitea", "github", "both"]>>;
+    provider: z.ZodEnum<["gitea", "github"]>;
     sha: z.ZodOptional<z.ZodString>;
     page: z.ZodOptional<z.ZodNumber>;
     limit: z.ZodOptional<z.ZodNumber>;
@@ -59,16 +59,16 @@ declare const CommitsInputSchema: z.ZodObject<{
     query: z.ZodOptional<z.ZodString>;
     author: z.ZodOptional<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
+    provider: "gitea" | "github";
     action: "get" | "create" | "list" | "search" | "compare";
-    provider?: "gitea" | "github" | "both" | undefined;
     message?: string | undefined;
     owner?: string | undefined;
     head?: string | undefined;
     base?: string | undefined;
+    repo?: string | undefined;
     page?: number | undefined;
     limit?: number | undefined;
     sha?: string | undefined;
-    repo?: string | undefined;
     query?: string | undefined;
     branch?: string | undefined;
     commit_sha?: string | undefined;
@@ -78,16 +78,16 @@ declare const CommitsInputSchema: z.ZodObject<{
     committer_email?: string | undefined;
     author?: string | undefined;
 }, {
+    provider: "gitea" | "github";
     action: "get" | "create" | "list" | "search" | "compare";
-    provider?: "gitea" | "github" | "both" | undefined;
     message?: string | undefined;
     owner?: string | undefined;
     head?: string | undefined;
     base?: string | undefined;
+    repo?: string | undefined;
     page?: number | undefined;
     limit?: number | undefined;
     sha?: string | undefined;
-    repo?: string | undefined;
     query?: string | undefined;
     branch?: string | undefined;
     commit_sha?: string | undefined;
@@ -118,14 +118,14 @@ declare const CommitsResultSchema: z.ZodObject<{
     message: string;
     action: string;
     success: boolean;
-    data?: any;
     error?: string | undefined;
+    data?: any;
 }, {
     message: string;
     action: string;
     success: boolean;
-    data?: any;
     error?: string | undefined;
+    data?: any;
 }>;
 export type CommitsResult = z.infer<typeof CommitsResultSchema>;
 /**

@@ -44,7 +44,7 @@ declare const FilesInputSchema: z.ZodObject<{
     owner: z.ZodOptional<z.ZodString>;
     repo: z.ZodOptional<z.ZodString>;
     path: z.ZodOptional<z.ZodString>;
-    provider: z.ZodOptional<z.ZodEnum<["gitea", "github", "both"]>>;
+    provider: z.ZodEnum<["gitea", "github"]>;
     content: z.ZodOptional<z.ZodString>;
     message: z.ZodOptional<z.ZodString>;
     branch: z.ZodOptional<z.ZodString>;
@@ -54,30 +54,30 @@ declare const FilesInputSchema: z.ZodObject<{
     page: z.ZodOptional<z.ZodNumber>;
     limit: z.ZodOptional<z.ZodNumber>;
 }, "strip", z.ZodTypeAny, {
+    provider: "gitea" | "github";
     action: "delete" | "get" | "create" | "list" | "update" | "search";
-    provider?: "gitea" | "github" | "both" | undefined;
     path?: string | undefined;
     message?: string | undefined;
     owner?: string | undefined;
     ref?: string | undefined;
+    repo?: string | undefined;
     page?: number | undefined;
     limit?: number | undefined;
     sha?: string | undefined;
-    repo?: string | undefined;
     query?: string | undefined;
     branch?: string | undefined;
     content?: string | undefined;
 }, {
+    provider: "gitea" | "github";
     action: "delete" | "get" | "create" | "list" | "update" | "search";
-    provider?: "gitea" | "github" | "both" | undefined;
     path?: string | undefined;
     message?: string | undefined;
     owner?: string | undefined;
     ref?: string | undefined;
+    repo?: string | undefined;
     page?: number | undefined;
     limit?: number | undefined;
     sha?: string | undefined;
-    repo?: string | undefined;
     query?: string | undefined;
     branch?: string | undefined;
     content?: string | undefined;
@@ -103,14 +103,14 @@ declare const FilesResultSchema: z.ZodObject<{
     message: string;
     action: string;
     success: boolean;
-    data?: any;
     error?: string | undefined;
+    data?: any;
 }, {
     message: string;
     action: string;
     success: boolean;
-    data?: any;
     error?: string | undefined;
+    data?: any;
 }>;
 export type FilesResult = z.infer<typeof FilesResultSchema>;
 /**

@@ -44,7 +44,7 @@ declare const ReleasesInputSchema: z.ZodObject<{
     action: z.ZodEnum<["create", "list", "get", "update", "delete", "publish"]>;
     owner: z.ZodOptional<z.ZodString>;
     repo: z.ZodOptional<z.ZodString>;
-    provider: z.ZodOptional<z.ZodEnum<["gitea", "github", "both"]>>;
+    provider: z.ZodEnum<["gitea", "github"]>;
     tag_name: z.ZodOptional<z.ZodString>;
     name: z.ZodOptional<z.ZodString>;
     body: z.ZodOptional<z.ZodString>;
@@ -62,17 +62,17 @@ declare const ReleasesInputSchema: z.ZodObject<{
     new_target_commitish: z.ZodOptional<z.ZodString>;
     latest: z.ZodOptional<z.ZodBoolean>;
 }, "strip", z.ZodTypeAny, {
+    provider: "gitea" | "github";
     action: "delete" | "get" | "create" | "list" | "update" | "publish";
-    provider?: "gitea" | "github" | "both" | undefined;
     name?: string | undefined;
     owner?: string | undefined;
     body?: string | undefined;
     tag_name?: string | undefined;
     draft?: boolean | undefined;
     prerelease?: boolean | undefined;
+    repo?: string | undefined;
     page?: number | undefined;
     limit?: number | undefined;
-    repo?: string | undefined;
     new_name?: string | undefined;
     new_body?: string | undefined;
     target_commitish?: string | undefined;
@@ -83,17 +83,17 @@ declare const ReleasesInputSchema: z.ZodObject<{
     new_target_commitish?: string | undefined;
     latest?: boolean | undefined;
 }, {
+    provider: "gitea" | "github";
     action: "delete" | "get" | "create" | "list" | "update" | "publish";
-    provider?: "gitea" | "github" | "both" | undefined;
     name?: string | undefined;
     owner?: string | undefined;
     body?: string | undefined;
     tag_name?: string | undefined;
     draft?: boolean | undefined;
     prerelease?: boolean | undefined;
+    repo?: string | undefined;
     page?: number | undefined;
     limit?: number | undefined;
-    repo?: string | undefined;
     new_name?: string | undefined;
     new_body?: string | undefined;
     target_commitish?: string | undefined;
@@ -125,14 +125,14 @@ declare const ReleasesResultSchema: z.ZodObject<{
     message: string;
     action: string;
     success: boolean;
-    data?: any;
     error?: string | undefined;
+    data?: any;
 }, {
     message: string;
     action: string;
     success: boolean;
-    data?: any;
     error?: string | undefined;
+    data?: any;
 }>;
 export type ReleasesResult = z.infer<typeof ReleasesResultSchema>;
 /**

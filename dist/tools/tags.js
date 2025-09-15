@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.tagsTool = void 0;
 const zod_1 = require("zod");
 const index_js_1 = require("../providers/index.js");
+const user_detection_js_1 = require("../utils/user-detection.js");
 /**
  * Tool: tags
  *
@@ -48,7 +49,7 @@ const TagsInputSchema = zod_1.z.object({
     owner: zod_1.z.string().optional(),
     repo: zod_1.z.string().optional(),
     // Para multi-provider
-    provider: zod_1.z.enum(['gitea', 'github', 'both']).optional(), // Provider específico: gitea, github ou both
+    provider: zod_1.z.enum(['gitea', 'github']).describe('Provider to use (gitea or github)'), // Provider específico: gitea, github ou both
     // Para create
     tag_name: zod_1.z.string().optional(),
     message: zod_1.z.string().optional(),
@@ -161,7 +162,7 @@ exports.tagsTool = {
             query: { type: 'string', description: 'Search query' },
             pattern: { type: 'string', description: 'Search pattern (e.g., v*.*.*)' }
         },
-        required: ['action']
+        required: ['action', 'provider']
     },
     /**
      * Handler principal da tool tags
@@ -194,26 +195,26 @@ exports.tagsTool = {
     async handler(input) {
         try {
             const validatedInput = TagsInputSchema.parse(input);
-            // Seleciona o provider baseado na entrada ou usa o padrão
-            const provider = validatedInput.provider
-                ? index_js_1.globalProviderFactory.getProvider(validatedInput.provider)
-                : index_js_1.globalProviderFactory.getDefaultProvider();
+            // Aplicar auto-detecção apenas para owner dentro do provider especificado
+            const processedInput = await (0, user_detection_js_1.applyAutoUserDetection)(validatedInput, validatedInput.provider);
+            // Usar o provider especificado pelo usuário
+            const provider = index_js_1.globalProviderFactory.getProvider(processedInput.provider);
             if (!provider) {
-                throw new Error('Provider não encontrado ou não configurado');
+                throw new Error(`Provider '${processedInput.provider}' não encontrado`);
             }
-            switch (validatedInput.action) {
+            switch (processedInput.action) {
                 case 'create':
-                    return await this.createTag(validatedInput, provider);
+                    return await this.createTag(processedInput, provider);
                 case 'list':
-                    return await this.listTags(validatedInput, provider);
+                    return await this.listTags(processedInput, provider);
                 case 'get':
-                    return await this.getTag(validatedInput, provider);
+                    return await this.getTag(processedInput, provider);
                 case 'delete':
-                    return await this.deleteTag(validatedInput, provider);
+                    return await this.deleteTag(processedInput, provider);
                 case 'search':
-                    return await this.searchTags(validatedInput, provider);
+                    return await this.searchTags(processedInput, provider);
                 default:
-                    throw new Error(`Ação não suportada: ${validatedInput.action}`);
+                    throw new Error(`Ação não suportada: ${processedInput.action}`);
             }
         }
         catch (error) {

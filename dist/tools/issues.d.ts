@@ -44,7 +44,7 @@ declare const IssuesInputSchema: z.ZodObject<{
     action: z.ZodEnum<["create", "list", "get", "update", "close", "comment", "search"]>;
     owner: z.ZodOptional<z.ZodString>;
     repo: z.ZodOptional<z.ZodString>;
-    provider: z.ZodOptional<z.ZodEnum<["gitea", "github", "both"]>>;
+    provider: z.ZodEnum<["gitea", "github"]>;
     title: z.ZodOptional<z.ZodString>;
     body: z.ZodOptional<z.ZodString>;
     labels: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
@@ -66,17 +66,17 @@ declare const IssuesInputSchema: z.ZodObject<{
     assignee: z.ZodOptional<z.ZodString>;
     label: z.ZodOptional<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
+    provider: "gitea" | "github";
     action: "get" | "create" | "list" | "update" | "search" | "close" | "comment";
-    provider?: "gitea" | "github" | "both" | undefined;
     owner?: string | undefined;
     title?: string | undefined;
     body?: string | undefined;
     state?: "open" | "closed" | "all" | undefined;
     assignees?: string[] | undefined;
     labels?: string[] | undefined;
+    repo?: string | undefined;
     page?: number | undefined;
     limit?: number | undefined;
-    repo?: string | undefined;
     query?: string | undefined;
     author?: string | undefined;
     milestone?: number | undefined;
@@ -91,17 +91,17 @@ declare const IssuesInputSchema: z.ZodObject<{
     assignee?: string | undefined;
     label?: string | undefined;
 }, {
+    provider: "gitea" | "github";
     action: "get" | "create" | "list" | "update" | "search" | "close" | "comment";
-    provider?: "gitea" | "github" | "both" | undefined;
     owner?: string | undefined;
     title?: string | undefined;
     body?: string | undefined;
     state?: "open" | "closed" | "all" | undefined;
     assignees?: string[] | undefined;
     labels?: string[] | undefined;
+    repo?: string | undefined;
     page?: number | undefined;
     limit?: number | undefined;
-    repo?: string | undefined;
     query?: string | undefined;
     author?: string | undefined;
     milestone?: number | undefined;
@@ -137,14 +137,14 @@ declare const IssuesResultSchema: z.ZodObject<{
     message: string;
     action: string;
     success: boolean;
-    data?: any;
     error?: string | undefined;
+    data?: any;
 }, {
     message: string;
     action: string;
     success: boolean;
-    data?: any;
     error?: string | undefined;
+    data?: any;
 }>;
 export type IssuesResult = z.infer<typeof IssuesResultSchema>;
 /**

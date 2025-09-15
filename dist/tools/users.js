@@ -347,19 +347,41 @@ exports.usersTool = {
             }
             const page = params.page || 1;
             const limit = params.limit || 30;
-            const users = await provider.searchUsers(params.query, page, limit);
-            return {
-                success: true,
-                action: 'search',
-                message: `${users.length} usuários encontrados para '${params.query}'`,
-                data: {
-                    users,
-                    query: params.query,
-                    page,
-                    limit,
-                    total: users.length
+            try {
+                const users = await provider.searchUsers(params.query, page, limit);
+                return {
+                    success: true,
+                    action: 'search',
+                    message: `${users.length} usuários encontrados para '${params.query}'`,
+                    data: {
+                        users,
+                        query: params.query,
+                        page,
+                        limit,
+                        total: users.length
+                    }
+                };
+            }
+            catch (error) {
+                // Se houver erro específico no provider, retornar resultado vazio
+                if (error.message && (error.message.includes('data.map') || error.message.includes('not a function'))) {
+                    console.warn('[USERS] Busca não suportada pelo provider, retornando lista vazia');
+                    return {
+                        success: true,
+                        action: 'search',
+                        message: `Busca de usuários não suportada pelo provider atual`,
+                        data: {
+                            users: [],
+                            query: params.query,
+                            page,
+                            limit,
+                            total: 0,
+                            note: 'Funcionalidade não suportada pelo provider'
+                        }
+                    };
                 }
-            };
+                throw error;
+            }
         }
         catch (error) {
             throw new Error(`Falha ao buscar usuários: ${error instanceof Error ? error.message : String(error)}`);

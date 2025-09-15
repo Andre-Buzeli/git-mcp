@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.pullsTool = void 0;
 const zod_1 = require("zod");
 const index_js_1 = require("../providers/index.js");
+const user_detection_js_1 = require("../utils/user-detection.js");
 /**
  * Tool: pulls
  *
@@ -239,7 +240,7 @@ exports.pullsTool = {
             reviewer: { type: 'string', description: 'PR reviewer filter' },
             label: { type: 'string', description: 'PR label filter' }
         },
-        required: ['action']
+        required: ['action', 'provider']
     },
     /**
      * Handler principal da tool pulls
@@ -272,14 +273,16 @@ exports.pullsTool = {
     async handler(input) {
         try {
             const validatedInput = PullsInputSchema.parse(input);
-            // Seleciona o provider baseado na entrada ou usa o padrão
-            const provider = validatedInput.provider
-                ? index_js_1.globalProviderFactory.getProvider(validatedInput.provider)
+            // Aplicar auto-detecção de usuário/owner
+            const processedInput = await (0, user_detection_js_1.applyAutoUserDetection)(validatedInput, validatedInput.provider);
+            // Obter o provider correto
+            const provider = processedInput.provider
+                ? index_js_1.globalProviderFactory.getProvider(processedInput.provider)
                 : index_js_1.globalProviderFactory.getDefaultProvider();
             if (!provider) {
-                throw new Error('Provider não encontrado ou não configurado');
+                throw new Error(`Provider '${processedInput.provider}' não encontrado`);
             }
-            switch (validatedInput.action) {
+            switch (processedInput.action) {
                 case 'create':
                     return await this.createPullRequest(validatedInput, provider);
                 case 'list':

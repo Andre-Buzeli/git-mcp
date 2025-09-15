@@ -13,6 +13,7 @@
  * CONFIGURAÇÃO:
  * - Configure as variáveis de ambiente necessárias
  * - GITEA_URL, GITEA_TOKEN são obrigatórias
+ * - Ou use DEMO_MODE=true para testes
  * 
  * RECOMENDAÇÕES:
  * - Use DEBUG=true para desenvolvimento
@@ -20,7 +21,11 @@
  * - Mantenha o token de acesso seguro
  */
 
-import { GiteaMCPServer } from './server.js';
+// Carregar variáveis de ambiente do arquivo .env
+import * as dotenv from 'dotenv';
+dotenv.config();
+
+import { GiteaMCPServer } from './server';
 
 /**
  * Função principal que inicializa o servidor MCP

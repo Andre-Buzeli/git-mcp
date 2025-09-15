@@ -69,14 +69,14 @@ declare const VersionControlResultSchema: z.ZodObject<{
     message: string;
     action: string;
     success: boolean;
-    data?: any;
     error?: string | undefined;
+    data?: any;
 }, {
     message: string;
     action: string;
     success: boolean;
-    data?: any;
     error?: string | undefined;
+    data?: any;
 }>;
 export type VersionControlResult = z.infer<typeof VersionControlResultSchema>;
 export declare const versionControlTool: {

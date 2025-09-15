@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.branchesTool = void 0;
 const zod_1 = require("zod");
 const index_js_1 = require("../providers/index.js");
+const user_detection_js_1 = require("../utils/user-detection.js");
 /**
  * Tool: branches
  *
@@ -47,8 +48,7 @@ const BranchesInputSchema = zod_1.z.object({
     // Parâmetros comuns
     owner: zod_1.z.string().optional(),
     repo: zod_1.z.string().optional(),
-    provider: zod_1.z.enum(['gitea', 'github', 'both']).optional(), // Provider específico: gitea, github ou both
-    // Para create
+    provider: zod_1.z.enum(['gitea', 'github']).describe('Provider to use (gitea or github)'), // Para create
     branch_name: zod_1.z.string().optional(),
     from_branch: zod_1.z.string().optional(),
     // Para get/delete
@@ -167,7 +167,7 @@ exports.branchesTool = {
             base_branch: { type: 'string', description: 'Base branch for comparison' },
             head_branch: { type: 'string', description: 'Head branch for comparison' }
         },
-        required: ['action']
+        required: ['action', 'provider']
     },
     /**
      * Handler principal da tool branches
@@ -199,28 +199,28 @@ exports.branchesTool = {
     async handler(input) {
         try {
             const validatedInput = BranchesInputSchema.parse(input);
-            // Obter o provider correto
-            const provider = validatedInput.provider
-                ? index_js_1.globalProviderFactory.getProvider(validatedInput.provider)
-                : index_js_1.globalProviderFactory.getDefaultProvider();
+            // Aplicar auto-detecção apenas para owner dentro do provider especificado
+            const processedInput = await (0, user_detection_js_1.applyAutoUserDetection)(validatedInput, validatedInput.provider);
+            // Usar o provider especificado pelo usuário
+            const provider = index_js_1.globalProviderFactory.getProvider(processedInput.provider);
             if (!provider) {
-                throw new Error(`Provider '${validatedInput.provider}' não encontrado`);
+                throw new Error(`Provider '${processedInput.provider}' não encontrado`);
             }
-            switch (validatedInput.action) {
+            switch (processedInput.action) {
                 case 'create':
-                    return await this.createBranch(validatedInput, provider);
+                    return await this.createBranch(processedInput, provider);
                 case 'list':
-                    return await this.listBranches(validatedInput, provider);
+                    return await this.listBranches(processedInput, provider);
                 case 'get':
-                    return await this.getBranch(validatedInput, provider);
+                    return await this.getBranch(processedInput, provider);
                 case 'delete':
-                    return await this.deleteBranch(validatedInput, provider);
+                    return await this.deleteBranch(processedInput, provider);
                 case 'merge':
-                    return await this.mergeBranches(validatedInput, provider);
+                    return await this.mergeBranches(processedInput, provider);
                 case 'compare':
-                    return await this.compareBranches(validatedInput, provider);
+                    return await this.compareBranches(processedInput, provider);
                 default:
-                    throw new Error(`Ação não suportada: ${validatedInput.action}`);
+                    throw new Error(`Ação não suportada: ${processedInput.action}`);
             }
         }
         catch (error) {

@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.filesTool = void 0;
 const zod_1 = require("zod");
 const index_js_1 = require("../providers/index.js");
+const user_detection_js_1 = require("../utils/user-detection.js");
 /**
  * Tool: files
  *
@@ -48,8 +49,7 @@ const FilesInputSchema = zod_1.z.object({
     owner: zod_1.z.string().optional(),
     repo: zod_1.z.string().optional(),
     path: zod_1.z.string().optional(),
-    provider: zod_1.z.enum(['gitea', 'github', 'both']).optional(), // Provider específico: gitea, github ou both
-    // Para create/update
+    provider: zod_1.z.enum(['gitea', 'github']).describe('Provider to use (gitea or github)'), // Para create/update
     content: zod_1.z.string().optional(),
     message: zod_1.z.string().optional(),
     branch: zod_1.z.string().optional(),
@@ -171,7 +171,7 @@ exports.filesTool = {
             page: { type: 'number', description: 'Page number', minimum: 1 },
             limit: { type: 'number', description: 'Items per page', minimum: 1, maximum: 100 }
         },
-        required: ['action']
+        required: ['action', 'provider']
     },
     /**
      * Handler principal da tool files
@@ -203,28 +203,28 @@ exports.filesTool = {
     async handler(input) {
         try {
             const validatedInput = FilesInputSchema.parse(input);
-            // Obter o provider correto
-            const provider = validatedInput.provider
-                ? index_js_1.globalProviderFactory.getProvider(validatedInput.provider)
-                : index_js_1.globalProviderFactory.getDefaultProvider();
+            // Aplicar auto-detecção apenas para owner dentro do provider especificado
+            const processedInput = await (0, user_detection_js_1.applyAutoUserDetection)(validatedInput, validatedInput.provider);
+            // Usar o provider especificado pelo usuário
+            const provider = index_js_1.globalProviderFactory.getProvider(processedInput.provider);
             if (!provider) {
-                throw new Error(`Provider '${validatedInput.provider}' não encontrado`);
+                throw new Error(`Provider '${processedInput.provider}' não encontrado`);
             }
-            switch (validatedInput.action) {
+            switch (processedInput.action) {
                 case 'get':
-                    return await this.getFile(validatedInput, provider);
+                    return await this.getFile(processedInput, provider);
                 case 'create':
-                    return await this.createFile(validatedInput, provider);
+                    return await this.createFile(processedInput, provider);
                 case 'update':
-                    return await this.updateFile(validatedInput, provider);
+                    return await this.updateFile(processedInput, provider);
                 case 'delete':
-                    return await this.deleteFile(validatedInput, provider);
+                    return await this.deleteFile(processedInput, provider);
                 case 'list':
-                    return await this.listFiles(validatedInput, provider);
+                    return await this.listFiles(processedInput, provider);
                 case 'search':
-                    return await this.searchFiles(validatedInput, provider);
+                    return await this.searchFiles(processedInput, provider);
                 default:
-                    throw new Error(`Ação não suportada: ${validatedInput.action}`);
+                    throw new Error(`Ação não suportada: ${processedInput.action}`);
             }
         }
         catch (error) {
@@ -358,10 +358,21 @@ exports.filesTool = {
      */
     async updateFile(params, provider) {
         try {
-            if (!params.owner || !params.repo || !params.path || !params.content || !params.message || !params.sha) {
-                throw new Error('Owner, repo, path, content, message e sha são obrigatórios');
+            if (!params.owner || !params.repo || !params.path || !params.content || !params.message) {
+                throw new Error('Owner, repo, path, content e message são obrigatórios');
             }
-            const result = await provider.updateFile(params.owner, params.repo, params.path, params.content, params.message, params.sha, params.branch);
+            // Se não foi fornecido SHA, obter automaticamente
+            let fileSha = params.sha;
+            if (!fileSha) {
+                try {
+                    const existingFile = await provider.getFile(params.owner, params.repo, params.path, params.branch);
+                    fileSha = existingFile.sha;
+                }
+                catch (error) {
+                    throw new Error('Não foi possível obter SHA do arquivo. Forneça sha ou verifique se o arquivo existe.');
+                }
+            }
+            const result = await provider.updateFile(params.owner, params.repo, params.path, params.content, params.message, fileSha, params.branch);
             return {
                 success: true,
                 action: 'update',
@@ -404,10 +415,21 @@ exports.filesTool = {
      */
     async deleteFile(params, provider) {
         try {
-            if (!params.owner || !params.repo || !params.path || !params.message || !params.sha) {
-                throw new Error('Owner, repo, path, message e sha são obrigatórios');
+            if (!params.owner || !params.repo || !params.path || !params.message) {
+                throw new Error('Owner, repo, path e message são obrigatórios');
             }
-            const result = await provider.deleteFile(params.owner, params.repo, params.path, params.message, params.sha, params.branch);
+            // Se não foi fornecido SHA, obter automaticamente
+            let fileSha = params.sha;
+            if (!fileSha) {
+                try {
+                    const existingFile = await provider.getFile(params.owner, params.repo, params.path, params.branch);
+                    fileSha = existingFile.sha;
+                }
+                catch (error) {
+                    throw new Error('Não foi possível obter SHA do arquivo. Forneça sha ou verifique se o arquivo existe.');
+                }
+            }
+            const result = await provider.deleteFile(params.owner, params.repo, params.path, params.message, fileSha, params.branch);
             return {
                 success: true,
                 action: 'delete',

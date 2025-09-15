@@ -47,18 +47,19 @@ const ConfigSchema = z.object({
   debug: z.boolean().default(false),
   timeout: z.number().positive().default(30000),
 }).superRefine((data, ctx) => {
-  // Validação: deve ter pelo menos uma configuração válida
+  // Validação: deve ter pelo menos uma configuração válida ou modo demo
   const hasGiteaConfig = data.giteaUrl && data.giteaToken;
   const hasGitHubConfig = data.githubToken;
   const hasGenericConfig = data.apiUrl && data.apiToken;
   const hasMultiProviderConfig = data.providersJson;
+  const isDemoMode = process.env.DEMO_MODE === 'true';
   
   const configCount = [hasGiteaConfig, hasGitHubConfig, hasGenericConfig, hasMultiProviderConfig].filter(Boolean).length;
   
-  if (configCount === 0) {
+  if (configCount === 0 && !isDemoMode) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
-      message: "Configuration required: At least one provider configuration must be provided (GITEA_URL+GITEA_TOKEN, GITHUB_TOKEN, API_URL+API_TOKEN, or PROVIDERS_JSON).",
+      message: "Configuration required: At least one provider configuration must be provided (GITEA_URL+GITEA_TOKEN, GITHUB_TOKEN, API_URL+API_TOKEN, or PROVIDERS_JSON). Use DEMO_MODE=true for testing without real providers.",
       path: ['giteaUrl', 'githubToken', 'apiUrl', 'providersJson'],
     });
   }
@@ -379,6 +380,35 @@ export class ConfigManager {
    */
   public isLegacyGitea(): boolean {
     return !!(this.config.giteaUrl && this.config.giteaToken);
+  }
+
+  /**
+   * Verifica se está em modo demo
+   * 
+   * RETORNO:
+   * - true se em modo demo, false caso contrário
+   */
+  public isDemoMode(): boolean {
+    return process.env.DEMO_MODE === 'true';
+  }
+
+  /**
+   * Obtém configuração demo para testes
+   * 
+   * RETORNO:
+   * - Configuração mock para modo demo
+   */
+  public getDemoConfig(): MultiProviderConfig {
+    return {
+      defaultProvider: 'demo',
+      providers: [{
+        name: 'demo',
+        type: 'gitea',
+        apiUrl: 'https://demo.gitea.io/api/v1',
+        token: 'demo-token',
+        username: 'demo-user'
+      }]
+    };
   }
 }
 

@@ -20,6 +20,7 @@ const index_js_2 = require("./providers/index.js");
  * - tags: Gerenciamento de tags
  * - users: Operações com usuários
  * - webhooks: Gerenciamento de webhooks
+ * - code-review: Análise e revisão de código
  */
 const repositories_js_1 = require("./tools/repositories.js");
 const branches_js_1 = require("./tools/branches.js");
@@ -33,6 +34,12 @@ const users_js_1 = require("./tools/users.js");
 const webhooks_js_1 = require("./tools/webhooks.js");
 const git_sync_js_1 = require("./tools/git-sync.js");
 const version_control_js_1 = require("./tools/version-control.js");
+const workflows_js_1 = require("./tools/workflows.js");
+const actions_js_1 = require("./tools/actions.js");
+const deployments_js_1 = require("./tools/deployments.js");
+const security_js_1 = require("./tools/security.js");
+const analytics_js_1 = require("./tools/analytics.js");
+const code_review_js_1 = require("./tools/code-review.js");
 /**
  * Array de todas as ferramentas disponíveis
  *
@@ -58,7 +65,13 @@ const tools = [
     users_js_1.usersTool,
     webhooks_js_1.webhooksTool,
     git_sync_js_1.gitSyncTool,
-    version_control_js_1.versionControlTool
+    version_control_js_1.versionControlTool,
+    workflows_js_1.workflowsTool,
+    actions_js_1.actionsTool,
+    deployments_js_1.deploymentsTool,
+    security_js_1.securityTool,
+    analytics_js_1.analyticsTool,
+    code_review_js_1.codeReviewTool
 ];
 /**
  * Servidor MCP principal para Gitea
@@ -83,8 +96,8 @@ class GiteaMCPServer {
     server;
     constructor() {
         this.server = new index_js_1.Server({
-            name: 'gitea-mcp-v2',
-            version: '2.0.0',
+            name: 'git-mcp',
+            version: '2.6.2',
         });
         this.setupHandlers();
     }
@@ -182,11 +195,20 @@ class GiteaMCPServer {
         }
         // Inicializar provider factory com configuração
         try {
+            console.log('[SERVER] Inicializando provider factory...');
             const factory = (0, index_js_2.initializeFactoryFromEnv)();
+            // Log detalhado dos providers configurados
+            const providersInfo = factory.getProvidersInfo();
+            console.log('[SERVER] Providers configurados:');
+            providersInfo.forEach(p => {
+                console.log(`  - ${p.name} (${p.type}) ${p.isDefault ? '[PADRÃO]' : ''}`);
+            });
             // Atualizar o globalProviderFactory com a configuração
             Object.assign(index_js_2.globalProviderFactory, factory);
+            console.log('[SERVER] Provider factory inicializado com sucesso');
         }
         catch (error) {
+            console.error('[SERVER] Erro ao inicializar providers:', error);
             throw new Error(`Failed to initialize providers: ${error instanceof Error ? error.message : 'Unknown error'}`);
         }
         const transport = new stdio_js_1.StdioServerTransport();

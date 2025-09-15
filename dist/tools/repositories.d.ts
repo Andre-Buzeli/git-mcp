@@ -42,7 +42,7 @@ declare const RepositoriesInputSchema: z.ZodObject<{
     action: z.ZodEnum<["create", "list", "get", "update", "delete", "fork", "search"]>;
     owner: z.ZodOptional<z.ZodString>;
     repo: z.ZodOptional<z.ZodString>;
-    provider: z.ZodOptional<z.ZodEnum<["gitea", "github", "both"]>>;
+    provider: z.ZodEnum<["gitea", "github"]>;
     name: z.ZodOptional<z.ZodString>;
     description: z.ZodOptional<z.ZodString>;
     private: z.ZodOptional<z.ZodBoolean>;
@@ -61,8 +61,8 @@ declare const RepositoriesInputSchema: z.ZodObject<{
     organization: z.ZodOptional<z.ZodString>;
     query: z.ZodOptional<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
+    provider: "gitea" | "github";
     action: "delete" | "get" | "create" | "list" | "update" | "fork" | "search";
-    provider?: "gitea" | "github" | "both" | undefined;
     username?: string | undefined;
     name?: string | undefined;
     description?: string | undefined;
@@ -70,9 +70,9 @@ declare const RepositoriesInputSchema: z.ZodObject<{
     default_branch?: string | undefined;
     owner?: string | undefined;
     organization?: string | undefined;
+    repo?: string | undefined;
     page?: number | undefined;
     limit?: number | undefined;
-    repo?: string | undefined;
     auto_init?: boolean | undefined;
     gitignores?: string | undefined;
     license?: string | undefined;
@@ -83,8 +83,8 @@ declare const RepositoriesInputSchema: z.ZodObject<{
     archived?: boolean | undefined;
     query?: string | undefined;
 }, {
+    provider: "gitea" | "github";
     action: "delete" | "get" | "create" | "list" | "update" | "fork" | "search";
-    provider?: "gitea" | "github" | "both" | undefined;
     username?: string | undefined;
     name?: string | undefined;
     description?: string | undefined;
@@ -92,9 +92,9 @@ declare const RepositoriesInputSchema: z.ZodObject<{
     default_branch?: string | undefined;
     owner?: string | undefined;
     organization?: string | undefined;
+    repo?: string | undefined;
     page?: number | undefined;
     limit?: number | undefined;
-    repo?: string | undefined;
     auto_init?: boolean | undefined;
     gitignores?: string | undefined;
     license?: string | undefined;
@@ -116,14 +116,14 @@ declare const RepositoriesResultSchema: z.ZodObject<{
     message: string;
     action: string;
     success: boolean;
-    data?: any;
     error?: string | undefined;
+    data?: any;
 }, {
     message: string;
     action: string;
     success: boolean;
-    data?: any;
     error?: string | undefined;
+    data?: any;
 }>;
 export type RepositoriesResult = z.infer<typeof RepositoriesResultSchema>;
 /**
@@ -211,6 +211,7 @@ export declare const repositoriesTool: {
             };
             provider: {
                 type: string;
+                enum: string[];
                 description: string;
             };
             name: {

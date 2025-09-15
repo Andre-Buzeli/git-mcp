@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { globalProviderFactory, VcsOperations } from '../providers/index.js';
+import { applyAutoUserDetection } from '../utils/user-detection.js';
 
 /**
  * Tool: commits
@@ -43,13 +44,13 @@ import { globalProviderFactory, VcsOperations } from '../providers/index.js';
  */
 const CommitsInputSchema = z.object({
   action: z.enum(['list', 'get', 'create', 'compare', 'search']),
-  
-  // Parâmetros comuns
+
+  // Parâmetros comuns - owner agora é opcional e será determinado automaticamente
   owner: z.string().optional(),
   repo: z.string().optional(),
-  
+
   // Para multi-provider
-  provider: z.enum(['gitea', 'github', 'both']).optional(), // Provider específico: gitea, github ou both
+  provider: z.enum(['gitea', 'github']).describe('Provider to use (gitea or github)'), // Provider específico: gitea, github ou both
   
   // Para list
   sha: z.string().optional(),
@@ -184,7 +185,7 @@ export const commitsTool = {
       query: { type: 'string', description: 'Search query' },
       author: { type: 'string', description: 'Author filter for search' }
     },
-    required: ['action']
+    required: ['action', 'provider']
   },
 
   /**
@@ -218,29 +219,37 @@ export const commitsTool = {
   async handler(input: CommitsInput): Promise<CommitsResult> {
     try {
       const validatedInput = CommitsInputSchema.parse(input);
-      
-      // Seleciona o provider baseado na entrada ou usa o padrão
-      const provider = validatedInput.provider
-        ? globalProviderFactory.getProvider(validatedInput.provider)
+
+      // Aplicar auto-detecção de usuário/owner
+      const processedInput = await applyAutoUserDetection(validatedInput, validatedInput.provider);
+
+      // Obter o provider correto
+      const provider = processedInput.provider
+        ? globalProviderFactory.getProvider(processedInput.provider)
         : globalProviderFactory.getDefaultProvider();
-      
+
       if (!provider) {
-        throw new Error('Provider não encontrado ou não configurado');
+        throw new Error(`Provider '${processedInput.provider}' não encontrado`);
+      }
+
+      // Para ações que precisam de owner, verificar se foi determinado
+      if (!processedInput.owner && ['list', 'get', 'create', 'compare', 'search'].includes(processedInput.action)) {
+        throw new Error('Não foi possível determinar o owner automaticamente. Verifique se o token está configurado corretamente.');
       }
       
-      switch (validatedInput.action) {
+      switch (processedInput.action) {
         case 'list':
-          return await this.listCommits(validatedInput, provider);
+          return await this.listCommits(processedInput, provider);
         case 'get':
-          return await this.getCommit(validatedInput, provider);
+          return await this.getCommit(processedInput, provider);
         case 'create':
-          return await this.createCommit(validatedInput, provider);
+          return await this.createCommit(processedInput, provider);
         case 'compare':
-          return await this.compareCommits(validatedInput, provider);
+          return await this.compareCommits(processedInput, provider);
         case 'search':
-          return await this.searchCommits(validatedInput, provider);
+          return await this.searchCommits(processedInput, provider);
         default:
-          throw new Error(`Ação não suportada: ${validatedInput.action}`);
+          throw new Error(`Ação não suportada: ${processedInput.action}`);
       }
     } catch (error) {
       return {
@@ -336,19 +345,36 @@ export const commitsTool = {
    */
   async getCommit(params: CommitsInput, provider: VcsOperations): Promise<CommitsResult> {
     try {
-      if (!params.owner || !params.repo || !params.commit_sha) {
-        throw new Error('Owner, repo e commit_sha são obrigatórios');
+      if (!params.owner || !params.repo) {
+        throw new Error('Owner e repo são obrigatórios');
       }
 
-      const commit = await provider.getCommit(params.owner, params.repo, params.commit_sha);
+      // Se não foi fornecido commit_sha, usa o SHA da branch padrão
+      let commitSha = params.commit_sha;
+      if (!commitSha) {
+        try {
+          const branchInfo = await provider.getBranch(params.owner, params.repo, 'main');
+          commitSha = branchInfo.commit.sha;
+        } catch (error) {
+          // Se não conseguir obter o branch main, tenta master
+          try {
+            const branchInfo = await provider.getBranch(params.owner, params.repo, 'master');
+            commitSha = branchInfo.commit.sha;
+          } catch (masterError) {
+            throw new Error('Não foi possível obter SHA do commit. Forneça commit_sha ou verifique se a branch existe.');
+          }
+        }
+      }
+
+      const commit = await provider.getCommit(params.owner, params.repo, commitSha);
 
       return {
         success: true,
         action: 'get',
-        message: `Commit '${params.commit_sha}' obtido com sucesso`,
+        message: `Commit '${commitSha}' obtido com sucesso`,
         data: {
           commit,
-          sha: params.commit_sha,
+          sha: commitSha,
           owner: params.owner,
           repo: params.repo
         }
@@ -524,3 +550,4 @@ export const commitsTool = {
     }
   }
 };
+

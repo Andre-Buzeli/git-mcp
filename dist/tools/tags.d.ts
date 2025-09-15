@@ -43,7 +43,7 @@ declare const TagsInputSchema: z.ZodObject<{
     action: z.ZodEnum<["create", "list", "get", "delete", "search"]>;
     owner: z.ZodOptional<z.ZodString>;
     repo: z.ZodOptional<z.ZodString>;
-    provider: z.ZodOptional<z.ZodEnum<["gitea", "github", "both"]>>;
+    provider: z.ZodEnum<["gitea", "github"]>;
     tag_name: z.ZodOptional<z.ZodString>;
     message: z.ZodOptional<z.ZodString>;
     target: z.ZodOptional<z.ZodString>;
@@ -56,15 +56,15 @@ declare const TagsInputSchema: z.ZodObject<{
     query: z.ZodOptional<z.ZodString>;
     pattern: z.ZodOptional<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
+    provider: "gitea" | "github";
     action: "delete" | "get" | "create" | "list" | "search";
-    provider?: "gitea" | "github" | "both" | undefined;
     message?: string | undefined;
     type?: "lightweight" | "annotated" | undefined;
     owner?: string | undefined;
     tag_name?: string | undefined;
+    repo?: string | undefined;
     page?: number | undefined;
     limit?: number | undefined;
-    repo?: string | undefined;
     query?: string | undefined;
     target?: string | undefined;
     tagger_name?: string | undefined;
@@ -72,15 +72,15 @@ declare const TagsInputSchema: z.ZodObject<{
     tag?: string | undefined;
     pattern?: string | undefined;
 }, {
+    provider: "gitea" | "github";
     action: "delete" | "get" | "create" | "list" | "search";
-    provider?: "gitea" | "github" | "both" | undefined;
     message?: string | undefined;
     type?: "lightweight" | "annotated" | undefined;
     owner?: string | undefined;
     tag_name?: string | undefined;
+    repo?: string | undefined;
     page?: number | undefined;
     limit?: number | undefined;
-    repo?: string | undefined;
     query?: string | undefined;
     target?: string | undefined;
     tagger_name?: string | undefined;
@@ -109,14 +109,14 @@ declare const TagsResultSchema: z.ZodObject<{
     message: string;
     action: string;
     success: boolean;
-    data?: any;
     error?: string | undefined;
+    data?: any;
 }, {
     message: string;
     action: string;
     success: boolean;
-    data?: any;
     error?: string | undefined;
+    data?: any;
 }>;
 export type TagsResult = z.infer<typeof TagsResultSchema>;
 /**

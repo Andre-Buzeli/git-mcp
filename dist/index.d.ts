@@ -12,6 +12,7 @@
  * CONFIGURAÇÃO:
  * - Configure as variáveis de ambiente necessárias
  * - GITEA_URL, GITEA_TOKEN são obrigatórias
+ * - Ou use DEMO_MODE=true para testes
  *
  * RECOMENDAÇÕES:
  * - Use DEBUG=true para desenvolvimento

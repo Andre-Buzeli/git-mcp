@@ -1,0 +1,160 @@
+[2025-09-15T16:37:09Z] issues.create
+INPUT: {"action":"create","provider":"gitea","owner":"andrebuzeli","repo":"git-mcp-test","title":"Log de testes automáticos (Gitea)","body":"Issue criada pelo agente para validar issues.create e registrar testes","labels":["automation","test"]}
+OUTPUT: {"success":true,"action":"create","message":"Issue 'Log de testes automáticos (Gitea)' criada com sucesso","data":{"number":2,"state":"open"}}
+---
+[2025-09-15T16:37:09Z] files.create (mcp-local-test.txt)
+INPUT: {"action":"create","provider":"gitea","owner":"andrebuzeli","repo":"git-mcp-test","path":"mcp-local-test.txt","content":"Arquivo temporário para validar files.* no Gitea.","message":"chore: add mcp-local-test.txt for files validation"}
+OUTPUT: {"success":true,"action":"create","message":"Arquivo 'mcp-local-test.txt' criado com sucesso"}
+---
+[2025-09-15T16:37:09Z] files.get (mcp-local-test.txt)
+INPUT: {"action":"get","provider":"gitea","owner":"andrebuzeli","repo":"git-mcp-test","path":"mcp-local-test.txt","ref":"main"}
+OUTPUT: {"success":true,"action":"get","message":"Arquivo 'mcp-local-test.txt' obtido com sucesso"}
+---
+[2025-09-15T16:37:10Z] files.update (mcp-local-test.txt) [falha]
+INPUT: {"action":"update","provider":"gitea","owner":"andrebuzeli","repo":"git-mcp-test","path":"mcp-local-test.txt","content":"Arquivo temporário para validar files.* no Gitea.\\nAtualização 1.","message":"chore: update mcp-local-test.txt with extra line","sha":"placeholder"}
+OUTPUT: {"success":false,"action":"update","message":"Erro na operação de arquivos","error":"Validation error - sha does not match"}
+---
+[2025-09-15T16:37:15Z] branches.create
+INPUT: {"action":"create","provider":"gitea","owner":"andrebuzeli","repo":"git-mcp-test","branch_name":"feature/local-mcp-tests","from_branch":"main"}
+OUTPUT: {"success":true,"action":"create","message":"Branch 'feature/local-mcp-tests' criada com sucesso a partir de 'main'"}
+---
+[2025-09-15T16:37:11Z] repositories.get
+INPUT: {"action":"get","provider":"gitea","owner":"andrebuzeli","repo":"git-mcp-test"}
+OUTPUT: {"success":true,"action":"get","message":"Repositório 'andrebuzeli/git-mcp-test' obtido com sucesso"}
+---
+[2025-09-15T16:37:11Z] repositories.update
+INPUT: {"action":"update","provider":"gitea","owner":"andrebuzeli","repo":"git-mcp-test","new_description":"Repo de testes do MCP (atualizado via testes automáticos)","new_private":false}
+OUTPUT: {"success":true,"action":"update","message":"Repositório 'andrebuzeli/git-mcp-test' atualizado com sucesso"}
+---
+[2025-09-15T16:37:12Z] repositories.search
+INPUT: {"action":"search","provider":"gitea","query":"git-mcp","page":1,"limit":10}
+OUTPUT: {"success":true,"action":"search","message":"2 repositórios encontrados para 'git-mcp'","data":{"total":2}}
+---
+[2025-09-15T16:37:13Z] repositories.fork [falha]
+INPUT: {"action":"fork","provider":"gitea","owner":"andrebuzeli","repo":"git-mcp-test"}
+OUTPUT: {"success":false,"action":"fork","message":"Erro na operação de repositórios","error":"Resource already exists - repository already exists"}
+---
+[2025-09-15T16:37:14Z] files.delete (mcp-local-test.txt)
+INPUT: {"action":"delete","provider":"gitea","owner":"andrebuzeli","repo":"git-mcp-test","path":"mcp-local-test.txt","sha":"511c3d408a426f46b9afbf1743d146d7c385eb0d","message":"chore: remove temp test file"}
+OUTPUT: {"success":true,"action":"delete","message":"Arquivo 'mcp-local-test.txt' deletado com sucesso"}
+---
+[2025-09-15T16:38:00Z] users.list
+INPUT: {"action":"list","provider":"gitea","page":1,"limit":10}
+OUTPUT: {"success":true,"action":"list","message":"Listagem de usuários solicitada"}
+---
+[2025-09-15T16:38:01Z] users.search [falha]
+INPUT: {"action":"search","provider":"gitea","query":"andre","page":1,"limit":10}
+OUTPUT: {"success":false,"action":"search","message":"Erro na operação de usuários","error":"data.map is not a function"}
+---
+[2025-09-15T16:38:02Z] commits.search
+INPUT: {"action":"search","provider":"gitea","owner":"andrebuzeli","repo":"git-mcp-test","query":"chore","page":1,"limit":5}
+OUTPUT: {"success":true,"action":"search","message":"Busca por commits com 'chore' solicitada"}
+---
+[2025-09-15T16:38:03Z] tags.create [falha]
+INPUT: {"action":"create","provider":"gitea","owner":"andrebuzeli","repo":"git-mcp-test","tag_name":"v0.0.3","message":"tag de teste criada pelo agente","target":"15f00e51f7c924fd1527cb446c83d4b44afcb0d4","type":"lightweight"}
+OUTPUT: {"success":false,"action":"create","message":"Erro na operação de tags","error":"Not found"}
+---
+[2025-09-15T16:38:03Z] releases.create [falha]
+INPUT: {"action":"create","provider":"gitea","owner":"andrebuzeli","repo":"git-mcp-test","tag_name":"v0.0.3","name":"v0.0.3","body":"Release de teste criada pelo agente (Gitea)","draft":false,"prerelease":false,"target_commitish":"main"}
+OUTPUT: {"success":false,"action":"create","message":"Erro na operação de releases","error":"User not found"}
+---
+[2025-09-15T16:38:04Z] webhooks.list
+INPUT: {"action":"list","provider":"gitea","owner":"andrebuzeli","repo":"git-mcp-test","page":1,"limit":50}
+OUTPUT: {"success":true,"action":"list","message":"1 webhooks encontrados","data":{"total":1}}
+---
+[2025-09-15T16:38:05Z] pulls.create [falha]
+INPUT: {"action":"create","provider":"gitea","owner":"andrebuzeli","repo":"git-mcp-test","title":"PR: feature/local-mcp-tests -> main","body":"Pull Request automatizado para validar pulls.create","head":"feature/local-mcp-tests","base":"main","draft":false}
+OUTPUT: {"success":false,"action":"create","message":"Erro na operação de pull requests","error":"Not found"}
+---
+[2025-09-15T16:38:06Z] workflows.list [não suportado]
+INPUT: {"action":"list","owner":"andrebuzeli","repo":"git-mcp-test","provider":"gitea"}
+OUTPUT: {"success":false,"action":"create-workflow","message":"Funcionalidade não suportada por este provider"}
+---
+[2025-09-15T16:38:06Z] actions.list-runs [não suportado]
+INPUT: {"action":"list-runs","owner":"andrebuzeli","repo":"git-mcp-test","provider":"gitea","limit":10}
+OUTPUT: {"success":false,"action":"cancel","message":"Funcionalidade não suportada por este provider"}
+---
+[2025-09-15T16:38:07Z] deployments.environments [não suportado]
+INPUT: {"action":"environments","owner":"andrebuzeli","repo":"git-mcp-test","provider":"gitea"}
+OUTPUT: {"success":false,"action":"rollback-deployment","message":"Funcionalidade não suportada por este provider"}
+---
+[2025-09-15T16:38:08Z] security.scan (dependencies) [não suportado]
+INPUT: {"action":"scan","provider":"gitea","owner":"andrebuzeli","repo":"git-mcp-test","scan_type":"dependencies","ref":"main"}
+OUTPUT: {"success":false,"action":"list-vulnerabilities","message":"Funcionalidade não suportada por este provider"}
+---
+[2025-09-15T16:38:08Z] analytics.insights [não suportado]
+INPUT: {"action":"insights","provider":"gitea","owner":"andrebuzeli","repo":"git-mcp-test","period":"month","report_format":"json"}
+OUTPUT: {"success":false,"action":"get-repository-insights","message":"Funcionalidade não suportada por este provider"}
+---
+[2025-09-15T16:38:09Z] code-review.analyze [não disponível]
+INPUT: {"action":"analyze","provider":"gitea","owner":"andrebuzeli","repo":"git-mcp-test","language":"typescript","code":"function sum(a: number, b: number) { return a + b }"}
+OUTPUT: {"success":false,"action":"analyze","message":"Code review automatizado não está disponível para o Gitea"}
+---
+[2025-09-15T16:38:10Z] version-control.history
+INPUT: {"action":"history","project":"GIT MCP"}
+OUTPUT: {"success":true,"action":"history","message":"Histórico de versões recuperado."}
+---
+[2025-09-15T16:38:10Z] git-sync.status (dry-run)
+INPUT: {"action":"status","source":{"provider":"gitea","owner":"andrebuzeli","repo":"git-mcp-test"},"target":{"provider":"gitea","owner":"andrebuzeli","repo":"git-mcp-test"},"direction":"one-way","include":["git","issues","labels","milestones","releases","pulls"],"dry_run":true}
+OUTPUT: {"success":true,"action":"status","message":"Status coletado (placeholder)."}
+---
+[2025-09-15T16:43:07Z] repositories.create (temp-mcp-delete)
+INPUT: {"action":"create","provider":"gitea","name":"temp-mcp-delete","description":"repo temporário para testes de delete","private":false}
+OUTPUT: {"success":true,"action":"create","message":"Repositório 'temp-mcp-delete' criado com sucesso"}
+---
+[2025-09-15T16:43:09Z] branches.create (feature/test-delete)
+INPUT: {"action":"create","provider":"gitea","owner":"andrebuzeli","repo":"temp-mcp-delete","branch_name":"feature/test-delete","from_branch":"main"}
+OUTPUT: {"success":true,"action":"create","message":"Branch 'feature/test-delete' criada com sucesso a partir de 'main'"}
+---
+[2025-09-15T16:43:12Z] branches.delete (feature/test-delete)
+INPUT: {"action":"delete","provider":"gitea","owner":"andrebuzeli","repo":"temp-mcp-delete","branch":"feature/test-delete"}
+OUTPUT: {"success":true,"action":"delete","message":"Branch 'feature/test-delete' deletada com sucesso"}
+---
+[2025-09-15T16:43:15Z] repositories.delete (temp-mcp-delete)
+INPUT: {"action":"delete","provider":"gitea","owner":"andrebuzeli","repo":"temp-mcp-delete"}
+OUTPUT: {"success":true,"action":"delete","message":"Repositório 'andrebuzeli/temp-mcp-delete' deletado com sucesso"}
+---
+[2025-09-15T16:44:27Z] branches.merge
+INPUT: {"action":"merge","provider":"gitea","owner":"andrebuzeli","repo":"git-mcp-test","head":"feature/local-mcp-tests","base":"main","merge_method":"merge"}
+OUTPUT: {"success":true,"action":"merge","message":"Merge de 'feature/local-mcp-tests' em 'main' solicitado (funcionalidade será implementada)"}
+---
+[2025-09-15T16:44:27Z] commits.get [falha]
+INPUT: {"action":"get","provider":"gitea","owner":"andrebuzeli","repo":"git-mcp-test","sha":"15f00e51f7c924fd1527cb446c83d4b44afcb0d4"}
+OUTPUT: {"success":false,"action":"get","message":"Erro na operação de commits","error":"commit_sha é obrigatório"}
+---
+[2025-09-15T16:44:28Z] issues.comment
+INPUT: {"action":"comment","provider":"gitea","owner":"andrebuzeli","repo":"git-mcp-test","issue_number":2,"comment_body":"Comentário automático de validação (issues.comment)"}
+OUTPUT: {"success":true,"action":"comment","message":"Comentário adicionado à issue #2 com sucesso"}
+---
+[2025-09-15T16:44:29Z] issues.close
+INPUT: {"action":"close","provider":"gitea","owner":"andrebuzeli","repo":"git-mcp-test","issue_number":2}
+OUTPUT: {"success":true,"action":"close","message":"Issue #2 fechada com sucesso"}
+---
+[2025-09-15T16:44:30Z] users.repos
+INPUT: {"action":"repos","provider":"gitea","username":"andrebuzeli","repo_type":"owner","page":1,"limit":10}
+OUTPUT: {"success":true,"action":"repos","message":"1 repositórios encontrados para 'andrebuzeli'","data":{"total":1}}
+---
+[2025-09-15T16:47:47Z] webhooks.update
+INPUT: {"action":"update","provider":"gitea","owner":"andrebuzeli","repo":"git-mcp-test","webhook_id":6,"new_active":true}
+OUTPUT: {"success":true,"action":"update","message":"Webhook #6 atualizado com sucesso"}
+---
+[2025-09-15T16:47:55Z] webhooks.test
+INPUT: {"action":"test","provider":"gitea","owner":"andrebuzeli","repo":"git-mcp-test","webhook_id":6}
+OUTPUT: {"success":true,"action":"test","message":"Webhook #6 testado com sucesso"}
+---
+[2025-09-15T16:48:10Z] webhooks.delete
+INPUT: {"action":"delete","provider":"gitea","owner":"andrebuzeli","repo":"git-mcp-test","webhook_id":6}
+OUTPUT: {"success":true,"action":"delete","message":"Webhook #6 deletado com sucesso"}
+---
+[2025-09-15T16:48:20Z] users.orgs
+INPUT: {"action":"orgs","provider":"gitea","username":"andrebuzeli"}
+OUTPUT: {"success":true,"action":"orgs","message":"1 organizações encontradas para 'andrebuzeli'"}
+---
+[2025-09-15T16:48:30Z] git-sync.one-shot (dry-run)
+INPUT: {"action":"one-shot","source":{"provider":"gitea","owner":"andrebuzeli","repo":"git-mcp-test"},"target":{"provider":"gitea","owner":"andrebuzeli","repo":"git-mcp-test"},"direction":"one-way","include":["git","issues","labels","milestones","releases","pulls"],"dry_run":true}
+OUTPUT: {"success":true,"action":"one-shot","message":"Sincronização pontual executada (placeholder)."}
+---
+[2025-09-15T16:48:40Z] version-control.rollback (dry-run)
+INPUT: {"action":"rollback","project":"GIT MCP","version":"2.11.0","dry_run":true}
+OUTPUT: {"success":true,"action":"rollback","message":"Rollback executado. Projeto revertido para versão anterior."}
+---

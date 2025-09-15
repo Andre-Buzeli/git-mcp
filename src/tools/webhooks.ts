@@ -1,11 +1,24 @@
 import { z } from 'zod';
 import { globalProviderFactory, VcsOperations } from '../providers/index.js';
+import { applyAutoUserDetection } from '../utils/user-detection.js';
 
 /**
  * Tool: webhooks
  * 
  * DESCRIÇÃO:
- * Gerenciamento completo de webhooks com suporte multi-provider (GitHub e Gitea)
+  async handler(input: WebhooksInput): Promise<WebhooksResult> {
+    try {
+      const validatedInput = WebhooksInputSchema.parse(input);
+      
+      // Aplicar auto-detecção apenas para owner dentro do provider especificado
+      const processedInput = await applyAutoUserDetection(validatedInput, validatedInput.provider);
+      
+      // Usar o provider especificado pelo usuário
+      const provider = globalProviderFactory.getProvider(processedInput.provider);
+      
+      if (!provider) {
+        throw new Error(`Provider '${processedInput.provider}' não encontrado`);
+      }o completo de webhooks com suporte multi-provider (GitHub e Gitea)
  * 
  * FUNCIONALIDADES:
  * - Criação de novos webhooks
@@ -50,7 +63,7 @@ const WebhooksInputSchema = z.object({
   repo: z.string().optional(),
   
   // Para multi-provider
-  provider: z.enum(['gitea', 'github', 'both']).optional(), // Provider específico: gitea, github ou both
+  provider: z.enum(['gitea', 'github']).describe('Provider to use (gitea or github)'), // Provider específico: gitea, github ou both
   
   // Para create
   url: z.string().optional(),
@@ -187,7 +200,7 @@ export const webhooksTool = {
       new_events: { type: 'array', items: { type: 'string' }, description: 'New webhook events' },
       new_active: { type: 'boolean', description: 'New webhook active status' }
     },
-    required: ['action']
+    required: ['action', 'provider']
   },
 
   /**
@@ -222,30 +235,33 @@ export const webhooksTool = {
     try {
       const validatedInput = WebhooksInputSchema.parse(input);
       
+      // Apply automatic user/owner detection from configured tokens
+      const processedInput = await applyAutoUserDetection(validatedInput, validatedInput.provider || 'default');
+      
       // Seleciona o provider baseado na entrada ou usa o padrão
-      const provider = validatedInput.provider
-        ? globalProviderFactory.getProvider(validatedInput.provider)
+      const provider = processedInput.provider
+        ? globalProviderFactory.getProvider(processedInput.provider)
         : globalProviderFactory.getDefaultProvider();
       
       if (!provider) {
         throw new Error('Provider não encontrado ou não configurado');
       }
       
-      switch (validatedInput.action) {
+      switch (processedInput.action) {
         case 'create':
-          return await this.createWebhook(validatedInput, provider);
+          return await this.createWebhook(processedInput, provider);
         case 'list':
-          return await this.listWebhooks(validatedInput, provider);
+          return await this.listWebhooks(processedInput, provider);
         case 'get':
-          return await this.getWebhook(validatedInput, provider);
+          return await this.getWebhook(processedInput, provider);
         case 'update':
-          return await this.updateWebhook(validatedInput, provider);
+          return await this.updateWebhook(processedInput, provider);
         case 'delete':
-          return await this.deleteWebhook(validatedInput, provider);
+          return await this.deleteWebhook(processedInput, provider);
         case 'test':
-          return await this.testWebhook(validatedInput, provider);
+          return await this.testWebhook(processedInput, provider);
         default:
-          throw new Error(`Ação não suportada: ${validatedInput.action}`);
+          throw new Error(`Ação não suportada: ${processedInput.action}`);
       }
     } catch (error) {
       return {
@@ -569,3 +585,4 @@ export const webhooksTool = {
     }
   }
 };
+

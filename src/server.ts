@@ -18,6 +18,7 @@ import { globalProviderFactory, initializeFactoryFromEnv } from './providers/ind
  * - tags: Gerenciamento de tags
  * - users: Operações com usuários
  * - webhooks: Gerenciamento de webhooks
+ * - code-review: Análise e revisão de código
  */
 import { repositoriesTool } from './tools/repositories.js';
 import { branchesTool } from './tools/branches.js';
@@ -31,6 +32,12 @@ import { usersTool } from './tools/users.js';
 import { webhooksTool } from './tools/webhooks.js';
 import { gitSyncTool } from './tools/git-sync.js';
 import { versionControlTool } from './tools/version-control.js';
+import { workflowsTool } from './tools/workflows.js';
+import { actionsTool } from './tools/actions.js';
+import { deploymentsTool } from './tools/deployments.js';
+import { securityTool } from './tools/security.js';
+import { analyticsTool } from './tools/analytics.js';
+import { codeReviewTool } from './tools/code-review.js';
 
 /**
  * Array de todas as ferramentas disponíveis
@@ -57,7 +64,13 @@ const tools = [
   usersTool,
   webhooksTool,
   gitSyncTool,
-  versionControlTool
+  versionControlTool,
+  workflowsTool,
+  actionsTool,
+  deploymentsTool,
+  securityTool,
+  analyticsTool,
+  codeReviewTool
 ];
 
 /**
@@ -85,8 +98,8 @@ export class GiteaMCPServer {
   constructor() {
     this.server = new Server(
       {
-        name: 'gitea-mcp-v2',
-        version: '2.0.0',
+        name: 'git-mcp',
+        version: '2.6.2',
       }
     );
 
@@ -194,10 +207,22 @@ export class GiteaMCPServer {
 
     // Inicializar provider factory com configuração
     try {
+      console.log('[SERVER] Inicializando provider factory...');
       const factory = initializeFactoryFromEnv();
+
+      // Log detalhado dos providers configurados
+      const providersInfo = factory.getProvidersInfo();
+      console.log('[SERVER] Providers configurados:');
+      providersInfo.forEach(p => {
+        console.log(`  - ${p.name} (${p.type}) ${p.isDefault ? '[PADRÃO]' : ''}`);
+      });
+
       // Atualizar o globalProviderFactory com a configuração
       Object.assign(globalProviderFactory, factory);
+
+      console.log('[SERVER] Provider factory inicializado com sucesso');
     } catch (error) {
+      console.error('[SERVER] Erro ao inicializar providers:', error);
       throw new Error(`Failed to initialize providers: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
 

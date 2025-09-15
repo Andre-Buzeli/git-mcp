@@ -215,6 +215,7 @@ export interface VcsOperations {
   // Commits
   listCommits(owner: string, repo: string, branch?: string, page?: number, limit?: number): Promise<CommitInfo[]>;
   getCommit(owner: string, repo: string, sha: string): Promise<CommitInfo>;
+  createCommit(owner: string, repo: string, message: string, branch: string, changes?: any): Promise<CommitInfo>;
   
   // Issues
   listIssues(owner: string, repo: string, state?: 'open' | 'closed' | 'all', page?: number, limit?: number): Promise<IssueInfo[]>;
@@ -244,6 +245,7 @@ export interface VcsOperations {
   deleteTag(owner: string, repo: string, tag: string): Promise<boolean>;
   
   // Users
+  getCurrentUser(): Promise<UserInfo>;
   getUser(username: string): Promise<UserInfo>;
   listUsers(page?: number, limit?: number): Promise<UserInfo[]>;
   searchUsers(query: string, page?: number, limit?: number): Promise<UserInfo[]>;
@@ -254,6 +256,64 @@ export interface VcsOperations {
   createWebhook(owner: string, repo: string, url: string, events: string[], secret?: string): Promise<WebhookInfo>;
   updateWebhook(owner: string, repo: string, webhookId: number, updates: Partial<WebhookInfo>): Promise<WebhookInfo>;
   deleteWebhook(owner: string, repo: string, webhookId: number): Promise<boolean>;
+  
+  // Extended Repository Operations (placeholder implementations)
+  cloneRepository?(params: any): Promise<any>;
+  archiveRepository?(params: any): Promise<any>;
+  transferRepository?(params: any): Promise<any>;
+  createFromTemplate?(params: any): Promise<any>;
+  mirrorRepository?(params: any): Promise<any>;
+  
+  // Workflows (placeholder implementations)
+  listWorkflows?(params: any): Promise<any>;
+  createWorkflow?(params: any): Promise<any>;
+  triggerWorkflow?(params: any): Promise<any>;
+  getWorkflowStatus?(params: any): Promise<any>;
+  getWorkflowLogs?(params: any): Promise<any>;
+  disableWorkflow?(params: any): Promise<any>;
+  enableWorkflow?(params: any): Promise<any>;
+  
+  // Actions (placeholder implementations)
+  listWorkflowRuns?(params: any): Promise<any>;
+  cancelWorkflowRun?(params: any): Promise<any>;
+  rerunWorkflow?(params: any): Promise<any>;
+  listArtifacts?(params: any): Promise<any>;
+  listSecrets?(params: any): Promise<any>;
+  listJobs?(params: any): Promise<any>;
+  downloadArtifact?(params: any): Promise<any>;
+  
+  // Deployments (placeholder implementations)
+  listDeployments?(params: any): Promise<any>;
+  createDeployment?(params: any): Promise<any>;
+  updateDeploymentStatus?(params: any): Promise<any>;
+  listEnvironments?(params: any): Promise<any>;
+  rollbackDeployment?(params: any): Promise<any>;
+  deleteDeployment?(params: any): Promise<any>;
+  
+  // Security (placeholder implementations)
+  runSecurityScan?(params: any): Promise<any>;
+  listVulnerabilities?(params: any): Promise<any>;
+  manageSecurityAlerts?(params: any): Promise<any>;
+  manageSecurityPolicies?(params: any): Promise<any>;
+  checkCompliance?(params: any): Promise<any>;
+  analyzeDependencies?(params: any): Promise<any>;
+  listSecurityAdvisories?(params: any): Promise<any>;
+  
+  // Analytics (placeholder implementations)
+  getTrafficStats?(params: any): Promise<any>;
+  analyzeContributors?(params: any): Promise<any>;
+  getActivityStats?(params: any): Promise<any>;
+  getPerformanceMetrics?(params: any): Promise<any>;
+  generateReports?(params: any): Promise<any>;
+  analyzeTrends?(params: any): Promise<any>;
+  getRepositoryInsights?(params: any): Promise<any>;
+
+  // Code Review (placeholder implementations)
+  startCodeReview?(params: any): Promise<any>;
+  reviewFile?(params: any): Promise<any>;
+  reviewCommit?(params: any): Promise<any>;
+  generateReviewReport?(params: any): Promise<any>;
+  applyReviewSuggestions?(params: any): Promise<any>;
 }
 
 // Factory para criar providers

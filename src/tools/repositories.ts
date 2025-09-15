@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { globalProviderFactory, VcsOperations } from '../providers/index.js';
+import { applyAutoUserDetection } from '../utils/user-detection.js';
 
 /**
  * Tool: repositories
@@ -46,9 +47,7 @@ const RepositoriesInputSchema = z.object({
   // Parâmetros comuns
   owner: z.string().optional(),
   repo: z.string().optional(),
-  provider: z.enum(['gitea', 'github', 'both']).optional(), // Provider específico: gitea, github ou both
-  
-  // Para create
+  provider: z.enum(['gitea', 'github']).describe('Provider to use (gitea or github)'),
   name: z.string().optional(),
   description: z.string().optional(),
   private: z.boolean().optional(),
@@ -166,7 +165,7 @@ export const repositoriesTool = {
       },
       owner: { type: 'string', description: 'Repository owner' },
       repo: { type: 'string', description: 'Repository name' },
-      provider: { type: 'string', description: 'Specific provider (github, gitea) or use default' },
+      provider: { type: 'string', enum: ['gitea', 'github'], description: 'Provider to use (gitea or github)' },
       name: { type: 'string', description: 'Repository name for creation' },
       description: { type: 'string', description: 'Repository description' },
       private: { type: 'boolean', description: 'Private repository' },
@@ -185,7 +184,7 @@ export const repositoriesTool = {
       organization: { type: 'string', description: 'Organization for fork' },
       query: { type: 'string', description: 'Search query' }
     },
-    required: ['action']
+    required: ['action', 'provider']
   },
 
   /**
@@ -219,32 +218,33 @@ export const repositoriesTool = {
     try {
       const validatedInput = RepositoriesInputSchema.parse(input);
       
-      // Obter o provider correto
-      const provider = validatedInput.provider 
-        ? globalProviderFactory.getProvider(validatedInput.provider)
-        : globalProviderFactory.getDefaultProvider();
+      // Aplicar auto-detecção apenas para owner/username dentro do provider especificado
+      const processedInput = await applyAutoUserDetection(validatedInput, validatedInput.provider);
+      
+      // Usar o provider especificado pelo usuário
+      const provider = globalProviderFactory.getProvider(processedInput.provider);
       
       if (!provider) {
-        throw new Error(`Provider '${validatedInput.provider}' não encontrado`);
+        throw new Error(`Provider '${processedInput.provider}' não encontrado`);
       }
       
-      switch (validatedInput.action) {
+      switch (processedInput.action) {
         case 'create':
-          return await this.createRepository(validatedInput, provider);
+          return await this.createRepository(processedInput, provider);
         case 'list':
-          return await this.listRepositories(validatedInput, provider);
+          return await this.listRepositories(processedInput, provider);
         case 'get':
-          return await this.getRepository(validatedInput, provider);
+          return await this.getRepository(processedInput, provider);
         case 'update':
-          return await this.updateRepository(validatedInput, provider);
+          return await this.updateRepository(processedInput, provider);
         case 'delete':
-          return await this.deleteRepository(validatedInput, provider);
+          return await this.deleteRepository(processedInput, provider);
         case 'fork':
-          return await this.forkRepository(validatedInput, provider);
+          return await this.forkRepository(processedInput, provider);
         case 'search':
-          return await this.searchRepositories(validatedInput, provider);
+          return await this.searchRepositories(processedInput, provider);
         default:
-          throw new Error(`Ação não suportada: ${validatedInput.action}`);
+          throw new Error(`Ação não suportada: ${processedInput.action}`);
       }
     } catch (error) {
       return {

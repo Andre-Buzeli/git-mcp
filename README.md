@@ -1,27 +1,33 @@
-# Gitea MCP Server v2.4.0
+# Git MCP Server v2.6.1
 
-🚀 **Complete MCP Server for Gitea Self-Hosted** - 12+1 tools (git-sync + version-control) with 80+ actions
+🚀 **Complete MCP Server for Gitea Self-Hosted** - 18 tools with 100+ actions including AI code review, enhanced validation and automated DevOps workflows
 
 ## 🎯 Overview
 
-Gitea MCP Server v2.4.0 é um servidor MCP moderno em TypeScript, focado em Gitea self-hosted e com suporte completo a multi-provedor (GitHub + Gitea simultaneamente). Inclui arquitetura de providers unificada, documentação abrangente, boas práticas e um guia para uso individual (solo).
+Git MCP Server v2.6.1 é um servidor MCP moderno em TypeScript, focado em Gitea self-hosted e com suporte completo a multi-provedor (GitHub + Gitea simultaneamente). Inclui arquitetura de providers unificada, documentação abrangente, boas práticas, validações aprimoradas, nova tool de code-review com IA e guia para uso individual (solo).
 
 ## ✨ Features
 
-### 🛠️ **12 Tools**
+### 🛠️ **18 Tools**
 
-1. **repositories** - Complete repository management
-2. **branches** - Branch operations
-3. **files** - File and directory management
-4. **commits** - Commit operations
-5. **issues** - Issue management
-6. **pulls** - Pull request management
-7. **releases** - Release management
-8. **tags** - Tag management
-9. **users** - User operations
-10. **webhooks** - Webhook management
-11. **git-sync** - Cross-provider repository synchronization
-12. **version-control** - Versioning, backup and change tracking system
+1. **repositories** - Complete repository management with cloning, archiving, templates
+2. **branches** - Branch operations with enhanced validation
+3. **files** - File and directory management with search capabilities
+4. **commits** - Commit operations with search and creation
+5. **issues** - Issue management with advanced search
+6. **pulls** - Pull request management with reviews
+7. **releases** - Release management with enhanced validation
+8. **tags** - Tag management with search
+9. **users** - User operations with search
+10. **webhooks** - Webhook management with testing
+11. **code-review** - AI-powered code analysis and review suggestions ⭐ **NEW**
+12. **git-sync** - Cross-provider repository synchronization with bidirectional sync
+13. **version-control** - Versioning, backup and change tracking system with semantic versioning
+14. **workflows** - CI/CD workflow management
+15. **actions** - GitHub Actions management
+16. **deployments** - Deployment tracking and rollbacks
+17. **security** - Security scanning and compliance
+18. **analytics** - Repository insights and analytics
 
 > 🚀 **Multi-Provider Complete** (GitHub + Gitea simultaneamente)
 
@@ -48,6 +54,20 @@ npm install -g @andrebuzeli/gitea-mcp-v2
 
 ## ⚙️ Configuration
 
+### Demo Mode
+
+Para testar o servidor sem configurar providers reais:
+
+```bash
+DEMO_MODE=true npx @andrebuzeli/gitea-mcp-v2
+```
+
+O modo demo permite:
+- ✅ Testar todas as funcionalidades sem APIs reais
+- ✅ Desenvolvimento e debugging
+- ✅ Demonstrações e tutoriais
+- ⚠️ Não executa operações reais nos repositórios
+
 ### Environment Variables
 
 ```bash
@@ -56,6 +76,7 @@ GITEA_TOKEN=your_personal_access_token
 GITEA_USERNAME=your_username
 DEBUG=false
 TIMEOUT=30000
+DEMO_MODE=false  # Set to 'true' for testing without real providers
 ```
 
 ### MCP Configuration

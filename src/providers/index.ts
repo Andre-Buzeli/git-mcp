@@ -21,5 +21,9 @@ export {
   initializeFactoryFromEnv 
 } from './provider-factory.js';
 
+// Error handling
+export { ErrorHandler } from './error-handler.js';
+export type { StandardError } from './error-handler.js';
+
 // Re-export para compatibilidade
 export type { VcsOperations as VcsProviderOperations } from './types.js';
