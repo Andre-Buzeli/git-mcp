@@ -19,6 +19,7 @@ declare const ConfigSchema: z.ZodEffects<z.ZodObject<{
     giteaToken: z.ZodOptional<z.ZodString>;
     giteaUsername: z.ZodOptional<z.ZodString>;
     githubToken: z.ZodOptional<z.ZodString>;
+    githubUsername: z.ZodOptional<z.ZodString>;
     provider: z.ZodOptional<z.ZodEnum<["gitea", "github"]>>;
     apiUrl: z.ZodOptional<z.ZodString>;
     apiToken: z.ZodOptional<z.ZodString>;
@@ -33,6 +34,7 @@ declare const ConfigSchema: z.ZodEffects<z.ZodObject<{
     giteaToken?: string | undefined;
     giteaUsername?: string | undefined;
     githubToken?: string | undefined;
+    githubUsername?: string | undefined;
     provider?: "gitea" | "github" | undefined;
     apiUrl?: string | undefined;
     apiToken?: string | undefined;
@@ -43,6 +45,7 @@ declare const ConfigSchema: z.ZodEffects<z.ZodObject<{
     giteaToken?: string | undefined;
     giteaUsername?: string | undefined;
     githubToken?: string | undefined;
+    githubUsername?: string | undefined;
     provider?: "gitea" | "github" | undefined;
     apiUrl?: string | undefined;
     apiToken?: string | undefined;
@@ -57,6 +60,7 @@ declare const ConfigSchema: z.ZodEffects<z.ZodObject<{
     giteaToken?: string | undefined;
     giteaUsername?: string | undefined;
     githubToken?: string | undefined;
+    githubUsername?: string | undefined;
     provider?: "gitea" | "github" | undefined;
     apiUrl?: string | undefined;
     apiToken?: string | undefined;
@@ -67,6 +71,7 @@ declare const ConfigSchema: z.ZodEffects<z.ZodObject<{
     giteaToken?: string | undefined;
     giteaUsername?: string | undefined;
     githubToken?: string | undefined;
+    githubUsername?: string | undefined;
     provider?: "gitea" | "github" | undefined;
     apiUrl?: string | undefined;
     apiToken?: string | undefined;
@@ -232,6 +237,13 @@ export declare class ConfigManager {
      * - Token do GitHub ou undefined
      */
     getGitHubToken(): string | undefined;
+    /**
+     * Obtém o nome de usuário do GitHub
+     *
+     * RETORNO:
+     * - Nome de usuário do GitHub ou undefined
+     */
+    getGitHubUsername(): string | undefined;
     /**
      * Obtém o provider padrão configurado
      *

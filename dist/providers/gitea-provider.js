@@ -521,10 +521,6 @@ class GiteaProvider extends base_provider_js_1.BaseVcsProvider {
         await this.delete(`/repos/${owner}/${repo}/tags/${tag}`);
         return true;
     }
-    async getCurrentUser() {
-        const data = await this.get('/user');
-        return this.normalizeUser(data);
-    }
     async getUser(username) {
         const data = await this.get(`/users/${username}`);
         return this.normalizeUser(data);

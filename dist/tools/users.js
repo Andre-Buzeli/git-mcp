@@ -238,15 +238,8 @@ exports.usersTool = {
             let user;
             let message;
             if (params.current) {
-                // Implementar getCurrentUser
-                user = {
-                    id: 1,
-                    login: 'usuário atual',
-                    name: 'Usuário Atual',
-                    email: 'user@example.com',
-                    avatar_url: 'https://example.com/avatar.png',
-                    note: 'Funcionalidade getCurrentUser será implementada'
-                };
+                // Obter usuário atual usando a API do provider
+                user = await provider.getCurrentUser();
                 message = 'Usuário atual obtido com sucesso';
             }
             else if (params.username) {

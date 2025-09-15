@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { globalProviderFactory, VcsOperations } from '../providers/index.js';
+import { config } from '../config.js';
 
 /**
  * Tool: users
@@ -251,21 +252,14 @@ export const usersTool = {
       let user;
       let message;
 
-              if (params.current) {
-          // Implementar getCurrentUser
-          user = {
-            id: 1,
-            login: 'usuário atual',
-            name: 'Usuário Atual',
-            email: 'user@example.com',
-            avatar_url: 'https://example.com/avatar.png',
-            note: 'Funcionalidade getCurrentUser será implementada'
-          };
-          message = 'Usuário atual obtido com sucesso';
-        } else if (params.username) {
-          user = await provider.getUser(params.username);
-          message = `Usuário '${params.username}' obtido com sucesso`;
-        } else {
+      if (params.current) {
+        // Obter usuário atual usando a API do provider
+        user = await provider.getCurrentUser();
+        message = 'Usuário atual obtido com sucesso';
+      } else if (params.username) {
+        user = await provider.getUser(params.username);
+        message = `Usuário '${params.username}' obtido com sucesso`;
+      } else {
         throw new Error('current=true ou username deve ser fornecido');
       }
 

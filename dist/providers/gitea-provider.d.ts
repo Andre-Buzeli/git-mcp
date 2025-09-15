@@ -56,7 +56,6 @@ export declare class GiteaProvider extends BaseVcsProvider {
     getTag(owner: string, repo: string, tag: string): Promise<TagInfo>;
     createTag(tagName: string, message: string, target: string): Promise<TagInfo>;
     deleteTag(owner: string, repo: string, tag: string): Promise<boolean>;
-    getCurrentUser(): Promise<UserInfo>;
     getUser(username: string): Promise<UserInfo>;
     listUsers(page?: number, limit?: number): Promise<UserInfo[]>;
     searchUsers(query: string, page?: number, limit?: number): Promise<UserInfo[]>;

@@ -63,7 +63,6 @@ declare const RepositoriesInputSchema: z.ZodObject<{
 }, "strip", z.ZodTypeAny, {
     provider: "gitea" | "github";
     action: "delete" | "get" | "create" | "list" | "update" | "fork" | "search";
-    username?: string | undefined;
     name?: string | undefined;
     description?: string | undefined;
     private?: boolean | undefined;
@@ -77,6 +76,7 @@ declare const RepositoriesInputSchema: z.ZodObject<{
     gitignores?: string | undefined;
     license?: string | undefined;
     readme?: string | undefined;
+    username?: string | undefined;
     new_name?: string | undefined;
     new_description?: string | undefined;
     new_private?: boolean | undefined;
@@ -85,7 +85,6 @@ declare const RepositoriesInputSchema: z.ZodObject<{
 }, {
     provider: "gitea" | "github";
     action: "delete" | "get" | "create" | "list" | "update" | "fork" | "search";
-    username?: string | undefined;
     name?: string | undefined;
     description?: string | undefined;
     private?: boolean | undefined;
@@ -99,6 +98,7 @@ declare const RepositoriesInputSchema: z.ZodObject<{
     gitignores?: string | undefined;
     license?: string | undefined;
     readme?: string | undefined;
+    username?: string | undefined;
     new_name?: string | undefined;
     new_description?: string | undefined;
     new_private?: boolean | undefined;

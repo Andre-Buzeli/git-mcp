@@ -54,9 +54,9 @@ declare const UsersInputSchema: z.ZodObject<{
     action: "get" | "list" | "search" | "orgs" | "repos";
     provider?: "gitea" | "github" | "both" | undefined;
     sort?: "full_name" | "updated" | "created" | "pushed" | undefined;
-    username?: string | undefined;
     page?: number | undefined;
     limit?: number | undefined;
+    username?: string | undefined;
     query?: string | undefined;
     current?: boolean | undefined;
     repo_type?: "all" | "owner" | "member" | "collaborator" | undefined;
@@ -65,9 +65,9 @@ declare const UsersInputSchema: z.ZodObject<{
     action: "get" | "list" | "search" | "orgs" | "repos";
     provider?: "gitea" | "github" | "both" | undefined;
     sort?: "full_name" | "updated" | "created" | "pushed" | undefined;
-    username?: string | undefined;
     page?: number | undefined;
     limit?: number | undefined;
+    username?: string | undefined;
     query?: string | undefined;
     current?: boolean | undefined;
     repo_type?: "all" | "owner" | "member" | "collaborator" | undefined;

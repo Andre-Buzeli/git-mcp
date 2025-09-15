@@ -20,9 +20,10 @@ const ConfigSchema = z.object({
   giteaUrl: z.string().url().optional(),
   giteaToken: z.string().min(1).optional(),
   giteaUsername: z.string().optional(),
-  
+
   // Configuração para GitHub
   githubToken: z.string().min(1).optional(),
+  githubUsername: z.string().optional(),
   
   // Configuração genérica para multi-provider
   provider: z.enum(['gitea', 'github']).optional(),
@@ -154,9 +155,10 @@ export class ConfigManager {
       giteaUrl: process.env.GITEA_URL,
       giteaToken: process.env.GITEA_TOKEN,
       giteaUsername: process.env.GITEA_USERNAME,
-      
+
       // Configuração para GitHub
       githubToken: process.env.GITHUB_TOKEN,
+      githubUsername: process.env.GITHUB_USERNAME,
       
       // Configuração genérica para multi-provider
       provider: (process.env.PROVIDER as 'gitea' | 'github'),
@@ -188,7 +190,8 @@ export class ConfigManager {
             name: 'github',
             type: 'github',
             apiUrl: 'https://api.github.com',
-            token: config.githubToken
+            token: config.githubToken,
+            username: config.githubUsername
           }
         ]
       });
@@ -324,12 +327,22 @@ export class ConfigManager {
 
   /**
    * Obtém o token do GitHub
-   * 
+   *
    * RETORNO:
    * - Token do GitHub ou undefined
    */
   public getGitHubToken(): string | undefined {
     return this.config.githubToken;
+  }
+
+  /**
+   * Obtém o nome de usuário do GitHub
+   *
+   * RETORNO:
+   * - Nome de usuário do GitHub ou undefined
+   */
+  public getGitHubUsername(): string | undefined {
+    return this.config.githubUsername;
   }
 
   /**
