@@ -49,7 +49,7 @@ const FilesInputSchema = z.object({
   owner: z.string().optional(),
   repo: z.string().optional(),
   path: z.string().optional(),
-    provider: z.enum(['gitea', 'github']).describe('Provider to use (gitea or github)'),  // Para create/update
+    provider: z.enum(['gitea', 'github']).optional().describe('Provider to use (gitea or github, optional - uses default if not specified)'),  // Para create/update
   content: z.string().optional(),
   message: z.string().optional(),
   branch: z.string().optional(),
@@ -181,7 +181,7 @@ export const filesTool = {
       page: { type: 'number', description: 'Page number', minimum: 1 },
       limit: { type: 'number', description: 'Items per page', minimum: 1, maximum: 100 }
     },
-    required: ['action', 'provider']
+    required: ['action']
   },
 
   /**

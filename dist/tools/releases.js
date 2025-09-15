@@ -50,7 +50,7 @@ const ReleasesInputSchema = zod_1.z.object({
     owner: zod_1.z.string().optional(),
     repo: zod_1.z.string().optional(),
     // Para multi-provider
-    provider: zod_1.z.enum(['gitea', 'github']).describe('Provider to use (gitea or github)'), // Provider específico: gitea, github ou both
+    provider: zod_1.z.enum(['gitea', 'github']).optional().describe('Provider to use (gitea or github, optional - uses default if not specified)'), // Provider específico: gitea, github ou both
     // Para create
     tag_name: zod_1.z.string().optional(),
     name: zod_1.z.string().optional(),
@@ -185,7 +185,7 @@ exports.releasesTool = {
             new_target_commitish: { type: 'string', description: 'New target branch or commit' },
             latest: { type: 'boolean', description: 'Get latest release' }
         },
-        required: ['action', 'provider']
+        required: ['action']
     },
     /**
      * Handler principal da tool releases

@@ -172,6 +172,20 @@ export interface UserInfo {
   raw?: any;
 }
 
+export interface OrganizationInfo {
+  id: number;
+  login: string;
+  name?: string;
+  description?: string;
+  avatar_url?: string;
+  html_url?: string;
+  location?: string;
+  website?: string;
+  public_repos?: number;
+  public_members?: number;
+  raw?: any;
+}
+
 export interface WebhookInfo {
   id: number;
   type: string;
@@ -249,7 +263,9 @@ export interface VcsOperations {
   getUser(username: string): Promise<UserInfo>;
   listUsers(page?: number, limit?: number): Promise<UserInfo[]>;
   searchUsers(query: string, page?: number, limit?: number): Promise<UserInfo[]>;
-  
+  getUserOrganizations(username: string, page?: number, limit?: number): Promise<OrganizationInfo[]>;
+  getUserRepositories(username: string, page?: number, limit?: number): Promise<RepositoryInfo[]>;
+
   // Webhooks
   listWebhooks(owner: string, repo: string, page?: number, limit?: number): Promise<WebhookInfo[]>;
   getWebhook(owner: string, repo: string, webhookId: number): Promise<WebhookInfo>;

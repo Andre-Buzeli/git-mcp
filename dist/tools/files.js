@@ -49,7 +49,7 @@ const FilesInputSchema = zod_1.z.object({
     owner: zod_1.z.string().optional(),
     repo: zod_1.z.string().optional(),
     path: zod_1.z.string().optional(),
-    provider: zod_1.z.enum(['gitea', 'github']).describe('Provider to use (gitea or github)'), // Para create/update
+    provider: zod_1.z.enum(['gitea', 'github']).optional().describe('Provider to use (gitea or github, optional - uses default if not specified)'), // Para create/update
     content: zod_1.z.string().optional(),
     message: zod_1.z.string().optional(),
     branch: zod_1.z.string().optional(),
@@ -171,7 +171,7 @@ exports.filesTool = {
             page: { type: 'number', description: 'Page number', minimum: 1 },
             limit: { type: 'number', description: 'Items per page', minimum: 1, maximum: 100 }
         },
-        required: ['action', 'provider']
+        required: ['action']
     },
     /**
      * Handler principal da tool files

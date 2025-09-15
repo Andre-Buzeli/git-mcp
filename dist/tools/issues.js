@@ -50,7 +50,7 @@ const IssuesInputSchema = zod_1.z.object({
     owner: zod_1.z.string().optional(),
     repo: zod_1.z.string().optional(),
     // Para multi-provider
-    provider: zod_1.z.enum(['gitea', 'github']).describe('Provider to use (gitea or github)'), // Provider específico: gitea, github ou both
+    provider: zod_1.z.enum(['gitea', 'github']).optional().describe('Provider to use (gitea or github, optional - uses default if not specified)'), // Provider específico: gitea, github ou both
     // Para create
     title: zod_1.z.string().optional(),
     body: zod_1.z.string().optional(),
@@ -204,7 +204,7 @@ exports.issuesTool = {
             assignee: { type: 'string', description: 'Issue assignee filter' },
             label: { type: 'string', description: 'Issue label filter' }
         },
-        required: ['action', 'provider']
+        required: ['action']
     },
     /**
      * Handler principal da tool issues
@@ -240,11 +240,28 @@ exports.issuesTool = {
             // Aplicar auto-detecção de usuário/owner
             const processedInput = await (0, user_detection_js_1.applyAutoUserDetection)(validatedInput, validatedInput.provider);
             // Obter o provider correto
-            const provider = processedInput.provider
-                ? index_js_1.globalProviderFactory.getProvider(processedInput.provider)
-                : index_js_1.globalProviderFactory.getDefaultProvider();
-            if (!provider) {
-                throw new Error(`Provider '${processedInput.provider}' não encontrado`);
+            let provider;
+            try {
+                if (processedInput.provider) {
+                    const requestedProvider = index_js_1.globalProviderFactory.getProvider(processedInput.provider);
+                    if (!requestedProvider) {
+                        console.warn(`[ISSUES] Provider '${processedInput.provider}' não encontrado, usando padrão`);
+                        provider = index_js_1.globalProviderFactory.getDefaultProvider();
+                    }
+                    else {
+                        provider = requestedProvider;
+                    }
+                }
+                else {
+                    provider = index_js_1.globalProviderFactory.getDefaultProvider();
+                }
+                if (!provider) {
+                    throw new Error('Nenhum provider disponível');
+                }
+            }
+            catch (providerError) {
+                console.error('[ISSUES] Erro ao obter provider:', providerError);
+                throw new Error(`Erro de configuração do provider: ${providerError instanceof Error ? providerError.message : 'Provider não disponível'}`);
             }
             switch (processedInput.action) {
                 case 'create':

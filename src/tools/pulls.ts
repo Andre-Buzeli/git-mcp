@@ -52,7 +52,7 @@ const PullsInputSchema = z.object({
   repo: z.string().optional(),
   
   // Para multi-provider
-  provider: z.string().optional(),
+  provider: z.enum(['gitea', 'github']).optional().describe('Provider to use (gitea or github, optional - uses default if not specified)'),
   
   // Para create
   title: z.string().optional(),
@@ -254,7 +254,7 @@ export const pullsTool = {
       reviewer: { type: 'string', description: 'PR reviewer filter' },
       label: { type: 'string', description: 'PR label filter' }
     },
-    required: ['action', 'provider']
+    required: ['action']
   },
 
   /**

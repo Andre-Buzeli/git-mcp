@@ -1,5 +1,5 @@
 import { BaseVcsProvider } from './base-provider.js';
-import { VcsProvider, RepositoryInfo, BranchInfo, FileInfo, CommitInfo, IssueInfo, PullRequestInfo, ReleaseInfo, TagInfo, UserInfo, WebhookInfo } from './types.js';
+import { VcsProvider, RepositoryInfo, BranchInfo, FileInfo, CommitInfo, IssueInfo, PullRequestInfo, ReleaseInfo, TagInfo, UserInfo, OrganizationInfo, WebhookInfo } from './types.js';
 /**
  * Provider específico para Gitea
  * Implementa todas as operações VCS usando a API do Gitea
@@ -17,6 +17,7 @@ export declare class GiteaProvider extends BaseVcsProvider {
     protected normalizeRelease(data: any): ReleaseInfo;
     protected normalizeTag(data: any): TagInfo;
     protected normalizeUser(data: any): UserInfo;
+    protected normalizeOrganization(data: any): OrganizationInfo;
     protected normalizeWebhook(data: any): WebhookInfo;
     listRepositories(username?: string, page?: number, limit?: number): Promise<RepositoryInfo[]>;
     getRepository(owner: string, repo: string): Promise<RepositoryInfo>;
@@ -56,9 +57,12 @@ export declare class GiteaProvider extends BaseVcsProvider {
     getTag(owner: string, repo: string, tag: string): Promise<TagInfo>;
     createTag(tagName: string, message: string, target: string): Promise<TagInfo>;
     deleteTag(owner: string, repo: string, tag: string): Promise<boolean>;
+    getCurrentUser(): Promise<UserInfo>;
     getUser(username: string): Promise<UserInfo>;
     listUsers(page?: number, limit?: number): Promise<UserInfo[]>;
     searchUsers(query: string, page?: number, limit?: number): Promise<UserInfo[]>;
+    getUserOrganizations(username: string, page?: number, limit?: number): Promise<OrganizationInfo[]>;
+    getUserRepositories(username: string, page?: number, limit?: number): Promise<RepositoryInfo[]>;
     listWebhooks(owner: string, repo: string, page?: number, limit?: number): Promise<WebhookInfo[]>;
     getWebhook(owner: string, repo: string, webhookId: number): Promise<WebhookInfo>;
     createWebhook(owner: string, repo: string, url: string, events: string[], secret?: string): Promise<WebhookInfo>;

@@ -244,6 +244,12 @@ class BaseVcsProvider {
     async createCommit(owner, repo, message, branch, changes) {
         throw new Error('createCommit not implemented');
     }
+    async getUserOrganizations(username, page = 1, limit = 30) {
+        throw new Error('getUserOrganizations not implemented');
+    }
+    async getUserRepositories(username, page = 1, limit = 30) {
+        throw new Error('getUserRepositories not implemented');
+    }
 }
 exports.BaseVcsProvider = BaseVcsProvider;
 //# sourceMappingURL=base-provider.js.map

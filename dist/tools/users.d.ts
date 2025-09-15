@@ -43,7 +43,6 @@ declare const UsersInputSchema: z.ZodObject<{
     action: z.ZodEnum<["get", "list", "search", "orgs", "repos"]>;
     provider: z.ZodOptional<z.ZodEnum<["gitea", "github", "both"]>>;
     username: z.ZodOptional<z.ZodString>;
-    current: z.ZodOptional<z.ZodBoolean>;
     query: z.ZodOptional<z.ZodString>;
     page: z.ZodOptional<z.ZodNumber>;
     limit: z.ZodOptional<z.ZodNumber>;
@@ -58,7 +57,6 @@ declare const UsersInputSchema: z.ZodObject<{
     limit?: number | undefined;
     username?: string | undefined;
     query?: string | undefined;
-    current?: boolean | undefined;
     repo_type?: "all" | "owner" | "member" | "collaborator" | undefined;
     direction?: "desc" | "asc" | undefined;
 }, {
@@ -69,7 +67,6 @@ declare const UsersInputSchema: z.ZodObject<{
     limit?: number | undefined;
     username?: string | undefined;
     query?: string | undefined;
-    current?: boolean | undefined;
     repo_type?: "all" | "owner" | "member" | "collaborator" | undefined;
     direction?: "desc" | "asc" | undefined;
 }>;
@@ -114,8 +111,7 @@ export type UsersResult = z.infer<typeof UsersResultSchema>;
  *
  * 1. get - Obter informações de usuário
  *    Parâmetros:
- *    - username (opcional): Nome de usuário específico
- *    - current (opcional): Se true, obtém usuário atual autenticado
+ *    - username (opcional): Nome de usuário específico (se não fornecido, usa usuário atual das env vars)
  *
  * 2. list - Listar usuários
  *    Parâmetros:
@@ -167,10 +163,6 @@ export declare const usersTool: {
                 description: string;
             };
             username: {
-                type: string;
-                description: string;
-            };
-            current: {
                 type: string;
                 description: string;
             };
@@ -244,15 +236,15 @@ export declare const usersTool: {
      * - Suporta usuário atual ou específico
      * - Inclui perfil, estatísticas e metadados
      *
-     * PARÂMETROS OBRIGATÓRIOS:
-     * - Nenhum (se current=true) ou username
-     *
-     * PARÂMETROS OPCIONAIS:
-     * - current: Se true, obtém usuário atual autenticado
-     * - username: Nome de usuário específico
-     *
-     * VALIDAÇÕES:
-     * - current=true OU username deve ser fornecido
+   * PARÂMETROS OBRIGATÓRIOS:
+   * - Nenhum (usa usuário atual das variáveis de ambiente)
+   *
+   * PARÂMETROS OPCIONAIS:
+   * - username: Nome de usuário específico (se não fornecido, usa usuário atual das env vars)
+   *
+   * VALIDAÇÕES:
+   * - Username deve existir se fornecido
+   * - Usuário deve ter permissão de acesso
      * - Usuário deve existir (se username fornecido)
      * - Usuário deve ter permissão de acesso
      *
@@ -342,6 +334,10 @@ export declare const usersTool: {
      */
     getUserOrganizations(params: UsersInput, provider: VcsOperations): Promise<UsersResult>;
     /**
+     * Obtém o nome de usuário atual das variáveis de ambiente baseado no provider
+     */
+    getCurrentUsername(provider: VcsOperations): Promise<string>;
+    /**
      * Lista repositórios de um usuário específico
      *
      * FUNCIONALIDADE:
@@ -349,15 +345,16 @@ export declare const usersTool: {
      * - Suporta diferentes tipos de repositório
      * - Permite ordenação e paginação
      *
-     * PARÂMETROS OBRIGATÓRIOS:
-     * - username: Nome de usuário
-     *
-     * PARÂMETROS OPCIONAIS:
-     * - repo_type: Tipo de repositório (all, owner, member, collaborator) - padrão: all
-     * - sort: Ordenação (created, updated, pushed, full_name) - padrão: created
-     * - direction: Direção (asc, desc) - padrão: desc
-     * - page: Página da listagem (padrão: 1)
-     * - limit: Itens por página (padrão: 30, máximo: 100)
+   * PARÂMETROS OBRIGATÓRIOS:
+   * - Nenhum (usa usuário atual das variáveis de ambiente)
+   *
+   * PARÂMETROS OPCIONAIS:
+   * - username: Nome de usuário específico (se não fornecido, usa usuário atual das env vars)
+   * - repo_type: Tipo de repositório (all, owner, member, collaborator) - padrão: all
+   * - sort: Ordenação (created, updated, pushed, full_name) - padrão: created
+   * - direction: Direção (asc, desc) - padrão: desc
+   * - page: Página da listagem (padrão: 1)
+   * - limit: Itens por página (padrão: 30, máximo: 100)
      *
      * VALIDAÇÕES:
      * - Username deve ser fornecido

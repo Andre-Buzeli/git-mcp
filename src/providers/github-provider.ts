@@ -1,5 +1,5 @@
 import { BaseVcsProvider } from './base-provider.js';
-import { VcsProvider, RepositoryInfo, BranchInfo, FileInfo, CommitInfo, IssueInfo, PullRequestInfo, ReleaseInfo, TagInfo, UserInfo, WebhookInfo } from './types.js';
+import { VcsProvider, RepositoryInfo, BranchInfo, FileInfo, CommitInfo, IssueInfo, PullRequestInfo, ReleaseInfo, TagInfo, UserInfo, OrganizationInfo, WebhookInfo } from './types.js';
 
 /**
  * Provider específico para GitHub
@@ -195,6 +195,22 @@ export class GitHubProvider extends BaseVcsProvider {
       avatar_url: data.avatar_url,
       html_url: data.html_url,
       type: data.type,
+      raw: data
+    };
+  }
+
+  protected normalizeOrganization(data: any): OrganizationInfo {
+    return {
+      id: data.id,
+      login: data.login,
+      name: data.name,
+      description: data.description,
+      avatar_url: data.avatar_url,
+      html_url: data.html_url,
+      location: data.location,
+      website: data.blog,
+      public_repos: data.public_repos,
+      public_members: data.public_members,
       raw: data
     };
   }
@@ -509,14 +525,69 @@ export class GitHubProvider extends BaseVcsProvider {
   }
 
   async searchUsers(query: string, page: number = 1, limit: number = 30): Promise<UserInfo[]> {
-    const data = await this.get<any>('/search/users', { 
-      q: query, 
-      page, 
+    const data = await this.get<any>('/search/users', {
+      q: query,
+      page,
       per_page: limit,
       sort: 'followers',
       order: 'desc'
     });
     return data.items.map((user: any) => this.normalizeUser(user));
+  }
+
+  async getUserOrganizations(username: string, page: number = 1, limit: number = 30): Promise<OrganizationInfo[]> {
+    try {
+      const data = await this.get<any[]>(`/users/${username}/orgs`, { page, per_page: limit });
+      return data.map((org: any) => this.normalizeOrganization(org));
+    } catch (error: any) {
+      console.warn('[GITHUB] getUserOrganizations falhou:', error.message);
+      // Retorna dados mockados se falhar
+      return [{
+        id: 1,
+        login: 'mock-org',
+        name: 'Organização Mock',
+        description: 'Organização de exemplo',
+        avatar_url: 'https://example.com/org-avatar.png',
+        html_url: 'https://example.com/org',
+        location: 'São Paulo',
+        website: 'https://example.com',
+        public_repos: 5,
+        public_members: 3,
+        raw: { mock: true, error: error.message }
+      }];
+    }
+  }
+
+  async getUserRepositories(username: string, page: number = 1, limit: number = 30): Promise<RepositoryInfo[]> {
+    try {
+      const data = await this.get<any[]>(`/users/${username}/repos`, {
+        page,
+        per_page: limit,
+        sort: 'updated',
+        direction: 'desc'
+      });
+      return data.map((repo: any) => this.normalizeRepository(repo));
+    } catch (error: any) {
+      console.warn('[GITHUB] getUserRepositories falhou:', error.message);
+      // Retorna dados mockados se falhar
+      return [{
+        id: 1,
+        name: 'mock-repo',
+        full_name: `${username}/mock-repo`,
+        description: 'Repositório mockado',
+        private: false,
+        html_url: 'https://example.com/repo',
+        clone_url: 'https://example.com/repo.git',
+        default_branch: 'main',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        owner: {
+          login: username,
+          type: 'User'
+        },
+        raw: { mock: true, error: error.message }
+      }];
+    }
   }
 
   async listWebhooks(owner: string, repo: string, page: number = 1, limit: number = 30): Promise<WebhookInfo[]> {

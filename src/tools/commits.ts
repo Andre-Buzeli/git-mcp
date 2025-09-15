@@ -50,7 +50,7 @@ const CommitsInputSchema = z.object({
   repo: z.string().optional(),
 
   // Para multi-provider
-  provider: z.enum(['gitea', 'github']).describe('Provider to use (gitea or github)'), // Provider específico: gitea, github ou both
+  provider: z.enum(['gitea', 'github']).optional().describe('Provider to use (gitea or github, optional - uses default if not specified)'), // Provider específico: gitea, github ou both
   
   // Para list
   sha: z.string().optional(),
@@ -185,7 +185,7 @@ export const commitsTool = {
       query: { type: 'string', description: 'Search query' },
       author: { type: 'string', description: 'Author filter for search' }
     },
-    required: ['action', 'provider']
+    required: ['action']
   },
 
   /**

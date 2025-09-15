@@ -136,5 +136,7 @@ export declare abstract class BaseVcsProvider implements VcsOperations {
     updateWebhook(owner: string, repo: string, webhookId: number, updates: any): Promise<any>;
     deleteWebhook(owner: string, repo: string, webhookId: number): Promise<boolean>;
     createCommit(owner: string, repo: string, message: string, branch: string, changes?: any): Promise<any>;
+    getUserOrganizations(username: string, page?: number, limit?: number): Promise<any[]>;
+    getUserRepositories(username: string, page?: number, limit?: number): Promise<any[]>;
 }
 //# sourceMappingURL=base-provider.d.ts.map

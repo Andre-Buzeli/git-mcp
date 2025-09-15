@@ -48,7 +48,7 @@ const BranchesInputSchema = zod_1.z.object({
     // Parâmetros comuns
     owner: zod_1.z.string().optional(),
     repo: zod_1.z.string().optional(),
-    provider: zod_1.z.enum(['gitea', 'github']).describe('Provider to use (gitea or github)'), // Para create
+    provider: zod_1.z.enum(['gitea', 'github']).optional().describe('Provider to use (gitea or github, optional - uses default if not specified)'), // Para create
     branch_name: zod_1.z.string().optional(),
     from_branch: zod_1.z.string().optional(),
     // Para get/delete
@@ -167,7 +167,7 @@ exports.branchesTool = {
             base_branch: { type: 'string', description: 'Base branch for comparison' },
             head_branch: { type: 'string', description: 'Head branch for comparison' }
         },
-        required: ['action', 'provider']
+        required: ['action']
     },
     /**
      * Handler principal da tool branches
@@ -201,10 +201,29 @@ exports.branchesTool = {
             const validatedInput = BranchesInputSchema.parse(input);
             // Aplicar auto-detecção apenas para owner dentro do provider especificado
             const processedInput = await (0, user_detection_js_1.applyAutoUserDetection)(validatedInput, validatedInput.provider);
-            // Usar o provider especificado pelo usuário
-            const provider = index_js_1.globalProviderFactory.getProvider(processedInput.provider);
-            if (!provider) {
-                throw new Error(`Provider '${processedInput.provider}' não encontrado`);
+            // Usar o provider especificado pelo usuário ou o padrão se não especificado
+            let provider;
+            try {
+                if (processedInput.provider) {
+                    const requestedProvider = index_js_1.globalProviderFactory.getProvider(processedInput.provider);
+                    if (!requestedProvider) {
+                        console.warn(`[BRANCHES] Provider '${processedInput.provider}' não encontrado, usando padrão`);
+                        provider = index_js_1.globalProviderFactory.getDefaultProvider();
+                    }
+                    else {
+                        provider = requestedProvider;
+                    }
+                }
+                else {
+                    provider = index_js_1.globalProviderFactory.getDefaultProvider();
+                }
+                if (!provider) {
+                    throw new Error('Nenhum provider disponível');
+                }
+            }
+            catch (providerError) {
+                console.error('[BRANCHES] Erro ao obter provider:', providerError);
+                throw new Error(`Erro de configuração do provider: ${providerError instanceof Error ? providerError.message : 'Provider não disponível'}`);
             }
             switch (processedInput.action) {
                 case 'create':

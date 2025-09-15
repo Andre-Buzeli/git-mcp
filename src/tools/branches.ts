@@ -48,7 +48,7 @@ const BranchesInputSchema = z.object({
   // Parâmetros comuns
   owner: z.string().optional(),
   repo: z.string().optional(),
-    provider: z.enum(['gitea', 'github']).describe('Provider to use (gitea or github)'),  // Para create
+    provider: z.enum(['gitea', 'github']).optional().describe('Provider to use (gitea or github, optional - uses default if not specified)'),  // Para create
   branch_name: z.string().optional(),
   from_branch: z.string().optional(),
   
@@ -177,7 +177,7 @@ export const branchesTool = {
       base_branch: { type: 'string', description: 'Base branch for comparison' },
       head_branch: { type: 'string', description: 'Head branch for comparison' }
     },
-    required: ['action', 'provider']
+    required: ['action']
   },
 
   /**
@@ -214,11 +214,27 @@ export const branchesTool = {
       // Aplicar auto-detecção apenas para owner dentro do provider especificado
       const processedInput = await applyAutoUserDetection(validatedInput, validatedInput.provider);
       
-      // Usar o provider especificado pelo usuário
-      const provider = globalProviderFactory.getProvider(processedInput.provider);
-      
-      if (!provider) {
-        throw new Error(`Provider '${processedInput.provider}' não encontrado`);
+      // Usar o provider especificado pelo usuário ou o padrão se não especificado
+      let provider: VcsOperations;
+      try {
+        if (processedInput.provider) {
+          const requestedProvider = globalProviderFactory.getProvider(processedInput.provider);
+          if (!requestedProvider) {
+            console.warn(`[BRANCHES] Provider '${processedInput.provider}' não encontrado, usando padrão`);
+            provider = globalProviderFactory.getDefaultProvider();
+          } else {
+            provider = requestedProvider;
+          }
+        } else {
+          provider = globalProviderFactory.getDefaultProvider();
+        }
+
+        if (!provider) {
+          throw new Error('Nenhum provider disponível');
+        }
+      } catch (providerError) {
+        console.error('[BRANCHES] Erro ao obter provider:', providerError);
+        throw new Error(`Erro de configuração do provider: ${providerError instanceof Error ? providerError.message : 'Provider não disponível'}`);
       }
       
       switch (processedInput.action) {

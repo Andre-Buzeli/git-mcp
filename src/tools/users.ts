@@ -50,7 +50,6 @@ const UsersInputSchema = z.object({
   
   // Para get específico
   username: z.string().optional(),
-  current: z.boolean().optional(),
   
   // Para search
   query: z.string().optional(),
@@ -95,8 +94,7 @@ export type UsersResult = z.infer<typeof UsersResultSchema>;
  * 
  * 1. get - Obter informações de usuário
  *    Parâmetros:
- *    - username (opcional): Nome de usuário específico
- *    - current (opcional): Se true, obtém usuário atual autenticado
+ *    - username (opcional): Nome de usuário específico (se não fornecido, usa usuário atual das env vars)
  * 
  * 2. list - Listar usuários
  *    Parâmetros:
@@ -144,8 +142,7 @@ export const usersTool = {
         description: 'Action to perform on users'
       },
       provider: { type: 'string', description: 'Provider to use (github, gitea, or omit for default)' },
-      username: { type: 'string', description: 'Username' },
-      current: { type: 'boolean', description: 'Get current authenticated user' },
+      username: { type: 'string', description: 'Username (optional - if not provided, uses current user from env vars)' },
       query: { type: 'string', description: 'Search query' },
       page: { type: 'number', description: 'Page number', minimum: 1 },
       limit: { type: 'number', description: 'Items per page', minimum: 1, maximum: 100 },
@@ -229,15 +226,15 @@ export const usersTool = {
    * - Suporta usuário atual ou específico
    * - Inclui perfil, estatísticas e metadados
    * 
-   * PARÂMETROS OBRIGATÓRIOS:
-   * - Nenhum (se current=true) ou username
-   * 
-   * PARÂMETROS OPCIONAIS:
-   * - current: Se true, obtém usuário atual autenticado
-   * - username: Nome de usuário específico
-   * 
-   * VALIDAÇÕES:
-   * - current=true OU username deve ser fornecido
+ * PARÂMETROS OBRIGATÓRIOS:
+ * - Nenhum (usa usuário atual das variáveis de ambiente)
+ *
+ * PARÂMETROS OPCIONAIS:
+ * - username: Nome de usuário específico (se não fornecido, usa usuário atual das env vars)
+ *
+ * VALIDAÇÕES:
+ * - Username deve existir se fornecido
+ * - Usuário deve ter permissão de acesso
    * - Usuário deve existir (se username fornecido)
    * - Usuário deve ter permissão de acesso
    * 
@@ -252,15 +249,14 @@ export const usersTool = {
       let user;
       let message;
 
-      if (params.current) {
-        // Obter usuário atual usando a API do provider
-        user = await provider.getCurrentUser();
-        message = 'Usuário atual obtido com sucesso';
-      } else if (params.username) {
+      if (params.username) {
+        // Obter usuário específico
         user = await provider.getUser(params.username);
         message = `Usuário '${params.username}' obtido com sucesso`;
       } else {
-        throw new Error('current=true ou username deve ser fornecido');
+        // Usar usuário atual das variáveis de ambiente
+        user = await provider.getCurrentUser();
+        message = 'Usuário atual obtido com sucesso (das variáveis de ambiente)';
       }
 
       return {
@@ -301,17 +297,19 @@ export const usersTool = {
     try {
       const page = params.page || 1;
       const limit = params.limit || 30;
-      
-      // Implementar listagem de usuários
-      // Por enquanto, retorna mensagem de funcionalidade
+
+      // Listar usuários do sistema
+      const users = await provider.listUsers(page, limit);
+
       return {
         success: true,
         action: 'list',
-        message: `Listagem de usuários solicitada`,
+        message: `${users.length} usuários listados com sucesso`,
         data: {
+          users,
           page,
           limit,
-          note: 'Funcionalidade de listagem de usuários será implementada'
+          total: users.length
         }
       };
     } catch (error) {
@@ -426,28 +424,21 @@ export const usersTool = {
    */
   async getUserOrganizations(params: UsersInput, provider: VcsOperations): Promise<UsersResult> {
     try {
-      if (!params.username) {
-        throw new Error('Username é obrigatório');
-      }
+      // Se não fornecer username, usar o usuário atual das variáveis de ambiente
+      const username = params.username || await this.getCurrentUsername(provider);
 
       const page = params.page || 1;
       const limit = params.limit || 30;
-      
-      // Implementar getUserOrganizations
-      const organizations = [{
-        id: 1,
-        login: 'org-example',
-        name: 'Organização Exemplo',
-        avatar_url: 'https://example.com/org-avatar.png',
-        note: 'Funcionalidade getUserOrganizations será implementada'
-      }];
+
+      // Obter organizações do usuário
+      const organizations = await provider.getUserOrganizations(username, page, limit);
 
       return {
         success: true,
         action: 'orgs',
-        message: `${organizations.length} organizações encontradas para '${params.username}'`,
+        message: `${organizations.length} organizações encontradas para '${username}'`,
         data: {
-          username: params.username,
+          username,
           organizations,
           page,
           limit,
@@ -460,6 +451,15 @@ export const usersTool = {
   },
 
   /**
+   * Obtém o nome de usuário atual das variáveis de ambiente baseado no provider
+   */
+  async getCurrentUsername(provider: VcsOperations): Promise<string> {
+    // Obter informações do usuário atual para extrair o username
+    const currentUser = await provider.getCurrentUser();
+    return currentUser.login;
+  },
+
+  /**
    * Lista repositórios de um usuário específico
    * 
    * FUNCIONALIDADE:
@@ -467,15 +467,16 @@ export const usersTool = {
    * - Suporta diferentes tipos de repositório
    * - Permite ordenação e paginação
    * 
-   * PARÂMETROS OBRIGATÓRIOS:
-   * - username: Nome de usuário
-   * 
-   * PARÂMETROS OPCIONAIS:
-   * - repo_type: Tipo de repositório (all, owner, member, collaborator) - padrão: all
-   * - sort: Ordenação (created, updated, pushed, full_name) - padrão: created
-   * - direction: Direção (asc, desc) - padrão: desc
-   * - page: Página da listagem (padrão: 1)
-   * - limit: Itens por página (padrão: 30, máximo: 100)
+ * PARÂMETROS OBRIGATÓRIOS:
+ * - Nenhum (usa usuário atual das variáveis de ambiente)
+ *
+ * PARÂMETROS OPCIONAIS:
+ * - username: Nome de usuário específico (se não fornecido, usa usuário atual das env vars)
+ * - repo_type: Tipo de repositório (all, owner, member, collaborator) - padrão: all
+ * - sort: Ordenação (created, updated, pushed, full_name) - padrão: created
+ * - direction: Direção (asc, desc) - padrão: desc
+ * - page: Página da listagem (padrão: 1)
+ * - limit: Itens por página (padrão: 30, máximo: 100)
    * 
    * VALIDAÇÕES:
    * - Username deve ser fornecido
@@ -490,32 +491,24 @@ export const usersTool = {
    */
   async getUserRepositories(params: UsersInput, provider: VcsOperations): Promise<UsersResult> {
     try {
-      if (!params.username) {
-        throw new Error('Username é obrigatório');
-      }
+      // Se não fornecer username, usar o usuário atual das variáveis de ambiente
+      const username = params.username || await this.getCurrentUsername(provider);
 
       const repoType = params.repo_type || 'all';
       const sort = params.sort || 'created';
       const direction = params.direction || 'desc';
       const page = params.page || 1;
       const limit = params.limit || 30;
-      
-      // Implementar getRepositories
-      const repositories = [{
-        id: 1,
-        name: 'repo-example',
-        full_name: `${params.username}/repo-example`,
-        private: false,
-        description: 'Repositório de exemplo',
-        note: 'Funcionalidade getRepositories será implementada'
-      }];
+
+      // Obter repositórios do usuário
+      const repositories = await provider.getUserRepositories(username, page, limit);
 
       return {
         success: true,
         action: 'repos',
-        message: `${repositories.length} repositórios encontrados para '${params.username}'`,
+        message: `${repositories.length} repositórios encontrados para '${username}'`,
         data: {
-          username: params.username,
+          username,
           repositories,
           repo_type: repoType,
           sort,

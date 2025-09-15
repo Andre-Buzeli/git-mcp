@@ -49,7 +49,7 @@ const CommitsInputSchema = zod_1.z.object({
     owner: zod_1.z.string().optional(),
     repo: zod_1.z.string().optional(),
     // Para multi-provider
-    provider: zod_1.z.enum(['gitea', 'github']).describe('Provider to use (gitea or github)'), // Provider específico: gitea, github ou both
+    provider: zod_1.z.enum(['gitea', 'github']).optional().describe('Provider to use (gitea or github, optional - uses default if not specified)'), // Provider específico: gitea, github ou both
     // Para list
     sha: zod_1.z.string().optional(),
     page: zod_1.z.number().min(1).optional(),
@@ -173,7 +173,7 @@ exports.commitsTool = {
             query: { type: 'string', description: 'Search query' },
             author: { type: 'string', description: 'Author filter for search' }
         },
-        required: ['action', 'provider']
+        required: ['action']
     },
     /**
      * Handler principal da tool commits

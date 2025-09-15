@@ -44,7 +44,7 @@ declare const IssuesInputSchema: z.ZodObject<{
     action: z.ZodEnum<["create", "list", "get", "update", "close", "comment", "search"]>;
     owner: z.ZodOptional<z.ZodString>;
     repo: z.ZodOptional<z.ZodString>;
-    provider: z.ZodEnum<["gitea", "github"]>;
+    provider: z.ZodOptional<z.ZodEnum<["gitea", "github"]>>;
     title: z.ZodOptional<z.ZodString>;
     body: z.ZodOptional<z.ZodString>;
     labels: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
@@ -66,8 +66,8 @@ declare const IssuesInputSchema: z.ZodObject<{
     assignee: z.ZodOptional<z.ZodString>;
     label: z.ZodOptional<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
-    provider: "gitea" | "github";
     action: "get" | "create" | "list" | "update" | "search" | "close" | "comment";
+    provider?: "gitea" | "github" | undefined;
     owner?: string | undefined;
     title?: string | undefined;
     body?: string | undefined;
@@ -91,8 +91,8 @@ declare const IssuesInputSchema: z.ZodObject<{
     assignee?: string | undefined;
     label?: string | undefined;
 }, {
-    provider: "gitea" | "github";
     action: "get" | "create" | "list" | "update" | "search" | "close" | "comment";
+    provider?: "gitea" | "github" | undefined;
     owner?: string | undefined;
     title?: string | undefined;
     body?: string | undefined;

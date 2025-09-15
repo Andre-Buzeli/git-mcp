@@ -44,7 +44,7 @@ declare const ReleasesInputSchema: z.ZodObject<{
     action: z.ZodEnum<["create", "list", "get", "update", "delete", "publish"]>;
     owner: z.ZodOptional<z.ZodString>;
     repo: z.ZodOptional<z.ZodString>;
-    provider: z.ZodEnum<["gitea", "github"]>;
+    provider: z.ZodOptional<z.ZodEnum<["gitea", "github"]>>;
     tag_name: z.ZodOptional<z.ZodString>;
     name: z.ZodOptional<z.ZodString>;
     body: z.ZodOptional<z.ZodString>;
@@ -62,8 +62,8 @@ declare const ReleasesInputSchema: z.ZodObject<{
     new_target_commitish: z.ZodOptional<z.ZodString>;
     latest: z.ZodOptional<z.ZodBoolean>;
 }, "strip", z.ZodTypeAny, {
-    provider: "gitea" | "github";
     action: "delete" | "get" | "create" | "list" | "update" | "publish";
+    provider?: "gitea" | "github" | undefined;
     name?: string | undefined;
     owner?: string | undefined;
     body?: string | undefined;
@@ -83,8 +83,8 @@ declare const ReleasesInputSchema: z.ZodObject<{
     new_target_commitish?: string | undefined;
     latest?: boolean | undefined;
 }, {
-    provider: "gitea" | "github";
     action: "delete" | "get" | "create" | "list" | "update" | "publish";
+    provider?: "gitea" | "github" | undefined;
     name?: string | undefined;
     owner?: string | undefined;
     body?: string | undefined;

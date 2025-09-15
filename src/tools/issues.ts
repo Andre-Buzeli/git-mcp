@@ -51,7 +51,7 @@ const IssuesInputSchema = z.object({
   repo: z.string().optional(),
   
   // Para multi-provider
-  provider: z.enum(['gitea', 'github']).describe('Provider to use (gitea or github)'), // Provider específico: gitea, github ou both
+  provider: z.enum(['gitea', 'github']).optional().describe('Provider to use (gitea or github, optional - uses default if not specified)'), // Provider específico: gitea, github ou both
   
   // Para create
   title: z.string().optional(),
@@ -217,7 +217,7 @@ export const issuesTool = {
       assignee: { type: 'string', description: 'Issue assignee filter' },
       label: { type: 'string', description: 'Issue label filter' }
     },
-    required: ['action', 'provider']
+    required: ['action']
   },
 
   /**
@@ -256,12 +256,26 @@ export const issuesTool = {
       const processedInput = await applyAutoUserDetection(validatedInput, validatedInput.provider);
       
       // Obter o provider correto
-      const provider = processedInput.provider 
-        ? globalProviderFactory.getProvider(processedInput.provider)
-        : globalProviderFactory.getDefaultProvider();
-      
-      if (!provider) {
-        throw new Error(`Provider '${processedInput.provider}' não encontrado`);
+      let provider: VcsOperations;
+      try {
+        if (processedInput.provider) {
+          const requestedProvider = globalProviderFactory.getProvider(processedInput.provider);
+          if (!requestedProvider) {
+            console.warn(`[ISSUES] Provider '${processedInput.provider}' não encontrado, usando padrão`);
+            provider = globalProviderFactory.getDefaultProvider();
+          } else {
+            provider = requestedProvider;
+          }
+        } else {
+          provider = globalProviderFactory.getDefaultProvider();
+        }
+
+        if (!provider) {
+          throw new Error('Nenhum provider disponível');
+        }
+      } catch (providerError) {
+        console.error('[ISSUES] Erro ao obter provider:', providerError);
+        throw new Error(`Erro de configuração do provider: ${providerError instanceof Error ? providerError.message : 'Provider não disponível'}`);
       }
       
       switch (processedInput.action) {

@@ -43,7 +43,7 @@ declare const BranchesInputSchema: z.ZodObject<{
     action: z.ZodEnum<["create", "list", "get", "delete", "merge", "compare"]>;
     owner: z.ZodOptional<z.ZodString>;
     repo: z.ZodOptional<z.ZodString>;
-    provider: z.ZodEnum<["gitea", "github"]>;
+    provider: z.ZodOptional<z.ZodEnum<["gitea", "github"]>>;
     branch_name: z.ZodOptional<z.ZodString>;
     from_branch: z.ZodOptional<z.ZodString>;
     branch: z.ZodOptional<z.ZodString>;
@@ -55,8 +55,8 @@ declare const BranchesInputSchema: z.ZodObject<{
     base_branch: z.ZodOptional<z.ZodString>;
     head_branch: z.ZodOptional<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
-    provider: "gitea" | "github";
     action: "merge" | "delete" | "get" | "create" | "list" | "compare";
+    provider?: "gitea" | "github" | undefined;
     owner?: string | undefined;
     head?: string | undefined;
     base?: string | undefined;
@@ -70,8 +70,8 @@ declare const BranchesInputSchema: z.ZodObject<{
     base_branch?: string | undefined;
     head_branch?: string | undefined;
 }, {
-    provider: "gitea" | "github";
     action: "merge" | "delete" | "get" | "create" | "list" | "compare";
+    provider?: "gitea" | "github" | undefined;
     owner?: string | undefined;
     head?: string | undefined;
     base?: string | undefined;

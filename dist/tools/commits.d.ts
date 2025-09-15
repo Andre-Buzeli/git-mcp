@@ -43,7 +43,7 @@ declare const CommitsInputSchema: z.ZodObject<{
     action: z.ZodEnum<["list", "get", "create", "compare", "search"]>;
     owner: z.ZodOptional<z.ZodString>;
     repo: z.ZodOptional<z.ZodString>;
-    provider: z.ZodEnum<["gitea", "github"]>;
+    provider: z.ZodOptional<z.ZodEnum<["gitea", "github"]>>;
     sha: z.ZodOptional<z.ZodString>;
     page: z.ZodOptional<z.ZodNumber>;
     limit: z.ZodOptional<z.ZodNumber>;
@@ -59,8 +59,8 @@ declare const CommitsInputSchema: z.ZodObject<{
     query: z.ZodOptional<z.ZodString>;
     author: z.ZodOptional<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
-    provider: "gitea" | "github";
     action: "get" | "create" | "list" | "search" | "compare";
+    provider?: "gitea" | "github" | undefined;
     message?: string | undefined;
     owner?: string | undefined;
     head?: string | undefined;
@@ -78,8 +78,8 @@ declare const CommitsInputSchema: z.ZodObject<{
     committer_email?: string | undefined;
     author?: string | undefined;
 }, {
-    provider: "gitea" | "github";
     action: "get" | "create" | "list" | "search" | "compare";
+    provider?: "gitea" | "github" | undefined;
     message?: string | undefined;
     owner?: string | undefined;
     head?: string | undefined;

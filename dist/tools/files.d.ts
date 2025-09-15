@@ -44,7 +44,7 @@ declare const FilesInputSchema: z.ZodObject<{
     owner: z.ZodOptional<z.ZodString>;
     repo: z.ZodOptional<z.ZodString>;
     path: z.ZodOptional<z.ZodString>;
-    provider: z.ZodEnum<["gitea", "github"]>;
+    provider: z.ZodOptional<z.ZodEnum<["gitea", "github"]>>;
     content: z.ZodOptional<z.ZodString>;
     message: z.ZodOptional<z.ZodString>;
     branch: z.ZodOptional<z.ZodString>;
@@ -54,8 +54,8 @@ declare const FilesInputSchema: z.ZodObject<{
     page: z.ZodOptional<z.ZodNumber>;
     limit: z.ZodOptional<z.ZodNumber>;
 }, "strip", z.ZodTypeAny, {
-    provider: "gitea" | "github";
     action: "delete" | "get" | "create" | "list" | "update" | "search";
+    provider?: "gitea" | "github" | undefined;
     path?: string | undefined;
     message?: string | undefined;
     owner?: string | undefined;
@@ -68,8 +68,8 @@ declare const FilesInputSchema: z.ZodObject<{
     branch?: string | undefined;
     content?: string | undefined;
 }, {
-    provider: "gitea" | "github";
     action: "delete" | "get" | "create" | "list" | "update" | "search";
+    provider?: "gitea" | "github" | undefined;
     path?: string | undefined;
     message?: string | undefined;
     owner?: string | undefined;

@@ -367,4 +367,12 @@ export abstract class BaseVcsProvider implements VcsOperations {
   async createCommit(owner: string, repo: string, message: string, branch: string, changes?: any): Promise<any> {
     throw new Error('createCommit not implemented');
   }
+
+  async getUserOrganizations(username: string, page: number = 1, limit: number = 30): Promise<any[]> {
+    throw new Error('getUserOrganizations not implemented');
+  }
+
+  async getUserRepositories(username: string, page: number = 1, limit: number = 30): Promise<any[]> {
+    throw new Error('getUserRepositories not implemented');
+  }
 }

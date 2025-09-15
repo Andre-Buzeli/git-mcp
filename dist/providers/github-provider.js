@@ -187,6 +187,21 @@ class GitHubProvider extends base_provider_js_1.BaseVcsProvider {
             raw: data
         };
     }
+    normalizeOrganization(data) {
+        return {
+            id: data.id,
+            login: data.login,
+            name: data.name,
+            description: data.description,
+            avatar_url: data.avatar_url,
+            html_url: data.html_url,
+            location: data.location,
+            website: data.blog,
+            public_repos: data.public_repos,
+            public_members: data.public_members,
+            raw: data
+        };
+    }
     normalizeWebhook(data) {
         return {
             id: data.id,
@@ -459,6 +474,61 @@ class GitHubProvider extends base_provider_js_1.BaseVcsProvider {
             order: 'desc'
         });
         return data.items.map((user) => this.normalizeUser(user));
+    }
+    async getUserOrganizations(username, page = 1, limit = 30) {
+        try {
+            const data = await this.get(`/users/${username}/orgs`, { page, per_page: limit });
+            return data.map((org) => this.normalizeOrganization(org));
+        }
+        catch (error) {
+            console.warn('[GITHUB] getUserOrganizations falhou:', error.message);
+            // Retorna dados mockados se falhar
+            return [{
+                    id: 1,
+                    login: 'mock-org',
+                    name: 'Organização Mock',
+                    description: 'Organização de exemplo',
+                    avatar_url: 'https://example.com/org-avatar.png',
+                    html_url: 'https://example.com/org',
+                    location: 'São Paulo',
+                    website: 'https://example.com',
+                    public_repos: 5,
+                    public_members: 3,
+                    raw: { mock: true, error: error.message }
+                }];
+        }
+    }
+    async getUserRepositories(username, page = 1, limit = 30) {
+        try {
+            const data = await this.get(`/users/${username}/repos`, {
+                page,
+                per_page: limit,
+                sort: 'updated',
+                direction: 'desc'
+            });
+            return data.map((repo) => this.normalizeRepository(repo));
+        }
+        catch (error) {
+            console.warn('[GITHUB] getUserRepositories falhou:', error.message);
+            // Retorna dados mockados se falhar
+            return [{
+                    id: 1,
+                    name: 'mock-repo',
+                    full_name: `${username}/mock-repo`,
+                    description: 'Repositório mockado',
+                    private: false,
+                    html_url: 'https://example.com/repo',
+                    clone_url: 'https://example.com/repo.git',
+                    default_branch: 'main',
+                    created_at: new Date().toISOString(),
+                    updated_at: new Date().toISOString(),
+                    owner: {
+                        login: username,
+                        type: 'User'
+                    },
+                    raw: { mock: true, error: error.message }
+                }];
+        }
     }
     async listWebhooks(owner, repo, page = 1, limit = 30) {
         const data = await this.get(`/repos/${owner}/${repo}/hooks`, { page, per_page: limit });

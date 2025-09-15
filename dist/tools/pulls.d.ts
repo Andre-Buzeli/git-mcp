@@ -45,7 +45,7 @@ declare const PullsInputSchema: z.ZodObject<{
     action: z.ZodEnum<["create", "list", "get", "update", "merge", "close", "review", "search"]>;
     owner: z.ZodOptional<z.ZodString>;
     repo: z.ZodOptional<z.ZodString>;
-    provider: z.ZodOptional<z.ZodString>;
+    provider: z.ZodOptional<z.ZodEnum<["gitea", "github"]>>;
     title: z.ZodOptional<z.ZodString>;
     body: z.ZodOptional<z.ZodString>;
     head: z.ZodOptional<z.ZodString>;
@@ -77,7 +77,7 @@ declare const PullsInputSchema: z.ZodObject<{
     label: z.ZodOptional<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
     action: "merge" | "get" | "create" | "list" | "update" | "search" | "close" | "review";
-    provider?: string | undefined;
+    provider?: "gitea" | "github" | undefined;
     owner?: string | undefined;
     title?: string | undefined;
     body?: string | undefined;
@@ -111,7 +111,7 @@ declare const PullsInputSchema: z.ZodObject<{
     reviewer?: string | undefined;
 }, {
     action: "merge" | "get" | "create" | "list" | "update" | "search" | "close" | "review";
-    provider?: string | undefined;
+    provider?: "gitea" | "github" | undefined;
     owner?: string | undefined;
     title?: string | undefined;
     body?: string | undefined;

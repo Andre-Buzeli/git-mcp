@@ -34,6 +34,7 @@ const user_detection_js_1 = require("../utils/user-detection.js");
  *
  * VALIDAÇÕES:
  * - action: Ação obrigatória (create, list, get, update, delete, fork, search)
+ * - provider: Opcional (usa padrão se não especificado)
  * - Parâmetros específicos por ação
  * - Validação de tipos e formatos
  *
@@ -47,7 +48,7 @@ const RepositoriesInputSchema = zod_1.z.object({
     // Parâmetros comuns
     owner: zod_1.z.string().optional(),
     repo: zod_1.z.string().optional(),
-    provider: zod_1.z.enum(['gitea', 'github']).describe('Provider to use (gitea or github)'),
+    provider: zod_1.z.enum(['gitea', 'github']).optional().describe('Provider to use (gitea or github, optional - uses default if not specified)'),
     name: zod_1.z.string().optional(),
     description: zod_1.z.string().optional(),
     private: zod_1.z.boolean().optional(),
@@ -174,7 +175,7 @@ exports.repositoriesTool = {
             organization: { type: 'string', description: 'Organization for fork' },
             query: { type: 'string', description: 'Search query' }
         },
-        required: ['action', 'provider']
+        required: ['action']
     },
     /**
      * Handler principal da tool repositories
@@ -208,10 +209,29 @@ exports.repositoriesTool = {
             const validatedInput = RepositoriesInputSchema.parse(input);
             // Aplicar auto-detecção apenas para owner/username dentro do provider especificado
             const processedInput = await (0, user_detection_js_1.applyAutoUserDetection)(validatedInput, validatedInput.provider);
-            // Usar o provider especificado pelo usuário
-            const provider = index_js_1.globalProviderFactory.getProvider(processedInput.provider);
-            if (!provider) {
-                throw new Error(`Provider '${processedInput.provider}' não encontrado`);
+            // Usar o provider especificado pelo usuário ou o padrão se não especificado
+            let provider;
+            try {
+                if (processedInput.provider) {
+                    const requestedProvider = index_js_1.globalProviderFactory.getProvider(processedInput.provider);
+                    if (!requestedProvider) {
+                        console.warn(`[REPOSITORIES] Provider '${processedInput.provider}' não encontrado, usando padrão`);
+                        provider = index_js_1.globalProviderFactory.getDefaultProvider();
+                    }
+                    else {
+                        provider = requestedProvider;
+                    }
+                }
+                else {
+                    provider = index_js_1.globalProviderFactory.getDefaultProvider();
+                }
+                if (!provider) {
+                    throw new Error('Nenhum provider disponível');
+                }
+            }
+            catch (providerError) {
+                console.error('[REPOSITORIES] Erro ao obter provider:', providerError);
+                throw new Error(`Erro de configuração do provider: ${providerError instanceof Error ? providerError.message : 'Provider não disponível'}`);
             }
             switch (processedInput.action) {
                 case 'create':

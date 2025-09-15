@@ -30,6 +30,7 @@ import { VcsOperations } from '../providers/index.js';
  *
  * VALIDAÇÕES:
  * - action: Ação obrigatória (create, list, get, update, delete, fork, search)
+ * - provider: Opcional (usa padrão se não especificado)
  * - Parâmetros específicos por ação
  * - Validação de tipos e formatos
  *
@@ -42,7 +43,7 @@ declare const RepositoriesInputSchema: z.ZodObject<{
     action: z.ZodEnum<["create", "list", "get", "update", "delete", "fork", "search"]>;
     owner: z.ZodOptional<z.ZodString>;
     repo: z.ZodOptional<z.ZodString>;
-    provider: z.ZodEnum<["gitea", "github"]>;
+    provider: z.ZodOptional<z.ZodEnum<["gitea", "github"]>>;
     name: z.ZodOptional<z.ZodString>;
     description: z.ZodOptional<z.ZodString>;
     private: z.ZodOptional<z.ZodBoolean>;
@@ -61,8 +62,8 @@ declare const RepositoriesInputSchema: z.ZodObject<{
     organization: z.ZodOptional<z.ZodString>;
     query: z.ZodOptional<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
-    provider: "gitea" | "github";
     action: "delete" | "get" | "create" | "list" | "update" | "fork" | "search";
+    provider?: "gitea" | "github" | undefined;
     name?: string | undefined;
     description?: string | undefined;
     private?: boolean | undefined;
@@ -83,8 +84,8 @@ declare const RepositoriesInputSchema: z.ZodObject<{
     archived?: boolean | undefined;
     query?: string | undefined;
 }, {
-    provider: "gitea" | "github";
     action: "delete" | "get" | "create" | "list" | "update" | "fork" | "search";
+    provider?: "gitea" | "github" | undefined;
     name?: string | undefined;
     description?: string | undefined;
     private?: boolean | undefined;

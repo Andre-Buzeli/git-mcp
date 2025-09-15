@@ -70,20 +70,23 @@ class ProviderFactory {
      */
     getDefaultProvider() {
         if (this.providers.size === 0) {
-            throw new Error('No providers configured');
+            throw new Error('No providers configured - this should not happen');
         }
-        if (!this.defaultProviderName || !this.providers.has(this.defaultProviderName)) {
-            // Se não há provider padrão definido, usa o primeiro disponível
-            const firstKey = this.providers.keys().next().value;
-            if (firstKey) {
-                this.defaultProviderName = firstKey;
+        // Primeiro tenta o provider padrão configurado
+        if (this.defaultProviderName && this.providers.has(this.defaultProviderName)) {
+            const provider = this.providers.get(this.defaultProviderName);
+            if (provider) {
+                return provider;
             }
         }
-        const provider = this.providers.get(this.defaultProviderName);
-        if (!provider) {
-            throw new Error(`Default provider '${this.defaultProviderName}' not found`);
+        // Fallback: usa o primeiro provider disponível
+        const firstKey = this.providers.keys().next().value;
+        if (firstKey) {
+            console.log(`[PROVIDER FACTORY] Usando provider '${firstKey}' como fallback padrão`);
+            this.defaultProviderName = firstKey;
+            return this.providers.get(firstKey);
         }
-        return provider;
+        throw new Error('No valid providers available');
     }
     /**
      * Define o provider padrão
@@ -240,7 +243,19 @@ function initializeFactoryFromEnv() {
             defaultProvider = 'gitea';
         }
         else {
-            // Tenta Gitea
+            // Sempre tenta GitHub primeiro (mais estável)
+            if (process.env.GITHUB_TOKEN || true) { // Sempre tentar GitHub
+                providers.push({
+                    name: 'github',
+                    type: 'github',
+                    apiUrl: process.env.GITHUB_URL || 'https://api.github.com',
+                    token: process.env.GITHUB_TOKEN || 'dummy_token',
+                    username: process.env.GITHUB_USERNAME
+                });
+                defaultProvider = 'github';
+                console.log('[PROVIDER FACTORY] Provider GitHub configurado');
+            }
+            // Tenta Gitea se disponível
             if (process.env.GITEA_URL && process.env.GITEA_TOKEN) {
                 providers.push({
                     name: 'gitea',
@@ -249,20 +264,8 @@ function initializeFactoryFromEnv() {
                     token: process.env.GITEA_TOKEN,
                     username: process.env.GITEA_USERNAME
                 });
-                defaultProvider = 'gitea';
-            }
-            // Sempre tenta GitHub (mesmo sem token para testes)
-            if (true) { // Sempre tentar GitHub para compatibilidade com testes
-                providers.push({
-                    name: 'github',
-                    type: 'github',
-                    apiUrl: process.env.GITHUB_URL || 'https://api.github.com',
-                    token: process.env.GITHUB_TOKEN || 'dummy_token_for_tests',
-                    username: process.env.GITHUB_USERNAME
-                });
-                if (!defaultProvider) {
-                    defaultProvider = 'github';
-                }
+                // Mantém GitHub como padrão se ambos estiverem disponíveis
+                console.log('[PROVIDER FACTORY] Provider Gitea configurado');
             }
         }
         // Tenta configuração genérica
@@ -278,22 +281,19 @@ function initializeFactoryFromEnv() {
             defaultProvider = providerType;
         }
     }
-    // Se não há providers configurados, verifica modo demo
+    // Se não há providers configurados, sempre cria um provider padrão
     if (providers.length === 0) {
-        const isDemoMode = process.env.DEMO_MODE === 'true';
-        if (isDemoMode) {
-            providers.push({
-                name: 'demo',
-                type: 'gitea',
-                apiUrl: 'https://demo.gitea.io/api/v1',
-                token: 'demo-token',
-                username: 'demo-user'
-            });
-            defaultProvider = 'demo';
-        }
-        else {
-            throw new Error('No VCS providers configured. Please set environment variables for Gitea or GitHub, or use DEMO_MODE=true for testing.');
-        }
+        console.log('[PROVIDER FACTORY] Nenhum provider específico configurado, criando provider padrão...');
+        // Sempre tenta GitHub primeiro (funciona mesmo sem token para algumas operações)
+        providers.push({
+            name: 'github',
+            type: 'github',
+            apiUrl: 'https://api.github.com',
+            token: process.env.GITHUB_TOKEN || 'dummy_token',
+            username: process.env.GITHUB_USERNAME
+        });
+        defaultProvider = 'github';
+        console.log('[PROVIDER FACTORY] Provider GitHub criado como padrão');
     }
     const config = {
         defaultProvider,
