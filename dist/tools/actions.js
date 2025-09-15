@@ -169,7 +169,7 @@ exports.actionsTool = {
                 maximum: 100
             }
         },
-        required: ['action']
+        required: ['action', 'owner', 'repo', 'provider']
     },
     async handler(input) {
         try {

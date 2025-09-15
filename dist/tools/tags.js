@@ -46,8 +46,8 @@ const user_detection_js_1 = require("../utils/user-detection.js");
 const TagsInputSchema = zod_1.z.object({
     action: zod_1.z.enum(['create', 'list', 'get', 'delete', 'search']),
     // Parâmetros comuns
-    owner: zod_1.z.string().optional(),
-    repo: zod_1.z.string().optional(),
+    owner: zod_1.z.string(),
+    repo: zod_1.z.string(),
     // Para multi-provider
     provider: zod_1.z.enum(['gitea', 'github']).describe('Provider to use (gitea or github)'), // Provider específico: gitea, github ou both
     // Para create
@@ -162,7 +162,7 @@ exports.tagsTool = {
             query: { type: 'string', description: 'Search query' },
             pattern: { type: 'string', description: 'Search pattern (e.g., v*.*.*)' }
         },
-        required: ['action', 'provider']
+        required: ['action', 'owner', 'repo', 'provider']
     },
     /**
      * Handler principal da tool tags

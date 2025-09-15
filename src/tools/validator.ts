@@ -8,10 +8,10 @@ import { z } from 'zod';
 // Schemas comuns reutilizáveis
 export const CommonSchemas = {
   // Identificadores
-  owner: z.string().min(1, 'Owner is required').max(100, 'Owner too long').optional(),
+  owner: z.string().min(1, 'Owner is required').max(100, 'Owner too long'),
   username: z.string().min(1, 'Username is required').max(100, 'Username too long').optional(),
   repo: z.string().min(1, 'Repository name is required').max(100, 'Repository name too long'),
-  provider: z.enum(['gitea', 'github', 'both']).optional(),
+  provider: z.enum(['gitea', 'github', 'both']),
   
   // Paginação
   page: z.number().min(1, 'Page must be at least 1').max(1000, 'Page too high').optional(),

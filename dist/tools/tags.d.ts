@@ -41,8 +41,8 @@ import { VcsOperations } from '../providers/index.js';
  */
 declare const TagsInputSchema: z.ZodObject<{
     action: z.ZodEnum<["create", "list", "get", "delete", "search"]>;
-    owner: z.ZodOptional<z.ZodString>;
-    repo: z.ZodOptional<z.ZodString>;
+    owner: z.ZodString;
+    repo: z.ZodString;
     provider: z.ZodEnum<["gitea", "github"]>;
     tag_name: z.ZodOptional<z.ZodString>;
     message: z.ZodOptional<z.ZodString>;
@@ -57,12 +57,12 @@ declare const TagsInputSchema: z.ZodObject<{
     pattern: z.ZodOptional<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
     provider: "gitea" | "github";
+    owner: string;
+    repo: string;
     action: "delete" | "get" | "create" | "list" | "search";
     message?: string | undefined;
     type?: "lightweight" | "annotated" | undefined;
-    owner?: string | undefined;
     tag_name?: string | undefined;
-    repo?: string | undefined;
     page?: number | undefined;
     limit?: number | undefined;
     query?: string | undefined;
@@ -73,12 +73,12 @@ declare const TagsInputSchema: z.ZodObject<{
     pattern?: string | undefined;
 }, {
     provider: "gitea" | "github";
+    owner: string;
+    repo: string;
     action: "delete" | "get" | "create" | "list" | "search";
     message?: string | undefined;
     type?: "lightweight" | "annotated" | undefined;
-    owner?: string | undefined;
     tag_name?: string | undefined;
-    repo?: string | undefined;
     page?: number | undefined;
     limit?: number | undefined;
     query?: string | undefined;

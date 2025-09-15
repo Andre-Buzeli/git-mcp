@@ -34,29 +34,29 @@ declare const VersionControlInputSchema: z.ZodObject<{
     include_files: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
     exclude_patterns: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
     dry_run: z.ZodOptional<z.ZodBoolean>;
-    provider: z.ZodOptional<z.ZodEnum<["gitea", "github", "both"]>>;
+    provider: z.ZodEnum<["gitea", "github", "both"]>;
 }, "strip", z.ZodTypeAny, {
-    action: "version" | "backup" | "track" | "rollback" | "history" | "analyze";
-    provider?: "gitea" | "github" | "both" | undefined;
+    provider: "gitea" | "github" | "both";
+    action: "rollback" | "analyze" | "version" | "backup" | "track" | "history";
     description?: string | undefined;
+    exclude_patterns?: string[] | undefined;
     dry_run?: boolean | undefined;
     version?: string | undefined;
     project?: string | undefined;
     auto_backup?: boolean | undefined;
     backup_retention?: number | undefined;
     include_files?: string[] | undefined;
-    exclude_patterns?: string[] | undefined;
 }, {
-    action: "version" | "backup" | "track" | "rollback" | "history" | "analyze";
-    provider?: "gitea" | "github" | "both" | undefined;
+    provider: "gitea" | "github" | "both";
+    action: "rollback" | "analyze" | "version" | "backup" | "track" | "history";
     description?: string | undefined;
+    exclude_patterns?: string[] | undefined;
     dry_run?: boolean | undefined;
     version?: string | undefined;
     project?: string | undefined;
     auto_backup?: boolean | undefined;
     backup_retention?: number | undefined;
     include_files?: string[] | undefined;
-    exclude_patterns?: string[] | undefined;
 }>;
 export type VersionControlInput = z.infer<typeof VersionControlInputSchema>;
 declare const VersionControlResultSchema: z.ZodObject<{

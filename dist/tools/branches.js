@@ -46,9 +46,10 @@ const user_detection_js_1 = require("../utils/user-detection.js");
 const BranchesInputSchema = zod_1.z.object({
     action: zod_1.z.enum(['create', 'list', 'get', 'delete', 'merge', 'compare']),
     // Parâmetros comuns
-    owner: zod_1.z.string().optional(),
-    repo: zod_1.z.string().optional(),
-    provider: zod_1.z.enum(['gitea', 'github']).optional().describe('Provider to use (gitea or github, optional - uses default if not specified)'), // Para create
+    owner: zod_1.z.string(),
+    repo: zod_1.z.string(),
+    projectPath: zod_1.z.string().describe('Local project path for git operations'),
+    provider: zod_1.z.enum(['gitea', 'github']).describe('Provider to use (gitea or github)'), // Para create
     branch_name: zod_1.z.string().optional(),
     from_branch: zod_1.z.string().optional(),
     // Para get/delete
@@ -151,6 +152,7 @@ exports.branchesTool = {
             },
             owner: { type: 'string', description: 'Repository owner' },
             repo: { type: 'string', description: 'Repository name' },
+            projectPath: { type: 'string', description: 'Local project path for git operations' },
             provider: { type: 'string', description: 'Specific provider (github, gitea) or use default' },
             branch_name: { type: 'string', description: 'Name of the new branch' },
             from_branch: { type: 'string', description: 'Source branch for creation' },
@@ -167,7 +169,7 @@ exports.branchesTool = {
             base_branch: { type: 'string', description: 'Base branch for comparison' },
             head_branch: { type: 'string', description: 'Head branch for comparison' }
         },
-        required: ['action']
+        required: ['action', 'owner', 'repo', 'provider', 'projectPath']
     },
     /**
      * Handler principal da tool branches

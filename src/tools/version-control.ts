@@ -36,7 +36,7 @@ const VersionControlInputSchema = z.object({
   include_files: z.array(z.string()).optional(),
   exclude_patterns: z.array(z.string()).optional(),
   dry_run: z.boolean().optional(),
-  provider: z.enum(['gitea', 'github', 'both']).optional() // Provider específico: gitea, github ou both
+  provider: z.enum(['gitea', 'github', 'both']) // Provider específico: gitea, github ou both
 });
 
 export type VersionControlInput = z.infer<typeof VersionControlInputSchema>;
@@ -71,7 +71,7 @@ export const versionControlTool = {
       exclude_patterns: { type: 'array', items: { type: 'string' }, description: 'File patterns to exclude' },
       dry_run: { type: 'boolean', description: 'Simulate without applying changes' }
     },
-    required: ['action']
+    required: ['action', 'provider']
   },
 
   async handler(input: VersionControlInput): Promise<VersionControlResult> {

@@ -42,9 +42,9 @@ import { VcsOperations } from '../providers/index.js';
  */
 declare const IssuesInputSchema: z.ZodObject<{
     action: z.ZodEnum<["create", "list", "get", "update", "close", "comment", "search"]>;
-    owner: z.ZodOptional<z.ZodString>;
-    repo: z.ZodOptional<z.ZodString>;
-    provider: z.ZodOptional<z.ZodEnum<["gitea", "github"]>>;
+    owner: z.ZodString;
+    repo: z.ZodString;
+    provider: z.ZodEnum<["gitea", "github"]>;
     title: z.ZodOptional<z.ZodString>;
     body: z.ZodOptional<z.ZodString>;
     labels: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
@@ -66,15 +66,15 @@ declare const IssuesInputSchema: z.ZodObject<{
     assignee: z.ZodOptional<z.ZodString>;
     label: z.ZodOptional<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
-    action: "get" | "create" | "list" | "update" | "search" | "close" | "comment";
-    provider?: "gitea" | "github" | undefined;
-    owner?: string | undefined;
+    provider: "gitea" | "github";
+    owner: string;
+    repo: string;
+    action: "get" | "close" | "create" | "list" | "update" | "search" | "comment";
     title?: string | undefined;
     body?: string | undefined;
     state?: "open" | "closed" | "all" | undefined;
     assignees?: string[] | undefined;
     labels?: string[] | undefined;
-    repo?: string | undefined;
     page?: number | undefined;
     limit?: number | undefined;
     query?: string | undefined;
@@ -91,15 +91,15 @@ declare const IssuesInputSchema: z.ZodObject<{
     assignee?: string | undefined;
     label?: string | undefined;
 }, {
-    action: "get" | "create" | "list" | "update" | "search" | "close" | "comment";
-    provider?: "gitea" | "github" | undefined;
-    owner?: string | undefined;
+    provider: "gitea" | "github";
+    owner: string;
+    repo: string;
+    action: "get" | "close" | "create" | "list" | "update" | "search" | "comment";
     title?: string | undefined;
     body?: string | undefined;
     state?: "open" | "closed" | "all" | undefined;
     assignees?: string[] | undefined;
     labels?: string[] | undefined;
-    repo?: string | undefined;
     page?: number | undefined;
     limit?: number | undefined;
     query?: string | undefined;

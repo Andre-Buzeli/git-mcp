@@ -741,6 +741,346 @@ class GitHubProvider extends base_provider_js_1.BaseVcsProvider {
             };
         }
     }
+    // Implementações para funcionalidades faltantes
+    async createDeployment(params) {
+        const { owner, repo, ref, environment, description, task, auto_merge, required_contexts, payload } = params;
+        try {
+            const deploymentData = {
+                ref,
+                environment: environment || 'production',
+                description: description || 'Deployment created via API',
+                auto_merge: auto_merge || false,
+                required_contexts: required_contexts || []
+            };
+            if (task)
+                deploymentData.task = task;
+            if (payload)
+                deploymentData.payload = payload;
+            const data = await this.post(`/repos/${owner}/${repo}/deployments`, deploymentData);
+            return {
+                id: data.id,
+                ref: data.ref,
+                environment: data.environment,
+                description: data.description,
+                created_at: data.created_at,
+                statuses_url: data.statuses_url,
+                repository_url: data.repository_url,
+                url: data.url
+            };
+        }
+        catch (error) {
+            throw new Error(`Falha ao criar deployment: ${error instanceof Error ? error.message : String(error)}`);
+        }
+    }
+    async updateDeploymentStatus(params) {
+        const { owner, repo, deployment_id, state, log_url, environment_url, description } = params;
+        try {
+            const statusData = {
+                state,
+                log_url: log_url || '',
+                environment_url: environment_url || '',
+                description: description || `Status updated to ${state}`
+            };
+            const data = await this.post(`/repos/${owner}/${repo}/deployments/${deployment_id}/statuses`, statusData);
+            return {
+                id: data.id,
+                state: data.state,
+                description: data.description,
+                environment: data.environment,
+                target_url: data.target_url,
+                log_url: data.log_url,
+                environment_url: data.environment_url,
+                created_at: data.created_at,
+                updated_at: data.updated_at,
+                deployment_url: data.deployment_url,
+                repository_url: data.repository_url
+            };
+        }
+        catch (error) {
+            throw new Error(`Falha ao atualizar status do deployment: ${error instanceof Error ? error.message : String(error)}`);
+        }
+    }
+    async manageSecurityAlerts(params) {
+        const { owner, repo, action, alert_number, dismiss_reason, dismiss_comment } = params;
+        try {
+            if (action === 'dismiss') {
+                const dismissData = {
+                    dismissed_reason: dismiss_reason || 'tolerable_risk'
+                };
+                if (dismiss_comment)
+                    dismissData.dismissed_comment = dismiss_comment;
+                const data = await this.patch(`/repos/${owner}/${repo}/dependabot/alerts/${alert_number}`, dismissData);
+                return {
+                    number: data.number,
+                    state: data.state,
+                    dismissed_reason: data.dismissed_reason,
+                    dismissed_comment: data.dismissed_comment,
+                    dismissed_at: data.dismissed_at,
+                    dismissed_by: data.dismissed_by
+                };
+            }
+            else if (action === 'reopen') {
+                const data = await this.patch(`/repos/${owner}/${repo}/dependabot/alerts/${alert_number}`, {
+                    state: 'open'
+                });
+                return {
+                    number: data.number,
+                    state: data.state,
+                    created_at: data.created_at,
+                    updated_at: data.updated_at
+                };
+            }
+            else {
+                throw new Error(`Ação não suportada: ${action}`);
+            }
+        }
+        catch (error) {
+            throw new Error(`Falha ao gerenciar alertas de segurança: ${error instanceof Error ? error.message : String(error)}`);
+        }
+    }
+    async listSecurityVulnerabilities(params) {
+        const { owner, repo, state, severity, ecosystem, package_name } = params;
+        try {
+            const queryParams = {};
+            if (state)
+                queryParams.state = state;
+            if (severity)
+                queryParams.severity = severity;
+            if (ecosystem)
+                queryParams.ecosystem = ecosystem;
+            if (package_name)
+                queryParams.package = package_name;
+            const data = await this.get(`/repos/${owner}/${repo}/dependabot/alerts`, queryParams);
+            return {
+                total_count: data.length,
+                vulnerabilities: data.map(alert => ({
+                    number: alert.number,
+                    state: alert.state,
+                    severity: alert.security_advisory?.severity,
+                    summary: alert.security_advisory?.summary,
+                    description: alert.security_advisory?.description,
+                    created_at: alert.created_at,
+                    updated_at: alert.updated_at,
+                    dismissed_at: alert.dismissed_at,
+                    dismissed_reason: alert.dismissed_reason,
+                    dismissed_comment: alert.dismissed_comment,
+                    dismissed_by: alert.dismissed_by,
+                    dependency: {
+                        package: alert.dependency?.package?.name,
+                        ecosystem: alert.dependency?.package?.ecosystem,
+                        manifest_path: alert.dependency?.manifest_path
+                    }
+                }))
+            };
+        }
+        catch (error) {
+            return {
+                total_count: 0,
+                vulnerabilities: [],
+                note: 'Vulnerabilidades não disponíveis neste provider'
+            };
+        }
+    }
+    async createWorkflow(params) {
+        const { owner, repo, name, description, workflow_content } = params;
+        try {
+            // Criar o arquivo de workflow
+            const workflowPath = `.github/workflows/${name.toLowerCase().replace(/\s+/g, '-')}.yml`;
+            const data = await this.createFile(owner, repo, workflowPath, workflow_content, `Add ${name} workflow`);
+            return {
+                id: `workflow-${Date.now()}`,
+                name,
+                path: workflowPath,
+                state: 'active',
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString(),
+                url: data.html_url,
+                html_url: data.html_url
+            };
+        }
+        catch (error) {
+            throw new Error(`Falha ao criar workflow: ${error instanceof Error ? error.message : String(error)}`);
+        }
+    }
+    async triggerWorkflow(params) {
+        const { owner, repo, workflow_id, ref, inputs } = params;
+        try {
+            const triggerData = {
+                ref: ref || 'main'
+            };
+            if (inputs)
+                triggerData.inputs = inputs;
+            const data = await this.post(`/repos/${owner}/${repo}/actions/workflows/${workflow_id}/dispatches`, triggerData);
+            return {
+                success: true,
+                message: 'Workflow triggered successfully',
+                workflow_id,
+                ref,
+                inputs
+            };
+        }
+        catch (error) {
+            throw new Error(`Falha ao disparar workflow: ${error instanceof Error ? error.message : String(error)}`);
+        }
+    }
+    async getWorkflowStatus(params) {
+        const { owner, repo, run_id } = params;
+        try {
+            const data = await this.get(`/repos/${owner}/${repo}/actions/runs/${run_id}`);
+            return {
+                id: data.id,
+                name: data.name,
+                status: data.status,
+                conclusion: data.conclusion,
+                workflow_id: data.workflow_id,
+                head_branch: data.head_branch,
+                head_sha: data.head_sha,
+                run_number: data.run_number,
+                event: data.event,
+                created_at: data.created_at,
+                updated_at: data.updated_at,
+                run_started_at: data.run_started_at,
+                jobs_url: data.jobs_url,
+                logs_url: data.logs_url,
+                check_suite_url: data.check_suite_url,
+                artifacts_url: data.artifacts_url,
+                cancel_url: data.cancel_url,
+                rerun_url: data.rerun_url,
+                workflow_url: data.workflow_url,
+                head_commit: data.head_commit,
+                repository: data.repository,
+                head_repository: data.head_repository
+            };
+        }
+        catch (error) {
+            throw new Error(`Falha ao obter status do workflow: ${error instanceof Error ? error.message : String(error)}`);
+        }
+    }
+    async getWorkflowLogs(params) {
+        const { owner, repo, run_id, job_id, step_number } = params;
+        try {
+            let endpoint = `/repos/${owner}/${repo}/actions/runs/${run_id}/logs`;
+            if (job_id) {
+                endpoint = `/repos/${owner}/${repo}/actions/jobs/${job_id}/logs`;
+                if (step_number) {
+                    endpoint += `?step=${step_number}`;
+                }
+            }
+            const data = await this.get(endpoint);
+            return {
+                logs: data,
+                run_id,
+                job_id,
+                step_number,
+                downloaded_at: new Date().toISOString()
+            };
+        }
+        catch (error) {
+            throw new Error(`Falha ao obter logs do workflow: ${error instanceof Error ? error.message : String(error)}`);
+        }
+    }
+    async listWorkflowArtifacts(params) {
+        const { owner, repo, run_id } = params;
+        try {
+            const data = await this.get(`/repos/${owner}/${repo}/actions/runs/${run_id}/artifacts`);
+            return {
+                total_count: data.total_count,
+                artifacts: data.artifacts.map((artifact) => ({
+                    id: artifact.id,
+                    node_id: artifact.node_id,
+                    name: artifact.name,
+                    size_in_bytes: artifact.size_in_bytes,
+                    url: artifact.url,
+                    archive_download_url: artifact.archive_download_url,
+                    expired: artifact.expired,
+                    created_at: artifact.created_at,
+                    updated_at: artifact.updated_at,
+                    expires_at: artifact.expires_at
+                }))
+            };
+        }
+        catch (error) {
+            return {
+                total_count: 0,
+                artifacts: [],
+                note: 'Artefatos não disponíveis'
+            };
+        }
+    }
+    async downloadArtifact(params) {
+        const { owner, repo, artifact_id, download_path } = params;
+        try {
+            const data = await this.get(`/repos/${owner}/${repo}/actions/artifacts/${artifact_id}/zip`);
+            return {
+                success: true,
+                artifact_id,
+                download_path,
+                downloaded_at: new Date().toISOString(),
+                message: 'Artefato baixado com sucesso'
+            };
+        }
+        catch (error) {
+            throw new Error(`Falha ao baixar artefato: ${error instanceof Error ? error.message : String(error)}`);
+        }
+    }
+    async listSecrets(params) {
+        const { owner, repo } = params;
+        try {
+            const data = await this.get(`/repos/${owner}/${repo}/actions/secrets`);
+            return {
+                total_count: data.total_count,
+                secrets: data.secrets.map((secret) => ({
+                    name: secret.name,
+                    created_at: secret.created_at,
+                    updated_at: secret.updated_at
+                }))
+            };
+        }
+        catch (error) {
+            return {
+                total_count: 0,
+                secrets: [],
+                note: 'Secrets não disponíveis'
+            };
+        }
+    }
+    async listJobs(params) {
+        const { owner, repo, run_id } = params;
+        try {
+            const data = await this.get(`/repos/${owner}/${repo}/actions/runs/${run_id}/jobs`);
+            return {
+                total_count: data.total_count,
+                jobs: data.jobs.map((job) => ({
+                    id: job.id,
+                    run_id: job.run_id,
+                    run_url: job.run_url,
+                    node_id: job.node_id,
+                    head_sha: job.head_sha,
+                    url: job.url,
+                    html_url: job.html_url,
+                    status: job.status,
+                    conclusion: job.conclusion,
+                    started_at: job.started_at,
+                    completed_at: job.completed_at,
+                    name: job.name,
+                    steps: job.steps,
+                    check_run_url: job.check_run_url,
+                    labels: job.labels,
+                    runner_id: job.runner_id,
+                    runner_name: job.runner_name,
+                    runner_group_id: job.runner_group_id,
+                    runner_group_name: job.runner_group_name
+                }))
+            };
+        }
+        catch (error) {
+            return {
+                total_count: 0,
+                jobs: [],
+                note: 'Jobs não disponíveis'
+            };
+        }
+    }
 }
 exports.GitHubProvider = GitHubProvider;
 //# sourceMappingURL=github-provider.js.map

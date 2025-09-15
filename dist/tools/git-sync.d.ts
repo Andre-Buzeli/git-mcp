@@ -21,7 +21,7 @@ import { z } from 'zod';
  */
 declare const GitSyncInputSchema: z.ZodObject<{
     action: z.ZodEnum<["configure", "status", "one-shot"]>;
-    source: z.ZodOptional<z.ZodObject<{
+    source: z.ZodObject<{
         provider: z.ZodEnum<["gitea", "github"]>;
         owner: z.ZodString;
         repo: z.ZodString;
@@ -33,8 +33,8 @@ declare const GitSyncInputSchema: z.ZodObject<{
         provider: "gitea" | "github";
         owner: string;
         repo: string;
-    }>>;
-    target: z.ZodOptional<z.ZodObject<{
+    }>;
+    target: z.ZodObject<{
         provider: z.ZodEnum<["gitea", "github"]>;
         owner: z.ZodString;
         repo: z.ZodString;
@@ -46,43 +46,43 @@ declare const GitSyncInputSchema: z.ZodObject<{
         provider: "gitea" | "github";
         owner: string;
         repo: string;
-    }>>;
+    }>;
     direction: z.ZodOptional<z.ZodEnum<["one-way", "two-way"]>>;
     include: z.ZodOptional<z.ZodArray<z.ZodEnum<["git", "issues", "labels", "milestones", "releases", "pulls"]>, "many">>;
     strategy: z.ZodOptional<z.ZodEnum<["source-wins", "timestamp", "skip-conflicts"]>>;
     dry_run: z.ZodOptional<z.ZodBoolean>;
 }, "strip", z.ZodTypeAny, {
     action: "status" | "configure" | "one-shot";
-    target?: {
+    target: {
         provider: "gitea" | "github";
         owner: string;
         repo: string;
-    } | undefined;
-    direction?: "one-way" | "two-way" | undefined;
-    source?: {
+    };
+    source: {
         provider: "gitea" | "github";
         owner: string;
         repo: string;
-    } | undefined;
-    include?: ("issues" | "labels" | "pulls" | "releases" | "git" | "milestones")[] | undefined;
+    };
     strategy?: "timestamp" | "source-wins" | "skip-conflicts" | undefined;
     dry_run?: boolean | undefined;
+    direction?: "one-way" | "two-way" | undefined;
+    include?: ("issues" | "labels" | "git" | "pulls" | "releases" | "milestones")[] | undefined;
 }, {
     action: "status" | "configure" | "one-shot";
-    target?: {
+    target: {
         provider: "gitea" | "github";
         owner: string;
         repo: string;
-    } | undefined;
-    direction?: "one-way" | "two-way" | undefined;
-    source?: {
+    };
+    source: {
         provider: "gitea" | "github";
         owner: string;
         repo: string;
-    } | undefined;
-    include?: ("issues" | "labels" | "pulls" | "releases" | "git" | "milestones")[] | undefined;
+    };
     strategy?: "timestamp" | "source-wins" | "skip-conflicts" | undefined;
     dry_run?: boolean | undefined;
+    direction?: "one-way" | "two-way" | undefined;
+    include?: ("issues" | "labels" | "git" | "pulls" | "releases" | "milestones")[] | undefined;
 }>;
 export type GitSyncInput = z.infer<typeof GitSyncInputSchema>;
 declare const GitSyncResultSchema: z.ZodObject<{

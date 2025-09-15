@@ -81,5 +81,17 @@ export declare class GitHubProvider extends BaseVcsProvider {
     analyzeContributors(params: any): Promise<any>;
     getActivityStats(params: any): Promise<any>;
     getRepositoryInsights(params: any): Promise<any>;
+    createDeployment(params: any): Promise<any>;
+    updateDeploymentStatus(params: any): Promise<any>;
+    manageSecurityAlerts(params: any): Promise<any>;
+    listSecurityVulnerabilities(params: any): Promise<any>;
+    createWorkflow(params: any): Promise<any>;
+    triggerWorkflow(params: any): Promise<any>;
+    getWorkflowStatus(params: any): Promise<any>;
+    getWorkflowLogs(params: any): Promise<any>;
+    listWorkflowArtifacts(params: any): Promise<any>;
+    downloadArtifact(params: any): Promise<any>;
+    listSecrets(params: any): Promise<any>;
+    listJobs(params: any): Promise<any>;
 }
 //# sourceMappingURL=github-provider.d.ts.map

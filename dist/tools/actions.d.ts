@@ -31,9 +31,9 @@ import { VcsOperations } from '../providers/index.js';
  */
 declare const ActionsInputSchema: z.ZodEffects<z.ZodObject<{
     action: z.ZodEnum<["list-runs", "cancel", "rerun", "artifacts", "secrets", "jobs", "download-artifact"]>;
-    owner: z.ZodOptional<z.ZodString>;
+    owner: z.ZodString;
     repo: z.ZodString;
-    provider: z.ZodOptional<z.ZodEnum<["gitea", "github", "both"]>>;
+    provider: z.ZodEnum<["gitea", "github", "both"]>;
     page: z.ZodOptional<z.ZodNumber>;
     limit: z.ZodOptional<z.ZodNumber>;
     run_id: z.ZodOptional<z.ZodString>;
@@ -49,11 +49,11 @@ declare const ActionsInputSchema: z.ZodEffects<z.ZodObject<{
     created_after: z.ZodOptional<z.ZodString>;
     created_before: z.ZodOptional<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
+    provider: "gitea" | "github" | "both";
+    owner: string;
     repo: string;
     action: "list-runs" | "cancel" | "rerun" | "artifacts" | "secrets" | "jobs" | "download-artifact";
-    provider?: "gitea" | "github" | "both" | undefined;
     status?: "success" | "queued" | "in_progress" | "completed" | "cancelled" | "failure" | undefined;
-    owner?: string | undefined;
     page?: number | undefined;
     limit?: number | undefined;
     workflow_id?: string | undefined;
@@ -68,11 +68,11 @@ declare const ActionsInputSchema: z.ZodEffects<z.ZodObject<{
     created_after?: string | undefined;
     created_before?: string | undefined;
 }, {
+    provider: "gitea" | "github" | "both";
+    owner: string;
     repo: string;
     action: "list-runs" | "cancel" | "rerun" | "artifacts" | "secrets" | "jobs" | "download-artifact";
-    provider?: "gitea" | "github" | "both" | undefined;
     status?: "success" | "queued" | "in_progress" | "completed" | "cancelled" | "failure" | undefined;
-    owner?: string | undefined;
     page?: number | undefined;
     limit?: number | undefined;
     workflow_id?: string | undefined;
@@ -87,11 +87,11 @@ declare const ActionsInputSchema: z.ZodEffects<z.ZodObject<{
     created_after?: string | undefined;
     created_before?: string | undefined;
 }>, {
+    provider: "gitea" | "github" | "both";
+    owner: string;
     repo: string;
     action: "list-runs" | "cancel" | "rerun" | "artifacts" | "secrets" | "jobs" | "download-artifact";
-    provider?: "gitea" | "github" | "both" | undefined;
     status?: "success" | "queued" | "in_progress" | "completed" | "cancelled" | "failure" | undefined;
-    owner?: string | undefined;
     page?: number | undefined;
     limit?: number | undefined;
     workflow_id?: string | undefined;
@@ -106,11 +106,11 @@ declare const ActionsInputSchema: z.ZodEffects<z.ZodObject<{
     created_after?: string | undefined;
     created_before?: string | undefined;
 }, {
+    provider: "gitea" | "github" | "both";
+    owner: string;
     repo: string;
     action: "list-runs" | "cancel" | "rerun" | "artifacts" | "secrets" | "jobs" | "download-artifact";
-    provider?: "gitea" | "github" | "both" | undefined;
     status?: "success" | "queued" | "in_progress" | "completed" | "cancelled" | "failure" | undefined;
-    owner?: string | undefined;
     page?: number | undefined;
     limit?: number | undefined;
     workflow_id?: string | undefined;

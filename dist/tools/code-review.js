@@ -38,8 +38,8 @@ const validator_js_1 = require("./validator.js");
 const CodeReviewInputSchema = zod_1.z.object({
     action: zod_1.z.enum(['analyze', 'review-file', 'review-commit', 'review-pr', 'generate-report', 'apply-suggestions']),
     // Parâmetros comuns
-    owner: zod_1.z.string().optional(),
-    repo: zod_1.z.string().optional(),
+    owner: zod_1.z.string(),
+    repo: zod_1.z.string(),
     provider: validator_js_1.CommonSchemas.provider,
     // Para analyze
     code: zod_1.z.string().optional(),
@@ -179,7 +179,7 @@ exports.codeReviewTool = {
                 description: 'Padrões para excluir da análise (ex: ["*.min.js", "dist/**"])'
             }
         },
-        required: ['action']
+        required: ['action', 'owner', 'repo', 'provider']
     },
     async handler(input) {
         try {

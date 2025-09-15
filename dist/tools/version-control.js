@@ -37,7 +37,7 @@ const VersionControlInputSchema = zod_1.z.object({
     include_files: zod_1.z.array(zod_1.z.string()).optional(),
     exclude_patterns: zod_1.z.array(zod_1.z.string()).optional(),
     dry_run: zod_1.z.boolean().optional(),
-    provider: zod_1.z.enum(['gitea', 'github', 'both']).optional() // Provider específico: gitea, github ou both
+    provider: zod_1.z.enum(['gitea', 'github', 'both']) // Provider específico: gitea, github ou both
 });
 const VersionControlResultSchema = zod_1.z.object({
     success: zod_1.z.boolean(),
@@ -66,7 +66,7 @@ exports.versionControlTool = {
             exclude_patterns: { type: 'array', items: { type: 'string' }, description: 'File patterns to exclude' },
             dry_run: { type: 'boolean', description: 'Simulate without applying changes' }
         },
-        required: ['action']
+        required: ['action', 'provider']
     },
     async handler(input) {
         try {

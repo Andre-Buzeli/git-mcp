@@ -9,10 +9,10 @@ const zod_1 = require("zod");
 // Schemas comuns reutilizáveis
 exports.CommonSchemas = {
     // Identificadores
-    owner: zod_1.z.string().min(1, 'Owner is required').max(100, 'Owner too long').optional(),
+    owner: zod_1.z.string().min(1, 'Owner is required').max(100, 'Owner too long'),
     username: zod_1.z.string().min(1, 'Username is required').max(100, 'Username too long').optional(),
     repo: zod_1.z.string().min(1, 'Repository name is required').max(100, 'Repository name too long'),
-    provider: zod_1.z.enum(['gitea', 'github', 'both']).optional(),
+    provider: zod_1.z.enum(['gitea', 'github', 'both']),
     // Paginação
     page: zod_1.z.number().min(1, 'Page must be at least 1').max(1000, 'Page too high').optional(),
     limit: zod_1.z.number().min(1, 'Limit must be at least 1').max(100, 'Limit cannot exceed 100').optional(),

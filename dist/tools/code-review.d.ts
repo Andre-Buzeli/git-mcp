@@ -32,9 +32,9 @@ import { VcsOperations } from '../providers/index.js';
  */
 declare const CodeReviewInputSchema: z.ZodEffects<z.ZodObject<{
     action: z.ZodEnum<["analyze", "review-file", "review-commit", "review-pr", "generate-report", "apply-suggestions"]>;
-    owner: z.ZodOptional<z.ZodString>;
-    repo: z.ZodOptional<z.ZodString>;
-    provider: z.ZodOptional<z.ZodEnum<["gitea", "github", "both"]>>;
+    owner: z.ZodString;
+    repo: z.ZodString;
+    provider: z.ZodEnum<["gitea", "github", "both"]>;
     code: z.ZodOptional<z.ZodString>;
     language: z.ZodOptional<z.ZodString>;
     file_path: z.ZodOptional<z.ZodString>;
@@ -63,16 +63,15 @@ declare const CodeReviewInputSchema: z.ZodEffects<z.ZodObject<{
     rules: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
     exclude_patterns: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
 }, "strip", z.ZodTypeAny, {
+    provider: "gitea" | "github" | "both";
+    owner: string;
+    repo: string;
     action: "analyze" | "review-file" | "review-commit" | "review-pr" | "generate-report" | "apply-suggestions";
-    provider?: "gitea" | "github" | "both" | undefined;
     code?: string | undefined;
     path?: string | undefined;
-    owner?: string | undefined;
-    repo?: string | undefined;
     sha?: string | undefined;
     branch?: string | undefined;
     pull_number?: number | undefined;
-    exclude_patterns?: string[] | undefined;
     report_type?: "security" | "performance" | "summary" | "detailed" | undefined;
     language?: string | undefined;
     file_path?: string | undefined;
@@ -84,17 +83,17 @@ declare const CodeReviewInputSchema: z.ZodEffects<z.ZodObject<{
         suggestion: string;
     }[] | undefined;
     rules?: string[] | undefined;
+    exclude_patterns?: string[] | undefined;
 }, {
+    provider: "gitea" | "github" | "both";
+    owner: string;
+    repo: string;
     action: "analyze" | "review-file" | "review-commit" | "review-pr" | "generate-report" | "apply-suggestions";
-    provider?: "gitea" | "github" | "both" | undefined;
     code?: string | undefined;
     path?: string | undefined;
-    owner?: string | undefined;
-    repo?: string | undefined;
     sha?: string | undefined;
     branch?: string | undefined;
     pull_number?: number | undefined;
-    exclude_patterns?: string[] | undefined;
     report_type?: "security" | "performance" | "summary" | "detailed" | undefined;
     language?: string | undefined;
     file_path?: string | undefined;
@@ -106,17 +105,17 @@ declare const CodeReviewInputSchema: z.ZodEffects<z.ZodObject<{
         suggestion: string;
     }[] | undefined;
     rules?: string[] | undefined;
+    exclude_patterns?: string[] | undefined;
 }>, {
+    provider: "gitea" | "github" | "both";
+    owner: string;
+    repo: string;
     action: "analyze" | "review-file" | "review-commit" | "review-pr" | "generate-report" | "apply-suggestions";
-    provider?: "gitea" | "github" | "both" | undefined;
     code?: string | undefined;
     path?: string | undefined;
-    owner?: string | undefined;
-    repo?: string | undefined;
     sha?: string | undefined;
     branch?: string | undefined;
     pull_number?: number | undefined;
-    exclude_patterns?: string[] | undefined;
     report_type?: "security" | "performance" | "summary" | "detailed" | undefined;
     language?: string | undefined;
     file_path?: string | undefined;
@@ -128,17 +127,17 @@ declare const CodeReviewInputSchema: z.ZodEffects<z.ZodObject<{
         suggestion: string;
     }[] | undefined;
     rules?: string[] | undefined;
+    exclude_patterns?: string[] | undefined;
 }, {
+    provider: "gitea" | "github" | "both";
+    owner: string;
+    repo: string;
     action: "analyze" | "review-file" | "review-commit" | "review-pr" | "generate-report" | "apply-suggestions";
-    provider?: "gitea" | "github" | "both" | undefined;
     code?: string | undefined;
     path?: string | undefined;
-    owner?: string | undefined;
-    repo?: string | undefined;
     sha?: string | undefined;
     branch?: string | undefined;
     pull_number?: number | undefined;
-    exclude_patterns?: string[] | undefined;
     report_type?: "security" | "performance" | "summary" | "detailed" | undefined;
     language?: string | undefined;
     file_path?: string | undefined;
@@ -150,6 +149,7 @@ declare const CodeReviewInputSchema: z.ZodEffects<z.ZodObject<{
         suggestion: string;
     }[] | undefined;
     rules?: string[] | undefined;
+    exclude_patterns?: string[] | undefined;
 }>;
 export type CodeReviewInput = z.infer<typeof CodeReviewInputSchema>;
 /**

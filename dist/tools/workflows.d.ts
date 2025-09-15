@@ -41,9 +41,9 @@ import { VcsOperations } from '../providers/index.js';
  */
 declare const WorkflowsInputSchema: z.ZodEffects<z.ZodObject<{
     action: z.ZodEnum<["list", "create", "trigger", "status", "logs", "disable", "enable"]>;
-    owner: z.ZodOptional<z.ZodString>;
+    owner: z.ZodString;
     repo: z.ZodString;
-    provider: z.ZodOptional<z.ZodEnum<["gitea", "github", "both"]>>;
+    provider: z.ZodEnum<["gitea", "github", "both"]>;
     page: z.ZodOptional<z.ZodNumber>;
     limit: z.ZodOptional<z.ZodNumber>;
     name: z.ZodOptional<z.ZodString>;
@@ -58,12 +58,12 @@ declare const WorkflowsInputSchema: z.ZodEffects<z.ZodObject<{
     inputs: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodString>>;
     ref: z.ZodOptional<z.ZodOptional<z.ZodString>>;
 }, "strip", z.ZodTypeAny, {
+    provider: "gitea" | "github" | "both";
+    owner: string;
     repo: string;
     action: "status" | "create" | "list" | "trigger" | "logs" | "disable" | "enable";
-    provider?: "gitea" | "github" | "both" | undefined;
     name?: string | undefined;
     description?: string | undefined;
-    owner?: string | undefined;
     ref?: string | undefined;
     page?: number | undefined;
     limit?: number | undefined;
@@ -76,12 +76,12 @@ declare const WorkflowsInputSchema: z.ZodEffects<z.ZodObject<{
     workflow_name?: string | undefined;
     step_number?: number | undefined;
 }, {
+    provider: "gitea" | "github" | "both";
+    owner: string;
     repo: string;
     action: "status" | "create" | "list" | "trigger" | "logs" | "disable" | "enable";
-    provider?: "gitea" | "github" | "both" | undefined;
     name?: string | undefined;
     description?: string | undefined;
-    owner?: string | undefined;
     ref?: string | undefined;
     page?: number | undefined;
     limit?: number | undefined;
@@ -94,12 +94,12 @@ declare const WorkflowsInputSchema: z.ZodEffects<z.ZodObject<{
     workflow_name?: string | undefined;
     step_number?: number | undefined;
 }>, {
+    provider: "gitea" | "github" | "both";
+    owner: string;
     repo: string;
     action: "status" | "create" | "list" | "trigger" | "logs" | "disable" | "enable";
-    provider?: "gitea" | "github" | "both" | undefined;
     name?: string | undefined;
     description?: string | undefined;
-    owner?: string | undefined;
     ref?: string | undefined;
     page?: number | undefined;
     limit?: number | undefined;
@@ -112,12 +112,12 @@ declare const WorkflowsInputSchema: z.ZodEffects<z.ZodObject<{
     workflow_name?: string | undefined;
     step_number?: number | undefined;
 }, {
+    provider: "gitea" | "github" | "both";
+    owner: string;
     repo: string;
     action: "status" | "create" | "list" | "trigger" | "logs" | "disable" | "enable";
-    provider?: "gitea" | "github" | "both" | undefined;
     name?: string | undefined;
     description?: string | undefined;
-    owner?: string | undefined;
     ref?: string | undefined;
     page?: number | undefined;
     limit?: number | undefined;

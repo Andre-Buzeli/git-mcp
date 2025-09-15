@@ -40,10 +40,11 @@ import { VcsOperations } from '../providers/index.js';
  * - Documente parâmetros obrigatórios
  */
 declare const CommitsInputSchema: z.ZodObject<{
-    action: z.ZodEnum<["list", "get", "create", "compare", "search"]>;
-    owner: z.ZodOptional<z.ZodString>;
-    repo: z.ZodOptional<z.ZodString>;
-    provider: z.ZodOptional<z.ZodEnum<["gitea", "github"]>>;
+    action: z.ZodEnum<["list", "get", "create", "compare", "search", "push", "pull"]>;
+    owner: z.ZodString;
+    repo: z.ZodString;
+    projectPath: z.ZodString;
+    provider: z.ZodEnum<["gitea", "github"]>;
     sha: z.ZodOptional<z.ZodString>;
     page: z.ZodOptional<z.ZodNumber>;
     limit: z.ZodOptional<z.ZodNumber>;
@@ -59,38 +60,40 @@ declare const CommitsInputSchema: z.ZodObject<{
     query: z.ZodOptional<z.ZodString>;
     author: z.ZodOptional<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
-    action: "get" | "create" | "list" | "search" | "compare";
-    provider?: "gitea" | "github" | undefined;
+    provider: "gitea" | "github";
+    owner: string;
+    repo: string;
+    action: "push" | "get" | "create" | "list" | "search" | "compare" | "pull";
+    projectPath: string;
     message?: string | undefined;
-    owner?: string | undefined;
     head?: string | undefined;
     base?: string | undefined;
-    repo?: string | undefined;
     page?: number | undefined;
     limit?: number | undefined;
     sha?: string | undefined;
     query?: string | undefined;
-    branch?: string | undefined;
     commit_sha?: string | undefined;
+    branch?: string | undefined;
     author_name?: string | undefined;
     author_email?: string | undefined;
     committer_name?: string | undefined;
     committer_email?: string | undefined;
     author?: string | undefined;
 }, {
-    action: "get" | "create" | "list" | "search" | "compare";
-    provider?: "gitea" | "github" | undefined;
+    provider: "gitea" | "github";
+    owner: string;
+    repo: string;
+    action: "push" | "get" | "create" | "list" | "search" | "compare" | "pull";
+    projectPath: string;
     message?: string | undefined;
-    owner?: string | undefined;
     head?: string | undefined;
     base?: string | undefined;
-    repo?: string | undefined;
     page?: number | undefined;
     limit?: number | undefined;
     sha?: string | undefined;
     query?: string | undefined;
-    branch?: string | undefined;
     commit_sha?: string | undefined;
+    branch?: string | undefined;
     author_name?: string | undefined;
     author_email?: string | undefined;
     committer_name?: string | undefined;
@@ -205,6 +208,10 @@ export declare const commitsTool: {
                 description: string;
             };
             provider: {
+                type: string;
+                description: string;
+            };
+            projectPath: {
                 type: string;
                 description: string;
             };
@@ -445,6 +452,46 @@ export declare const commitsTool: {
      * - Analise relevância dos resultados
      */
     searchCommits(params: CommitsInput, provider: VcsOperations): Promise<CommitsResult>;
+    /**
+     * Faz push dos commits locais para o repositório remoto
+     *
+     * FUNCIONALIDADE:
+     * - Faz push da branch atual para o remote
+     * - Suporta especificar branch específica
+     * - Verifica se há commits para fazer push
+     *
+     * PARÂMETROS OBRIGATÓRIOS:
+     * - projectPath: Caminho do projeto local
+     *
+     * PARÂMETROS OPCIONAIS:
+     * - branch: Branch para fazer push (padrão: branch atual)
+     *
+     * RECOMENDAÇÕES:
+     * - Verifique se há commits locais antes do push
+     * - Use branch específica se necessário
+     * - Monitore conflitos durante o push
+     */
+    pushCommits(params: CommitsInput, provider?: VcsOperations): Promise<CommitsResult>;
+    /**
+     * Faz pull dos commits do repositório remoto
+     *
+     * FUNCIONALIDADE:
+     * - Faz pull da branch atual do remote
+     * - Suporta especificar branch específica
+     * - Faz merge automático se possível
+     *
+     * PARÂMETROS OBRIGATÓRIOS:
+     * - projectPath: Caminho do projeto local
+     *
+     * PARÂMETROS OPCIONAIS:
+     * - branch: Branch para fazer pull (padrão: branch atual)
+     *
+     * RECOMENDAÇÕES:
+     * - Faça backup antes do pull
+     * - Resolva conflitos manualmente se houver
+     * - Use branch específica se necessário
+     */
+    pullCommits(params: CommitsInput, provider?: VcsOperations): Promise<CommitsResult>;
 };
 export {};
 //# sourceMappingURL=commits.d.ts.map

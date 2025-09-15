@@ -41,9 +41,10 @@ import { VcsOperations } from '../providers/index.js';
  */
 declare const BranchesInputSchema: z.ZodObject<{
     action: z.ZodEnum<["create", "list", "get", "delete", "merge", "compare"]>;
-    owner: z.ZodOptional<z.ZodString>;
-    repo: z.ZodOptional<z.ZodString>;
-    provider: z.ZodOptional<z.ZodEnum<["gitea", "github"]>>;
+    owner: z.ZodString;
+    repo: z.ZodString;
+    projectPath: z.ZodString;
+    provider: z.ZodEnum<["gitea", "github"]>;
     branch_name: z.ZodOptional<z.ZodString>;
     from_branch: z.ZodOptional<z.ZodString>;
     branch: z.ZodOptional<z.ZodString>;
@@ -55,32 +56,34 @@ declare const BranchesInputSchema: z.ZodObject<{
     base_branch: z.ZodOptional<z.ZodString>;
     head_branch: z.ZodOptional<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
+    provider: "gitea" | "github";
+    owner: string;
+    repo: string;
     action: "merge" | "delete" | "get" | "create" | "list" | "compare";
-    provider?: "gitea" | "github" | undefined;
-    owner?: string | undefined;
+    projectPath: string;
     head?: string | undefined;
     base?: string | undefined;
-    repo?: string | undefined;
     page?: number | undefined;
     limit?: number | undefined;
+    branch?: string | undefined;
     branch_name?: string | undefined;
     from_branch?: string | undefined;
-    branch?: string | undefined;
     merge_method?: "merge" | "rebase" | "squash" | undefined;
     base_branch?: string | undefined;
     head_branch?: string | undefined;
 }, {
+    provider: "gitea" | "github";
+    owner: string;
+    repo: string;
     action: "merge" | "delete" | "get" | "create" | "list" | "compare";
-    provider?: "gitea" | "github" | undefined;
-    owner?: string | undefined;
+    projectPath: string;
     head?: string | undefined;
     base?: string | undefined;
-    repo?: string | undefined;
     page?: number | undefined;
     limit?: number | undefined;
+    branch?: string | undefined;
     branch_name?: string | undefined;
     from_branch?: string | undefined;
-    branch?: string | undefined;
     merge_method?: "merge" | "rebase" | "squash" | undefined;
     base_branch?: string | undefined;
     head_branch?: string | undefined;
@@ -189,6 +192,10 @@ export declare const branchesTool: {
                 description: string;
             };
             repo: {
+                type: string;
+                description: string;
+            };
+            projectPath: {
                 type: string;
                 description: string;
             };

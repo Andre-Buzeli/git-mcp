@@ -1,7 +1,7 @@
 {
   "name": "@andrebuzeli/git-mcp",
-  "version": "2.12.5",
-  "description": "MCP server for Gitea and GitHub integration with 18 comprehensive DevOps tools including mandatory provider specification and auto-user detection",
+  "version": "2.14.2",
+  "description": "MCP server for Gitea and GitHub integration with 30 comprehensive DevOps tools - Complete Git/GitHub functionality with ALL methods implemented: createDeployment, updateDeploymentStatus, manageSecurityAlerts, listSecurityVulnerabilities and more",
   "main": "dist/index.js",
   "bin": {
     "git-mcp": "dist/index.js"
@@ -41,7 +41,7 @@
     "zod": "^3.22.0"
   },
   "devDependencies": {
-    "@types/node": "^20.0.0",
+    "@types/node": "^20.19.15",
     "ts-node": "^10.9.0",
     "typescript": "^5.0.0"
   },

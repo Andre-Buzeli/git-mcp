@@ -124,7 +124,7 @@ exports.deploymentsTool = {
             page: { type: 'number', description: 'Page number', minimum: 1 },
             limit: { type: 'number', description: 'Items per page', minimum: 1, maximum: 100 }
         },
-        required: ['action']
+        required: ['action', 'owner', 'repo', 'provider']
     },
     async handler(input) {
         try {

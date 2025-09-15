@@ -45,7 +45,7 @@ const index_js_1 = require("../providers/index.js");
 const UsersInputSchema = zod_1.z.object({
     action: zod_1.z.enum(['get', 'list', 'search', 'orgs', 'repos']),
     // Para multi-provider
-    provider: zod_1.z.enum(['gitea', 'github', 'both']).optional(), // Provider específico: gitea, github ou both
+    provider: zod_1.z.enum(['gitea', 'github', 'both']), // Provider específico: gitea, github ou both
     // Para get específico
     username: zod_1.z.string().optional(),
     // Para search
@@ -140,7 +140,7 @@ exports.usersTool = {
             sort: { type: 'string', enum: ['created', 'updated', 'pushed', 'full_name'], description: 'Sort order' },
             direction: { type: 'string', enum: ['asc', 'desc'], description: 'Sort direction' }
         },
-        required: ['action']
+        required: ['action', 'provider']
     },
     /**
      * Handler principal da tool users

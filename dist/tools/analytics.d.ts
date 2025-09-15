@@ -31,9 +31,9 @@ import { VcsOperations } from '../providers/index.js';
  */
 declare const AnalyticsInputSchema: z.ZodEffects<z.ZodObject<{
     action: z.ZodEnum<["traffic", "contributors", "activity", "performance", "reports", "trends", "insights"]>;
-    owner: z.ZodOptional<z.ZodString>;
+    owner: z.ZodString;
     repo: z.ZodString;
-    provider: z.ZodOptional<z.ZodEnum<["gitea", "github", "both"]>>;
+    provider: z.ZodEnum<["gitea", "github", "both"]>;
     page: z.ZodOptional<z.ZodNumber>;
     limit: z.ZodOptional<z.ZodNumber>;
     period: z.ZodOptional<z.ZodEnum<["day", "week", "month", "quarter", "year"]>>;
@@ -54,11 +54,11 @@ declare const AnalyticsInputSchema: z.ZodEffects<z.ZodObject<{
     path: z.ZodOptional<z.ZodString>;
     file_type: z.ZodOptional<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
+    provider: "gitea" | "github" | "both";
+    owner: string;
     repo: string;
     action: "traffic" | "contributors" | "activity" | "performance" | "reports" | "trends" | "insights";
-    provider?: "gitea" | "github" | "both" | undefined;
     path?: string | undefined;
-    owner?: string | undefined;
     page?: number | undefined;
     limit?: number | undefined;
     branch?: string | undefined;
@@ -78,11 +78,11 @@ declare const AnalyticsInputSchema: z.ZodEffects<z.ZodObject<{
     trend_period?: "daily" | "weekly" | "monthly" | undefined;
     file_type?: string | undefined;
 }, {
+    provider: "gitea" | "github" | "both";
+    owner: string;
     repo: string;
     action: "traffic" | "contributors" | "activity" | "performance" | "reports" | "trends" | "insights";
-    provider?: "gitea" | "github" | "both" | undefined;
     path?: string | undefined;
-    owner?: string | undefined;
     page?: number | undefined;
     limit?: number | undefined;
     branch?: string | undefined;
@@ -102,11 +102,11 @@ declare const AnalyticsInputSchema: z.ZodEffects<z.ZodObject<{
     trend_period?: "daily" | "weekly" | "monthly" | undefined;
     file_type?: string | undefined;
 }>, {
+    provider: "gitea" | "github" | "both";
+    owner: string;
     repo: string;
     action: "traffic" | "contributors" | "activity" | "performance" | "reports" | "trends" | "insights";
-    provider?: "gitea" | "github" | "both" | undefined;
     path?: string | undefined;
-    owner?: string | undefined;
     page?: number | undefined;
     limit?: number | undefined;
     branch?: string | undefined;
@@ -126,11 +126,11 @@ declare const AnalyticsInputSchema: z.ZodEffects<z.ZodObject<{
     trend_period?: "daily" | "weekly" | "monthly" | undefined;
     file_type?: string | undefined;
 }, {
+    provider: "gitea" | "github" | "both";
+    owner: string;
     repo: string;
     action: "traffic" | "contributors" | "activity" | "performance" | "reports" | "trends" | "insights";
-    provider?: "gitea" | "github" | "both" | undefined;
     path?: string | undefined;
-    owner?: string | undefined;
     page?: number | undefined;
     limit?: number | undefined;
     branch?: string | undefined;

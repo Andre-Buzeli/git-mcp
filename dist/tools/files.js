@@ -46,10 +46,11 @@ const user_detection_js_1 = require("../utils/user-detection.js");
 const FilesInputSchema = zod_1.z.object({
     action: zod_1.z.enum(['get', 'create', 'update', 'delete', 'list', 'search']),
     // Parâmetros comuns
-    owner: zod_1.z.string().optional(),
-    repo: zod_1.z.string().optional(),
+    owner: zod_1.z.string(),
+    repo: zod_1.z.string(),
     path: zod_1.z.string().optional(),
-    provider: zod_1.z.enum(['gitea', 'github']).optional().describe('Provider to use (gitea or github, optional - uses default if not specified)'), // Para create/update
+    projectPath: zod_1.z.string().describe('Local project path for git operations'),
+    provider: zod_1.z.enum(['gitea', 'github']).describe('Provider to use (gitea or github)'),
     content: zod_1.z.string().optional(),
     message: zod_1.z.string().optional(),
     branch: zod_1.z.string().optional(),
@@ -161,6 +162,7 @@ exports.filesTool = {
             owner: { type: 'string', description: 'Repository owner' },
             repo: { type: 'string', description: 'Repository name' },
             path: { type: 'string', description: 'File or directory path' },
+            projectPath: { type: 'string', description: 'Local project path for git operations' },
             provider: { type: 'string', description: 'Specific provider (github, gitea) or use default' },
             content: { type: 'string', description: 'File content' },
             message: { type: 'string', description: 'Commit message' },
@@ -171,7 +173,7 @@ exports.filesTool = {
             page: { type: 'number', description: 'Page number', minimum: 1 },
             limit: { type: 'number', description: 'Items per page', minimum: 1, maximum: 100 }
         },
-        required: ['action']
+        required: ['action', 'owner', 'repo', 'provider', 'projectPath']
     },
     /**
      * Handler principal da tool files

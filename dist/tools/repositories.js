@@ -4,6 +4,7 @@ exports.repositoriesTool = void 0;
 const zod_1 = require("zod");
 const index_js_1 = require("../providers/index.js");
 const user_detection_js_1 = require("../utils/user-detection.js");
+const terminal_controller_js_1 = require("../utils/terminal-controller.js");
 /**
  * Tool: repositories
  *
@@ -44,11 +45,12 @@ const user_detection_js_1 = require("../utils/user-detection.js");
  * - Documente parâmetros obrigatórios
  */
 const RepositoriesInputSchema = zod_1.z.object({
-    action: zod_1.z.enum(['create', 'list', 'get', 'update', 'delete', 'fork', 'search']),
+    action: zod_1.z.enum(['create', 'list', 'get', 'update', 'delete', 'fork', 'search', 'init', 'clone']),
     // Parâmetros comuns
-    owner: zod_1.z.string().optional(),
-    repo: zod_1.z.string().optional(),
-    provider: zod_1.z.enum(['gitea', 'github']).optional().describe('Provider to use (gitea or github, optional - uses default if not specified)'),
+    owner: zod_1.z.string(),
+    repo: zod_1.z.string(),
+    provider: zod_1.z.enum(['gitea', 'github']).describe('Provider to use (gitea or github)'),
+    projectPath: zod_1.z.string().describe('Local project path for git operations'),
     name: zod_1.z.string().optional(),
     description: zod_1.z.string().optional(),
     private: zod_1.z.boolean().optional(),
@@ -151,12 +153,13 @@ exports.repositoriesTool = {
         properties: {
             action: {
                 type: 'string',
-                enum: ['create', 'list', 'get', 'update', 'delete', 'fork', 'search'],
+                enum: ['create', 'list', 'get', 'update', 'delete', 'fork', 'search', 'init', 'clone'],
                 description: 'Action to perform on repositories'
             },
             owner: { type: 'string', description: 'Repository owner' },
             repo: { type: 'string', description: 'Repository name' },
             provider: { type: 'string', enum: ['gitea', 'github'], description: 'Provider to use (gitea or github)' },
+            projectPath: { type: 'string', description: 'Local project path for git operations' },
             name: { type: 'string', description: 'Repository name for creation' },
             description: { type: 'string', description: 'Repository description' },
             private: { type: 'boolean', description: 'Private repository' },
@@ -175,7 +178,7 @@ exports.repositoriesTool = {
             organization: { type: 'string', description: 'Organization for fork' },
             query: { type: 'string', description: 'Search query' }
         },
-        required: ['action']
+        required: ['action', 'owner', 'repo', 'provider', 'projectPath']
     },
     /**
      * Handler principal da tool repositories
@@ -248,6 +251,10 @@ exports.repositoriesTool = {
                     return await this.forkRepository(processedInput, provider);
                 case 'search':
                     return await this.searchRepositories(processedInput, provider);
+                case 'init':
+                    return await this.initRepository(processedInput, provider);
+                case 'clone':
+                    return await this.cloneRepository(processedInput, provider);
                 default:
                     throw new Error(`Ação não suportada: ${processedInput.action}`);
             }
@@ -434,6 +441,122 @@ exports.repositoriesTool = {
         }
         catch (error) {
             throw new Error(`Falha ao buscar repositórios: ${error instanceof Error ? error.message : String(error)}`);
+        }
+    },
+    /**
+     * Inicializa um repositório Git local
+     *
+     * FUNCIONALIDADE:
+     * - Executa 'git init' no diretório especificado
+     * - Cria estrutura básica do Git
+     * - Adiciona remote se especificado
+     *
+     * PARÂMETROS OBRIGATÓRIOS:
+     * - projectPath: Caminho do projeto local
+     *
+     * PARÂMETROS OPCIONAIS:
+     * - owner/repo: Para configurar remote
+     * - provider: Para determinar URL do remote
+     *
+     * RECOMENDAÇÕES:
+     * - Verifique se diretório existe
+     * - Use caminhos absolutos
+     * - Configure remote após inicialização
+     */
+    async initRepository(params, provider) {
+        try {
+            if (!params.projectPath) {
+                throw new Error('projectPath é obrigatório para inicialização do repositório');
+            }
+            // Executa git init no diretório especificado
+            const initResult = await (0, terminal_controller_js_1.runTerminalCmd)({
+                command: `git init "${params.projectPath}"`,
+                is_background: false,
+                explanation: 'Inicializando repositório Git local'
+            });
+            if (initResult.exitCode !== 0) {
+                throw new Error(`Falha ao inicializar repositório: ${initResult.output}`);
+            }
+            // Se owner/repo foram especificados, configura remote
+            if (params.owner && params.repo) {
+                const remoteUrl = params.provider === 'gitea'
+                    ? `http://nas-ubuntu:3000/${params.owner}/${params.repo}.git`
+                    : `https://github.com/${params.owner}/${params.repo}.git`;
+                const remoteResult = await (0, terminal_controller_js_1.runTerminalCmd)({
+                    command: `cd "${params.projectPath}" && git remote add origin "${remoteUrl}"`,
+                    is_background: false,
+                    explanation: 'Configurando remote origin'
+                });
+                if (remoteResult.exitCode !== 0) {
+                    console.warn(`Aviso: Não foi possível configurar remote: ${remoteResult.output}`);
+                }
+            }
+            return {
+                success: true,
+                action: 'init',
+                message: `Repositório Git inicializado com sucesso em '${params.projectPath}'`,
+                data: {
+                    path: params.projectPath,
+                    initialized: true,
+                    remoteConfigured: !!(params.owner && params.repo && provider)
+                }
+            };
+        }
+        catch (error) {
+            throw new Error(`Falha ao inicializar repositório: ${error instanceof Error ? error.message : String(error)}`);
+        }
+    },
+    /**
+     * Clona um repositório para o diretório local
+     *
+     * FUNCIONALIDADE:
+     * - Clona repositório remoto para diretório local
+     * - Suporta diferentes protocolos (HTTPS, SSH)
+     * - Mantém estrutura de diretórios
+     *
+     * PARÂMETROS OBRIGATÓRIOS:
+     * - owner: Proprietário do repositório
+     * - repo: Nome do repositório
+     * - projectPath: Caminho local de destino
+     * - provider: Provider a ser usado
+     *
+     * RECOMENDAÇÕES:
+     * - Verifique espaço em disco disponível
+     * - Use caminhos absolutos
+     * - Considere profundidade de clone para repositórios grandes
+     */
+    async cloneRepository(params, provider) {
+        try {
+            if (!params.owner || !params.repo || !params.projectPath) {
+                throw new Error('owner, repo e projectPath são obrigatórios para clonagem');
+            }
+            // Obtém URL do repositório
+            const repoUrl = params.provider === 'gitea'
+                ? `http://nas-ubuntu:3000/${params.owner}/${params.repo}.git`
+                : `https://github.com/${params.owner}/${params.repo}.git`;
+            // Executa git clone
+            const cloneResult = await (0, terminal_controller_js_1.runTerminalCmd)({
+                command: `git clone "${repoUrl}" "${params.projectPath}"`,
+                is_background: false,
+                explanation: 'Clonando repositório remoto'
+            });
+            if (cloneResult.exitCode !== 0) {
+                throw new Error(`Falha ao clonar repositório: ${cloneResult.output}`);
+            }
+            return {
+                success: true,
+                action: 'clone',
+                message: `Repositório '${params.owner}/${params.repo}' clonado com sucesso para '${params.projectPath}'`,
+                data: {
+                    source: `${params.owner}/${params.repo}`,
+                    destination: params.projectPath,
+                    cloned: true,
+                    url: repoUrl
+                }
+            };
+        }
+        catch (error) {
+            throw new Error(`Falha ao clonar repositório: ${error instanceof Error ? error.message : String(error)}`);
         }
     }
 };

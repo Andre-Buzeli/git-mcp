@@ -40,10 +40,11 @@ import { VcsOperations } from '../providers/index.js';
  * - Documente parâmetros obrigatórios
  */
 declare const RepositoriesInputSchema: z.ZodObject<{
-    action: z.ZodEnum<["create", "list", "get", "update", "delete", "fork", "search"]>;
-    owner: z.ZodOptional<z.ZodString>;
-    repo: z.ZodOptional<z.ZodString>;
-    provider: z.ZodOptional<z.ZodEnum<["gitea", "github"]>>;
+    action: z.ZodEnum<["create", "list", "get", "update", "delete", "fork", "search", "init", "clone"]>;
+    owner: z.ZodString;
+    repo: z.ZodString;
+    provider: z.ZodEnum<["gitea", "github"]>;
+    projectPath: z.ZodString;
     name: z.ZodOptional<z.ZodString>;
     description: z.ZodOptional<z.ZodString>;
     private: z.ZodOptional<z.ZodBoolean>;
@@ -62,15 +63,16 @@ declare const RepositoriesInputSchema: z.ZodObject<{
     organization: z.ZodOptional<z.ZodString>;
     query: z.ZodOptional<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
-    action: "delete" | "get" | "create" | "list" | "update" | "fork" | "search";
-    provider?: "gitea" | "github" | undefined;
+    provider: "gitea" | "github";
+    owner: string;
+    repo: string;
+    action: "delete" | "get" | "create" | "list" | "update" | "fork" | "search" | "init" | "clone";
+    projectPath: string;
     name?: string | undefined;
     description?: string | undefined;
     private?: boolean | undefined;
     default_branch?: string | undefined;
-    owner?: string | undefined;
     organization?: string | undefined;
-    repo?: string | undefined;
     page?: number | undefined;
     limit?: number | undefined;
     auto_init?: boolean | undefined;
@@ -84,15 +86,16 @@ declare const RepositoriesInputSchema: z.ZodObject<{
     archived?: boolean | undefined;
     query?: string | undefined;
 }, {
-    action: "delete" | "get" | "create" | "list" | "update" | "fork" | "search";
-    provider?: "gitea" | "github" | undefined;
+    provider: "gitea" | "github";
+    owner: string;
+    repo: string;
+    action: "delete" | "get" | "create" | "list" | "update" | "fork" | "search" | "init" | "clone";
+    projectPath: string;
     name?: string | undefined;
     description?: string | undefined;
     private?: boolean | undefined;
     default_branch?: string | undefined;
-    owner?: string | undefined;
     organization?: string | undefined;
-    repo?: string | undefined;
     page?: number | undefined;
     limit?: number | undefined;
     auto_init?: boolean | undefined;
@@ -213,6 +216,10 @@ export declare const repositoriesTool: {
             provider: {
                 type: string;
                 enum: string[];
+                description: string;
+            };
+            projectPath: {
+                type: string;
                 description: string;
             };
             name: {
@@ -356,6 +363,47 @@ export declare const repositoriesTool: {
     deleteRepository(params: RepositoriesInput, provider: VcsOperations): Promise<RepositoriesResult>;
     forkRepository(params: RepositoriesInput, provider: VcsOperations): Promise<RepositoriesResult>;
     searchRepositories(params: RepositoriesInput, provider: VcsOperations): Promise<RepositoriesResult>;
+    /**
+     * Inicializa um repositório Git local
+     *
+     * FUNCIONALIDADE:
+     * - Executa 'git init' no diretório especificado
+     * - Cria estrutura básica do Git
+     * - Adiciona remote se especificado
+     *
+     * PARÂMETROS OBRIGATÓRIOS:
+     * - projectPath: Caminho do projeto local
+     *
+     * PARÂMETROS OPCIONAIS:
+     * - owner/repo: Para configurar remote
+     * - provider: Para determinar URL do remote
+     *
+     * RECOMENDAÇÕES:
+     * - Verifique se diretório existe
+     * - Use caminhos absolutos
+     * - Configure remote após inicialização
+     */
+    initRepository(params: RepositoriesInput, provider?: VcsOperations): Promise<RepositoriesResult>;
+    /**
+     * Clona um repositório para o diretório local
+     *
+     * FUNCIONALIDADE:
+     * - Clona repositório remoto para diretório local
+     * - Suporta diferentes protocolos (HTTPS, SSH)
+     * - Mantém estrutura de diretórios
+     *
+     * PARÂMETROS OBRIGATÓRIOS:
+     * - owner: Proprietário do repositório
+     * - repo: Nome do repositório
+     * - projectPath: Caminho local de destino
+     * - provider: Provider a ser usado
+     *
+     * RECOMENDAÇÕES:
+     * - Verifique espaço em disco disponível
+     * - Use caminhos absolutos
+     * - Considere profundidade de clone para repositórios grandes
+     */
+    cloneRepository(params: RepositoriesInput, provider: VcsOperations): Promise<RepositoriesResult>;
 };
 export {};
 //# sourceMappingURL=repositories.d.ts.map

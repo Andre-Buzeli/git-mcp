@@ -7,46 +7,89 @@ const types_js_1 = require("@modelcontextprotocol/sdk/types.js");
 const config_js_1 = require("./config.js");
 const index_js_2 = require("./providers/index.js");
 /**
- * Importação de todas as ferramentas MCP disponíveis
+ * Importação de todas as ferramentas MCP disponíveis (30 tools)
  *
- * FERRAMENTAS INCLUÍDAS:
- * - repositories: Gerenciamento de repositórios
- * - branches: Operações com branches
- * - files: Gerenciamento de arquivos
- * - commits: Histórico de commits
- * - issues: Gerenciamento de issues
- * - pulls: Pull requests e merges
- * - releases: Gerenciamento de releases
- * - tags: Gerenciamento de tags
- * - users: Operações com usuários
- * - webhooks: Gerenciamento de webhooks
- * - code-review: Análise e revisão de código
+ * GIT CORE (15 tools) - Funcionam com GitHub + Gitea:
+ * - git-repositories: Gerenciamento de repositórios
+ * - git-commits: Operações com commits
+ * - git-branches: Operações com branches
+ * - git-tags: Gerenciamento de tags
+ * - git-files: Gerenciamento de arquivos
+ * - git-issues: Gerenciamento de issues
+ * - git-pulls: Pull requests e merges
+ * - git-releases: Gerenciamento de releases
+ * - git-webhooks: Gerenciamento de webhooks
+ * - git-rebase: Operações de rebase
+ * - git-reset: Operações de reset
+ * - git-revert: Operações de revert
+ * - git-stash: Gerenciamento de stash
+ * - git-config: Configuração do Git
+ * - git-remote: Gerenciamento de remotes
+ *
+ * GIT AVANÇADO (5 tools) - Funcionam com GitHub + Gitea:
+ * - git-cherry-pick: Cherry-pick de commits
+ * - git-submodule: Gerenciamento de submódulos
+ * - git-worktree: Gerenciamento de worktrees
+ * - git-archive: Criação de arquivos
+ * - git-bundle: Transferência de repositórios
+ *
+ * GITHUB EXCLUSIVO (10 tools) - Apenas GitHub:
+ * - gh-workflows: GitHub Actions workflows
+ * - gh-actions: GitHub Actions runs
+ * - gh-deployments: GitHub Deployments
+ * - gh-security: GitHub Security
+ * - gh-analytics: GitHub Analytics
+ * - gh-code-review: GitHub Code Review
+ * - gh-gists: GitHub Gists
+ * - gh-codespaces: GitHub Codespaces
+ * - gh-projects: GitHub Projects
+ * - gh-sync: GitHub Sync
  */
-const repositories_js_1 = require("./tools/repositories.js");
-const branches_js_1 = require("./tools/branches.js");
-const files_js_1 = require("./tools/files.js");
-const commits_js_1 = require("./tools/commits.js");
-const issues_js_1 = require("./tools/issues.js");
-const pulls_js_1 = require("./tools/pulls.js");
-const releases_js_1 = require("./tools/releases.js");
-const tags_js_1 = require("./tools/tags.js");
-const users_js_1 = require("./tools/users.js");
-const webhooks_js_1 = require("./tools/webhooks.js");
-const git_sync_js_1 = require("./tools/git-sync.js");
-const version_control_js_1 = require("./tools/version-control.js");
-const workflows_js_1 = require("./tools/workflows.js");
-const actions_js_1 = require("./tools/actions.js");
-const deployments_js_1 = require("./tools/deployments.js");
-const security_js_1 = require("./tools/security.js");
-const analytics_js_1 = require("./tools/analytics.js");
-const code_review_js_1 = require("./tools/code-review.js");
+// Git Core Tools (15)
+const git_repositories_js_1 = require("./tools/git-repositories.js");
+const git_commits_js_1 = require("./tools/git-commits.js");
+const git_branches_js_1 = require("./tools/git-branches.js");
+const git_tags_js_1 = require("./tools/git-tags.js");
+const git_files_js_1 = require("./tools/git-files.js");
+const git_issues_js_1 = require("./tools/git-issues.js");
+const git_pulls_js_1 = require("./tools/git-pulls.js");
+const git_releases_js_1 = require("./tools/git-releases.js");
+const git_webhooks_js_1 = require("./tools/git-webhooks.js");
+const git_rebase_js_1 = require("./tools/git-rebase.js");
+const git_reset_js_1 = require("./tools/git-reset.js");
+const git_revert_js_1 = require("./tools/git-revert.js");
+const git_stash_js_1 = require("./tools/git-stash.js");
+const git_config_js_1 = require("./tools/git-config.js");
+const git_remote_js_1 = require("./tools/git-remote.js");
+// Git Avançado Tools (5)
+const git_cherry_pick_js_1 = require("./tools/git-cherry-pick.js");
+const git_submodule_js_1 = require("./tools/git-submodule.js");
+const git_worktree_js_1 = require("./tools/git-worktree.js");
+const git_archive_js_1 = require("./tools/git-archive.js");
+const git_bundle_js_1 = require("./tools/git-bundle.js");
+// GitHub Exclusivo Tools (10)
+const gh_workflows_js_1 = require("./tools/gh-workflows.js");
+const gh_actions_js_1 = require("./tools/gh-actions.js");
+const gh_deployments_js_1 = require("./tools/gh-deployments.js");
+const gh_security_js_1 = require("./tools/gh-security.js");
+const gh_analytics_js_1 = require("./tools/gh-analytics.js");
+const gh_code_review_js_1 = require("./tools/gh-code-review.js");
+const gh_gists_js_1 = require("./tools/gh-gists.js");
+const gh_codespaces_js_1 = require("./tools/gh-codespaces.js");
+const gh_projects_js_1 = require("./tools/gh-projects.js");
+const gh_sync_js_1 = require("./tools/gh-sync.js");
 /**
- * Array de todas as ferramentas disponíveis
+ * Array de todas as ferramentas disponíveis (30 tools)
  *
  * ESTRUTURA:
  * - Cada tool deve implementar a interface Tool
  * - Nome, descrição e schema são obrigatórios
  * - Handler deve ser assíncrono e retornar resultado
+ *
+ * ORGANIZAÇÃO:
+ * - Git Core (15): Funcionam com GitHub + Gitea
+ * - Git Avançado (5): Funcionam com GitHub + Gitea
+ * - GitHub Exclusivo (10): Apenas GitHub
  *
  * USO:
  * - Para listagem de tools disponíveis
@@ -54,24 +97,39 @@ const code_review_js_1 = require("./tools/code-review.js");
  * - Para validação de parâmetros
  */
 const tools = [
-    repositories_js_1.repositoriesTool,
-    branches_js_1.branchesTool,
-    files_js_1.filesTool,
-    commits_js_1.commitsTool,
-    issues_js_1.issuesTool,
-    pulls_js_1.pullsTool,
-    releases_js_1.releasesTool,
-    tags_js_1.tagsTool,
-    users_js_1.usersTool,
-    webhooks_js_1.webhooksTool,
-    git_sync_js_1.gitSyncTool,
-    version_control_js_1.versionControlTool,
-    workflows_js_1.workflowsTool,
-    actions_js_1.actionsTool,
-    deployments_js_1.deploymentsTool,
-    security_js_1.securityTool,
-    analytics_js_1.analyticsTool,
-    code_review_js_1.codeReviewTool
+    // Git Core Tools (15) - GitHub + Gitea
+    git_repositories_js_1.gitRepositoriesTool,
+    git_commits_js_1.commitsTool,
+    git_branches_js_1.branchesTool,
+    git_tags_js_1.tagsTool,
+    git_files_js_1.filesTool,
+    git_issues_js_1.issuesTool,
+    git_pulls_js_1.pullsTool,
+    git_releases_js_1.releasesTool,
+    git_webhooks_js_1.webhooksTool,
+    git_rebase_js_1.gitRebaseTool,
+    git_reset_js_1.gitResetTool,
+    git_revert_js_1.gitRevertTool,
+    git_stash_js_1.gitStashTool,
+    git_config_js_1.gitConfigTool,
+    git_remote_js_1.gitRemoteTool,
+    // Git Avançado Tools (5) - GitHub + Gitea
+    git_cherry_pick_js_1.gitCherryPickTool,
+    git_submodule_js_1.gitSubmoduleTool,
+    git_worktree_js_1.gitWorktreeTool,
+    git_archive_js_1.gitArchiveTool,
+    git_bundle_js_1.gitBundleTool,
+    // GitHub Exclusivo Tools (10) - Apenas GitHub
+    gh_workflows_js_1.workflowsTool,
+    gh_actions_js_1.actionsTool,
+    gh_deployments_js_1.deploymentsTool,
+    gh_security_js_1.securityTool,
+    gh_analytics_js_1.analyticsTool,
+    gh_code_review_js_1.codeReviewTool,
+    gh_gists_js_1.ghGistsTool,
+    gh_codespaces_js_1.ghCodespacesTool,
+    gh_projects_js_1.ghProjectsTool,
+    gh_sync_js_1.ghSyncTool
 ];
 /**
  * Servidor MCP principal para Gitea
@@ -97,7 +155,7 @@ class GiteaMCPServer {
     constructor() {
         this.server = new index_js_1.Server({
             name: 'git-mcp',
-            version: '2.6.2',
+            version: '2.14.2',
         });
         this.setupHandlers();
     }

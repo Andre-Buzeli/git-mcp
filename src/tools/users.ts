@@ -46,7 +46,7 @@ const UsersInputSchema = z.object({
   action: z.enum(['get', 'list', 'search', 'orgs', 'repos']),
   
   // Para multi-provider
-  provider: z.enum(['gitea', 'github', 'both']).optional(), // Provider específico: gitea, github ou both
+  provider: z.enum(['gitea', 'github', 'both']), // Provider específico: gitea, github ou both
   
   // Para get específico
   username: z.string().optional(),
@@ -150,7 +150,7 @@ export const usersTool = {
       sort: { type: 'string', enum: ['created', 'updated', 'pushed', 'full_name'], description: 'Sort order' },
       direction: { type: 'string', enum: ['asc', 'desc'], description: 'Sort direction' }
     },
-    required: ['action']
+    required: ['action', 'provider']
   },
 
   /**

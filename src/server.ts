@@ -5,47 +5,93 @@ import { config } from './config.js';
 import { globalProviderFactory, initializeFactoryFromEnv } from './providers/index.js';
 
 /**
- * Importação de todas as ferramentas MCP disponíveis
+ * Importação de todas as ferramentas MCP disponíveis (30 tools)
  * 
- * FERRAMENTAS INCLUÍDAS:
- * - repositories: Gerenciamento de repositórios
- * - branches: Operações com branches
- * - files: Gerenciamento de arquivos
- * - commits: Histórico de commits
- * - issues: Gerenciamento de issues
- * - pulls: Pull requests e merges
- * - releases: Gerenciamento de releases
- * - tags: Gerenciamento de tags
- * - users: Operações com usuários
- * - webhooks: Gerenciamento de webhooks
- * - code-review: Análise e revisão de código
+ * GIT CORE (15 tools) - Funcionam com GitHub + Gitea:
+ * - git-repositories: Gerenciamento de repositórios
+ * - git-commits: Operações com commits
+ * - git-branches: Operações com branches
+ * - git-tags: Gerenciamento de tags
+ * - git-files: Gerenciamento de arquivos
+ * - git-issues: Gerenciamento de issues
+ * - git-pulls: Pull requests e merges
+ * - git-releases: Gerenciamento de releases
+ * - git-webhooks: Gerenciamento de webhooks
+ * - git-rebase: Operações de rebase
+ * - git-reset: Operações de reset
+ * - git-revert: Operações de revert
+ * - git-stash: Gerenciamento de stash
+ * - git-config: Configuração do Git
+ * - git-remote: Gerenciamento de remotes
+ * 
+ * GIT AVANÇADO (5 tools) - Funcionam com GitHub + Gitea:
+ * - git-cherry-pick: Cherry-pick de commits
+ * - git-submodule: Gerenciamento de submódulos
+ * - git-worktree: Gerenciamento de worktrees
+ * - git-archive: Criação de arquivos
+ * - git-bundle: Transferência de repositórios
+ * 
+ * GITHUB EXCLUSIVO (10 tools) - Apenas GitHub:
+ * - gh-workflows: GitHub Actions workflows
+ * - gh-actions: GitHub Actions runs
+ * - gh-deployments: GitHub Deployments
+ * - gh-security: GitHub Security
+ * - gh-analytics: GitHub Analytics
+ * - gh-code-review: GitHub Code Review
+ * - gh-gists: GitHub Gists
+ * - gh-codespaces: GitHub Codespaces
+ * - gh-projects: GitHub Projects
+ * - gh-sync: GitHub Sync
  */
-import { repositoriesTool } from './tools/repositories.js';
-import { branchesTool } from './tools/branches.js';
-import { filesTool } from './tools/files.js';
-import { commitsTool } from './tools/commits.js';
-import { issuesTool } from './tools/issues.js';
-import { pullsTool } from './tools/pulls.js';
-import { releasesTool } from './tools/releases.js';
-import { tagsTool } from './tools/tags.js';
-import { usersTool } from './tools/users.js';
-import { webhooksTool } from './tools/webhooks.js';
-import { gitSyncTool } from './tools/git-sync.js';
-import { versionControlTool } from './tools/version-control.js';
-import { workflowsTool } from './tools/workflows.js';
-import { actionsTool } from './tools/actions.js';
-import { deploymentsTool } from './tools/deployments.js';
-import { securityTool } from './tools/security.js';
-import { analyticsTool } from './tools/analytics.js';
-import { codeReviewTool } from './tools/code-review.js';
+
+// Git Core Tools (15)
+import { gitRepositoriesTool } from './tools/git-repositories.js';
+import { commitsTool } from './tools/git-commits.js';
+import { branchesTool } from './tools/git-branches.js';
+import { tagsTool } from './tools/git-tags.js';
+import { filesTool } from './tools/git-files.js';
+import { issuesTool } from './tools/git-issues.js';
+import { pullsTool } from './tools/git-pulls.js';
+import { releasesTool } from './tools/git-releases.js';
+import { webhooksTool } from './tools/git-webhooks.js';
+import { gitRebaseTool } from './tools/git-rebase.js';
+import { gitResetTool } from './tools/git-reset.js';
+import { gitRevertTool } from './tools/git-revert.js';
+import { gitStashTool } from './tools/git-stash.js';
+import { gitConfigTool } from './tools/git-config.js';
+import { gitRemoteTool } from './tools/git-remote.js';
+
+// Git Avançado Tools (5)
+import { gitCherryPickTool } from './tools/git-cherry-pick.js';
+import { gitSubmoduleTool } from './tools/git-submodule.js';
+import { gitWorktreeTool } from './tools/git-worktree.js';
+import { gitArchiveTool } from './tools/git-archive.js';
+import { gitBundleTool } from './tools/git-bundle.js';
+
+// GitHub Exclusivo Tools (10)
+import { workflowsTool } from './tools/gh-workflows.js';
+import { actionsTool } from './tools/gh-actions.js';
+import { deploymentsTool } from './tools/gh-deployments.js';
+import { securityTool } from './tools/gh-security.js';
+import { analyticsTool } from './tools/gh-analytics.js';
+import { codeReviewTool } from './tools/gh-code-review.js';
+import { ghGistsTool } from './tools/gh-gists.js';
+import { ghCodespacesTool } from './tools/gh-codespaces.js';
+import { ghProjectsTool } from './tools/gh-projects.js';
+import { ghSyncTool } from './tools/gh-sync.js';
 
 /**
- * Array de todas as ferramentas disponíveis
+ * Array de todas as ferramentas disponíveis (30 tools)
  * 
  * ESTRUTURA:
  * - Cada tool deve implementar a interface Tool
  * - Nome, descrição e schema são obrigatórios
  * - Handler deve ser assíncrono e retornar resultado
+ * 
+ * ORGANIZAÇÃO:
+ * - Git Core (15): Funcionam com GitHub + Gitea
+ * - Git Avançado (5): Funcionam com GitHub + Gitea
+ * - GitHub Exclusivo (10): Apenas GitHub
  * 
  * USO:
  * - Para listagem de tools disponíveis
@@ -53,24 +99,41 @@ import { codeReviewTool } from './tools/code-review.js';
  * - Para validação de parâmetros
  */
 const tools = [
-  repositoriesTool,
-  branchesTool,
-  filesTool,
+  // Git Core Tools (15) - GitHub + Gitea
+  gitRepositoriesTool,
   commitsTool,
+  branchesTool,
+  tagsTool,
+  filesTool,
   issuesTool,
   pullsTool,
   releasesTool,
-  tagsTool,
-  usersTool,
   webhooksTool,
-  gitSyncTool,
-  versionControlTool,
+  gitRebaseTool,
+  gitResetTool,
+  gitRevertTool,
+  gitStashTool,
+  gitConfigTool,
+  gitRemoteTool,
+  
+  // Git Avançado Tools (5) - GitHub + Gitea
+  gitCherryPickTool,
+  gitSubmoduleTool,
+  gitWorktreeTool,
+  gitArchiveTool,
+  gitBundleTool,
+  
+  // GitHub Exclusivo Tools (10) - Apenas GitHub
   workflowsTool,
   actionsTool,
   deploymentsTool,
   securityTool,
   analyticsTool,
-  codeReviewTool
+  codeReviewTool,
+  ghGistsTool,
+  ghCodespacesTool,
+  ghProjectsTool,
+  ghSyncTool
 ];
 
 /**
@@ -99,7 +162,7 @@ export class GiteaMCPServer {
     this.server = new Server(
       {
         name: 'git-mcp',
-        version: '2.6.2',
+        version: '2.14.2',
       }
     );
 

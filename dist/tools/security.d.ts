@@ -31,9 +31,9 @@ import { VcsOperations } from '../providers/index.js';
  */
 declare const SecurityInputSchema: z.ZodEffects<z.ZodObject<{
     action: z.ZodEnum<["scan", "vulnerabilities", "alerts", "policies", "compliance", "dependencies", "advisories"]>;
-    owner: z.ZodOptional<z.ZodString>;
+    owner: z.ZodString;
     repo: z.ZodString;
-    provider: z.ZodOptional<z.ZodEnum<["gitea", "github", "both"]>>;
+    provider: z.ZodEnum<["gitea", "github", "both"]>;
     page: z.ZodOptional<z.ZodNumber>;
     limit: z.ZodOptional<z.ZodNumber>;
     scan_type: z.ZodOptional<z.ZodEnum<["code", "dependencies", "secrets", "infrastructure"]>>;
@@ -56,10 +56,10 @@ declare const SecurityInputSchema: z.ZodEffects<z.ZodObject<{
     updated_after: z.ZodOptional<z.ZodString>;
     updated_before: z.ZodOptional<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
+    provider: "gitea" | "github" | "both";
+    owner: string;
     repo: string;
     action: "scan" | "vulnerabilities" | "alerts" | "policies" | "compliance" | "dependencies" | "advisories";
-    provider?: "gitea" | "github" | "both" | undefined;
-    owner?: string | undefined;
     state?: "open" | "fixed" | "dismissed" | undefined;
     ref?: string | undefined;
     page?: number | undefined;
@@ -82,10 +82,10 @@ declare const SecurityInputSchema: z.ZodEffects<z.ZodObject<{
     updated_after?: string | undefined;
     updated_before?: string | undefined;
 }, {
+    provider: "gitea" | "github" | "both";
+    owner: string;
     repo: string;
     action: "scan" | "vulnerabilities" | "alerts" | "policies" | "compliance" | "dependencies" | "advisories";
-    provider?: "gitea" | "github" | "both" | undefined;
-    owner?: string | undefined;
     state?: "open" | "fixed" | "dismissed" | undefined;
     ref?: string | undefined;
     page?: number | undefined;
@@ -108,10 +108,10 @@ declare const SecurityInputSchema: z.ZodEffects<z.ZodObject<{
     updated_after?: string | undefined;
     updated_before?: string | undefined;
 }>, {
+    provider: "gitea" | "github" | "both";
+    owner: string;
     repo: string;
     action: "scan" | "vulnerabilities" | "alerts" | "policies" | "compliance" | "dependencies" | "advisories";
-    provider?: "gitea" | "github" | "both" | undefined;
-    owner?: string | undefined;
     state?: "open" | "fixed" | "dismissed" | undefined;
     ref?: string | undefined;
     page?: number | undefined;
@@ -134,10 +134,10 @@ declare const SecurityInputSchema: z.ZodEffects<z.ZodObject<{
     updated_after?: string | undefined;
     updated_before?: string | undefined;
 }, {
+    provider: "gitea" | "github" | "both";
+    owner: string;
     repo: string;
     action: "scan" | "vulnerabilities" | "alerts" | "policies" | "compliance" | "dependencies" | "advisories";
-    provider?: "gitea" | "github" | "both" | undefined;
-    owner?: string | undefined;
     state?: "open" | "fixed" | "dismissed" | undefined;
     ref?: string | undefined;
     page?: number | undefined;

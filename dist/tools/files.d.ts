@@ -41,10 +41,11 @@ import { VcsOperations } from '../providers/index.js';
  */
 declare const FilesInputSchema: z.ZodObject<{
     action: z.ZodEnum<["get", "create", "update", "delete", "list", "search"]>;
-    owner: z.ZodOptional<z.ZodString>;
-    repo: z.ZodOptional<z.ZodString>;
+    owner: z.ZodString;
+    repo: z.ZodString;
     path: z.ZodOptional<z.ZodString>;
-    provider: z.ZodOptional<z.ZodEnum<["gitea", "github"]>>;
+    projectPath: z.ZodString;
+    provider: z.ZodEnum<["gitea", "github"]>;
     content: z.ZodOptional<z.ZodString>;
     message: z.ZodOptional<z.ZodString>;
     branch: z.ZodOptional<z.ZodString>;
@@ -54,13 +55,14 @@ declare const FilesInputSchema: z.ZodObject<{
     page: z.ZodOptional<z.ZodNumber>;
     limit: z.ZodOptional<z.ZodNumber>;
 }, "strip", z.ZodTypeAny, {
+    provider: "gitea" | "github";
+    owner: string;
+    repo: string;
     action: "delete" | "get" | "create" | "list" | "update" | "search";
-    provider?: "gitea" | "github" | undefined;
+    projectPath: string;
     path?: string | undefined;
     message?: string | undefined;
-    owner?: string | undefined;
     ref?: string | undefined;
-    repo?: string | undefined;
     page?: number | undefined;
     limit?: number | undefined;
     sha?: string | undefined;
@@ -68,13 +70,14 @@ declare const FilesInputSchema: z.ZodObject<{
     branch?: string | undefined;
     content?: string | undefined;
 }, {
+    provider: "gitea" | "github";
+    owner: string;
+    repo: string;
     action: "delete" | "get" | "create" | "list" | "update" | "search";
-    provider?: "gitea" | "github" | undefined;
+    projectPath: string;
     path?: string | undefined;
     message?: string | undefined;
-    owner?: string | undefined;
     ref?: string | undefined;
-    repo?: string | undefined;
     page?: number | undefined;
     limit?: number | undefined;
     sha?: string | undefined;
@@ -200,6 +203,10 @@ export declare const filesTool: {
                 description: string;
             };
             path: {
+                type: string;
+                description: string;
+            };
+            projectPath: {
                 type: string;
                 description: string;
             };

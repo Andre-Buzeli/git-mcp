@@ -43,9 +43,9 @@ import { VcsOperations } from '../providers/index.js';
  */
 declare const PullsInputSchema: z.ZodObject<{
     action: z.ZodEnum<["create", "list", "get", "update", "merge", "close", "review", "search"]>;
-    owner: z.ZodOptional<z.ZodString>;
-    repo: z.ZodOptional<z.ZodString>;
-    provider: z.ZodOptional<z.ZodEnum<["gitea", "github"]>>;
+    owner: z.ZodString;
+    repo: z.ZodString;
+    provider: z.ZodEnum<["gitea", "github"]>;
     title: z.ZodOptional<z.ZodString>;
     body: z.ZodOptional<z.ZodString>;
     head: z.ZodOptional<z.ZodString>;
@@ -76,9 +76,10 @@ declare const PullsInputSchema: z.ZodObject<{
     reviewer: z.ZodOptional<z.ZodString>;
     label: z.ZodOptional<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
-    action: "merge" | "get" | "create" | "list" | "update" | "search" | "close" | "review";
-    provider?: "gitea" | "github" | undefined;
-    owner?: string | undefined;
+    provider: "gitea" | "github";
+    owner: string;
+    repo: string;
+    action: "merge" | "get" | "close" | "create" | "list" | "update" | "search" | "review";
     title?: string | undefined;
     body?: string | undefined;
     state?: "open" | "closed" | "merged" | "all" | undefined;
@@ -87,12 +88,11 @@ declare const PullsInputSchema: z.ZodObject<{
     head?: string | undefined;
     base?: string | undefined;
     draft?: boolean | undefined;
-    repo?: string | undefined;
     page?: number | undefined;
     limit?: number | undefined;
     query?: string | undefined;
-    merge_method?: "merge" | "rebase" | "squash" | undefined;
     author?: string | undefined;
+    merge_method?: "merge" | "rebase" | "squash" | undefined;
     milestone?: number | undefined;
     new_title?: string | undefined;
     new_body?: string | undefined;
@@ -110,9 +110,10 @@ declare const PullsInputSchema: z.ZodObject<{
     review_body?: string | undefined;
     reviewer?: string | undefined;
 }, {
-    action: "merge" | "get" | "create" | "list" | "update" | "search" | "close" | "review";
-    provider?: "gitea" | "github" | undefined;
-    owner?: string | undefined;
+    provider: "gitea" | "github";
+    owner: string;
+    repo: string;
+    action: "merge" | "get" | "close" | "create" | "list" | "update" | "search" | "review";
     title?: string | undefined;
     body?: string | undefined;
     state?: "open" | "closed" | "merged" | "all" | undefined;
@@ -121,12 +122,11 @@ declare const PullsInputSchema: z.ZodObject<{
     head?: string | undefined;
     base?: string | undefined;
     draft?: boolean | undefined;
-    repo?: string | undefined;
     page?: number | undefined;
     limit?: number | undefined;
     query?: string | undefined;
-    merge_method?: "merge" | "rebase" | "squash" | undefined;
     author?: string | undefined;
+    merge_method?: "merge" | "rebase" | "squash" | undefined;
     milestone?: number | undefined;
     new_title?: string | undefined;
     new_body?: string | undefined;

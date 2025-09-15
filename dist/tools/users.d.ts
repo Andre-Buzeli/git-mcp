@@ -41,7 +41,7 @@ import { VcsOperations } from '../providers/index.js';
  */
 declare const UsersInputSchema: z.ZodObject<{
     action: z.ZodEnum<["get", "list", "search", "orgs", "repos"]>;
-    provider: z.ZodOptional<z.ZodEnum<["gitea", "github", "both"]>>;
+    provider: z.ZodEnum<["gitea", "github", "both"]>;
     username: z.ZodOptional<z.ZodString>;
     query: z.ZodOptional<z.ZodString>;
     page: z.ZodOptional<z.ZodNumber>;
@@ -50,25 +50,25 @@ declare const UsersInputSchema: z.ZodObject<{
     sort: z.ZodOptional<z.ZodEnum<["created", "updated", "pushed", "full_name"]>>;
     direction: z.ZodOptional<z.ZodEnum<["asc", "desc"]>>;
 }, "strip", z.ZodTypeAny, {
+    provider: "gitea" | "github" | "both";
     action: "get" | "list" | "search" | "orgs" | "repos";
-    provider?: "gitea" | "github" | "both" | undefined;
     sort?: "full_name" | "updated" | "created" | "pushed" | undefined;
     page?: number | undefined;
     limit?: number | undefined;
     username?: string | undefined;
     query?: string | undefined;
-    repo_type?: "all" | "owner" | "member" | "collaborator" | undefined;
     direction?: "desc" | "asc" | undefined;
+    repo_type?: "all" | "owner" | "member" | "collaborator" | undefined;
 }, {
+    provider: "gitea" | "github" | "both";
     action: "get" | "list" | "search" | "orgs" | "repos";
-    provider?: "gitea" | "github" | "both" | undefined;
     sort?: "full_name" | "updated" | "created" | "pushed" | undefined;
     page?: number | undefined;
     limit?: number | undefined;
     username?: string | undefined;
     query?: string | undefined;
-    repo_type?: "all" | "owner" | "member" | "collaborator" | undefined;
     direction?: "desc" | "asc" | undefined;
+    repo_type?: "all" | "owner" | "member" | "collaborator" | undefined;
 }>;
 export type UsersInput = z.infer<typeof UsersInputSchema>;
 /**

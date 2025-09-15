@@ -47,10 +47,10 @@ const user_detection_js_1 = require("../utils/user-detection.js");
 const IssuesInputSchema = zod_1.z.object({
     action: zod_1.z.enum(['create', 'list', 'get', 'update', 'close', 'comment', 'search']),
     // Parâmetros comuns
-    owner: zod_1.z.string().optional(),
-    repo: zod_1.z.string().optional(),
+    owner: zod_1.z.string(),
+    repo: zod_1.z.string(),
     // Para multi-provider
-    provider: zod_1.z.enum(['gitea', 'github']).optional().describe('Provider to use (gitea or github, optional - uses default if not specified)'), // Provider específico: gitea, github ou both
+    provider: zod_1.z.enum(['gitea', 'github']).describe('Provider to use (gitea or github)'), // Provider específico: gitea, github ou both
     // Para create
     title: zod_1.z.string().optional(),
     body: zod_1.z.string().optional(),
@@ -204,7 +204,7 @@ exports.issuesTool = {
             assignee: { type: 'string', description: 'Issue assignee filter' },
             label: { type: 'string', description: 'Issue label filter' }
         },
-        required: ['action']
+        required: ['action', 'owner', 'repo', 'provider']
     },
     /**
      * Handler principal da tool issues

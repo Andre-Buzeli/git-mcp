@@ -23,8 +23,8 @@ import { z } from 'zod';
 
 const GitSyncInputSchema = z.object({
   action: z.enum(['configure', 'status', 'one-shot']),
-  source: z.object({ provider: z.enum(['gitea', 'github']), owner: z.string(), repo: z.string() }).optional(),
-  target: z.object({ provider: z.enum(['gitea', 'github']), owner: z.string(), repo: z.string() }).optional(),
+  source: z.object({ provider: z.enum(['gitea', 'github']), owner: z.string(), repo: z.string() }),
+  target: z.object({ provider: z.enum(['gitea', 'github']), owner: z.string(), repo: z.string() }),
   direction: z.enum(['one-way', 'two-way']).optional(),
   include: z.array(z.enum(['git', 'issues', 'labels', 'milestones', 'releases', 'pulls'])).optional(),
   strategy: z.enum(['source-wins', 'timestamp', 'skip-conflicts']).optional(),
@@ -73,7 +73,7 @@ export const gitSyncTool = {
       strategy: { type: 'string', enum: ['source-wins', 'timestamp', 'skip-conflicts'], description: 'Conflict strategy' },
       dry_run: { type: 'boolean', description: 'Simulate without applying changes' }
     },
-    required: ['action']
+    required: ['action', 'source', 'target']
   },
 
   async handler(input: GitSyncInput): Promise<GitSyncResult> {

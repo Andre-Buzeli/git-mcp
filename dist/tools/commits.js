@@ -4,6 +4,7 @@ exports.commitsTool = void 0;
 const zod_1 = require("zod");
 const index_js_1 = require("../providers/index.js");
 const user_detection_js_1 = require("../utils/user-detection.js");
+const terminal_controller_js_1 = require("../utils/terminal-controller.js");
 /**
  * Tool: commits
  *
@@ -44,12 +45,13 @@ const user_detection_js_1 = require("../utils/user-detection.js");
  * - Documente parâmetros obrigatórios
  */
 const CommitsInputSchema = zod_1.z.object({
-    action: zod_1.z.enum(['list', 'get', 'create', 'compare', 'search']),
-    // Parâmetros comuns - owner agora é opcional e será determinado automaticamente
-    owner: zod_1.z.string().optional(),
-    repo: zod_1.z.string().optional(),
+    action: zod_1.z.enum(['list', 'get', 'create', 'compare', 'search', 'push', 'pull']),
+    // Parâmetros comuns
+    owner: zod_1.z.string(),
+    repo: zod_1.z.string(),
+    projectPath: zod_1.z.string().describe('Local project path for git operations'),
     // Para multi-provider
-    provider: zod_1.z.enum(['gitea', 'github']).optional().describe('Provider to use (gitea or github, optional - uses default if not specified)'), // Provider específico: gitea, github ou both
+    provider: zod_1.z.enum(['gitea', 'github']).describe('Provider to use (gitea or github)'), // Provider específico: gitea, github ou both
     // Para list
     sha: zod_1.z.string().optional(),
     page: zod_1.z.number().min(1).optional(),
@@ -152,12 +154,13 @@ exports.commitsTool = {
         properties: {
             action: {
                 type: 'string',
-                enum: ['list', 'get', 'create', 'compare', 'search'],
+                enum: ['list', 'get', 'create', 'compare', 'search', 'push', 'pull'],
                 description: 'Action to perform on commits'
             },
             owner: { type: 'string', description: 'Repository owner' },
             repo: { type: 'string', description: 'Repository name' },
             provider: { type: 'string', description: 'Provider to use (github, gitea, or omit for default)' },
+            projectPath: { type: 'string', description: 'Local project path for git operations' },
             sha: { type: 'string', description: 'Branch, tag or commit SHA' },
             page: { type: 'number', description: 'Page number', minimum: 1 },
             limit: { type: 'number', description: 'Items per page', minimum: 1, maximum: 100 },
@@ -173,7 +176,7 @@ exports.commitsTool = {
             query: { type: 'string', description: 'Search query' },
             author: { type: 'string', description: 'Author filter for search' }
         },
-        required: ['action']
+        required: ['action', 'owner', 'repo', 'provider', 'projectPath']
     },
     /**
      * Handler principal da tool commits
@@ -230,6 +233,10 @@ exports.commitsTool = {
                     return await this.compareCommits(processedInput, provider);
                 case 'search':
                     return await this.searchCommits(processedInput, provider);
+                case 'push':
+                    return await this.pushCommits(processedInput, provider);
+                case 'pull':
+                    return await this.pullCommits(processedInput, provider);
                 default:
                     throw new Error(`Ação não suportada: ${processedInput.action}`);
             }
@@ -521,6 +528,98 @@ exports.commitsTool = {
         }
         catch (error) {
             throw new Error(`Falha ao buscar commits: ${error instanceof Error ? error.message : String(error)}`);
+        }
+    },
+    /**
+     * Faz push dos commits locais para o repositório remoto
+     *
+     * FUNCIONALIDADE:
+     * - Faz push da branch atual para o remote
+     * - Suporta especificar branch específica
+     * - Verifica se há commits para fazer push
+     *
+     * PARÂMETROS OBRIGATÓRIOS:
+     * - projectPath: Caminho do projeto local
+     *
+     * PARÂMETROS OPCIONAIS:
+     * - branch: Branch para fazer push (padrão: branch atual)
+     *
+     * RECOMENDAÇÕES:
+     * - Verifique se há commits locais antes do push
+     * - Use branch específica se necessário
+     * - Monitore conflitos durante o push
+     */
+    async pushCommits(params, provider) {
+        try {
+            if (!params.projectPath) {
+                throw new Error('projectPath é obrigatório para push');
+            }
+            const branch = params.branch || 'main';
+            // Faz push usando o terminal controller
+            const pushResult = await (0, terminal_controller_js_1.gitPush)(params.projectPath, branch);
+            if (pushResult.exitCode !== 0) {
+                throw new Error(`Falha no push: ${pushResult.output}`);
+            }
+            return {
+                success: true,
+                action: 'push',
+                message: `Push realizado com sucesso na branch '${branch}'`,
+                data: {
+                    projectPath: params.projectPath,
+                    branch: branch,
+                    pushed: true,
+                    output: pushResult.output
+                }
+            };
+        }
+        catch (error) {
+            throw new Error(`Falha ao fazer push: ${error instanceof Error ? error.message : String(error)}`);
+        }
+    },
+    /**
+     * Faz pull dos commits do repositório remoto
+     *
+     * FUNCIONALIDADE:
+     * - Faz pull da branch atual do remote
+     * - Suporta especificar branch específica
+     * - Faz merge automático se possível
+     *
+     * PARÂMETROS OBRIGATÓRIOS:
+     * - projectPath: Caminho do projeto local
+     *
+     * PARÂMETROS OPCIONAIS:
+     * - branch: Branch para fazer pull (padrão: branch atual)
+     *
+     * RECOMENDAÇÕES:
+     * - Faça backup antes do pull
+     * - Resolva conflitos manualmente se houver
+     * - Use branch específica se necessário
+     */
+    async pullCommits(params, provider) {
+        try {
+            if (!params.projectPath) {
+                throw new Error('projectPath é obrigatório para pull');
+            }
+            const branch = params.branch || 'main';
+            // Faz pull usando o terminal controller
+            const pullResult = await (0, terminal_controller_js_1.gitPull)(params.projectPath, branch);
+            if (pullResult.exitCode !== 0) {
+                throw new Error(`Falha no pull: ${pullResult.output}`);
+            }
+            return {
+                success: true,
+                action: 'pull',
+                message: `Pull realizado com sucesso na branch '${branch}'`,
+                data: {
+                    projectPath: params.projectPath,
+                    branch: branch,
+                    pulled: true,
+                    output: pullResult.output
+                }
+            };
+        }
+        catch (error) {
+            throw new Error(`Falha ao fazer pull: ${error instanceof Error ? error.message : String(error)}`);
         }
     }
 };

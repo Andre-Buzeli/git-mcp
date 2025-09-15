@@ -59,8 +59,8 @@ const user_detection_js_1 = require("../utils/user-detection.js");
 const WebhooksInputSchema = zod_1.z.object({
     action: zod_1.z.enum(['create', 'list', 'get', 'update', 'delete', 'test']),
     // Parâmetros comuns
-    owner: zod_1.z.string().optional(),
-    repo: zod_1.z.string().optional(),
+    owner: zod_1.z.string(),
+    repo: zod_1.z.string(),
     // Para multi-provider
     provider: zod_1.z.enum(['gitea', 'github']).describe('Provider to use (gitea or github)'), // Provider específico: gitea, github ou both
     // Para create
@@ -189,7 +189,7 @@ exports.webhooksTool = {
             new_events: { type: 'array', items: { type: 'string' }, description: 'New webhook events' },
             new_active: { type: 'boolean', description: 'New webhook active status' }
         },
-        required: ['action', 'provider']
+        required: ['action', 'owner', 'repo', 'provider']
     },
     /**
      * Handler principal da tool webhooks

@@ -265,6 +265,7 @@ export interface VcsOperations {
     deleteDeployment?(params: any): Promise<any>;
     runSecurityScan?(params: any): Promise<any>;
     listVulnerabilities?(params: any): Promise<any>;
+    listSecurityVulnerabilities?(params: any): Promise<any>;
     manageSecurityAlerts?(params: any): Promise<any>;
     manageSecurityPolicies?(params: any): Promise<any>;
     checkCompliance?(params: any): Promise<any>;
