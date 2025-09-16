@@ -37,7 +37,6 @@ const validator_js_1 = require("./validator.js");
 const DeploymentsInputSchema = zod_1.z.object({
     action: zod_1.z.enum(['list', 'create', 'status', 'environments', 'rollback', 'delete']),
     // Parâmetros comuns
-    owner: validator_js_1.CommonSchemas.owner,
     repo: validator_js_1.CommonSchemas.repo,
     provider: validator_js_1.CommonSchemas.provider,
     // Parâmetros para listagem
@@ -68,12 +67,12 @@ const DeploymentsInputSchema = zod_1.z.object({
 }).refine((data) => {
     // Validações específicas por ação
     if (['create'].includes(data.action)) {
-        return data.owner && data.repo && data.ref && data.environment;
+        return data.repo && data.ref && data.environment;
     }
     if (['status', 'rollback', 'delete'].includes(data.action)) {
-        return data.owner && data.repo && data.deployment_id;
+        return data.repo && data.deployment_id;
     }
-    return data.owner && data.repo;
+    return data.repo;
 }, {
     message: "Parâmetros obrigatórios não fornecidos para a ação especificada"
 });
@@ -124,7 +123,7 @@ exports.deploymentsTool = {
             page: { type: 'number', description: 'Page number', minimum: 1 },
             limit: { type: 'number', description: 'Items per page', minimum: 1, maximum: 100 }
         },
-        required: ['action', 'owner', 'repo', 'provider']
+        required: ['action', 'repo', 'provider']
     },
     async handler(input) {
         try {
@@ -168,17 +167,8 @@ exports.deploymentsTool = {
      */
     async listDeployments(params, provider) {
         try {
-            // Auto-detecção de owner/username se não fornecidos
-            let updatedParams = { ...params };
-            if (!updatedParams.owner) {
-                try {
-                    const currentUser = await provider.getCurrentUser();
-                    updatedParams.owner = currentUser.login;
-                }
-                catch (error) {
-                    console.warn('[DEPLOYMENTS.TS] Falha na auto-detecção de usuário');
-                }
-            }
+            const currentUser = await provider.getCurrentUser();
+            const owner = currentUser.login;
             if (!provider.listDeployments) {
                 return {
                     success: true,
@@ -192,7 +182,7 @@ exports.deploymentsTool = {
                 };
             }
             const result = await provider.listDeployments({
-                owner: params.owner,
+                owner,
                 repo: params.repo,
                 sha: params.sha,
                 ref: params.ref,
@@ -225,8 +215,10 @@ exports.deploymentsTool = {
                     error: 'Provider não implementa createDeployment'
                 };
             }
+            const currentUser = await provider.getCurrentUser();
+            const owner = currentUser.login;
             const result = await provider.createDeployment({
-                owner: params.owner,
+                owner,
                 repo: params.repo,
                 ref: params.ref,
                 environment: params.environment,
@@ -239,7 +231,7 @@ exports.deploymentsTool = {
             return {
                 success: true,
                 action: 'create',
-                message: `Deployment criado com sucesso`,
+                message: 'Deployment criado com sucesso',
                 data: result
             };
         }
@@ -260,8 +252,10 @@ exports.deploymentsTool = {
                     error: 'Provider não implementa updateDeploymentStatus'
                 };
             }
+            const currentUser = await provider.getCurrentUser();
+            const owner = currentUser.login;
             const result = await provider.updateDeploymentStatus({
-                owner: params.owner,
+                owner,
                 repo: params.repo,
                 deployment_id: params.deployment_id,
                 state: params.state || 'pending',
@@ -285,17 +279,6 @@ exports.deploymentsTool = {
      */
     async listEnvironments(params, provider) {
         try {
-            // Auto-detecção de owner/username se não fornecidos
-            let updatedParams = { ...params };
-            if (!updatedParams.owner) {
-                try {
-                    const currentUser = await provider.getCurrentUser();
-                    updatedParams.owner = currentUser.login;
-                }
-                catch (error) {
-                    console.warn('[DEPLOYMENTS.TS] Falha na auto-detecção de usuário');
-                }
-            }
             if (!provider.listEnvironments) {
                 return {
                     success: false,
@@ -304,8 +287,10 @@ exports.deploymentsTool = {
                     error: 'Provider não implementa listEnvironments'
                 };
             }
+            const currentUser = await provider.getCurrentUser();
+            const owner = currentUser.login;
             const result = await provider.listEnvironments({
-                owner: params.owner,
+                owner,
                 repo: params.repo,
                 page: params.page,
                 limit: params.limit
@@ -334,8 +319,10 @@ exports.deploymentsTool = {
                     error: 'Provider não implementa rollbackDeployment'
                 };
             }
+            const currentUser = await provider.getCurrentUser();
+            const owner = currentUser.login;
             const result = await provider.rollbackDeployment({
-                owner: params.owner,
+                owner,
                 repo: params.repo,
                 deployment_id: params.deployment_id,
                 description: params.description || 'Rollback automático'
@@ -364,8 +351,10 @@ exports.deploymentsTool = {
                     error: 'Provider não implementa deleteDeployment'
                 };
             }
+            const currentUser = await provider.getCurrentUser();
+            const owner = currentUser.login;
             const result = await provider.deleteDeployment({
-                owner: params.owner,
+                owner,
                 repo: params.repo,
                 deployment_id: params.deployment_id
             });

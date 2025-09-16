@@ -65,7 +65,7 @@ declare const ReleasesInputSchema: z.ZodObject<{
     provider: "gitea" | "github";
     owner: string;
     repo: string;
-    action: "delete" | "get" | "create" | "list" | "update" | "publish";
+    action: "delete" | "get" | "list" | "create" | "update" | "publish";
     name?: string | undefined;
     body?: string | undefined;
     tag_name?: string | undefined;
@@ -86,7 +86,7 @@ declare const ReleasesInputSchema: z.ZodObject<{
     provider: "gitea" | "github";
     owner: string;
     repo: string;
-    action: "delete" | "get" | "create" | "list" | "update" | "publish";
+    action: "delete" | "get" | "list" | "create" | "update" | "publish";
     name?: string | undefined;
     body?: string | undefined;
     tag_name?: string | undefined;

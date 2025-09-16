@@ -46,7 +46,6 @@ const BranchesInputSchema = z.object({
   action: z.enum(['create', 'list', 'get', 'delete', 'merge', 'compare']),
   
   // Parâmetros comuns
-  owner: z.string(),
   repo: z.string(),
   projectPath: z.string().describe('Local project path for git operations'),
   provider: z.enum(['gitea', 'github']).describe('Provider to use (gitea or github)'),  // Para create
@@ -160,7 +159,6 @@ export const branchesTool = {
         enum: ['create', 'list', 'get', 'delete', 'merge', 'compare'],
         description: 'Action to perform on branches'
       },
-      owner: { type: 'string', description: 'Repository owner' },
       repo: { type: 'string', description: 'Repository name' },
       projectPath: { type: 'string', description: 'Local project path for git operations' },
       provider: { type: 'string', description: 'Specific provider (github, gitea) or use default' },
@@ -179,7 +177,7 @@ export const branchesTool = {
       base_branch: { type: 'string', description: 'Base branch for comparison' },
       head_branch: { type: 'string', description: 'Head branch for comparison' }
     },
-    required: ['action', 'owner', 'repo', 'provider', 'projectPath']
+    required: ['action', 'repo', 'provider', 'projectPath']
   },
 
   /**
@@ -292,12 +290,15 @@ export const branchesTool = {
    */
   async createBranch(params: BranchesInput, provider: VcsOperations): Promise<BranchesResult> {
     try {
-      if (!params.owner || !params.repo || !params.branch_name || !params.from_branch) {
-        throw new Error('Owner, repo, branch_name e from_branch são obrigatórios');
+      if (!params.repo || !params.branch_name || !params.from_branch) {
+        throw new Error('Repo, branch_name e from_branch são obrigatórios');
       }
 
+      const currentUser = await provider.getCurrentUser();
+      const owner = currentUser.login;
+
       const branch = await provider.createBranch(
-        params.owner,
+        owner,
         params.repo,
         params.branch_name,
         params.from_branch
@@ -342,14 +343,17 @@ export const branchesTool = {
    */
   async listBranches(params: BranchesInput, provider: VcsOperations): Promise<BranchesResult> {
     try {
-      if (!params.owner || !params.repo) {
-        throw new Error('Owner e repo são obrigatórios');
+      if (!params.repo) {
+        throw new Error('Repo é obrigatório');
       }
+
+      const currentUser = await provider.getCurrentUser();
+      const owner = currentUser.login;
 
       const page = params.page || 1;
       const limit = params.limit || 30;
       
-      const branches = await provider.listBranches(params.owner, params.repo, page, limit);
+      const branches = await provider.listBranches(owner, params.repo, page, limit);
 
       return {
         success: true,
@@ -391,11 +395,14 @@ export const branchesTool = {
    */
   async getBranch(params: BranchesInput, provider: VcsOperations): Promise<BranchesResult> {
     try {
-      if (!params.owner || !params.repo || !params.branch) {
-        throw new Error('Owner, repo e branch são obrigatórios');
+      if (!params.repo || !params.branch) {
+        throw new Error('Repo e branch são obrigatórios');
       }
 
-      const branch = await provider.getBranch(params.owner, params.repo, params.branch);
+      const currentUser = await provider.getCurrentUser();
+      const owner = currentUser.login;
+
+      const branch = await provider.getBranch(owner, params.repo, params.branch);
 
       return {
         success: true,
@@ -434,11 +441,14 @@ export const branchesTool = {
    */
   async deleteBranch(params: BranchesInput, provider: VcsOperations): Promise<BranchesResult> {
     try {
-      if (!params.owner || !params.repo || !params.branch) {
-        throw new Error('Owner, repo e branch são obrigatórios');
+      if (!params.repo || !params.branch) {
+        throw new Error('Repo e branch são obrigatórios');
       }
 
-      await provider.deleteBranch(params.owner, params.repo, params.branch);
+      const currentUser = await provider.getCurrentUser();
+      const owner = currentUser.login;
+
+      await provider.deleteBranch(owner, params.repo, params.branch);
 
       return {
         success: true,
@@ -481,8 +491,8 @@ export const branchesTool = {
    */
   async mergeBranches(params: BranchesInput, provider: VcsOperations): Promise<BranchesResult> {
     try {
-      if (!params.owner || !params.repo || !params.head || !params.base) {
-        throw new Error('Owner, repo, head e base são obrigatórios');
+      if (!params.repo || !params.head || !params.base) {
+        throw new Error('Repo, head e base são obrigatórios');
       }
 
       // Por enquanto, retorna mensagem de funcionalidade não implementada
@@ -528,8 +538,8 @@ export const branchesTool = {
    */
   async compareBranches(params: BranchesInput, provider: VcsOperations): Promise<BranchesResult> {
     try {
-      if (!params.owner || !params.repo || !params.base_branch || !params.head_branch) {
-        throw new Error('Owner, repo, base_branch e head_branch são obrigatórios');
+      if (!params.repo || !params.base_branch || !params.head_branch) {
+        throw new Error('Repo, base_branch e head_branch são obrigatórios');
       }
 
       // Implementar comparação de branches

@@ -1,4 +1,37 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GitHubProvider = void 0;
 const base_provider_js_1 = require("./base-provider.js");
@@ -330,6 +363,48 @@ class GitHubProvider extends base_provider_js_1.BaseVcsProvider {
         const params = ref ? { ref } : {};
         const data = await this.get(`/repos/${owner}/${repo}/contents/${path}`, params);
         return data.map(file => this.normalizeFile(file));
+    }
+    async uploadProject(owner, repo, projectPath, message, branch) {
+        const fs = await Promise.resolve().then(() => __importStar(require('fs/promises')));
+        const path = await Promise.resolve().then(() => __importStar(require('path')));
+        let uploaded = 0;
+        const errors = [];
+        try {
+            // Função recursiva para processar diretórios
+            const processDirectory = async (dirPath, relativePath = '') => {
+                const items = await fs.readdir(dirPath, { withFileTypes: true });
+                for (const item of items) {
+                    const fullPath = path.join(dirPath, item.name);
+                    const itemRelativePath = relativePath ? path.join(relativePath, item.name) : item.name;
+                    // Pular diretórios que não devem ser enviados
+                    if (item.isDirectory()) {
+                        if (item.name === 'node_modules' || item.name === '.git' || item.name === 'dist') {
+                            continue;
+                        }
+                        await processDirectory(fullPath, itemRelativePath);
+                    }
+                    else {
+                        // Pular arquivos que não devem ser enviados
+                        if (item.name.endsWith('.log') || item.name.endsWith('.tmp') || item.name.startsWith('.')) {
+                            continue;
+                        }
+                        try {
+                            const content = await fs.readFile(fullPath, 'utf-8');
+                            await this.createFile(owner, repo, itemRelativePath, content, message, branch);
+                            uploaded++;
+                        }
+                        catch (error) {
+                            errors.push(`Erro ao enviar ${itemRelativePath}: ${error instanceof Error ? error.message : String(error)}`);
+                        }
+                    }
+                }
+            };
+            await processDirectory(projectPath);
+            return { uploaded, errors };
+        }
+        catch (error) {
+            throw new Error(`Falha ao fazer upload do projeto: ${error instanceof Error ? error.message : String(error)}`);
+        }
     }
     async listCommits(owner, repo, branch, page = 1, limit = 30) {
         const params = { page, per_page: limit };

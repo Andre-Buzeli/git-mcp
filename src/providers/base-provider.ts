@@ -131,6 +131,11 @@ export abstract class BaseVcsProvider implements VcsOperations {
   protected abstract normalizeWebhook(data: any): any;
 
   /**
+   * Upload de projeto completo - deve ser implementado pelos providers específicos
+   */
+  abstract uploadProject(owner: string, repo: string, projectPath: string, message: string, branch?: string): Promise<{ uploaded: number; errors: string[] }>;
+
+  /**
    * Executa uma requisição HTTP com tratamento de erro
    */
   protected async request<T>(config: AxiosRequestConfig): Promise<T> {

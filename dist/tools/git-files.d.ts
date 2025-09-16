@@ -40,7 +40,7 @@ import { VcsOperations } from '../providers/index.js';
  * - Documente parâmetros obrigatórios
  */
 declare const FilesInputSchema: z.ZodObject<{
-    action: z.ZodEnum<["get", "create", "update", "delete", "list", "search"]>;
+    action: z.ZodEnum<["get", "create", "update", "delete", "list", "search", "upload-project"]>;
     owner: z.ZodString;
     repo: z.ZodString;
     path: z.ZodOptional<z.ZodString>;
@@ -58,7 +58,7 @@ declare const FilesInputSchema: z.ZodObject<{
     provider: "gitea" | "github";
     owner: string;
     repo: string;
-    action: "delete" | "get" | "create" | "list" | "update" | "search";
+    action: "delete" | "get" | "search" | "list" | "create" | "update" | "upload-project";
     projectPath: string;
     path?: string | undefined;
     message?: string | undefined;
@@ -66,14 +66,14 @@ declare const FilesInputSchema: z.ZodObject<{
     page?: number | undefined;
     limit?: number | undefined;
     sha?: string | undefined;
-    query?: string | undefined;
     branch?: string | undefined;
+    query?: string | undefined;
     content?: string | undefined;
 }, {
     provider: "gitea" | "github";
     owner: string;
     repo: string;
-    action: "delete" | "get" | "create" | "list" | "update" | "search";
+    action: "delete" | "get" | "search" | "list" | "create" | "update" | "upload-project";
     projectPath: string;
     path?: string | undefined;
     message?: string | undefined;
@@ -81,8 +81,8 @@ declare const FilesInputSchema: z.ZodObject<{
     page?: number | undefined;
     limit?: number | undefined;
     sha?: string | undefined;
-    query?: string | undefined;
     branch?: string | undefined;
+    query?: string | undefined;
     content?: string | undefined;
 }>;
 export type FilesInput = z.infer<typeof FilesInputSchema>;
@@ -194,12 +194,13 @@ export declare const filesTool: {
                 enum: string[];
                 description: string;
             };
-            owner: {
+            repo: {
                 type: string;
                 description: string;
             };
-            repo: {
+            provider: {
                 type: string;
+                enum: string[];
                 description: string;
             };
             path: {
@@ -207,10 +208,6 @@ export declare const filesTool: {
                 description: string;
             };
             projectPath: {
-                type: string;
-                description: string;
-            };
-            provider: {
                 type: string;
                 description: string;
             };
@@ -458,6 +455,36 @@ export declare const filesTool: {
      * - Analise resultados para relevância
      */
     searchFiles(params: FilesInput, provider: VcsOperations): Promise<FilesResult>;
+    /**
+     * Faz upload de todo o projeto para o repositório
+     *
+     * FUNCIONALIDADE:
+     * - Envia todos os arquivos do projeto local
+     * - Ignora diretórios desnecessários (node_modules, .git, dist)
+     * - Ignora arquivos temporários e logs
+     * - Faz commit com mensagem personalizada
+     *
+     * PARÂMETROS OBRIGATÓRIOS:
+     * - owner: Proprietário do repositório
+     * - repo: Nome do repositório
+     * - projectPath: Caminho do projeto local
+     * - message: Mensagem de commit
+     *
+     * PARÂMETROS OPCIONAIS:
+     * - branch: Branch de destino (padrão: branch padrão)
+     *
+     * VALIDAÇÕES:
+     * - Todos os parâmetros obrigatórios
+     * - Projeto deve existir no caminho especificado
+     * - Usuário deve ter permissão de escrita
+     *
+     * RECOMENDAÇÕES:
+     * - Use mensagens de commit descritivas
+     * - Verifique se o repositório está limpo
+     * - Use branches para mudanças grandes
+     * - Monitore erros de upload
+     */
+    uploadProject(params: FilesInput, provider: VcsOperations): Promise<FilesResult>;
 };
 export {};
 //# sourceMappingURL=git-files.d.ts.map

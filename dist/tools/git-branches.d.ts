@@ -41,7 +41,6 @@ import { VcsOperations } from '../providers/index.js';
  */
 declare const BranchesInputSchema: z.ZodObject<{
     action: z.ZodEnum<["create", "list", "get", "delete", "merge", "compare"]>;
-    owner: z.ZodString;
     repo: z.ZodString;
     projectPath: z.ZodString;
     provider: z.ZodEnum<["gitea", "github"]>;
@@ -57,9 +56,8 @@ declare const BranchesInputSchema: z.ZodObject<{
     head_branch: z.ZodOptional<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
     provider: "gitea" | "github";
-    owner: string;
     repo: string;
-    action: "merge" | "delete" | "get" | "create" | "list" | "compare";
+    action: "merge" | "delete" | "get" | "list" | "create" | "compare";
     projectPath: string;
     head?: string | undefined;
     base?: string | undefined;
@@ -73,9 +71,8 @@ declare const BranchesInputSchema: z.ZodObject<{
     head_branch?: string | undefined;
 }, {
     provider: "gitea" | "github";
-    owner: string;
     repo: string;
-    action: "merge" | "delete" | "get" | "create" | "list" | "compare";
+    action: "merge" | "delete" | "get" | "list" | "create" | "compare";
     projectPath: string;
     head?: string | undefined;
     base?: string | undefined;
@@ -185,10 +182,6 @@ export declare const branchesTool: {
             action: {
                 type: string;
                 enum: string[];
-                description: string;
-            };
-            owner: {
-                type: string;
                 description: string;
             };
             repo: {

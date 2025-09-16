@@ -368,6 +368,53 @@ export class GitHubProvider extends BaseVcsProvider {
     return data.map(file => this.normalizeFile(file));
   }
 
+  async uploadProject(owner: string, repo: string, projectPath: string, message: string, branch?: string): Promise<{ uploaded: number; errors: string[] }> {
+    const fs = await import('fs/promises');
+    const path = await import('path');
+    
+    let uploaded = 0;
+    const errors: string[] = [];
+    
+    try {
+      // Função recursiva para processar diretórios
+      const processDirectory = async (dirPath: string, relativePath: string = ''): Promise<void> => {
+        const items = await fs.readdir(dirPath, { withFileTypes: true });
+        
+        for (const item of items) {
+          const fullPath = path.join(dirPath, item.name);
+          const itemRelativePath = relativePath ? path.join(relativePath, item.name) : item.name;
+          
+          // Pular diretórios que não devem ser enviados
+          if (item.isDirectory()) {
+            if (item.name === 'node_modules' || item.name === '.git' || item.name === 'dist') {
+              continue;
+            }
+            await processDirectory(fullPath, itemRelativePath);
+          } else {
+            // Pular arquivos que não devem ser enviados
+            if (item.name.endsWith('.log') || item.name.endsWith('.tmp') || item.name.startsWith('.')) {
+              continue;
+            }
+            
+            try {
+              const content = await fs.readFile(fullPath, 'utf-8');
+              await this.createFile(owner, repo, itemRelativePath, content, message, branch);
+              uploaded++;
+            } catch (error) {
+              errors.push(`Erro ao enviar ${itemRelativePath}: ${error instanceof Error ? error.message : String(error)}`);
+            }
+          }
+        }
+      };
+      
+      await processDirectory(projectPath);
+      
+      return { uploaded, errors };
+    } catch (error) {
+      throw new Error(`Falha ao fazer upload do projeto: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  }
+
   async listCommits(owner: string, repo: string, branch?: string, page: number = 1, limit: number = 30): Promise<CommitInfo[]> {
     const params: any = { page, per_page: limit };
     if (branch) params.sha = branch;

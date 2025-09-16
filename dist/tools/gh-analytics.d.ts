@@ -29,9 +29,8 @@ import { VcsOperations } from '../providers/index.js';
 /**
  * Schema de validação para entrada da tool analytics
  */
-declare const AnalyticsInputSchema: z.ZodEffects<z.ZodObject<{
+declare const AnalyticsInputSchema: z.ZodObject<{
     action: z.ZodEnum<["traffic", "contributors", "activity", "performance", "reports", "trends", "insights"]>;
-    owner: z.ZodString;
     repo: z.ZodString;
     provider: z.ZodEnum<["gitea", "github", "both"]>;
     page: z.ZodOptional<z.ZodNumber>;
@@ -55,7 +54,6 @@ declare const AnalyticsInputSchema: z.ZodEffects<z.ZodObject<{
     file_type: z.ZodOptional<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
     provider: "gitea" | "github" | "both";
-    owner: string;
     repo: string;
     action: "traffic" | "contributors" | "activity" | "performance" | "reports" | "trends" | "insights";
     path?: string | undefined;
@@ -79,55 +77,6 @@ declare const AnalyticsInputSchema: z.ZodEffects<z.ZodObject<{
     file_type?: string | undefined;
 }, {
     provider: "gitea" | "github" | "both";
-    owner: string;
-    repo: string;
-    action: "traffic" | "contributors" | "activity" | "performance" | "reports" | "trends" | "insights";
-    path?: string | undefined;
-    page?: number | undefined;
-    limit?: number | undefined;
-    branch?: string | undefined;
-    author?: string | undefined;
-    report_format?: "json" | "csv" | "pdf" | "html" | undefined;
-    period?: "day" | "week" | "month" | "quarter" | "year" | undefined;
-    start_date?: string | undefined;
-    end_date?: string | undefined;
-    metric_type?: "views" | "clones" | "visitors" | "unique_visitors" | undefined;
-    contributor_type?: "all" | "internal" | "external" | "bots" | undefined;
-    sort_by?: "commits" | "additions" | "deletions" | "contributions" | undefined;
-    activity_type?: "issues" | "all" | "commits" | "pulls" | "releases" | undefined;
-    performance_metric?: "build_time" | "test_coverage" | "code_quality" | "deployment_frequency" | undefined;
-    report_type?: "trends" | "summary" | "detailed" | "comparison" | undefined;
-    include_charts?: boolean | undefined;
-    trend_metric?: "issues" | "stars" | "contributors" | "commits" | "forks" | undefined;
-    trend_period?: "daily" | "weekly" | "monthly" | undefined;
-    file_type?: string | undefined;
-}>, {
-    provider: "gitea" | "github" | "both";
-    owner: string;
-    repo: string;
-    action: "traffic" | "contributors" | "activity" | "performance" | "reports" | "trends" | "insights";
-    path?: string | undefined;
-    page?: number | undefined;
-    limit?: number | undefined;
-    branch?: string | undefined;
-    author?: string | undefined;
-    report_format?: "json" | "csv" | "pdf" | "html" | undefined;
-    period?: "day" | "week" | "month" | "quarter" | "year" | undefined;
-    start_date?: string | undefined;
-    end_date?: string | undefined;
-    metric_type?: "views" | "clones" | "visitors" | "unique_visitors" | undefined;
-    contributor_type?: "all" | "internal" | "external" | "bots" | undefined;
-    sort_by?: "commits" | "additions" | "deletions" | "contributions" | undefined;
-    activity_type?: "issues" | "all" | "commits" | "pulls" | "releases" | undefined;
-    performance_metric?: "build_time" | "test_coverage" | "code_quality" | "deployment_frequency" | undefined;
-    report_type?: "trends" | "summary" | "detailed" | "comparison" | undefined;
-    include_charts?: boolean | undefined;
-    trend_metric?: "issues" | "stars" | "contributors" | "commits" | "forks" | undefined;
-    trend_period?: "daily" | "weekly" | "monthly" | undefined;
-    file_type?: string | undefined;
-}, {
-    provider: "gitea" | "github" | "both";
-    owner: string;
     repo: string;
     action: "traffic" | "contributors" | "activity" | "performance" | "reports" | "trends" | "insights";
     path?: string | undefined;
@@ -186,10 +135,6 @@ export declare const analyticsTool: {
             action: {
                 type: string;
                 enum: string[];
-                description: string;
-            };
-            owner: {
-                type: string;
                 description: string;
             };
             repo: {

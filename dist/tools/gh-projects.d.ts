@@ -52,7 +52,7 @@ declare const GhProjectsInputSchema: z.ZodObject<{
     provider: "github";
     owner: string;
     repo: string;
-    action: "delete" | "get" | "create" | "list" | "update" | "items" | "fields";
+    action: "delete" | "get" | "list" | "create" | "update" | "items" | "fields";
     projectPath: string;
     title?: string | undefined;
     body?: string | undefined;
@@ -73,7 +73,7 @@ declare const GhProjectsInputSchema: z.ZodObject<{
     provider: "github";
     owner: string;
     repo: string;
-    action: "delete" | "get" | "create" | "list" | "update" | "items" | "fields";
+    action: "delete" | "get" | "list" | "create" | "update" | "items" | "fields";
     projectPath: string;
     title?: string | undefined;
     body?: string | undefined;

@@ -69,7 +69,7 @@ declare const IssuesInputSchema: z.ZodObject<{
     provider: "gitea" | "github";
     owner: string;
     repo: string;
-    action: "get" | "close" | "create" | "list" | "update" | "search" | "comment";
+    action: "get" | "search" | "list" | "create" | "close" | "update" | "comment";
     title?: string | undefined;
     body?: string | undefined;
     state?: "open" | "closed" | "all" | undefined;
@@ -94,7 +94,7 @@ declare const IssuesInputSchema: z.ZodObject<{
     provider: "gitea" | "github";
     owner: string;
     repo: string;
-    action: "get" | "close" | "create" | "list" | "update" | "search" | "comment";
+    action: "get" | "search" | "list" | "create" | "close" | "update" | "comment";
     title?: string | undefined;
     body?: string | undefined;
     state?: "open" | "closed" | "all" | undefined;

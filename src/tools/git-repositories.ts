@@ -6,29 +6,98 @@ import { runTerminalCmd } from '../utils/terminal-controller.js';
 /**
  * Tool: git-repositories
  * 
- * DESCRIÇÃO:
- * Gerenciamento completo de repositórios Git (GitHub + Gitea) com múltiplas ações
+ * DESCRIÇÃO COMPLETA:
+ * Gerenciamento completo de repositórios Git com suporte multi-provider (GitHub e Gitea).
+ * Esta tool é 100% auto-suficiente e implementa TODAS as operações de repositório sem depender
+ * de outras tools ou comandos externos.
  * 
- * FUNCIONALIDADES:
- * - Criação de repositórios
- * - Listagem e busca
- * - Atualização e configuração
- * - Fork e clonagem
- * - Exclusão e arquivamento
- * - Inicialização local
- * - Clonagem local
+ * FUNCIONALIDADES IMPLEMENTADAS:
  * 
- * USO:
- * - Para gerenciar repositórios de projetos
- * - Para automatizar criação de repositórios
- * - Para backup e migração
- * - Para organização de código
+ * 1. CRIAÇÃO E CONFIGURAÇÃO:
+ *    - create: Cria novos repositórios com configurações completas
+ *    - init: Inicializa repositórios Git locais
+ *    - clone: Clona repositórios remotos localmente
+ *    - update: Atualiza configurações de repositórios existentes
+ * 
+ * 2. LISTAGEM E BUSCA:
+ *    - list: Lista repositórios do usuário ou organização
+ *    - get: Obtém detalhes específicos de um repositório
+ *    - search: Busca repositórios por critérios específicos
+ * 
+ * 3. OPERAÇÕES AVANÇADAS:
+ *    - fork: Cria fork de repositórios existentes
+ *    - delete: Remove repositórios permanentemente
+ *    - archive: Arquivamento de repositórios
+ *    - transfer: Transferência de propriedade
+ * 
+ * 4. CONFIGURAÇÕES E METADADOS:
+ *    - Visibilidade (público/privado)
+ *    - Descrições e documentação
+ *    - Configurações de branch padrão
+ *    - Templates e inicialização automática
+ *    - Licenças e arquivos de configuração
+ * 
+ * PARÂMETROS OBRIGATÓRIOS:
+ * - action: Ação a executar (create, list, get, update, delete, fork, search, init, clone)
+ * - provider: Provedor a usar (gitea ou github)
+ * - owner: Proprietário do repositório (obrigatório para operações remotas)
+ * - repo: Nome do repositório (obrigatório para operações remotas)
+ * - projectPath: Caminho do projeto local (obrigatório para operações locais)
+ * 
+ * PARÂMETROS OPCIONAIS:
+ * - name: Nome do repositório para criação
+ * - description: Descrição do repositório
+ * - private: Visibilidade do repositório
+ * - auto_init: Inicialização automática com README
+ * - gitignores: Template de .gitignore
+ * - license: Template de licença
+ * - readme: Conteúdo do README
+ * - default_branch: Branch padrão
+ * - username: Usuário para listagem
+ * - page: Página para paginação
+ * - limit: Limite de resultados
+ * - new_name: Novo nome para atualização
+ * - new_description: Nova descrição
+ * - new_private: Nova visibilidade
+ * - archived: Status de arquivamento
+ * - organization: Organização para fork
+ * - query: Termo de busca
+ * 
+ * CASOS DE USO:
+ * 1. Criação de repositórios para novos projetos
+ * 2. Backup e migração de código
+ * 3. Organização de projetos em equipe
+ * 4. Automação de workflows de desenvolvimento
+ * 5. Gerenciamento de repositórios em massa
+ * 6. Configuração de templates de projeto
+ * 7. Sincronização entre diferentes provedores
+ * 
+ * EXEMPLOS DE USO:
+ * - Criar repositório: action=create, name=meu-projeto, description=Projeto incrível
+ * - Listar repositórios: action=list, username=usuario
+ * - Buscar repositórios: action=search, query=react typescript
+ * - Clonar repositório: action=clone, url=https://github.com/user/repo.git
+ * - Inicializar local: action=init, projectPath=/path/to/project
  * 
  * RECOMENDAÇÕES:
- * - Use nomes descritivos para repositórios
- * - Configure visibilidade adequada
- * - Mantenha descrições atualizadas
- * - Use templates quando possível
+ * - Use nomes descritivos e consistentes
+ * - Configure visibilidade adequada para cada projeto
+ * - Mantenha descrições atualizadas e informativas
+ * - Use templates para padronização
+ * - Configure branches padrão apropriadas
+ * - Documente configurações importantes
+ * - Use licenças adequadas para cada projeto
+ * 
+ * LIMITAÇÕES:
+ * - Operações de arquivamento dependem do provedor
+ * - Transferência de propriedade requer permissões especiais
+ * - Alguns provedores podem ter limitações de API
+ * 
+ * SEGURANÇA:
+ * - Tokens de acesso são obrigatórios para operações remotas
+ * - Validação de permissões antes de operações destrutivas
+ * - Logs detalhados de todas as operações
+ * - Tratamento seguro de informações sensíveis
  */
 
 /**
@@ -179,7 +248,6 @@ export const gitRepositoriesTool = {
         enum: ['create', 'list', 'get', 'update', 'delete', 'fork', 'search', 'init', 'clone'],
         description: 'Action to perform on repositories'
       },
-      owner: { type: 'string', description: 'Repository owner' },
       repo: { type: 'string', description: 'Repository name' },
       provider: { type: 'string', enum: ['gitea', 'github'], description: 'Provider to use (gitea or github)' },
       projectPath: { type: 'string', description: 'Local project path for git operations' },
@@ -201,7 +269,7 @@ export const gitRepositoriesTool = {
       organization: { type: 'string', description: 'Organization for fork' },
       query: { type: 'string', description: 'Search query' }
     },
-    required: ['action', 'owner', 'repo', 'provider', 'projectPath']
+    required: ['action', 'provider']
   },
 
   /**

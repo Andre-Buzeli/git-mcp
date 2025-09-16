@@ -43,8 +43,9 @@ declare const GitArchiveInputSchema: z.ZodObject<{
     provider: "gitea" | "github";
     owner: string;
     repo: string;
-    action: "create" | "list" | "extract" | "verify";
+    action: "list" | "create" | "extract" | "verify";
     projectPath: string;
+    output?: string | undefined;
     archive_path?: string | undefined;
     commit_or_tree?: string | undefined;
     format?: "tar" | "zip" | "tar.gz" | "tar.bz2" | undefined;
@@ -53,13 +54,13 @@ declare const GitArchiveInputSchema: z.ZodObject<{
     list_archive?: string | undefined;
     verify_archive?: string | undefined;
     prefix?: string | undefined;
-    output?: string | undefined;
 }, {
     provider: "gitea" | "github";
     owner: string;
     repo: string;
-    action: "create" | "list" | "extract" | "verify";
+    action: "list" | "create" | "extract" | "verify";
     projectPath: string;
+    output?: string | undefined;
     archive_path?: string | undefined;
     commit_or_tree?: string | undefined;
     format?: "tar" | "zip" | "tar.gz" | "tar.bz2" | undefined;
@@ -68,7 +69,6 @@ declare const GitArchiveInputSchema: z.ZodObject<{
     list_archive?: string | undefined;
     verify_archive?: string | undefined;
     prefix?: string | undefined;
-    output?: string | undefined;
 }>;
 export type GitArchiveInput = z.infer<typeof GitArchiveInputSchema>;
 declare const GitArchiveResultSchema: z.ZodObject<{

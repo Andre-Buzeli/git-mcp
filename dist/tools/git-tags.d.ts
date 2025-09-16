@@ -41,7 +41,6 @@ import { VcsOperations } from '../providers/index.js';
  */
 declare const TagsInputSchema: z.ZodObject<{
     action: z.ZodEnum<["create", "list", "get", "delete", "search"]>;
-    owner: z.ZodString;
     repo: z.ZodString;
     provider: z.ZodEnum<["gitea", "github"]>;
     tag_name: z.ZodOptional<z.ZodString>;
@@ -57,35 +56,33 @@ declare const TagsInputSchema: z.ZodObject<{
     pattern: z.ZodOptional<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
     provider: "gitea" | "github";
-    owner: string;
     repo: string;
-    action: "delete" | "get" | "create" | "list" | "search";
+    action: "delete" | "get" | "search" | "list" | "create";
     message?: string | undefined;
     type?: "lightweight" | "annotated" | undefined;
     tag_name?: string | undefined;
     page?: number | undefined;
     limit?: number | undefined;
+    tag?: string | undefined;
     query?: string | undefined;
     target?: string | undefined;
     tagger_name?: string | undefined;
     tagger_email?: string | undefined;
-    tag?: string | undefined;
     pattern?: string | undefined;
 }, {
     provider: "gitea" | "github";
-    owner: string;
     repo: string;
-    action: "delete" | "get" | "create" | "list" | "search";
+    action: "delete" | "get" | "search" | "list" | "create";
     message?: string | undefined;
     type?: "lightweight" | "annotated" | undefined;
     tag_name?: string | undefined;
     page?: number | undefined;
     limit?: number | undefined;
+    tag?: string | undefined;
     query?: string | undefined;
     target?: string | undefined;
     tagger_name?: string | undefined;
     tagger_email?: string | undefined;
-    tag?: string | undefined;
     pattern?: string | undefined;
 }>;
 export type TagsInput = z.infer<typeof TagsInputSchema>;
@@ -181,10 +178,6 @@ export declare const tagsTool: {
             action: {
                 type: string;
                 enum: string[];
-                description: string;
-            };
-            owner: {
-                type: string;
                 description: string;
             };
             repo: {

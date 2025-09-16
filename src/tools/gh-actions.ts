@@ -37,7 +37,6 @@ const ActionsInputSchema = z.object({
   action: z.enum(['list-runs', 'cancel', 'rerun', 'artifacts', 'secrets', 'jobs', 'download-artifact']),
   
   // Parâmetros comuns
-  owner: CommonSchemas.owner,
   repo: CommonSchemas.repo,
   provider: CommonSchemas.provider,
   
@@ -69,12 +68,12 @@ const ActionsInputSchema = z.object({
 }).refine((data) => {
   // Validações específicas por ação
   if (['cancel', 'rerun', 'jobs'].includes(data.action)) {
-    return data.owner && data.repo && data.run_id;
+    return data.repo && data.run_id;
   }
   if (['download-artifact'].includes(data.action)) {
-    return data.owner && data.repo && (data.artifact_id || data.artifact_name);
+    return data.repo && (data.artifact_id || data.artifact_name);
   }
-  return data.owner && data.repo;
+  return data.repo;
 }, {
   message: "Parâmetros obrigatórios não fornecidos para a ação especificada"
 });
@@ -106,82 +105,26 @@ export const actionsTool = {
       action: {
         type: 'string',
         enum: ['list-runs', 'cancel', 'rerun', 'artifacts', 'secrets', 'jobs', 'download-artifact'],
-        description: 'Ação a executar: list-runs (lista execuções), cancel (cancela), rerun (re-executa), artifacts (artefatos), secrets (lista secrets), jobs (lista jobs), download-artifact (baixa artefato)'
+        description: 'Action to perform on GitHub Actions'
       },
-      owner: {
-        type: 'string',
-        description: 'Proprietário do repositório (OBRIGATÓRIO para todas as ações)'
-      },
-      repo: {
-        type: 'string',
-        description: 'Nome do repositório (OBRIGATÓRIO para todas as ações)'
-      },
-      provider: {
-        type: 'string',
-        description: 'Provider específico (github, gitea) ou usa padrão'
-      },
-      run_id: {
-        type: 'string',
-        description: 'ID da execução do workflow (OBRIGATÓRIO para cancel, rerun, jobs)'
-      },
-      workflow_id: {
-        type: 'string',
-        description: 'ID do workflow (OPCIONAL para list-runs)'
-      },
-      status: {
-        type: 'string',
-        enum: ['queued', 'in_progress', 'completed', 'cancelled', 'failure', 'success'],
-        description: 'Status da execução para filtrar (OPCIONAL para list-runs)'
-      },
-      branch: {
-        type: 'string',
-        description: 'Branch para filtrar execuções (OPCIONAL para list-runs)'
-      },
-      event: {
-        type: 'string',
-        description: 'Evento que disparou a execução (OPCIONAL para list-runs)'
-      },
-      job_id: {
-        type: 'string',
-        description: 'ID do job específico (OBRIGATÓRIO para jobs)'
-      },
-      artifact_id: {
-        type: 'string',
-        description: 'ID do artefato (OBRIGATÓRIO para download-artifact se não usar artifact_name)'
-      },
-      artifact_name: {
-        type: 'string',
-        description: 'Nome do artefato (OBRIGATÓRIO para download-artifact se não usar artifact_id)'
-      },
-      download_path: {
-        type: 'string',
-        description: 'Caminho local para salvar o artefato (OBRIGATÓRIO para download-artifact)'
-      },
-      secret_name: {
-        type: 'string',
-        description: 'Nome do secret específico (OPCIONAL para secrets)'
-      },
-      created_after: {
-        type: 'string',
-        description: 'Filtrar execuções criadas após esta data (OPCIONAL para list-runs)'
-      },
-      created_before: {
-        type: 'string',
-        description: 'Filtrar execuções criadas antes desta data (OPCIONAL para list-runs)'
-      },
-      page: {
-        type: 'number',
-        description: 'Página da listagem (mínimo: 1, padrão: 1)',
-        minimum: 1
-      },
-      limit: {
-        type: 'number',
-        description: 'Itens por página (mínimo: 1, máximo: 100, padrão: 30)',
-        minimum: 1,
-        maximum: 100
-      }
+      repo: { type: 'string', description: 'Repository name' },
+      provider: { type: 'string', description: 'Specific provider (github, gitea) or use default' },
+      run_id: { type: 'string', description: 'Workflow run ID' },
+      workflow_id: { type: 'string', description: 'Workflow ID' },
+      status: { type: 'string', description: 'Status filter' },
+      branch: { type: 'string', description: 'Branch to filter runs' },
+      event: { type: 'string', description: 'Event that triggered the run' },
+      job_id: { type: 'string', description: 'Job ID' },
+      artifact_id: { type: 'string', description: 'Artifact ID' },
+      artifact_name: { type: 'string', description: 'Artifact name' },
+      download_path: { type: 'string', description: 'Local path to save artifact' },
+      secret_name: { type: 'string', description: 'Specific secret name' },
+      created_after: { type: 'string', description: 'Filter runs created after this date' },
+      created_before: { type: 'string', description: 'Filter runs created before this date' },
+      page: { type: 'number', description: 'Page number', minimum: 1 },
+      limit: { type: 'number', description: 'Items per page', minimum: 1, maximum: 100 }
     },
-    required: ['action', 'owner', 'repo', 'provider']
+    required: ['action', 'repo', 'provider']
   },
 
   async handler(input: ActionsInput): Promise<ActionsResult> {
@@ -235,14 +178,8 @@ export const actionsTool = {
     try {
       // Auto-detecção de owner/username se não fornecidos
       let updatedParams = { ...params };
-      if (!updatedParams.owner) {
-        try {
-          const currentUser = await provider.getCurrentUser();
-          updatedParams.owner = currentUser.login;
-        } catch (error) {
-          console.warn('[ACTIONS.TS] Falha na auto-detecção de usuário');
-        }
-      }
+      const currentUser = await provider.getCurrentUser();
+      const owner = currentUser.login;
 
       
       if (!provider.listWorkflowRuns) {
@@ -259,7 +196,7 @@ export const actionsTool = {
       }
       
       const result = await provider.listWorkflowRuns({
-        owner: params.owner!,
+        owner: (await provider.getCurrentUser()).login,
         repo: params.repo!,
         workflow_id: params.workflow_id,
         status: params.status,
@@ -297,7 +234,7 @@ export const actionsTool = {
       }
       
       const result = await provider.cancelWorkflowRun({
-        owner: params.owner!,
+        owner: (await provider.getCurrentUser()).login,
         repo: params.repo!,
         run_id: params.run_id!
       });
@@ -328,7 +265,7 @@ export const actionsTool = {
       }
       
       const result = await provider.rerunWorkflow({
-        owner: params.owner!,
+        owner: (await provider.getCurrentUser()).login,
         repo: params.repo!,
         run_id: params.run_id!
       });
@@ -351,14 +288,8 @@ export const actionsTool = {
     try {
       // Auto-detecção de owner/username se não fornecidos
       let updatedParams = { ...params };
-      if (!updatedParams.owner) {
-        try {
-          const currentUser = await provider.getCurrentUser();
-          updatedParams.owner = currentUser.login;
-        } catch (error) {
-          console.warn('[ACTIONS.TS] Falha na auto-detecção de usuário');
-        }
-      }
+      const currentUser = await provider.getCurrentUser();
+      const owner = currentUser.login;
 
       
       if (!provider.listArtifacts) {
@@ -371,7 +302,7 @@ export const actionsTool = {
       }
       
       const result = await provider.listArtifacts({
-        owner: params.owner!,
+        owner: (await provider.getCurrentUser()).login,
         repo: params.repo!,
         run_id: params.run_id,
         page: params.page,
@@ -396,14 +327,8 @@ export const actionsTool = {
     try {
       // Auto-detecção de owner/username se não fornecidos
       let updatedParams = { ...params };
-      if (!updatedParams.owner) {
-        try {
-          const currentUser = await provider.getCurrentUser();
-          updatedParams.owner = currentUser.login;
-        } catch (error) {
-          console.warn('[ACTIONS.TS] Falha na auto-detecção de usuário');
-        }
-      }
+      const currentUser = await provider.getCurrentUser();
+      const owner = currentUser.login;
 
       
       if (!provider.listSecrets) {
@@ -416,7 +341,7 @@ export const actionsTool = {
       }
       
       const result = await provider.listSecrets({
-        owner: params.owner!,
+        owner: (await provider.getCurrentUser()).login,
         repo: params.repo!,
         page: params.page,
         limit: params.limit
@@ -440,14 +365,8 @@ export const actionsTool = {
     try {
       // Auto-detecção de owner/username se não fornecidos
       let updatedParams = { ...params };
-      if (!updatedParams.owner) {
-        try {
-          const currentUser = await provider.getCurrentUser();
-          updatedParams.owner = currentUser.login;
-        } catch (error) {
-          console.warn('[ACTIONS.TS] Falha na auto-detecção de usuário');
-        }
-      }
+      const currentUser = await provider.getCurrentUser();
+      const owner = currentUser.login;
 
       
       if (!provider.listJobs) {
@@ -460,7 +379,7 @@ export const actionsTool = {
       }
       
       const result = await provider.listJobs({
-        owner: params.owner!,
+        owner: (await provider.getCurrentUser()).login,
         repo: params.repo!,
         run_id: params.run_id!,
         page: params.page,
@@ -493,7 +412,7 @@ export const actionsTool = {
       }
       
       const result = await provider.downloadArtifact({
-        owner: params.owner!,
+        owner: (await provider.getCurrentUser()).login,
         repo: params.repo!,
         artifact_id: params.artifact_id,
         artifact_name: params.artifact_name,

@@ -31,7 +31,6 @@ import { VcsOperations } from '../providers/index.js';
  */
 declare const DeploymentsInputSchema: z.ZodEffects<z.ZodObject<{
     action: z.ZodEnum<["list", "create", "status", "environments", "rollback", "delete"]>;
-    owner: z.ZodString;
     repo: z.ZodString;
     provider: z.ZodEnum<["gitea", "github", "both"]>;
     page: z.ZodOptional<z.ZodNumber>;
@@ -55,9 +54,8 @@ declare const DeploymentsInputSchema: z.ZodEffects<z.ZodObject<{
     environment_filter: z.ZodOptional<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
     provider: "gitea" | "github" | "both";
-    owner: string;
     repo: string;
-    action: "status" | "delete" | "create" | "list" | "environments" | "rollback";
+    action: "status" | "delete" | "list" | "create" | "environments" | "rollback";
     description?: string | undefined;
     state?: "error" | "success" | "queued" | "in_progress" | "failure" | "pending" | "inactive" | undefined;
     ref?: string | undefined;
@@ -79,9 +77,8 @@ declare const DeploymentsInputSchema: z.ZodEffects<z.ZodObject<{
     environment_filter?: string | undefined;
 }, {
     provider: "gitea" | "github" | "both";
-    owner: string;
     repo: string;
-    action: "status" | "delete" | "create" | "list" | "environments" | "rollback";
+    action: "status" | "delete" | "list" | "create" | "environments" | "rollback";
     description?: string | undefined;
     state?: "error" | "success" | "queued" | "in_progress" | "failure" | "pending" | "inactive" | undefined;
     ref?: string | undefined;
@@ -103,9 +100,8 @@ declare const DeploymentsInputSchema: z.ZodEffects<z.ZodObject<{
     environment_filter?: string | undefined;
 }>, {
     provider: "gitea" | "github" | "both";
-    owner: string;
     repo: string;
-    action: "status" | "delete" | "create" | "list" | "environments" | "rollback";
+    action: "status" | "delete" | "list" | "create" | "environments" | "rollback";
     description?: string | undefined;
     state?: "error" | "success" | "queued" | "in_progress" | "failure" | "pending" | "inactive" | undefined;
     ref?: string | undefined;
@@ -127,9 +123,8 @@ declare const DeploymentsInputSchema: z.ZodEffects<z.ZodObject<{
     environment_filter?: string | undefined;
 }, {
     provider: "gitea" | "github" | "both";
-    owner: string;
     repo: string;
-    action: "status" | "delete" | "create" | "list" | "environments" | "rollback";
+    action: "status" | "delete" | "list" | "create" | "environments" | "rollback";
     description?: string | undefined;
     state?: "error" | "success" | "queued" | "in_progress" | "failure" | "pending" | "inactive" | undefined;
     ref?: string | undefined;

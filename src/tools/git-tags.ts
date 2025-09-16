@@ -46,7 +46,6 @@ const TagsInputSchema = z.object({
   action: z.enum(['create', 'list', 'get', 'delete', 'search']),
   
   // Parâmetros comuns
-  owner: z.string(),
   repo: z.string(),
   
   // Para multi-provider
@@ -158,7 +157,6 @@ export const tagsTool = {
         enum: ['create', 'list', 'get', 'delete', 'search'],
         description: 'Action to perform on tags'
       },
-      owner: { type: 'string', description: 'Repository owner' },
       repo: { type: 'string', description: 'Repository name' },
       provider: { type: 'string', description: 'Provider to use (github, gitea, or omit for default)' },
       tag_name: { type: 'string', description: 'Tag name' },
@@ -173,7 +171,7 @@ export const tagsTool = {
       query: { type: 'string', description: 'Search query' },
       pattern: { type: 'string', description: 'Search pattern (e.g., v*.*.*)' }
     },
-    required: ['action', 'owner', 'repo', 'provider']
+    required: ['action', 'repo', 'provider']
   },
 
   /**
@@ -276,9 +274,12 @@ export const tagsTool = {
    */
   async createTag(params: TagsInput, provider: VcsOperations): Promise<TagsResult> {
     try {
-      if (!params.owner || !params.repo || !params.tag_name || !params.target) {
-        throw new Error('Owner, repo, tag_name e target são obrigatórios');
+      if (!params.repo || !params.tag_name || !params.target) {
+        throw new Error('Repo, tag_name e target são obrigatórios');
       }
+
+      const currentUser = await provider.getCurrentUser();
+      const owner = currentUser.login;
 
       const tagData: any = {
         tag_name: params.tag_name,
@@ -291,7 +292,7 @@ export const tagsTool = {
         if (params.tagger_email) tagData.tagger_email = params.tagger_email;
       }
 
-      const tag = await provider.createTag(params.owner, params.repo, tagData);
+      const tag = await provider.createTag(owner, params.repo, tagData);
 
       return {
         success: true,
@@ -333,14 +334,17 @@ export const tagsTool = {
    */
   async listTags(params: TagsInput, provider: VcsOperations): Promise<TagsResult> {
     try {
-      if (!params.owner || !params.repo) {
-        throw new Error('Owner e repo são obrigatórios');
+      if (!params.repo) {
+        throw new Error('Repo é obrigatório');
       }
+
+      const currentUser = await provider.getCurrentUser();
+      const owner = currentUser.login;
 
       const page = params.page || 1;
       const limit = params.limit || 30;
       
-      const tags = await provider.listTags(params.owner, params.repo, page, limit);
+      const tags = await provider.listTags(owner, params.repo, page, limit);
 
       return {
         success: true,
@@ -384,9 +388,12 @@ export const tagsTool = {
    */
   async getTag(params: TagsInput, provider: VcsOperations): Promise<TagsResult> {
     try {
-      if (!params.owner || !params.repo || !params.tag) {
-        throw new Error('Owner, repo e tag são obrigatórios');
+      if (!params.repo || !params.tag) {
+        throw new Error('Repo e tag são obrigatórios');
       }
+
+      const currentUser = await provider.getCurrentUser();
+      const owner = currentUser.login;
 
       // Implementar obtenção de tag específica
       // Por enquanto, retorna mensagem de funcionalidade
@@ -430,11 +437,14 @@ export const tagsTool = {
    */
   async deleteTag(params: TagsInput, provider: VcsOperations): Promise<TagsResult> {
     try {
-      if (!params.owner || !params.repo || !params.tag) {
-        throw new Error('Owner, repo e tag são obrigatórios');
+      if (!params.repo || !params.tag) {
+        throw new Error('Repo e tag são obrigatórios');
       }
 
-      await provider.deleteTag(params.owner, params.repo, params.tag);
+      const currentUser = await provider.getCurrentUser();
+      const owner = currentUser.login;
+
+      await provider.deleteTag(owner, params.repo, params.tag);
 
       return {
         success: true,
@@ -476,8 +486,8 @@ export const tagsTool = {
    */
   async searchTags(params: TagsInput, provider: VcsOperations): Promise<TagsResult> {
     try {
-      if (!params.owner || !params.repo) {
-        throw new Error('Owner e repo são obrigatórios');
+      if (!params.repo) {
+        throw new Error('Repo é obrigatório');
       }
 
       if (!params.query && !params.pattern) {

@@ -42,7 +42,7 @@ declare const GitCherryPickInputSchema: z.ZodObject<{
     provider: "gitea" | "github";
     owner: string;
     repo: string;
-    action: "abort" | "continue" | "cherry-pick" | "cherry-pick-range";
+    action: "cherry-pick" | "abort" | "continue" | "cherry-pick-range";
     projectPath: string;
     commit_range?: string | undefined;
     commit_hash?: string | undefined;
@@ -56,7 +56,7 @@ declare const GitCherryPickInputSchema: z.ZodObject<{
     provider: "gitea" | "github";
     owner: string;
     repo: string;
-    action: "abort" | "continue" | "cherry-pick" | "cherry-pick-range";
+    action: "cherry-pick" | "abort" | "continue" | "cherry-pick-range";
     projectPath: string;
     commit_range?: string | undefined;
     commit_hash?: string | undefined;

@@ -32,7 +32,6 @@ import { VcsOperations } from '../providers/index.js';
  */
 declare const CodeReviewInputSchema: z.ZodEffects<z.ZodObject<{
     action: z.ZodEnum<["analyze", "review-file", "review-commit", "review-pr", "generate-report", "apply-suggestions"]>;
-    owner: z.ZodString;
     repo: z.ZodString;
     provider: z.ZodEnum<["gitea", "github", "both"]>;
     code: z.ZodOptional<z.ZodString>;
@@ -64,7 +63,6 @@ declare const CodeReviewInputSchema: z.ZodEffects<z.ZodObject<{
     exclude_patterns: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
 }, "strip", z.ZodTypeAny, {
     provider: "gitea" | "github" | "both";
-    owner: string;
     repo: string;
     action: "analyze" | "review-file" | "review-commit" | "review-pr" | "generate-report" | "apply-suggestions";
     code?: string | undefined;
@@ -86,7 +84,6 @@ declare const CodeReviewInputSchema: z.ZodEffects<z.ZodObject<{
     exclude_patterns?: string[] | undefined;
 }, {
     provider: "gitea" | "github" | "both";
-    owner: string;
     repo: string;
     action: "analyze" | "review-file" | "review-commit" | "review-pr" | "generate-report" | "apply-suggestions";
     code?: string | undefined;
@@ -108,7 +105,6 @@ declare const CodeReviewInputSchema: z.ZodEffects<z.ZodObject<{
     exclude_patterns?: string[] | undefined;
 }>, {
     provider: "gitea" | "github" | "both";
-    owner: string;
     repo: string;
     action: "analyze" | "review-file" | "review-commit" | "review-pr" | "generate-report" | "apply-suggestions";
     code?: string | undefined;
@@ -130,7 +126,6 @@ declare const CodeReviewInputSchema: z.ZodEffects<z.ZodObject<{
     exclude_patterns?: string[] | undefined;
 }, {
     provider: "gitea" | "github" | "both";
-    owner: string;
     repo: string;
     action: "analyze" | "review-file" | "review-commit" | "review-pr" | "generate-report" | "apply-suggestions";
     code?: string | undefined;
@@ -187,10 +182,6 @@ export declare const codeReviewTool: {
             action: {
                 type: string;
                 enum: string[];
-                description: string;
-            };
-            owner: {
-                type: string;
                 description: string;
             };
             repo: {

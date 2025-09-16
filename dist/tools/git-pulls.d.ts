@@ -79,7 +79,7 @@ declare const PullsInputSchema: z.ZodObject<{
     provider: "gitea" | "github";
     owner: string;
     repo: string;
-    action: "merge" | "get" | "close" | "create" | "list" | "update" | "search" | "review";
+    action: "merge" | "get" | "search" | "list" | "create" | "close" | "update" | "review";
     title?: string | undefined;
     body?: string | undefined;
     state?: "open" | "closed" | "merged" | "all" | undefined;
@@ -113,7 +113,7 @@ declare const PullsInputSchema: z.ZodObject<{
     provider: "gitea" | "github";
     owner: string;
     repo: string;
-    action: "merge" | "get" | "close" | "create" | "list" | "update" | "search" | "review";
+    action: "merge" | "get" | "search" | "list" | "create" | "close" | "update" | "review";
     title?: string | undefined;
     body?: string | undefined;
     state?: "open" | "closed" | "merged" | "all" | undefined;

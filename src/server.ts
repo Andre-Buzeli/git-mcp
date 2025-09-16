@@ -50,6 +50,7 @@ import { commitsTool } from './tools/git-commits.js';
 import { branchesTool } from './tools/git-branches.js';
 import { tagsTool } from './tools/git-tags.js';
 import { filesTool } from './tools/git-files.js';
+import { uploadProjectTool } from './tools/git-upload-project.js';
 import { issuesTool } from './tools/git-issues.js';
 import { pullsTool } from './tools/git-pulls.js';
 import { releasesTool } from './tools/git-releases.js';
@@ -105,6 +106,7 @@ const tools = [
   branchesTool,
   tagsTool,
   filesTool,
+  uploadProjectTool,
   issuesTool,
   pullsTool,
   releasesTool,
@@ -160,10 +162,10 @@ export class GiteaMCPServer {
 
   constructor() {
     this.server = new Server(
-      {
-        name: 'git-mcp',
-        version: '2.14.2',
-      }
+        {
+          name: 'git-mcp',
+          version: '2.16.0',
+        }
     );
 
     this.setupHandlers();

@@ -40,7 +40,7 @@ declare const GitStashInputSchema: z.ZodObject<{
     provider: "gitea" | "github";
     owner: string;
     repo: string;
-    action: "pop" | "list" | "stash" | "apply" | "show" | "drop" | "clear";
+    action: "pop" | "apply" | "list" | "show" | "drop" | "clear" | "stash";
     projectPath: string;
     message?: string | undefined;
     include_untracked?: boolean | undefined;
@@ -51,7 +51,7 @@ declare const GitStashInputSchema: z.ZodObject<{
     provider: "gitea" | "github";
     owner: string;
     repo: string;
-    action: "pop" | "list" | "stash" | "apply" | "show" | "drop" | "clear";
+    action: "pop" | "apply" | "list" | "show" | "drop" | "clear" | "stash";
     projectPath: string;
     message?: string | undefined;
     include_untracked?: boolean | undefined;

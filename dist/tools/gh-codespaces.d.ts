@@ -43,7 +43,7 @@ declare const GhCodespacesInputSchema: z.ZodObject<{
     provider: "github";
     owner: string;
     repo: string;
-    action: "delete" | "create" | "list" | "logs" | "start" | "stop" | "rebuild";
+    action: "delete" | "list" | "create" | "logs" | "start" | "stop" | "rebuild";
     projectPath: string;
     branch?: string | undefined;
     codespace_name?: string | undefined;
@@ -55,7 +55,7 @@ declare const GhCodespacesInputSchema: z.ZodObject<{
     provider: "github";
     owner: string;
     repo: string;
-    action: "delete" | "create" | "list" | "logs" | "start" | "stop" | "rebuild";
+    action: "delete" | "list" | "create" | "logs" | "start" | "stop" | "rebuild";
     projectPath: string;
     branch?: string | undefined;
     codespace_name?: string | undefined;

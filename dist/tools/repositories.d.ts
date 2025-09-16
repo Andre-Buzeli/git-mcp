@@ -66,7 +66,7 @@ declare const RepositoriesInputSchema: z.ZodObject<{
     provider: "gitea" | "github";
     owner: string;
     repo: string;
-    action: "delete" | "get" | "create" | "list" | "update" | "fork" | "search" | "init" | "clone";
+    action: "delete" | "get" | "search" | "init" | "clone" | "list" | "create" | "update" | "fork";
     projectPath: string;
     name?: string | undefined;
     description?: string | undefined;
@@ -89,7 +89,7 @@ declare const RepositoriesInputSchema: z.ZodObject<{
     provider: "gitea" | "github";
     owner: string;
     repo: string;
-    action: "delete" | "get" | "create" | "list" | "update" | "fork" | "search" | "init" | "clone";
+    action: "delete" | "get" | "search" | "init" | "clone" | "list" | "create" | "update" | "fork";
     projectPath: string;
     name?: string | undefined;
     description?: string | undefined;

@@ -39,23 +39,23 @@ declare const GitRemoteInputSchema: z.ZodObject<{
     provider: "gitea" | "github";
     owner: string;
     repo: string;
-    action: "show" | "add" | "remove" | "rename" | "set-url" | "prune";
+    action: "add" | "show" | "remove" | "prune" | "rename" | "set-url";
     projectPath: string;
+    remote?: string | undefined;
     new_name?: string | undefined;
     remote_name?: string | undefined;
     remote_url?: string | undefined;
-    remote?: string | undefined;
     remote_to_prune?: string | undefined;
 }, {
     provider: "gitea" | "github";
     owner: string;
     repo: string;
-    action: "show" | "add" | "remove" | "rename" | "set-url" | "prune";
+    action: "add" | "show" | "remove" | "prune" | "rename" | "set-url";
     projectPath: string;
+    remote?: string | undefined;
     new_name?: string | undefined;
     remote_name?: string | undefined;
     remote_url?: string | undefined;
-    remote?: string | undefined;
     remote_to_prune?: string | undefined;
 }>;
 export type GitRemoteInput = z.infer<typeof GitRemoteInputSchema>;

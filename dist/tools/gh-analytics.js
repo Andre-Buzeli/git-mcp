@@ -37,7 +37,6 @@ const validator_js_1 = require("./validator.js");
 const AnalyticsInputSchema = zod_1.z.object({
     action: zod_1.z.enum(['traffic', 'contributors', 'activity', 'performance', 'reports', 'trends', 'insights']),
     // Parâmetros comuns
-    owner: validator_js_1.CommonSchemas.owner,
     repo: validator_js_1.CommonSchemas.repo,
     provider: validator_js_1.CommonSchemas.provider,
     // Parâmetros para listagem
@@ -68,10 +67,6 @@ const AnalyticsInputSchema = zod_1.z.object({
     author: validator_js_1.CommonSchemas.shortString,
     path: validator_js_1.CommonSchemas.mediumString,
     file_type: validator_js_1.CommonSchemas.shortString
-}).refine((data) => {
-    return data.owner && data.repo;
-}, {
-    message: "Owner e repo são obrigatórios"
 });
 /**
  * Schema de validação para resultado da tool analytics
@@ -97,10 +92,6 @@ exports.analyticsTool = {
                 enum: ['traffic', 'contributors', 'activity', 'performance', 'reports', 'trends', 'insights'],
                 description: 'Ação a executar: traffic (tráfego), contributors (contribuidores), activity (atividade), performance (performance), reports (relatórios), trends (tendências), insights (insights gerais)'
             },
-            owner: {
-                type: 'string',
-                description: 'Proprietário do repositório (OBRIGATÓRIO para todas as ações)'
-            },
             repo: {
                 type: 'string',
                 description: 'Nome do repositório (OBRIGATÓRIO para todas as ações)'
@@ -109,97 +100,27 @@ exports.analyticsTool = {
                 type: 'string',
                 description: 'Provider específico (github, gitea) ou usa padrão'
             },
-            period: {
-                type: 'string',
-                enum: ['day', 'week', 'month', 'quarter', 'year'],
-                description: 'Período de análise (padrão: week para traffic, month para outros)'
-            },
-            start_date: {
-                type: 'string',
-                description: 'Data inicial para análise (formato: YYYY-MM-DD)'
-            },
-            end_date: {
-                type: 'string',
-                description: 'Data final para análise (formato: YYYY-MM-DD)'
-            },
-            metric_type: {
-                type: 'string',
-                enum: ['views', 'clones', 'visitors', 'unique_visitors'],
-                description: 'Tipo de métrica de tráfego (OBRIGATÓRIO para traffic, padrão: views)'
-            },
-            contributor_type: {
-                type: 'string',
-                enum: ['all', 'internal', 'external', 'bots'],
-                description: 'Tipo de contribuidores (padrão: all)'
-            },
-            sort_by: {
-                type: 'string',
-                enum: ['commits', 'additions', 'deletions', 'contributions'],
-                description: 'Ordenar contribuidores por (padrão: commits)'
-            },
-            activity_type: {
-                type: 'string',
-                enum: ['commits', 'issues', 'pulls', 'releases', 'all'],
-                description: 'Tipo de atividade (padrão: all)'
-            },
-            branch: {
-                type: 'string',
-                description: 'Branch específico para análise'
-            },
-            performance_metric: {
-                type: 'string',
-                enum: ['build_time', 'test_coverage', 'code_quality', 'deployment_frequency'],
-                description: 'Métrica de performance específica'
-            },
-            report_type: {
-                type: 'string',
-                enum: ['summary', 'detailed', 'trends', 'comparison'],
-                description: 'Tipo de relatório (padrão: summary)'
-            },
-            report_format: {
-                type: 'string',
-                enum: ['json', 'csv', 'pdf', 'html'],
-                description: 'Formato do relatório (padrão: json)'
-            },
-            include_charts: {
-                type: 'boolean',
-                description: 'Incluir gráficos no relatório (padrão: false)'
-            },
-            trend_metric: {
-                type: 'string',
-                enum: ['commits', 'contributors', 'issues', 'stars', 'forks'],
-                description: 'Métrica para análise de tendências (padrão: commits)'
-            },
-            trend_period: {
-                type: 'string',
-                enum: ['daily', 'weekly', 'monthly'],
-                description: 'Período para análise de tendências (padrão: weekly)'
-            },
-            author: {
-                type: 'string',
-                description: 'Filtrar por autor específico'
-            },
-            path: {
-                type: 'string',
-                description: 'Filtrar por caminho específico'
-            },
-            file_type: {
-                type: 'string',
-                description: 'Filtrar por tipo de arquivo'
-            },
-            page: {
-                type: 'number',
-                description: 'Página da listagem (mínimo: 1, padrão: 1)',
-                minimum: 1
-            },
-            limit: {
-                type: 'number',
-                description: 'Itens por página (mínimo: 1, máximo: 100, padrão: 30)',
-                minimum: 1,
-                maximum: 100
-            }
+            period: { type: 'string', enum: ['day', 'week', 'month', 'quarter', 'year'], description: 'Período de análise' },
+            start_date: { type: 'string', description: 'Data inicial para análise' },
+            end_date: { type: 'string', description: 'Data final para análise' },
+            metric_type: { type: 'string', enum: ['views', 'clones', 'visitors', 'unique_visitors'], description: 'Tipo de métrica de tráfego' },
+            contributor_type: { type: 'string', enum: ['all', 'internal', 'external', 'bots'], description: 'Tipo de contribuidores' },
+            sort_by: { type: 'string', enum: ['commits', 'additions', 'deletions', 'contributions'], description: 'Ordenação de contribuidores' },
+            activity_type: { type: 'string', enum: ['commits', 'issues', 'pulls', 'releases', 'all'], description: 'Tipo de atividade' },
+            branch: { type: 'string', description: 'Branch específico para análise' },
+            performance_metric: { type: 'string', enum: ['build_time', 'test_coverage', 'code_quality', 'deployment_frequency'], description: 'Métrica de performance' },
+            report_type: { type: 'string', enum: ['summary', 'detailed', 'trends', 'comparison'], description: 'Tipo de relatório' },
+            report_format: { type: 'string', enum: ['json', 'csv', 'pdf', 'html'], description: 'Formato do relatório' },
+            include_charts: { type: 'boolean', description: 'Incluir gráficos no relatório' },
+            trend_metric: { type: 'string', enum: ['commits', 'contributors', 'issues', 'stars', 'forks'], description: 'Métrica de tendências' },
+            trend_period: { type: 'string', enum: ['daily', 'weekly', 'monthly'], description: 'Período de tendências' },
+            author: { type: 'string', description: 'Filtrar por autor' },
+            path: { type: 'string', description: 'Filtrar por caminho' },
+            file_type: { type: 'string', description: 'Filtrar por tipo de arquivo' },
+            page: { type: 'number', description: 'Página', minimum: 1 },
+            limit: { type: 'number', description: 'Itens por página', minimum: 1, maximum: 100 }
         },
-        required: ['action', 'owner', 'repo', 'provider']
+        required: ['action', 'repo', 'provider']
     },
     async handler(input) {
         try {
@@ -214,17 +135,17 @@ exports.analyticsTool = {
             }
             switch (updatedParams.action) {
                 case 'traffic':
-                    return await this.analyzeContributors(updatedParams, provider);
+                    return await this.getTrafficStats(updatedParams, provider);
                 case 'contributors':
-                    return await this.getActivityStats(updatedParams, provider);
+                    return await this.analyzeContributors(updatedParams, provider);
                 case 'activity':
-                    return await this.getPerformanceMetrics(updatedParams, provider);
+                    return await this.getActivityStats(updatedParams, provider);
                 case 'performance':
-                    return await this.generateReports(updatedParams, provider);
+                    return await this.getPerformanceMetrics(updatedParams, provider);
                 case 'reports':
-                    return await this.analyzeTrends(updatedParams, provider);
+                    return await this.generateReports(updatedParams, provider);
                 case 'trends':
-                    return await this.getRepositoryInsights(updatedParams, provider);
+                    return await this.analyzeTrends(updatedParams, provider);
                 case 'insights':
                     return await this.getRepositoryInsights(updatedParams, provider);
                 default:
@@ -245,17 +166,8 @@ exports.analyticsTool = {
      */
     async getTrafficStats(params, provider) {
         try {
-            // Auto-detecção de owner/username se não fornecidos
-            let updatedParams = { ...params };
-            if (!updatedParams.owner) {
-                try {
-                    const currentUser = await provider.getCurrentUser();
-                    updatedParams.owner = currentUser.login;
-                }
-                catch (error) {
-                    console.warn('[ANALYTICS.TS] Falha na auto-detecção de usuário');
-                }
-            }
+            const currentUser = await provider.getCurrentUser();
+            const owner = currentUser.login;
             if (!provider.getTrafficStats) {
                 return {
                     success: false,
@@ -265,7 +177,7 @@ exports.analyticsTool = {
                 };
             }
             const result = await provider.getTrafficStats({
-                owner: params.owner,
+                owner,
                 repo: params.repo,
                 metric_type: params.metric_type || 'views',
                 period: params.period || 'week',
@@ -296,8 +208,9 @@ exports.analyticsTool = {
                     error: 'Provider não implementa analyzeContributors'
                 };
             }
+            const owner = (await provider.getCurrentUser()).login;
             const result = await provider.analyzeContributors({
-                owner: params.owner,
+                owner,
                 repo: params.repo,
                 contributor_type: params.contributor_type || 'all',
                 sort_by: params.sort_by || 'commits',
@@ -323,17 +236,7 @@ exports.analyticsTool = {
      */
     async getActivityStats(params, provider) {
         try {
-            // Auto-detecção de owner/username se não fornecidos
-            let updatedParams = { ...params };
-            if (!updatedParams.owner) {
-                try {
-                    const currentUser = await provider.getCurrentUser();
-                    updatedParams.owner = currentUser.login;
-                }
-                catch (error) {
-                    console.warn('[ANALYTICS.TS] Falha na auto-detecção de usuário');
-                }
-            }
+            const owner = (await provider.getCurrentUser()).login;
             if (!provider.getActivityStats) {
                 return {
                     success: false,
@@ -343,7 +246,7 @@ exports.analyticsTool = {
                 };
             }
             const result = await provider.getActivityStats({
-                owner: params.owner,
+                owner,
                 repo: params.repo,
                 activity_type: params.activity_type || 'all',
                 branch: params.branch,
@@ -368,17 +271,7 @@ exports.analyticsTool = {
      */
     async getPerformanceMetrics(params, provider) {
         try {
-            // Auto-detecção de owner/username se não fornecidos
-            let updatedParams = { ...params };
-            if (!updatedParams.owner) {
-                try {
-                    const currentUser = await provider.getCurrentUser();
-                    updatedParams.owner = currentUser.login;
-                }
-                catch (error) {
-                    console.warn('[ANALYTICS.TS] Falha na auto-detecção de usuário');
-                }
-            }
+            const owner = (await provider.getCurrentUser()).login;
             if (!provider.getPerformanceMetrics) {
                 return {
                     success: false,
@@ -388,7 +281,7 @@ exports.analyticsTool = {
                 };
             }
             const result = await provider.getPerformanceMetrics({
-                owner: params.owner,
+                owner,
                 repo: params.repo,
                 performance_metric: params.performance_metric,
                 period: params.period || 'month',
@@ -419,8 +312,9 @@ exports.analyticsTool = {
                     error: 'Provider não implementa generateReports'
                 };
             }
+            const owner = (await provider.getCurrentUser()).login;
             const result = await provider.generateReports({
-                owner: params.owner,
+                owner,
                 repo: params.repo,
                 report_type: params.report_type || 'summary',
                 report_format: params.report_format || 'json',
@@ -453,8 +347,9 @@ exports.analyticsTool = {
                     error: 'Provider não implementa analyzeTrends'
                 };
             }
+            const owner = (await provider.getCurrentUser()).login;
             const result = await provider.analyzeTrends({
-                owner: params.owner,
+                owner,
                 repo: params.repo,
                 trend_metric: params.trend_metric || 'commits',
                 trend_period: params.trend_period || 'weekly',
@@ -478,17 +373,7 @@ exports.analyticsTool = {
      */
     async getRepositoryInsights(params, provider) {
         try {
-            // Auto-detecção de owner/username se não fornecidos
-            let updatedParams = { ...params };
-            if (!updatedParams.owner) {
-                try {
-                    const currentUser = await provider.getCurrentUser();
-                    updatedParams.owner = currentUser.login;
-                }
-                catch (error) {
-                    console.warn('[ANALYTICS.TS] Falha na auto-detecção de usuário');
-                }
-            }
+            const owner = (await provider.getCurrentUser()).login;
             if (!provider.getRepositoryInsights) {
                 return {
                     success: true,
@@ -502,7 +387,7 @@ exports.analyticsTool = {
                 };
             }
             const result = await provider.getRepositoryInsights({
-                owner: params.owner,
+                owner,
                 repo: params.repo,
                 period: params.period || 'month',
                 start_date: params.start_date,

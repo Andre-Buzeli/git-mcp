@@ -38,7 +38,6 @@ const validator_js_1 = require("./validator.js");
 const CodeReviewInputSchema = zod_1.z.object({
     action: zod_1.z.enum(['analyze', 'review-file', 'review-commit', 'review-pr', 'generate-report', 'apply-suggestions']),
     // Parâmetros comuns
-    owner: zod_1.z.string(),
     repo: zod_1.z.string(),
     provider: validator_js_1.CommonSchemas.provider,
     // Para analyze
@@ -62,23 +61,22 @@ const CodeReviewInputSchema = zod_1.z.object({
         severity: zod_1.z.enum(['low', 'medium', 'high', 'critical'])
     })).optional(),
     // Configurações
-    rules: zod_1.z.array(zod_1.z.string()).optional(), // Regras específicas para análise
-    exclude_patterns: zod_1.z.array(zod_1.z.string()).optional() // Padrões para excluir da análise
+    rules: zod_1.z.array(zod_1.z.string()).optional(),
+    exclude_patterns: zod_1.z.array(zod_1.z.string()).optional()
 }).refine((data) => {
-    // Validações específicas por ação
     if (['analyze'].includes(data.action)) {
-        return data.code || (data.owner && data.repo && data.path);
+        return !!data.code || !!(data.repo && data.file_path);
     }
     if (['review-file', 'review-commit'].includes(data.action)) {
-        return data.owner && data.repo && (data.path || data.sha);
+        return !!(data.repo && (data.path || data.sha));
     }
     if (['review-pr'].includes(data.action)) {
-        return data.owner && data.repo && data.pull_number;
+        return !!(data.repo && data.pull_number);
     }
     if (['apply-suggestions'].includes(data.action)) {
-        return data.owner && data.repo && data.suggestions && data.suggestions.length > 0;
+        return !!(data.repo && data.suggestions && data.suggestions.length > 0);
     }
-    return data.owner && data.repo;
+    return !!data.repo;
 }, {
     message: "Parâmetros obrigatórios não fornecidos para a ação especificada"
 });
@@ -106,10 +104,6 @@ exports.codeReviewTool = {
                 enum: ['analyze', 'review-file', 'review-commit', 'review-pr', 'generate-report', 'apply-suggestions'],
                 description: 'Ação a executar: analyze (análise), review-file (revisar arquivo), review-commit (revisar commit), review-pr (revisar PR), generate-report (gerar relatório), apply-suggestions (aplicar sugestões)'
             },
-            owner: {
-                type: 'string',
-                description: 'Proprietário do repositório (OBRIGATÓRIO para ações que acessam repositório)'
-            },
             repo: {
                 type: 'string',
                 description: 'Nome do repositório (OBRIGATÓRIO para ações que acessam repositório)'
@@ -118,43 +112,15 @@ exports.codeReviewTool = {
                 type: 'string',
                 description: 'Provider específico (github, gitea) ou usa padrão'
             },
-            code: {
-                type: 'string',
-                description: 'Código para análise direta (OBRIGATÓRIO para analyze se não usar file_path)'
-            },
-            language: {
-                type: 'string',
-                description: 'Linguagem de programação (javascript, python, java, etc.)'
-            },
-            file_path: {
-                type: 'string',
-                description: 'Caminho do arquivo para análise (OBRIGATÓRIO para analyze se não usar code)'
-            },
-            path: {
-                type: 'string',
-                description: 'Caminho do arquivo (OBRIGATÓRIO para review-file)'
-            },
-            sha: {
-                type: 'string',
-                description: 'SHA do commit (OBRIGATÓRIO para review-commit)'
-            },
-            branch: {
-                type: 'string',
-                description: 'Branch específica para análise'
-            },
-            pull_number: {
-                type: 'number',
-                description: 'Número do Pull Request (OBRIGATÓRIO para review-pr)'
-            },
-            report_type: {
-                type: 'string',
-                enum: ['summary', 'detailed', 'security', 'performance'],
-                description: 'Tipo de relatório (padrão: summary)'
-            },
-            include_suggestions: {
-                type: 'boolean',
-                description: 'Incluir sugestões no relatório (padrão: true)'
-            },
+            code: { type: 'string', description: 'Código para análise direta' },
+            language: { type: 'string', description: 'Linguagem de programação' },
+            file_path: { type: 'string', description: 'Caminho do arquivo para análise' },
+            path: { type: 'string', description: 'Caminho do arquivo' },
+            sha: { type: 'string', description: 'SHA do commit' },
+            branch: { type: 'string', description: 'Branch específica para análise' },
+            pull_number: { type: 'number', description: 'Número do Pull Request' },
+            report_type: { type: 'string', enum: ['summary', 'detailed', 'security', 'performance'], description: 'Tipo de relatório' },
+            include_suggestions: { type: 'boolean', description: 'Incluir sugestões no relatório' },
             suggestions: {
                 type: 'array',
                 items: {
@@ -166,20 +132,12 @@ exports.codeReviewTool = {
                         severity: { type: 'string', enum: ['low', 'medium', 'high', 'critical'] }
                     }
                 },
-                description: 'Lista de sugestões para aplicar (OBRIGATÓRIO para apply-suggestions)'
+                description: 'Lista de sugestões para aplicar'
             },
-            rules: {
-                type: 'array',
-                items: { type: 'string' },
-                description: 'Regras específicas para análise (ex: ["no-console", "max-lines"])'
-            },
-            exclude_patterns: {
-                type: 'array',
-                items: { type: 'string' },
-                description: 'Padrões para excluir da análise (ex: ["*.min.js", "dist/**"])'
-            }
+            rules: { type: 'array', items: { type: 'string' }, description: 'Regras específicas para análise' },
+            exclude_patterns: { type: 'array', items: { type: 'string' }, description: 'Padrões para excluir da análise' }
         },
-        required: ['action', 'owner', 'repo', 'provider']
+        required: ['action', 'repo', 'provider']
     },
     async handler(input) {
         try {
@@ -249,12 +207,14 @@ exports.codeReviewTool = {
             let codeToAnalyze = params.code;
             let fileName = 'code.txt';
             // Se não foi fornecido código direto, buscar do repositório
-            if (!codeToAnalyze && params.owner && params.repo && params.file_path) {
+            if (!codeToAnalyze && params.repo && params.file_path) {
                 const provider = params.provider
                     ? index_js_1.globalProviderFactory.getProvider(params.provider)
                     : index_js_1.globalProviderFactory.getDefaultProvider();
                 if (provider) {
-                    const file = await provider.getFile(params.owner, params.repo, params.file_path);
+                    const currentUser = await provider.getCurrentUser();
+                    const owner = currentUser.login;
+                    const file = await provider.getFile(owner, params.repo, params.file_path);
                     codeToAnalyze = file.content || '';
                     fileName = params.file_path;
                 }
@@ -280,10 +240,12 @@ exports.codeReviewTool = {
      */
     async reviewFile(params, provider) {
         try {
-            if (!params.owner || !params.repo || !params.path) {
-                throw new Error('Owner, repo e path são obrigatórios');
+            if (!params.repo || !params.path) {
+                throw new Error('Repo e path são obrigatórios');
             }
-            const file = await provider.getFile(params.owner, params.repo, params.path, params.branch);
+            const currentUser = await provider.getCurrentUser();
+            const owner = currentUser.login;
+            const file = await provider.getFile(owner, params.repo, params.path, params.branch);
             if (!file.content) {
                 throw new Error('Arquivo não possui conteúdo para análise');
             }
@@ -308,10 +270,12 @@ exports.codeReviewTool = {
      */
     async reviewCommit(params, provider) {
         try {
-            if (!params.owner || !params.repo || !params.sha) {
-                throw new Error('Owner, repo e sha são obrigatórios');
+            if (!params.repo || !params.sha) {
+                throw new Error('Repo e sha são obrigatórios');
             }
-            const commit = await provider.getCommit(params.owner, params.repo, params.sha);
+            const currentUser = await provider.getCurrentUser();
+            const owner = currentUser.login;
+            const commit = await provider.getCommit(owner, params.repo, params.sha);
             // Análise básica da mensagem do commit
             const messageAnalysis = this.analyzeCommitMessage(commit.message);
             return {
@@ -335,11 +299,13 @@ exports.codeReviewTool = {
      */
     async reviewPullRequest(params, provider) {
         try {
-            if (!params.owner || !params.repo || !(params.pull_number || 0)) {
-                throw new Error('Owner, repo e pull_number são obrigatórios');
+            if (!params.repo || !(params.pull_number || 0)) {
+                throw new Error('Repo e pull_number são obrigatórios');
             }
             // Buscar informações do PR
-            const pr = await provider.getPullRequest(params.owner, params.repo, (params.pull_number || 0));
+            const currentUser = await provider.getCurrentUser();
+            const owner = currentUser.login;
+            const pr = await provider.getPullRequest(owner, params.repo, (params.pull_number || 0));
             const review = {
                 pr_number: (params.pull_number || 0),
                 title: pr.title,
@@ -376,7 +342,7 @@ exports.codeReviewTool = {
             const reportType = params.report_type || 'summary';
             const includeSuggestions = params.include_suggestions !== false;
             const report = {
-                repository: `${params.owner}/${params.repo}`,
+                repository: `${params.repo}`,
                 report_type: reportType,
                 generated_at: new Date().toISOString(),
                 summary: {
@@ -408,15 +374,17 @@ exports.codeReviewTool = {
      */
     async applySuggestions(params, provider) {
         try {
-            if (!params.owner || !params.repo || !params.suggestions) {
-                throw new Error('Owner, repo e suggestions são obrigatórios');
+            if (!params.repo || !params.suggestions) {
+                throw new Error('Repo e suggestions são obrigatórios');
             }
             const applied = [];
             const failed = [];
             for (const suggestion of params.suggestions) {
                 try {
                     // Para cada sugestão, buscar o arquivo atual
-                    const file = await provider.getFile(params.owner, params.repo, suggestion.file_path);
+                    const currentUser = await provider.getCurrentUser();
+                    const owner = currentUser.login;
+                    const file = await provider.getFile(owner, params.repo, suggestion.file_path);
                     if (file.content) {
                         // Aplicar sugestão (simplificado - apenas marcar como aplicada)
                         applied.push({

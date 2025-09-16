@@ -41,7 +41,6 @@ import { VcsOperations } from '../providers/index.js';
  */
 declare const WorkflowsInputSchema: z.ZodEffects<z.ZodObject<{
     action: z.ZodEnum<["list", "create", "trigger", "status", "logs", "disable", "enable"]>;
-    owner: z.ZodString;
     repo: z.ZodString;
     provider: z.ZodEnum<["gitea", "github", "both"]>;
     page: z.ZodOptional<z.ZodNumber>;
@@ -59,9 +58,8 @@ declare const WorkflowsInputSchema: z.ZodEffects<z.ZodObject<{
     ref: z.ZodOptional<z.ZodOptional<z.ZodString>>;
 }, "strip", z.ZodTypeAny, {
     provider: "gitea" | "github" | "both";
-    owner: string;
     repo: string;
-    action: "status" | "create" | "list" | "trigger" | "logs" | "disable" | "enable";
+    action: "status" | "list" | "create" | "trigger" | "logs" | "disable" | "enable";
     name?: string | undefined;
     description?: string | undefined;
     ref?: string | undefined;
@@ -77,9 +75,8 @@ declare const WorkflowsInputSchema: z.ZodEffects<z.ZodObject<{
     workflow_name?: string | undefined;
 }, {
     provider: "gitea" | "github" | "both";
-    owner: string;
     repo: string;
-    action: "status" | "create" | "list" | "trigger" | "logs" | "disable" | "enable";
+    action: "status" | "list" | "create" | "trigger" | "logs" | "disable" | "enable";
     name?: string | undefined;
     description?: string | undefined;
     ref?: string | undefined;
@@ -95,9 +92,8 @@ declare const WorkflowsInputSchema: z.ZodEffects<z.ZodObject<{
     workflow_name?: string | undefined;
 }>, {
     provider: "gitea" | "github" | "both";
-    owner: string;
     repo: string;
-    action: "status" | "create" | "list" | "trigger" | "logs" | "disable" | "enable";
+    action: "status" | "list" | "create" | "trigger" | "logs" | "disable" | "enable";
     name?: string | undefined;
     description?: string | undefined;
     ref?: string | undefined;
@@ -113,9 +109,8 @@ declare const WorkflowsInputSchema: z.ZodEffects<z.ZodObject<{
     workflow_name?: string | undefined;
 }, {
     provider: "gitea" | "github" | "both";
-    owner: string;
     repo: string;
-    action: "status" | "create" | "list" | "trigger" | "logs" | "disable" | "enable";
+    action: "status" | "list" | "create" | "trigger" | "logs" | "disable" | "enable";
     name?: string | undefined;
     description?: string | undefined;
     ref?: string | undefined;
@@ -190,10 +185,6 @@ export declare const workflowsTool: {
                 enum: string[];
                 description: string;
             };
-            owner: {
-                type: string;
-                description: string;
-            };
             repo: {
                 type: string;
                 description: string;
@@ -235,10 +226,6 @@ export declare const workflowsTool: {
                 description: string;
             };
             step_number: {
-                type: string;
-                description: string;
-            };
-            inputs: {
                 type: string;
                 description: string;
             };

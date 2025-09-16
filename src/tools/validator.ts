@@ -8,7 +8,6 @@ import { z } from 'zod';
 // Schemas comuns reutilizáveis
 export const CommonSchemas = {
   // Identificadores
-  owner: z.string().min(1, 'Owner is required').max(100, 'Owner too long'),
   username: z.string().min(1, 'Username is required').max(100, 'Username too long').optional(),
   repo: z.string().min(1, 'Repository name is required').max(100, 'Repository name too long'),
   provider: z.enum(['gitea', 'github', 'both']),
@@ -55,13 +54,11 @@ export const CommonSchemas = {
 export const RepositorySchemas = {
   source: z.object({
     provider: z.enum(['gitea', 'github']),
-    owner: CommonSchemas.owner,
     repo: CommonSchemas.repo
   }).optional(),
   
   target: z.object({
     provider: z.enum(['gitea', 'github']),
-    owner: CommonSchemas.owner,
     repo: CommonSchemas.repo
   }).optional()
 };
@@ -182,7 +179,6 @@ export class ToolValidator {
    */
   static createBaseToolSchema(additionalFields: Record<string, z.ZodTypeAny> = {}) {
     return z.object({
-      owner: CommonSchemas.owner,
       repo: CommonSchemas.repo,
       provider: CommonSchemas.provider,
       page: CommonSchemas.page,

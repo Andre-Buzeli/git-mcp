@@ -4,7 +4,6 @@ import { z } from 'zod';
  * Fornece schemas e métodos de validação padronizados
  */
 export declare const CommonSchemas: {
-    owner: z.ZodString;
     username: z.ZodOptional<z.ZodString>;
     repo: z.ZodString;
     provider: z.ZodEnum<["gitea", "github", "both"]>;
@@ -31,28 +30,22 @@ export declare const CommonSchemas: {
 export declare const RepositorySchemas: {
     source: z.ZodOptional<z.ZodObject<{
         provider: z.ZodEnum<["gitea", "github"]>;
-        owner: z.ZodString;
         repo: z.ZodString;
     }, "strip", z.ZodTypeAny, {
         provider: "gitea" | "github";
-        owner: string;
         repo: string;
     }, {
         provider: "gitea" | "github";
-        owner: string;
         repo: string;
     }>>;
     target: z.ZodOptional<z.ZodObject<{
         provider: z.ZodEnum<["gitea", "github"]>;
-        owner: z.ZodString;
         repo: z.ZodString;
     }, "strip", z.ZodTypeAny, {
         provider: "gitea" | "github";
-        owner: string;
         repo: string;
     }, {
         provider: "gitea" | "github";
-        owner: string;
         repo: string;
     }>>;
 };
@@ -93,20 +86,17 @@ export declare class ToolValidator {
      * Cria um schema base para tools com parâmetros comuns
      */
     static createBaseToolSchema(additionalFields?: Record<string, z.ZodTypeAny>): z.ZodObject<{
-        owner: z.ZodString;
         repo: z.ZodString;
         provider: z.ZodEnum<["gitea", "github", "both"]>;
         page: z.ZodOptional<z.ZodNumber>;
         limit: z.ZodOptional<z.ZodNumber>;
     }, "strip", z.ZodTypeAny, {
         provider: "gitea" | "github" | "both";
-        owner: string;
         repo: string;
         page?: number | undefined;
         limit?: number | undefined;
     }, {
         provider: "gitea" | "github" | "both";
-        owner: string;
         repo: string;
         page?: number | undefined;
         limit?: number | undefined;
@@ -114,77 +104,65 @@ export declare class ToolValidator {
 }
 export declare const ToolSchemas: {
     repositoryOperation: z.ZodObject<{
-        owner: z.ZodString;
         repo: z.ZodString;
         provider: z.ZodEnum<["gitea", "github", "both"]>;
         page: z.ZodOptional<z.ZodNumber>;
         limit: z.ZodOptional<z.ZodNumber>;
     }, "strip", z.ZodTypeAny, {
         provider: "gitea" | "github" | "both";
-        owner: string;
         repo: string;
         page?: number | undefined;
         limit?: number | undefined;
     }, {
         provider: "gitea" | "github" | "both";
-        owner: string;
         repo: string;
         page?: number | undefined;
         limit?: number | undefined;
     }>;
     fileOperation: z.ZodObject<{
-        owner: z.ZodString;
         repo: z.ZodString;
         provider: z.ZodEnum<["gitea", "github", "both"]>;
         page: z.ZodOptional<z.ZodNumber>;
         limit: z.ZodOptional<z.ZodNumber>;
     }, "strip", z.ZodTypeAny, {
         provider: "gitea" | "github" | "both";
-        owner: string;
         repo: string;
         page?: number | undefined;
         limit?: number | undefined;
     }, {
         provider: "gitea" | "github" | "both";
-        owner: string;
         repo: string;
         page?: number | undefined;
         limit?: number | undefined;
     }>;
     issueOperation: z.ZodObject<{
-        owner: z.ZodString;
         repo: z.ZodString;
         provider: z.ZodEnum<["gitea", "github", "both"]>;
         page: z.ZodOptional<z.ZodNumber>;
         limit: z.ZodOptional<z.ZodNumber>;
     }, "strip", z.ZodTypeAny, {
         provider: "gitea" | "github" | "both";
-        owner: string;
         repo: string;
         page?: number | undefined;
         limit?: number | undefined;
     }, {
         provider: "gitea" | "github" | "both";
-        owner: string;
         repo: string;
         page?: number | undefined;
         limit?: number | undefined;
     }>;
     branchOperation: z.ZodObject<{
-        owner: z.ZodString;
         repo: z.ZodString;
         provider: z.ZodEnum<["gitea", "github", "both"]>;
         page: z.ZodOptional<z.ZodNumber>;
         limit: z.ZodOptional<z.ZodNumber>;
     }, "strip", z.ZodTypeAny, {
         provider: "gitea" | "github" | "both";
-        owner: string;
         repo: string;
         page?: number | undefined;
         limit?: number | undefined;
     }, {
         provider: "gitea" | "github" | "both";
-        owner: string;
         repo: string;
         page?: number | undefined;
         limit?: number | undefined;

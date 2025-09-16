@@ -9,7 +9,6 @@ const zod_1 = require("zod");
 // Schemas comuns reutilizáveis
 exports.CommonSchemas = {
     // Identificadores
-    owner: zod_1.z.string().min(1, 'Owner is required').max(100, 'Owner too long'),
     username: zod_1.z.string().min(1, 'Username is required').max(100, 'Username too long').optional(),
     repo: zod_1.z.string().min(1, 'Repository name is required').max(100, 'Repository name too long'),
     provider: zod_1.z.enum(['gitea', 'github', 'both']),
@@ -46,12 +45,10 @@ exports.CommonSchemas = {
 exports.RepositorySchemas = {
     source: zod_1.z.object({
         provider: zod_1.z.enum(['gitea', 'github']),
-        owner: exports.CommonSchemas.owner,
         repo: exports.CommonSchemas.repo
     }).optional(),
     target: zod_1.z.object({
         provider: zod_1.z.enum(['gitea', 'github']),
-        owner: exports.CommonSchemas.owner,
         repo: exports.CommonSchemas.repo
     }).optional()
 };
@@ -158,7 +155,6 @@ class ToolValidator {
      */
     static createBaseToolSchema(additionalFields = {}) {
         return zod_1.z.object({
-            owner: exports.CommonSchemas.owner,
             repo: exports.CommonSchemas.repo,
             provider: exports.CommonSchemas.provider,
             page: exports.CommonSchemas.page,

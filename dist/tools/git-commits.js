@@ -157,10 +157,8 @@ exports.commitsTool = {
                 enum: ['list', 'get', 'create', 'compare', 'search', 'push', 'pull'],
                 description: 'Action to perform on commits'
             },
-            owner: { type: 'string', description: 'Repository owner' },
             repo: { type: 'string', description: 'Repository name' },
-            provider: { type: 'string', description: 'Provider to use (github, gitea, or omit for default)' },
-            projectPath: { type: 'string', description: 'Local project path for git operations' },
+            provider: { type: 'string', description: 'Specific provider (github, gitea) or use default' },
             sha: { type: 'string', description: 'Branch, tag or commit SHA' },
             page: { type: 'number', description: 'Page number', minimum: 1 },
             limit: { type: 'number', description: 'Items per page', minimum: 1, maximum: 100 },
@@ -176,7 +174,7 @@ exports.commitsTool = {
             query: { type: 'string', description: 'Search query' },
             author: { type: 'string', description: 'Author filter for search' }
         },
-        required: ['action', 'owner', 'repo', 'provider', 'projectPath']
+        required: ['action', 'repo', 'provider']
     },
     /**
      * Handler principal da tool commits

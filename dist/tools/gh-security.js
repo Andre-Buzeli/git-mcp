@@ -37,7 +37,6 @@ const validator_js_1 = require("./validator.js");
 const SecurityInputSchema = zod_1.z.object({
     action: zod_1.z.enum(['scan', 'vulnerabilities', 'alerts', 'policies', 'compliance', 'dependencies', 'advisories']),
     // Parâmetros comuns
-    owner: validator_js_1.CommonSchemas.owner,
     repo: validator_js_1.CommonSchemas.repo,
     provider: validator_js_1.CommonSchemas.provider,
     // Parâmetros para listagem
@@ -68,14 +67,6 @@ const SecurityInputSchema = zod_1.z.object({
     created_before: zod_1.z.string().optional(),
     updated_after: zod_1.z.string().optional(),
     updated_before: zod_1.z.string().optional()
-}).refine((data) => {
-    // Validações específicas por ação
-    if (['alerts'].includes(data.action) && data.alert_id) {
-        return data.owner && data.repo;
-    }
-    return data.owner && data.repo;
-}, {
-    message: "Parâmetros obrigatórios não fornecidos para a ação especificada"
 });
 /**
  * Schema de validação para resultado da tool security
@@ -101,7 +92,6 @@ exports.securityTool = {
                 enum: ['scan', 'vulnerabilities', 'alerts', 'policies', 'compliance', 'dependencies', 'advisories'],
                 description: 'Action to perform on security'
             },
-            owner: { type: 'string', description: 'Repository owner' },
             repo: { type: 'string', description: 'Repository name' },
             provider: { type: 'string', description: 'Specific provider (github, gitea) or use default' },
             scan_type: { type: 'string', enum: ['code', 'dependencies', 'secrets', 'infrastructure'], description: 'Type of security scan' },
@@ -126,7 +116,7 @@ exports.securityTool = {
             page: { type: 'number', description: 'Page number', minimum: 1 },
             limit: { type: 'number', description: 'Items per page', minimum: 1, maximum: 100 }
         },
-        required: ['action', 'owner', 'repo', 'provider']
+        required: ['action', 'repo', 'provider']
     },
     async handler(input) {
         try {
@@ -185,7 +175,7 @@ exports.securityTool = {
                 };
             }
             const result = await provider.runSecurityScan({
-                owner: params.owner,
+                owner: (await provider.getCurrentUser()).login,
                 repo: params.repo,
                 scan_type: params.scan_type || 'code',
                 ref: params.ref || 'main'
@@ -208,15 +198,8 @@ exports.securityTool = {
         try {
             // Auto-detecção de owner/username se não fornecidos
             let updatedParams = { ...params };
-            if (!updatedParams.owner) {
-                try {
-                    const currentUser = await provider.getCurrentUser();
-                    updatedParams.owner = currentUser.login;
-                }
-                catch (error) {
-                    console.warn('[SECURITY.TS] Falha na auto-detecção de usuário');
-                }
-            }
+            const currentUser = await provider.getCurrentUser();
+            const owner = currentUser.login;
             if (!provider.listSecurityVulnerabilities) {
                 return {
                     success: true,
@@ -230,7 +213,7 @@ exports.securityTool = {
                 };
             }
             const result = await provider.listSecurityVulnerabilities({
-                owner: params.owner,
+                owner: (await provider.getCurrentUser()).login,
                 repo: params.repo,
                 severity: params.severity,
                 state: params.state,
@@ -264,7 +247,7 @@ exports.securityTool = {
                 };
             }
             const result = await provider.manageSecurityAlerts({
-                owner: params.owner,
+                owner: (await provider.getCurrentUser()).login,
                 repo: params.repo,
                 action: 'dismiss', // ou 'reopen' baseado nos parâmetros
                 alert_number: params.alert_number,
@@ -296,7 +279,7 @@ exports.securityTool = {
                 };
             }
             const result = await provider.manageSecurityPolicies({
-                owner: params.owner,
+                owner: (await provider.getCurrentUser()).login,
                 repo: params.repo,
                 policy_name: params.policy_name,
                 policy_type: params.policy_type,
@@ -329,7 +312,7 @@ exports.securityTool = {
                 };
             }
             const result = await provider.checkCompliance({
-                owner: params.owner,
+                owner: (await provider.getCurrentUser()).login,
                 repo: params.repo,
                 framework: params.compliance_framework,
                 report_format: params.report_format || 'json'
@@ -359,7 +342,7 @@ exports.securityTool = {
                 };
             }
             const result = await provider.analyzeDependencies({
-                owner: params.owner,
+                owner: (await provider.getCurrentUser()).login,
                 repo: params.repo,
                 ecosystem: params.ecosystem,
                 package: params.package_name,
@@ -383,15 +366,8 @@ exports.securityTool = {
         try {
             // Auto-detecção de owner/username se não fornecidos
             let updatedParams = { ...params };
-            if (!updatedParams.owner) {
-                try {
-                    const currentUser = await provider.getCurrentUser();
-                    updatedParams.owner = currentUser.login;
-                }
-                catch (error) {
-                    console.warn('[SECURITY.TS] Falha na auto-detecção de usuário');
-                }
-            }
+            const currentUser = await provider.getCurrentUser();
+            const owner = currentUser.login;
             if (!provider.listSecurityAdvisories) {
                 return {
                     success: false,
@@ -401,7 +377,7 @@ exports.securityTool = {
                 };
             }
             const result = await provider.listSecurityAdvisories({
-                owner: params.owner,
+                owner: (await provider.getCurrentUser()).login,
                 repo: params.repo,
                 severity: params.severity,
                 ecosystem: params.ecosystem,

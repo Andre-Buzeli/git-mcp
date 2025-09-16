@@ -43,7 +43,7 @@ import { applyAutoUserDetection } from '../utils/user-detection.js';
  * - Documente parâmetros obrigatórios
  */
 const FilesInputSchema = z.object({
-  action: z.enum(['get', 'create', 'update', 'delete', 'list', 'search']),
+  action: z.enum(['get', 'create', 'update', 'delete', 'list', 'search', 'upload-project']),
 
   // Parâmetros comuns
   owner: z.string(),
@@ -160,20 +160,19 @@ export type FilesResult = z.infer<typeof FilesResultSchema>;
  */
 export const filesTool = {
   name: 'git-files',
-  description: 'Gerenciamento completo de arquivos com suporte multi-provider (GitHub e Gitea). PARÂMETROS OBRIGATÓRIOS: action, owner, repo, provider, projectPath. AÇÕES: get (obtém arquivo), create (cria arquivo), update (atualiza), delete (remove), list (lista diretório), search (busca conteúdo). Boas práticas: use commits pequenos, mantenha README enxuto, valide conteúdo antes de enviar.',
+  description: 'Gerenciamento completo de arquivos com suporte multi-provider (GitHub e Gitea). PARÂMETROS OBRIGATÓRIOS: action, owner, repo, provider, projectPath. AÇÕES: get (obtém arquivo), create (cria arquivo), update (atualiza), delete (remove), list (lista diretório), search (busca conteúdo), upload-project (envia projeto completo). Boas práticas: use commits pequenos, mantenha README enxuto, valide conteúdo antes de enviar.',
   inputSchema: {
     type: 'object',
     properties: {
-      action: {
-        type: 'string',
-        enum: ['get', 'create', 'update', 'delete', 'list', 'search'],
-        description: 'Action to perform on files'
-      },
-      owner: { type: 'string', description: 'Repository owner' },
+  action: {
+    type: 'string',
+    enum: ['get', 'create', 'update', 'delete', 'list', 'search', 'upload-project'],
+    description: 'Action to perform on files'
+  },
       repo: { type: 'string', description: 'Repository name' },
+      provider: { type: 'string', enum: ['gitea', 'github'], description: 'Provider to use (github, gitea) or use default' },
       path: { type: 'string', description: 'File or directory path' },
       projectPath: { type: 'string', description: 'Local project path for git operations' },
-      provider: { type: 'string', description: 'Specific provider (github, gitea) or use default' },
       content: { type: 'string', description: 'File content' },
       message: { type: 'string', description: 'Commit message' },
       branch: { type: 'string', description: 'Target branch' },
@@ -183,7 +182,7 @@ export const filesTool = {
       page: { type: 'number', description: 'Page number', minimum: 1 },
       limit: { type: 'number', description: 'Items per page', minimum: 1, maximum: 100 }
     },
-    required: ['action', 'owner', 'repo', 'provider', 'projectPath']
+    required: ['action', 'repo', 'provider']
   },
 
   /**
@@ -240,6 +239,8 @@ export const filesTool = {
           return await this.listFiles(processedInput, provider);
         case 'search':
           return await this.searchFiles(processedInput, provider);
+        case 'upload-project':
+          return await this.uploadProject(processedInput, provider);
         default:
           throw new Error(`Ação não suportada: ${processedInput.action}`);
       }
@@ -598,6 +599,64 @@ export const filesTool = {
       };
     } catch (error) {
       throw new Error(`Falha ao buscar arquivos: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  },
+
+  /**
+   * Faz upload de todo o projeto para o repositório
+   * 
+   * FUNCIONALIDADE:
+   * - Envia todos os arquivos do projeto local
+   * - Ignora diretórios desnecessários (node_modules, .git, dist)
+   * - Ignora arquivos temporários e logs
+   * - Faz commit com mensagem personalizada
+   * 
+   * PARÂMETROS OBRIGATÓRIOS:
+   * - owner: Proprietário do repositório
+   * - repo: Nome do repositório
+   * - projectPath: Caminho do projeto local
+   * - message: Mensagem de commit
+   * 
+   * PARÂMETROS OPCIONAIS:
+   * - branch: Branch de destino (padrão: branch padrão)
+   * 
+   * VALIDAÇÕES:
+   * - Todos os parâmetros obrigatórios
+   * - Projeto deve existir no caminho especificado
+   * - Usuário deve ter permissão de escrita
+   * 
+   * RECOMENDAÇÕES:
+   * - Use mensagens de commit descritivas
+   * - Verifique se o repositório está limpo
+   * - Use branches para mudanças grandes
+   * - Monitore erros de upload
+   */
+  async uploadProject(params: FilesInput, provider: VcsOperations): Promise<FilesResult> {
+    try {
+      if (!params.owner || !params.repo || !params.projectPath || !params.message) {
+        throw new Error('Owner, repo, projectPath e message são obrigatórios');
+      }
+
+      const result = await provider.uploadProject(
+        params.owner,
+        params.repo,
+        params.projectPath,
+        params.message,
+        params.branch
+      );
+
+      return {
+        success: true,
+        action: 'upload-project',
+        message: `Projeto enviado com sucesso: ${result.uploaded} arquivos enviados`,
+        data: {
+          uploaded: result.uploaded,
+          errors: result.errors,
+          totalErrors: result.errors.length
+        }
+      };
+    } catch (error) {
+      throw new Error(`Falha ao fazer upload do projeto: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
 };

@@ -55,10 +55,10 @@ declare const GhSyncInputSchema: z.ZodObject<{
     repo: string;
     action: "sync-repos" | "sync-issues" | "sync-pulls" | "sync-releases" | "sync-webhooks" | "sync-config";
     projectPath: string;
+    force?: boolean | undefined;
     issue_number?: number | undefined;
     pull_number?: number | undefined;
     webhook_id?: string | undefined;
-    force?: boolean | undefined;
     source_repo?: string | undefined;
     target_repo?: string | undefined;
     sync_branches?: boolean | undefined;
@@ -78,10 +78,10 @@ declare const GhSyncInputSchema: z.ZodObject<{
     repo: string;
     action: "sync-repos" | "sync-issues" | "sync-pulls" | "sync-releases" | "sync-webhooks" | "sync-config";
     projectPath: string;
+    force?: boolean | undefined;
     issue_number?: number | undefined;
     pull_number?: number | undefined;
     webhook_id?: string | undefined;
-    force?: boolean | undefined;
     source_repo?: string | undefined;
     target_repo?: string | undefined;
     sync_branches?: boolean | undefined;

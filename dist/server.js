@@ -51,6 +51,7 @@ const git_commits_js_1 = require("./tools/git-commits.js");
 const git_branches_js_1 = require("./tools/git-branches.js");
 const git_tags_js_1 = require("./tools/git-tags.js");
 const git_files_js_1 = require("./tools/git-files.js");
+const git_upload_project_js_1 = require("./tools/git-upload-project.js");
 const git_issues_js_1 = require("./tools/git-issues.js");
 const git_pulls_js_1 = require("./tools/git-pulls.js");
 const git_releases_js_1 = require("./tools/git-releases.js");
@@ -103,6 +104,7 @@ const tools = [
     git_branches_js_1.branchesTool,
     git_tags_js_1.tagsTool,
     git_files_js_1.filesTool,
+    git_upload_project_js_1.uploadProjectTool,
     git_issues_js_1.issuesTool,
     git_pulls_js_1.pullsTool,
     git_releases_js_1.releasesTool,
@@ -155,7 +157,7 @@ class GiteaMCPServer {
     constructor() {
         this.server = new index_js_1.Server({
             name: 'git-mcp',
-            version: '2.14.2',
+            version: '2.16.0',
         });
         this.setupHandlers();
     }

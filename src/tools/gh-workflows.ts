@@ -47,7 +47,6 @@ const WorkflowsInputSchema = z.object({
   action: z.enum(['list', 'create', 'trigger', 'status', 'logs', 'disable', 'enable']),
   
   // Parâmetros comuns
-  owner: CommonSchemas.owner,
   repo: CommonSchemas.repo,
   provider: CommonSchemas.provider,
   
@@ -76,12 +75,12 @@ const WorkflowsInputSchema = z.object({
 }).refine((data) => {
   // Validações específicas por ação
   if (['create'].includes(data.action)) {
-    return data.owner && data.repo && data.name && data.workflow_content;
+    return data.repo && data.name && data.workflow_content;
   }
   if (['trigger', 'status', 'logs', 'disable', 'enable'].includes(data.action)) {
-    return data.owner && data.repo && (data.workflow_id || data.workflow_name);
+    return data.repo && (data.workflow_id || data.workflow_name);
   }
-  return data.owner && data.repo;
+  return data.repo;
 }, {
   message: "Parâmetros obrigatórios não fornecidos para a ação especificada"
 });
@@ -137,7 +136,6 @@ export const workflowsTool = {
         enum: ['list', 'create', 'trigger', 'status', 'logs', 'disable', 'enable'],
         description: 'Action to perform on workflows'
       },
-      owner: { type: 'string', description: 'Repository owner' },
       repo: { type: 'string', description: 'Repository name' },
       provider: { type: 'string', description: 'Specific provider (github, gitea) or use default' },
       name: { type: 'string', description: 'Workflow name for creation' },
@@ -149,12 +147,11 @@ export const workflowsTool = {
       run_id: { type: 'string', description: 'Workflow run ID' },
       job_id: { type: 'string', description: 'Job ID for logs' },
       step_number: { type: 'number', description: 'Step number for logs' },
-      inputs: { type: 'object', description: 'Workflow inputs' },
       ref: { type: 'string', description: 'Git reference for trigger' },
       page: { type: 'number', description: 'Page number', minimum: 1 },
       limit: { type: 'number', description: 'Items per page', minimum: 1, maximum: 100 }
     },
-    required: ['action', 'owner', 'repo', 'provider']
+    required: ['action', 'repo', 'provider']
   },
 
   /**
@@ -231,14 +228,8 @@ export const workflowsTool = {
     try {
       // Auto-detecção de owner/username se não fornecidos
       let updatedParams = { ...params };
-      if (!updatedParams.owner) {
-        try {
-          const currentUser = await provider.getCurrentUser();
-          updatedParams.owner = currentUser.login;
-        } catch (error) {
-          console.warn('[WORKFLOWS.TS] Falha na auto-detecção de usuário');
-        }
-      }
+      const currentUser = await provider.getCurrentUser();
+      const owner = currentUser.login;
 
       
       if (!provider.listWorkflows) {
@@ -255,7 +246,7 @@ export const workflowsTool = {
       }
       
       const result = await provider.listWorkflows({
-        owner: params.owner!,
+        owner: (await provider.getCurrentUser()).login,
         repo: params.repo!,
         page: params.page,
         limit: params.limit
@@ -287,7 +278,7 @@ export const workflowsTool = {
       }
       
       const result = await provider.createWorkflow({
-        owner: params.owner!,
+        owner: (await provider.getCurrentUser()).login,
         repo: params.repo!,
         name: params.name!,
         description: params.description,
@@ -321,7 +312,7 @@ export const workflowsTool = {
       }
       
       const result = await provider.triggerWorkflow({
-        owner: params.owner!,
+        owner: (await provider.getCurrentUser()).login,
         repo: params.repo!,
         workflow_id: params.workflow_id,
         workflow_name: params.workflow_name,
@@ -347,14 +338,8 @@ export const workflowsTool = {
     try {
       // Auto-detecção de owner/username se não fornecidos
       let updatedParams = { ...params };
-      if (!updatedParams.owner) {
-        try {
-          const currentUser = await provider.getCurrentUser();
-          updatedParams.owner = currentUser.login;
-        } catch (error) {
-          console.warn('[WORKFLOWS.TS] Falha na auto-detecção de usuário');
-        }
-      }
+      const currentUser = await provider.getCurrentUser();
+      const owner = currentUser.login;
 
       
       if (!provider.getWorkflowStatus) {
@@ -367,7 +352,7 @@ export const workflowsTool = {
       }
       
       const result = await provider.getWorkflowStatus({
-        owner: params.owner!,
+        owner: (await provider.getCurrentUser()).login,
         repo: params.repo!,
         run_id: params.run_id,
         workflow_id: params.workflow_id
@@ -391,14 +376,8 @@ export const workflowsTool = {
     try {
       // Auto-detecção de owner/username se não fornecidos
       let updatedParams = { ...params };
-      if (!updatedParams.owner) {
-        try {
-          const currentUser = await provider.getCurrentUser();
-          updatedParams.owner = currentUser.login;
-        } catch (error) {
-          console.warn('[WORKFLOWS.TS] Falha na auto-detecção de usuário');
-        }
-      }
+      const currentUser = await provider.getCurrentUser();
+      const owner = currentUser.login;
 
       
       if (!provider.getWorkflowLogs) {
@@ -411,7 +390,7 @@ export const workflowsTool = {
       }
       
       const result = await provider.getWorkflowLogs({
-        owner: params.owner!,
+        owner: (await provider.getCurrentUser()).login,
         repo: params.repo!,
         run_id: params.run_id!,
         job_id: params.job_id,
@@ -444,7 +423,7 @@ export const workflowsTool = {
       }
       
       const result = await provider.disableWorkflow({
-        owner: params.owner!,
+        owner: (await provider.getCurrentUser()).login,
         repo: params.repo!,
         workflow_id: params.workflow_id!,
         workflow_name: params.workflow_name
@@ -476,7 +455,7 @@ export const workflowsTool = {
       }
       
       const result = await provider.enableWorkflow({
-        owner: params.owner!,
+        owner: (await provider.getCurrentUser()).login,
         repo: params.repo!,
         workflow_id: params.workflow_id!,
         workflow_name: params.workflow_name

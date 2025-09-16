@@ -37,7 +37,6 @@ const SecurityInputSchema = z.object({
   action: z.enum(['scan', 'vulnerabilities', 'alerts', 'policies', 'compliance', 'dependencies', 'advisories']),
   
   // Parâmetros comuns
-  owner: CommonSchemas.owner,
   repo: CommonSchemas.repo,
   provider: CommonSchemas.provider,
   
@@ -75,14 +74,6 @@ const SecurityInputSchema = z.object({
   created_before: z.string().optional(),
   updated_after: z.string().optional(),
   updated_before: z.string().optional()
-}).refine((data) => {
-  // Validações específicas por ação
-  if (['alerts'].includes(data.action) && data.alert_id) {
-    return data.owner && data.repo;
-  }
-  return data.owner && data.repo;
-}, {
-  message: "Parâmetros obrigatórios não fornecidos para a ação especificada"
 });
 
 export type SecurityInput = z.infer<typeof SecurityInputSchema>;
@@ -114,7 +105,6 @@ export const securityTool = {
         enum: ['scan', 'vulnerabilities', 'alerts', 'policies', 'compliance', 'dependencies', 'advisories'],
         description: 'Action to perform on security'
       },
-      owner: { type: 'string', description: 'Repository owner' },
       repo: { type: 'string', description: 'Repository name' },
       provider: { type: 'string', description: 'Specific provider (github, gitea) or use default' },
       scan_type: { type: 'string', enum: ['code', 'dependencies', 'secrets', 'infrastructure'], description: 'Type of security scan' },
@@ -139,7 +129,7 @@ export const securityTool = {
       page: { type: 'number', description: 'Page number', minimum: 1 },
       limit: { type: 'number', description: 'Items per page', minimum: 1, maximum: 100 }
     },
-    required: ['action', 'owner', 'repo', 'provider']
+    required: ['action', 'repo', 'provider']
   },
 
   async handler(input: SecurityInput): Promise<SecurityResult> {
@@ -205,7 +195,7 @@ export const securityTool = {
       }
       
       const result = await provider.runSecurityScan({
-        owner: params.owner!,
+        owner: (await provider.getCurrentUser()).login,
         repo: params.repo!,
         scan_type: params.scan_type || 'code',
         ref: params.ref || 'main'
@@ -229,14 +219,8 @@ export const securityTool = {
     try {
       // Auto-detecção de owner/username se não fornecidos
       let updatedParams = { ...params };
-      if (!updatedParams.owner) {
-        try {
-          const currentUser = await provider.getCurrentUser();
-          updatedParams.owner = currentUser.login;
-        } catch (error) {
-          console.warn('[SECURITY.TS] Falha na auto-detecção de usuário');
-        }
-      }
+      const currentUser = await provider.getCurrentUser();
+      const owner = currentUser.login;
 
       
       if (!provider.listSecurityVulnerabilities) {
@@ -253,7 +237,7 @@ export const securityTool = {
       }
       
       const result = await provider.listSecurityVulnerabilities({
-        owner: params.owner!,
+        owner: (await provider.getCurrentUser()).login,
         repo: params.repo!,
         severity: params.severity,
         state: params.state,
@@ -289,7 +273,7 @@ export const securityTool = {
       }
       
       const result = await provider.manageSecurityAlerts({
-        owner: params.owner!,
+        owner: (await provider.getCurrentUser()).login,
         repo: params.repo!,
         action: 'dismiss', // ou 'reopen' baseado nos parâmetros
         alert_number: params.alert_number,
@@ -323,7 +307,7 @@ export const securityTool = {
       }
       
       const result = await provider.manageSecurityPolicies({
-        owner: params.owner!,
+        owner: (await provider.getCurrentUser()).login,
         repo: params.repo!,
         policy_name: params.policy_name,
         policy_type: params.policy_type,
@@ -358,7 +342,7 @@ export const securityTool = {
       }
       
       const result = await provider.checkCompliance({
-        owner: params.owner!,
+        owner: (await provider.getCurrentUser()).login,
         repo: params.repo!,
         framework: params.compliance_framework,
         report_format: params.report_format || 'json'
@@ -390,7 +374,7 @@ export const securityTool = {
       }
       
       const result = await provider.analyzeDependencies({
-        owner: params.owner!,
+        owner: (await provider.getCurrentUser()).login,
         repo: params.repo!,
         ecosystem: params.ecosystem,
         package: params.package_name,
@@ -415,14 +399,8 @@ export const securityTool = {
     try {
       // Auto-detecção de owner/username se não fornecidos
       let updatedParams = { ...params };
-      if (!updatedParams.owner) {
-        try {
-          const currentUser = await provider.getCurrentUser();
-          updatedParams.owner = currentUser.login;
-        } catch (error) {
-          console.warn('[SECURITY.TS] Falha na auto-detecção de usuário');
-        }
-      }
+      const currentUser = await provider.getCurrentUser();
+      const owner = currentUser.login;
 
       
       if (!provider.listSecurityAdvisories) {
@@ -435,7 +413,7 @@ export const securityTool = {
       }
       
       const result = await provider.listSecurityAdvisories({
-        owner: params.owner!,
+        owner: (await provider.getCurrentUser()).login,
         repo: params.repo!,
         severity: params.severity,
         ecosystem: params.ecosystem,

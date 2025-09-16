@@ -63,7 +63,7 @@ declare const CommitsInputSchema: z.ZodObject<{
     provider: "gitea" | "github";
     owner: string;
     repo: string;
-    action: "push" | "get" | "create" | "list" | "search" | "compare" | "pull";
+    action: "push" | "get" | "search" | "pull" | "list" | "create" | "compare";
     projectPath: string;
     message?: string | undefined;
     head?: string | undefined;
@@ -71,9 +71,9 @@ declare const CommitsInputSchema: z.ZodObject<{
     page?: number | undefined;
     limit?: number | undefined;
     sha?: string | undefined;
+    branch?: string | undefined;
     query?: string | undefined;
     commit_sha?: string | undefined;
-    branch?: string | undefined;
     author_name?: string | undefined;
     author_email?: string | undefined;
     committer_name?: string | undefined;
@@ -83,7 +83,7 @@ declare const CommitsInputSchema: z.ZodObject<{
     provider: "gitea" | "github";
     owner: string;
     repo: string;
-    action: "push" | "get" | "create" | "list" | "search" | "compare" | "pull";
+    action: "push" | "get" | "search" | "pull" | "list" | "create" | "compare";
     projectPath: string;
     message?: string | undefined;
     head?: string | undefined;
@@ -91,9 +91,9 @@ declare const CommitsInputSchema: z.ZodObject<{
     page?: number | undefined;
     limit?: number | undefined;
     sha?: string | undefined;
+    branch?: string | undefined;
     query?: string | undefined;
     commit_sha?: string | undefined;
-    branch?: string | undefined;
     author_name?: string | undefined;
     author_email?: string | undefined;
     committer_name?: string | undefined;
@@ -199,19 +199,11 @@ export declare const commitsTool: {
                 enum: string[];
                 description: string;
             };
-            owner: {
-                type: string;
-                description: string;
-            };
             repo: {
                 type: string;
                 description: string;
             };
             provider: {
-                type: string;
-                description: string;
-            };
-            projectPath: {
                 type: string;
                 description: string;
             };

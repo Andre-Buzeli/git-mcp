@@ -56,7 +56,7 @@ declare const GhGistsInputSchema: z.ZodObject<{
     provider: "github";
     owner: string;
     repo: string;
-    action: "delete" | "get" | "create" | "list" | "update" | "fork" | "comment" | "star";
+    action: "delete" | "get" | "list" | "create" | "update" | "fork" | "comment" | "star";
     projectPath: string;
     description?: string | undefined;
     page?: number | undefined;
@@ -74,7 +74,7 @@ declare const GhGistsInputSchema: z.ZodObject<{
     provider: "github";
     owner: string;
     repo: string;
-    action: "delete" | "get" | "create" | "list" | "update" | "fork" | "comment" | "star";
+    action: "delete" | "get" | "list" | "create" | "update" | "fork" | "comment" | "star";
     projectPath: string;
     description?: string | undefined;
     page?: number | undefined;

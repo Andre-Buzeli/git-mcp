@@ -205,6 +205,10 @@ export interface VcsOperations {
     updateFile(owner: string, repo: string, path: string, content: string, message: string, sha: string, branch?: string): Promise<FileInfo>;
     deleteFile(owner: string, repo: string, path: string, message: string, sha: string, branch?: string): Promise<boolean>;
     listFiles(owner: string, repo: string, path: string, ref?: string): Promise<FileInfo[]>;
+    uploadProject(owner: string, repo: string, projectPath: string, message: string, branch?: string): Promise<{
+        uploaded: number;
+        errors: string[];
+    }>;
     listCommits(owner: string, repo: string, branch?: string, page?: number, limit?: number): Promise<CommitInfo[]>;
     getCommit(owner: string, repo: string, sha: string): Promise<CommitInfo>;
     createCommit(owner: string, repo: string, message: string, branch: string, changes?: any): Promise<CommitInfo>;

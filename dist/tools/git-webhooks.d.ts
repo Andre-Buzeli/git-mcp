@@ -74,7 +74,7 @@ declare const WebhooksInputSchema: z.ZodObject<{
     provider: "gitea" | "github";
     owner: string;
     repo: string;
-    action: "delete" | "get" | "create" | "list" | "update" | "test";
+    action: "delete" | "get" | "list" | "create" | "update" | "test";
     active?: boolean | undefined;
     events?: string[] | undefined;
     url?: string | undefined;
@@ -92,7 +92,7 @@ declare const WebhooksInputSchema: z.ZodObject<{
     provider: "gitea" | "github";
     owner: string;
     repo: string;
-    action: "delete" | "get" | "create" | "list" | "update" | "test";
+    action: "delete" | "get" | "list" | "create" | "update" | "test";
     active?: boolean | undefined;
     events?: string[] | undefined;
     url?: string | undefined;

@@ -22,7 +22,7 @@ export declare function runTerminalCmd(params: TerminalCommand & {
     projectPath?: string;
 }): Promise<TerminalResult>;
 /**
- * Executa comando Git no diretório especificado
+ * Executa comando Git usando GitOperations - 100% auto-suficiente
  *
  * @param gitCommand Comando Git a executar
  * @param projectPath Caminho do projeto
@@ -31,21 +31,21 @@ export declare function runTerminalCmd(params: TerminalCommand & {
  */
 export declare function runGitCommand(gitCommand: string, projectPath: string, explanation: string): Promise<TerminalResult>;
 /**
- * Verifica se um diretório é um repositório Git
+ * Verifica se um diretório é um repositório Git - 100% auto-suficiente
  *
  * @param projectPath Caminho do projeto
  * @returns Promise<boolean>
  */
 export declare function isGitRepository(projectPath: string): Promise<boolean>;
 /**
- * Obtém status do repositório Git
+ * Obtém status do repositório Git - 100% auto-suficiente
  *
  * @param projectPath Caminho do projeto
  * @returns Promise<TerminalResult>
  */
 export declare function getGitStatus(projectPath: string): Promise<TerminalResult>;
 /**
- * Adiciona arquivos ao stage
+ * Adiciona arquivos ao stage - 100% auto-suficiente
  *
  * @param projectPath Caminho do projeto
  * @param files Arquivos específicos ou '.' para todos
@@ -53,7 +53,7 @@ export declare function getGitStatus(projectPath: string): Promise<TerminalResul
  */
 export declare function gitAdd(projectPath: string, files?: string): Promise<TerminalResult>;
 /**
- * Faz commit dos arquivos staged
+ * Faz commit dos arquivos staged - 100% auto-suficiente
  *
  * @param projectPath Caminho do projeto
  * @param message Mensagem do commit
@@ -61,7 +61,7 @@ export declare function gitAdd(projectPath: string, files?: string): Promise<Ter
  */
 export declare function gitCommit(projectPath: string, message: string): Promise<TerminalResult>;
 /**
- * Faz push para o repositório remoto
+ * Faz push para o repositório remoto - 100% auto-suficiente
  *
  * @param projectPath Caminho do projeto
  * @param branch Branch para fazer push
@@ -70,7 +70,7 @@ export declare function gitCommit(projectPath: string, message: string): Promise
  */
 export declare function gitPush(projectPath: string, branch?: string, remote?: string): Promise<TerminalResult>;
 /**
- * Faz pull do repositório remoto
+ * Faz pull do repositório remoto - 100% auto-suficiente
  *
  * @param projectPath Caminho do projeto
  * @param branch Branch para fazer pull

@@ -29,9 +29,8 @@ import { VcsOperations } from '../providers/index.js';
 /**
  * Schema de validação para entrada da tool security
  */
-declare const SecurityInputSchema: z.ZodEffects<z.ZodObject<{
+declare const SecurityInputSchema: z.ZodObject<{
     action: z.ZodEnum<["scan", "vulnerabilities", "alerts", "policies", "compliance", "dependencies", "advisories"]>;
-    owner: z.ZodString;
     repo: z.ZodString;
     provider: z.ZodEnum<["gitea", "github", "both"]>;
     page: z.ZodOptional<z.ZodNumber>;
@@ -57,7 +56,6 @@ declare const SecurityInputSchema: z.ZodEffects<z.ZodObject<{
     updated_before: z.ZodOptional<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
     provider: "gitea" | "github" | "both";
-    owner: string;
     repo: string;
     action: "scan" | "vulnerabilities" | "alerts" | "policies" | "compliance" | "dependencies" | "advisories";
     state?: "open" | "fixed" | "dismissed" | undefined;
@@ -83,59 +81,6 @@ declare const SecurityInputSchema: z.ZodEffects<z.ZodObject<{
     updated_before?: string | undefined;
 }, {
     provider: "gitea" | "github" | "both";
-    owner: string;
-    repo: string;
-    action: "scan" | "vulnerabilities" | "alerts" | "policies" | "compliance" | "dependencies" | "advisories";
-    state?: "open" | "fixed" | "dismissed" | undefined;
-    ref?: string | undefined;
-    page?: number | undefined;
-    limit?: number | undefined;
-    alert_number?: number | undefined;
-    dismiss_reason?: "tolerable_risk" | "fix_started" | "inaccurate" | "no_bandwidth" | "not_used" | undefined;
-    dismiss_comment?: string | undefined;
-    severity?: "high" | "medium" | "low" | "critical" | undefined;
-    ecosystem?: string | undefined;
-    package_name?: string | undefined;
-    created_after?: string | undefined;
-    created_before?: string | undefined;
-    scan_type?: "code" | "secrets" | "dependencies" | "infrastructure" | undefined;
-    alert_id?: string | undefined;
-    policy_name?: string | undefined;
-    policy_type?: "branch_protection" | "required_reviews" | "status_checks" | "restrictions" | undefined;
-    policy_config?: Record<string, any> | undefined;
-    compliance_framework?: "sox" | "pci" | "hipaa" | "gdpr" | "iso27001" | undefined;
-    report_format?: "json" | "csv" | "pdf" | undefined;
-    updated_after?: string | undefined;
-    updated_before?: string | undefined;
-}>, {
-    provider: "gitea" | "github" | "both";
-    owner: string;
-    repo: string;
-    action: "scan" | "vulnerabilities" | "alerts" | "policies" | "compliance" | "dependencies" | "advisories";
-    state?: "open" | "fixed" | "dismissed" | undefined;
-    ref?: string | undefined;
-    page?: number | undefined;
-    limit?: number | undefined;
-    alert_number?: number | undefined;
-    dismiss_reason?: "tolerable_risk" | "fix_started" | "inaccurate" | "no_bandwidth" | "not_used" | undefined;
-    dismiss_comment?: string | undefined;
-    severity?: "high" | "medium" | "low" | "critical" | undefined;
-    ecosystem?: string | undefined;
-    package_name?: string | undefined;
-    created_after?: string | undefined;
-    created_before?: string | undefined;
-    scan_type?: "code" | "secrets" | "dependencies" | "infrastructure" | undefined;
-    alert_id?: string | undefined;
-    policy_name?: string | undefined;
-    policy_type?: "branch_protection" | "required_reviews" | "status_checks" | "restrictions" | undefined;
-    policy_config?: Record<string, any> | undefined;
-    compliance_framework?: "sox" | "pci" | "hipaa" | "gdpr" | "iso27001" | undefined;
-    report_format?: "json" | "csv" | "pdf" | undefined;
-    updated_after?: string | undefined;
-    updated_before?: string | undefined;
-}, {
-    provider: "gitea" | "github" | "both";
-    owner: string;
     repo: string;
     action: "scan" | "vulnerabilities" | "alerts" | "policies" | "compliance" | "dependencies" | "advisories";
     state?: "open" | "fixed" | "dismissed" | undefined;
@@ -196,10 +141,6 @@ export declare const securityTool: {
             action: {
                 type: string;
                 enum: string[];
-                description: string;
-            };
-            owner: {
-                type: string;
                 description: string;
             };
             repo: {
