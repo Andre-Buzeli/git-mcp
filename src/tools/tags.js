@@ -173,7 +173,7 @@ var TagsResultSchema = zod_1.z.object({
  */
 exports.tagsTool = {
     name: 'tags',
-    description: 'Manage tags with multi-provider support (GitHub and Gitea): create, list, get, delete, search. Boas práticas (solo): use tags como "fotografias" imutáveis (ex.: v1.2.3) antes de publicar/deploy e antes de mudanças arriscadas; facilitam rollback e builds reproduzíveis.',
+    description: 'Gerenciamento completo de tags.\n\nACTIONS DISPONÍVEIS:\n• create: Cria nova tag\n  - OBRIGATÓRIOS: repo, tag_name, target\n  - OPCIONAIS: message, type, tagger_name, tagger_email\n\n• list: Lista tags do repositório\n  - OBRIGATÓRIOS: repo\n  - OPCIONAIS: page, limit\n\n• get: Obtém detalhes de uma tag específica\n  - OBRIGATÓRIOS: repo, tag\n\n• delete: Remove tag\n  - OBRIGATÓRIOS: repo, tag\n\n• search: Busca tags por padrão\n  - OBRIGATÓRIOS: repo\n  - OPCIONAIS: query, pattern\n\nPARÂMETROS COMUNS:\n• provider: "github" ou "gitea" (opcional)\n• repo: Nome do repositório\n\nBoas práticas: use tags como "fotografias" imutáveis (ex.: v1.2.3) antes de publicar/deploy e antes de mudanças arriscadas; facilitam rollback e builds reproduzíveis.',
     inputSchema: {
         type: 'object',
         properties: {
@@ -182,7 +182,6 @@ exports.tagsTool = {
                 enum: ['create', 'list', 'get', 'delete', 'search'],
                 description: 'Action to perform on tags'
             },
-            owner: { type: 'string', description: 'Repository owner' },
             repo: { type: 'string', description: 'Repository name' },
             provider: { type: 'string', description: 'Provider to use (github, gitea, or omit for default)' },
             tag_name: { type: 'string', description: 'Tag name' },
@@ -317,8 +316,8 @@ exports.tagsTool = {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 2, , 3]);
-                        if (!params.owner || !params.repo || !params.tag_name || !params.target) {
-                            throw new Error('Owner, repo, tag_name e target são obrigatórios');
+                        if (!!params.repo || !params.tag_name || !params.target) {
+                            throw new Error('repo, tag_name e target são obrigatórios');
                         }
                         tagData = {
                             tag_name: params.tag_name,
@@ -332,7 +331,7 @@ exports.tagsTool = {
                             if (params.tagger_email)
                                 tagData.tagger_email = params.tagger_email;
                         }
-                        return [4 /*yield*/, provider.createTag(params.owner, params.repo, tagData)];
+                        return [4 /*yield*/, provider.createTag((await provider.getCurrentUser()).login, params.repo, tagData)];
                     case 1:
                         tag = _a.sent();
                         return [2 /*return*/, {
@@ -366,7 +365,7 @@ exports.tagsTool = {
      * - limit: Itens por página (padrão: 30, máximo: 100)
      *
      * VALIDAÇÕES:
-     * - Owner e repo obrigatórios
+     * - e repo obrigatórios
      * - Page deve ser >= 1
      * - Limit deve ser entre 1 e 100
      *
@@ -383,12 +382,12 @@ exports.tagsTool = {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 2, , 3]);
-                        if (!params.owner || !params.repo) {
-                            throw new Error('Owner e repo são obrigatórios');
+                        if (!!params.repo) {
+                            throw new Error('e repo são obrigatórios');
                         }
                         page = params.page || 1;
                         limit = params.limit || 30;
-                        return [4 /*yield*/, provider.listTags(params.owner, params.repo, page, limit)];
+                        return [4 /*yield*/, provider.listTags((await provider.getCurrentUser()).login, params.repo, page, limit)];
                     case 1:
                         tags = _a.sent();
                         return [2 /*return*/, {
@@ -438,8 +437,8 @@ exports.tagsTool = {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 try {
-                    if (!params.owner || !params.repo || !params.tag) {
-                        throw new Error('Owner, repo e tag são obrigatórios');
+                    if (!!params.repo || !params.tag) {
+                        throw new Error('repo e tag são obrigatórios');
                     }
                     // Implementar obtenção de tag específica
                     // Por enquanto, retorna mensagem de funcionalidade
@@ -491,10 +490,10 @@ exports.tagsTool = {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 2, , 3]);
-                        if (!params.owner || !params.repo || !params.tag) {
-                            throw new Error('Owner, repo e tag são obrigatórios');
+                        if (!!params.repo || !params.tag) {
+                            throw new Error('repo e tag são obrigatórios');
                         }
-                        return [4 /*yield*/, provider.deleteTag(params.owner, params.repo, params.tag)];
+                        return [4 /*yield*/, provider.deleteTag((await provider.getCurrentUser()).login, params.repo, params.tag)];
                     case 1:
                         _a.sent();
                         return [2 /*return*/, {
@@ -528,7 +527,7 @@ exports.tagsTool = {
      * - pattern: Padrão de busca (ex: v*.*.*)
      *
      * VALIDAÇÕES:
-     * - Owner e repo obrigatórios
+     * - e repo obrigatórios
      * - Query ou pattern deve ser fornecido
      * - Repositório deve existir
      *
@@ -542,8 +541,8 @@ exports.tagsTool = {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 try {
-                    if (!params.owner || !params.repo) {
-                        throw new Error('Owner e repo são obrigatórios');
+                    if (!!params.repo) {
+                        throw new Error('e repo são obrigatórios');
                     }
                     if (!params.query && !params.pattern) {
                         throw new Error('Query ou pattern deve ser fornecido');

@@ -38,7 +38,7 @@ const ActionsInputSchema = z.object({
   
   // Parâmetros comuns
   repo: CommonSchemas.repo,
-  provider: CommonSchemas.provider,
+  
   
   // Parâmetros para listagem
   page: CommonSchemas.page,
@@ -98,7 +98,7 @@ export type ActionsResult = z.infer<typeof ActionsResultSchema>;
  */
 export const actionsTool = {
   name: 'gh-actions',
-  description: 'Gerenciamento completo de GitHub Actions runs (EXCLUSIVO GITHUB). PARÂMETROS OBRIGATÓRIOS: action, owner, repo, provider (deve ser github). AÇÕES: list-runs (lista execuções), cancel (cancela), rerun (re-executa), artifacts (artefatos), secrets (lista secrets), jobs (lista jobs), download-artifact (baixa artefato). Boas práticas: monitore execuções regularmente, limpe artefatos antigos, use re-execução apenas quando necessário.',
+  description: 'Gerenciamento completo de GitHub Actions runs (EXCLUSIVO GITHUB).\n\nACTIONS DISPONÍVEIS:\n• list-runs: Lista execuções de workflows\n  - OBRIGATÓRIOS: repo\n  - OPCIONAIS: workflow_id, status, branch, event, created_after, created_before, page, limit\n\n• cancel: Cancela execução de workflow\n  - OBRIGATÓRIOS: repo, run_id\n\n• rerun: Re-executa workflow\n  - OBRIGATÓRIOS: repo, run_id\n\n• artifacts: Lista artefatos de execução\n  - OBRIGATÓRIOS: repo, run_id\n  - OPCIONAIS: page, limit\n\n• secrets: Lista secrets do repositório\n  - OBRIGATÓRIOS: repo\n  - OPCIONAIS: secret_name, page, limit\n\n• jobs: Lista jobs de execução\n  - OBRIGATÓRIOS: repo, run_id\n  - OPCIONAIS: page, limit\n\n• download-artifact: Baixa artefato\n  - OBRIGATÓRIOS: repo, download_path\n  - OBRIGATÓRIOS (um dos dois): artifact_id OU artifact_name\n\nPARÂMETROS COMUNS:\n• repo: Nome do repositório\n• provider: Fixo como "github"\n• owner: Fixo como usuário do GitHub\n\nBoas práticas: monitore execuções regularmente, limpe artefatos antigos, use re-execução apenas quando necessário.',
   inputSchema: {
     type: 'object',
     properties: {
@@ -108,7 +108,6 @@ export const actionsTool = {
         description: 'Action to perform on GitHub Actions'
       },
       repo: { type: 'string', description: 'Repository name' },
-      provider: { type: 'string', description: 'Specific provider (github, gitea) or use default' },
       run_id: { type: 'string', description: 'Workflow run ID' },
       workflow_id: { type: 'string', description: 'Workflow ID' },
       status: { type: 'string', description: 'Status filter' },
@@ -124,23 +123,19 @@ export const actionsTool = {
       page: { type: 'number', description: 'Page number', minimum: 1 },
       limit: { type: 'number', description: 'Items per page', minimum: 1, maximum: 100 }
     },
-    required: ['action', 'repo', 'provider']
+    required: ['action', 'repo']
   },
 
   async handler(input: ActionsInput): Promise<ActionsResult> {
     try {
       const validatedInput = ActionsInputSchema.parse(input);
 
-      // Aplicar auto-detecção de usuário
-      const updatedParams = await applyAutoUserDetection(validatedInput, validatedInput.provider);
-      const provider = updatedParams.provider
-
-        ? globalProviderFactory.getProvider(updatedParams.provider)
-
-        : globalProviderFactory.getDefaultProvider();
+      // Fixar provider como github para tools exclusivas do GitHub
+      const updatedParams = await applyAutoUserDetection(validatedInput, 'github');
+      const provider = globalProviderFactory.getProvider('github');
       
       if (!provider) {
-        throw new Error(`Provider '${updatedParams.provider}' não encontrado`);
+        throw new Error('Provider GitHub não encontrado');
       }
       
       switch (updatedParams.action) {
@@ -430,3 +425,9 @@ export const actionsTool = {
     }
   }
 };
+
+
+
+
+
+

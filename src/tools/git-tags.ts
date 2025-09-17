@@ -292,7 +292,7 @@ export const tagsTool = {
         if (params.tagger_email) tagData.tagger_email = params.tagger_email;
       }
 
-      const tag = await provider.createTag(owner, params.repo, tagData);
+      const tag = await provider.createTag((await provider.getCurrentUser()).login, params.repo, tagData);
 
       return {
         success: true,
@@ -322,7 +322,7 @@ export const tagsTool = {
    * - limit: Itens por página (padrão: 30, máximo: 100)
    * 
    * VALIDAÇÕES:
-   * - Owner e repo obrigatórios
+   * - e repo obrigatórios
    * - Page deve ser >= 1
    * - Limit deve ser entre 1 e 100
    * 
@@ -344,7 +344,7 @@ export const tagsTool = {
       const page = params.page || 1;
       const limit = params.limit || 30;
       
-      const tags = await provider.listTags(owner, params.repo, page, limit);
+      const tags = await provider.listTags((await provider.getCurrentUser()).login, params.repo, page, limit);
 
       return {
         success: true,
@@ -444,7 +444,7 @@ export const tagsTool = {
       const currentUser = await provider.getCurrentUser();
       const owner = currentUser.login;
 
-      await provider.deleteTag(owner, params.repo, params.tag);
+      await provider.deleteTag((await provider.getCurrentUser()).login, params.repo, params.tag);
 
       return {
         success: true,
@@ -474,7 +474,7 @@ export const tagsTool = {
    * - pattern: Padrão de busca (ex: v*.*.*)
    * 
    * VALIDAÇÕES:
-   * - Owner e repo obrigatórios
+   * - e repo obrigatórios
    * - Query ou pattern deve ser fornecido
    * - Repositório deve existir
    * 

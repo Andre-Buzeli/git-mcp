@@ -42,7 +42,6 @@ import { VcsOperations } from '../providers/index.js';
  */
 declare const IssuesInputSchema: z.ZodObject<{
     action: z.ZodEnum<["create", "list", "get", "update", "close", "comment", "search"]>;
-    owner: z.ZodString;
     repo: z.ZodString;
     provider: z.ZodEnum<["gitea", "github"]>;
     title: z.ZodOptional<z.ZodString>;
@@ -67,7 +66,6 @@ declare const IssuesInputSchema: z.ZodObject<{
     label: z.ZodOptional<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
     provider: "gitea" | "github";
-    owner: string;
     repo: string;
     action: "get" | "search" | "list" | "create" | "close" | "update" | "comment";
     title?: string | undefined;
@@ -92,7 +90,6 @@ declare const IssuesInputSchema: z.ZodObject<{
     label?: string | undefined;
 }, {
     provider: "gitea" | "github";
-    owner: string;
     repo: string;
     action: "get" | "search" | "list" | "create" | "close" | "update" | "comment";
     title?: string | undefined;
@@ -230,10 +227,6 @@ export declare const issuesTool: {
             action: {
                 type: string;
                 enum: string[];
-                description: string;
-            };
-            owner: {
-                type: string;
                 description: string;
             };
             repo: {

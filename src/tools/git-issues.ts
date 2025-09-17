@@ -47,7 +47,6 @@ const IssuesInputSchema = z.object({
   action: z.enum(['create', 'list', 'get', 'update', 'close', 'comment', 'search']),
   
   // Parâmetros comuns
-  owner: z.string(),
   repo: z.string(),
   
   // Para multi-provider
@@ -193,7 +192,6 @@ export const issuesTool = {
         enum: ['create', 'list', 'get', 'update', 'close', 'comment', 'search'],
         description: 'Action to perform on issues'
       },
-      owner: { type: 'string', description: 'Repository owner' },
       repo: { type: 'string', description: 'Repository name' },
       provider: { type: 'string', description: 'Provider to use (github, gitea, or omit for default)' },
       title: { type: 'string', description: 'Issue title' },
@@ -339,8 +337,8 @@ export const issuesTool = {
    */
   async createIssue(params: IssuesInput, provider: VcsOperations): Promise<IssuesResult> {
     try {
-      if (!params.owner) {
-        throw new Error('Owner é obrigatório');
+      if (!owner) {
+        throw new Error('é obrigatório');
       }
       if (!params.repo) {
         throw new Error('Repo é obrigatório');
@@ -350,7 +348,7 @@ export const issuesTool = {
       }
 
       const issue = await provider.createIssue(
-        params.owner, 
+        owner, 
         params.repo, 
         params.title, 
         params.body, 
@@ -387,7 +385,7 @@ export const issuesTool = {
    * - limit: Itens por página (padrão: 30, máximo: 100)
    * 
    * VALIDAÇÕES:
-   * - Owner e repo obrigatórios
+   * - e repo obrigatórios
    * - State deve ser um dos valores válidos
    * - Page deve ser >= 1
    * - Limit deve ser entre 1 e 100
@@ -400,8 +398,8 @@ export const issuesTool = {
    */
   async listIssues(params: IssuesInput, provider: VcsOperations): Promise<IssuesResult> {
     try {
-      if (!params.owner) {
-        throw new Error('Owner é obrigatório');
+      if (!owner) {
+        throw new Error('é obrigatório');
       }
       if (!params.repo) {
         throw new Error('Repo é obrigatório');
@@ -411,7 +409,7 @@ export const issuesTool = {
       const page = params.page || 1;
       const limit = params.limit || 30;
       
-      const issues = await provider.listIssues(params.owner, params.repo, state, page, limit);
+      const issues = await provider.listIssues((await provider.getCurrentUser()).login, params.repo, state, page, limit);
 
       return {
         success: true,
@@ -457,8 +455,8 @@ export const issuesTool = {
   async getIssue(params: IssuesInput, provider: VcsOperations): Promise<IssuesResult> {
     try {
       // Aplicar auto-detecção se necessário
-      if (!params.owner) {
-        throw new Error('Owner é obrigatório');
+      if (!owner) {
+        throw new Error('é obrigatório');
       }
       if (!params.repo) {
         throw new Error('Repo é obrigatório');
@@ -467,7 +465,7 @@ export const issuesTool = {
         throw new Error('Issue_number é obrigatório');
       }
 
-      const issue = await provider.getIssue(params.owner, params.repo, params.issue_number);
+      const issue = await provider.getIssue((await provider.getCurrentUser()).login, params.repo, params.issue_number);
 
       return {
         success: true,
@@ -514,8 +512,8 @@ export const issuesTool = {
    */
   async updateIssue(params: IssuesInput, provider: VcsOperations): Promise<IssuesResult> {
     try {
-      if (!params.owner) {
-        throw new Error('Owner é obrigatório');
+      if (!owner) {
+        throw new Error('é obrigatório');
       }
       if (!params.repo) {
         throw new Error('Repo é obrigatório');
@@ -536,7 +534,7 @@ export const issuesTool = {
         throw new Error('Nenhum campo para atualizar foi fornecido');
       }
 
-      const issue = await provider.updateIssue(params.owner, params.repo, params.issue_number, updateData);
+      const issue = await provider.updateIssue((await provider.getCurrentUser()).login, params.repo, params.issue_number, updateData);
 
       return {
         success: true,
@@ -575,8 +573,8 @@ export const issuesTool = {
    */
   async closeIssue(params: IssuesInput, provider: VcsOperations): Promise<IssuesResult> {
     try {
-      if (!params.owner) {
-        throw new Error('Owner é obrigatório');
+      if (!owner) {
+        throw new Error('é obrigatório');
       }
       if (!params.repo) {
         throw new Error('Repo é obrigatório');
@@ -585,7 +583,7 @@ export const issuesTool = {
         throw new Error('Issue_number é obrigatório');
       }
 
-      const issue = await provider.updateIssue(params.owner, params.repo, params.issue_number, { state: 'closed' });
+      const issue = await provider.updateIssue((await provider.getCurrentUser()).login, params.repo, params.issue_number, { state: 'closed' });
 
       return {
         success: true,
@@ -625,8 +623,8 @@ export const issuesTool = {
    */
   async addComment(params: IssuesInput, provider: VcsOperations): Promise<IssuesResult> {
     try {
-      if (!params.owner) {
-        throw new Error('Owner é obrigatório');
+      if (!owner) {
+        throw new Error('é obrigatório');
       }
       if (!params.repo) {
         throw new Error('Repo é obrigatório');
@@ -690,8 +688,8 @@ export const issuesTool = {
    */
   async searchIssues(params: IssuesInput, provider: VcsOperations): Promise<IssuesResult> {
     try {
-      if (!params.owner) {
-        throw new Error('Owner é obrigatório');
+      if (!owner) {
+        throw new Error('é obrigatório');
       }
       if (!params.repo) {
         throw new Error('Repo é obrigatório');

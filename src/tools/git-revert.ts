@@ -28,7 +28,7 @@ import { runGitCommand } from '../utils/terminal-controller.js';
 
 const GitRevertInputSchema = z.object({
   action: z.enum(['revert-commit', 'revert-merge', 'revert-range']),
-  owner: z.string(),
+  // owner: obtido automaticamente do provider,
   repo: z.string(),
   provider: z.enum(['gitea', 'github']).describe('Provider to use (gitea or github)'),
   projectPath: z.string().describe('Local project path for git operations'),

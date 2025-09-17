@@ -29,7 +29,7 @@ import { runGitCommand } from '../utils/terminal-controller.js';
 
 const GitBundleInputSchema = z.object({
   action: z.enum(['create', 'verify', 'list-heads', 'unbundle']),
-  owner: z.string(),
+  // owner: obtido automaticamente do provider,
   repo: z.string(),
   provider: z.enum(['gitea', 'github']).describe('Provider to use (gitea or github)'),
   projectPath: z.string().describe('Local project path for git operations'),

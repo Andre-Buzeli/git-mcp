@@ -332,7 +332,7 @@ export const branchesTool = {
    * - limit: Itens por página (padrão: 30, máximo: 100)
    * 
    * VALIDAÇÕES:
-   * - Owner e repo obrigatórios
+   * - e repo obrigatórios
    * - Page deve ser >= 1
    * - Limit deve ser entre 1 e 100
    * 
@@ -353,7 +353,7 @@ export const branchesTool = {
       const page = params.page || 1;
       const limit = params.limit || 30;
       
-      const branches = await provider.listBranches(owner, params.repo, page, limit);
+      const branches = await provider.listBranches((await provider.getCurrentUser()).login, params.repo, page, limit);
 
       return {
         success: true,
@@ -402,7 +402,7 @@ export const branchesTool = {
       const currentUser = await provider.getCurrentUser();
       const owner = currentUser.login;
 
-      const branch = await provider.getBranch(owner, params.repo, params.branch);
+      const branch = await provider.getBranch((await provider.getCurrentUser()).login, params.repo, params.branch);
 
       return {
         success: true,
@@ -448,7 +448,7 @@ export const branchesTool = {
       const currentUser = await provider.getCurrentUser();
       const owner = currentUser.login;
 
-      await provider.deleteBranch(owner, params.repo, params.branch);
+      await provider.deleteBranch((await provider.getCurrentUser()).login, params.repo, params.branch);
 
       return {
         success: true,

@@ -127,11 +127,11 @@ var RepositoriesInputSchema = zod_1.z.object({
         throw new Error('Name is required for create action');
     }
     if (['get', 'update', 'delete', 'fork', 'archive', 'transfer'].includes(data.action)) {
-        if (!data.owner || !data.repo) {
-            throw new Error('Owner and repo are required for this action');
+        if (!data.owner || (await provider.getCurrentUser()).login || !data.repo) {
+            throw new Error('and repo are required for this action');
         }
     }
-    if (data.action === 'list' && !data.username && !data.owner) {
+    if (data.action === 'list' && !data.username && !data.owner || (await provider.getCurrentUser()).login) {
         throw new Error('Username or owner is required for list action');
     }
     if (data.action === 'search' && !data.query) {
@@ -222,7 +222,7 @@ var RepositoriesResultSchema = zod_1.z.object({
  */
 exports.repositoriesTool = {
     name: 'repositories',
-    description: 'GERENCIAMENTO COMPLETO DE REPOSITÓRIOS - GitHub & Gitea\n\nACTIONS DISPONÍVEIS:\n• list: Lista repositórios do usuário/organização\n• get: Obtém detalhes de um repositório específico\n• create: Cria novo repositório\n• update: Atualiza informações do repositório\n• delete: Remove repositório\n• fork: Cria fork do repositório\n• search: Busca repositórios por nome/descrição\n• clone: Clona repositório localmente\n• archive: Arquiva repositório\n• transfer: Transfere propriedade\n• template: Cria repo a partir de template\n• mirror: Configura espelhamento\n\nPARÂMETROS COMUNS:\n• provider: "github" ou "gitea" (opcional)\n• owner: Proprietário do repositório\n• repo: Nome do repositório\n\nPARÂMETROS OBRIGATÓRIOS POR ACTION:\n- list: username OU owner\n- get: owner + repo\n- create: name\n- update: owner + repo\n- delete: owner + repo\n- fork: owner + repo\n- search: query\n- clone: clone_url\n- archive: owner + repo\n- transfer: owner + repo + new_owner\n- template: template_owner + template_repo + name\n- mirror: mirror_url + name\n\nEXEMPLOS DE USO:\n• Listar repos: {"action":"list","username":"johndoe","provider":"github"}\n• Criar repo: {"action":"create","name":"my-project","private":false}\n• Buscar: {"action":"search","query":"react","provider":"gitea"}',
+    description: 'GERENCIAMENTO COMPLETO DE REPOSITÓRIOS - GitHub & Gitea\n\nACTIONS DISPONÍVEIS:\n• list: Lista repositórios do usuário/organização\n  - OBRIGATÓRIOS: username OU owner\n  - OPCIONAIS: page, limit, type, sort\n\n• get: Obtém detalhes de um repositório específico\n  - OBRIGATÓRIOS: repo\n\n• create: Cria novo repositório\n  - OBRIGATÓRIOS: name\n  - OPCIONAIS: description, private, auto_init, gitignores, license, readme, default_branch\n\n• update: Atualiza informações do repositório\n  - OBRIGATÓRIOS: repo\n  - OPCIONAIS: new_name, new_description, new_private, archived\n\n• delete: Remove repositório\n  - OBRIGATÓRIOS: repo\n\n• fork: Cria fork do repositório\n  - OBRIGATÓRIOS: repo\n  - OPCIONAIS: organization\n\n• search: Busca repositórios por nome/descrição\n  - OBRIGATÓRIOS: query\n  - OPCIONAIS: page, limit\n\n• clone: Clona repositório localmente\n  - OBRIGATÓRIOS: clone_url\n  - OPCIONAIS: local_path\n\n• archive: Arquiva repositório\n  - OBRIGATÓRIOS: repo\n\n• transfer: Transfere propriedade\n  - OBRIGATÓRIOS: repo, new_owner\n\n• template: Cria repo a partir de template\n  - OBRIGATÓRIOS: template_owner, template_repo, name\n  - OPCIONAIS: description, private\n\n• mirror: Configura espelhamento\n  - OBRIGATÓRIOS: mirror_url, name\n  - OPCIONAIS: mirror_username, mirror_password\n\nPARÂMETROS COMUNS:\n• provider: "github" ou "gitea" (opcional)\n• repo: Nome do repositório',
     inputSchema: {
         type: 'object',
         properties: {
@@ -231,7 +231,6 @@ exports.repositoriesTool = {
                 enum: ['create', 'list', 'get', 'update', 'delete', 'fork', 'search', 'clone', 'archive', 'transfer', 'template', 'mirror'],
                 description: 'Action to perform on repositories'
             },
-            owner: { type: 'string', description: 'Repository owner' },
             repo: { type: 'string', description: 'Repository name' },
             provider: { type: 'string', description: 'Specific provider (github, gitea) or use default' },
             name: { type: 'string', description: 'Repository name for creation' },
@@ -434,7 +433,7 @@ exports.repositoriesTool = {
                         _a.trys.push([0, 2, , 7]);
                         page = params.page || 1;
                         limit = params.limit || 30;
-                        targetUser = params.username || params.owner;
+                        targetUser = params.username || owner;
                         return [4 /*yield*/, provider.listRepositories(targetUser, page, limit)];
                     case 1:
                         repositories = _a.sent();
@@ -456,7 +455,7 @@ exports.repositoriesTool = {
                         _a.label = 3;
                     case 3:
                         _a.trys.push([3, 5, , 6]);
-                        console.warn("[REPOSITORIES] Usu\u00E1rio '".concat(params.username || params.owner, "' n\u00E3o encontrado, tentando listar reposit\u00F3rios do usu\u00E1rio atual"));
+                        console.warn("[REPOSITORIES] Usu\u00E1rio '".concat(params.username || owner, "' n\u00E3o encontrado, tentando listar reposit\u00F3rios do usu\u00E1rio atual"));
                         return [4 /*yield*/, provider.listRepositories(undefined, params.page || 1, params.limit || 30)];
                     case 4:
                         repositories = _a.sent();
@@ -489,16 +488,16 @@ exports.repositoriesTool = {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 2, , 3]);
-                        if (!params.owner || !params.repo) {
-                            throw new Error('Owner e nome do repositório são obrigatórios');
+                        if (!!params.repo) {
+                            throw new Error('e nome do repositório são obrigatórios');
                         }
-                        return [4 /*yield*/, provider.getRepository(params.owner, params.repo)];
+                        return [4 /*yield*/, provider.getRepository((await provider.getCurrentUser()).login, params.repo)];
                     case 1:
                         repository = _a.sent();
                         return [2 /*return*/, {
                                 success: true,
                                 action: 'get',
-                                message: "Reposit\u00F3rio '".concat(params.owner, "/").concat(params.repo, "' obtido com sucesso"),
+                                message: "Reposit\u00F3rio '".concat(owner, "/").concat(params.repo, "' obtido com sucesso"),
                                 data: repository
                             }];
                     case 2:
@@ -516,8 +515,8 @@ exports.repositoriesTool = {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 2, , 3]);
-                        if (!params.owner || !params.repo) {
-                            throw new Error('Owner e nome do repositório são obrigatórios');
+                        if (!!params.repo) {
+                            throw new Error('e nome do repositório são obrigatórios');
                         }
                         updateData = {};
                         if (params.new_name)
@@ -531,13 +530,13 @@ exports.repositoriesTool = {
                         if (Object.keys(updateData).length === 0) {
                             throw new Error('Nenhum campo para atualizar foi fornecido');
                         }
-                        return [4 /*yield*/, provider.updateRepository(params.owner, params.repo, updateData)];
+                        return [4 /*yield*/, provider.updateRepository((await provider.getCurrentUser()).login, params.repo, updateData)];
                     case 1:
                         repository = _a.sent();
                         return [2 /*return*/, {
                                 success: true,
                                 action: 'update',
-                                message: "Reposit\u00F3rio '".concat(params.owner, "/").concat(params.repo, "' atualizado com sucesso"),
+                                message: "Reposit\u00F3rio '".concat(owner, "/").concat(params.repo, "' atualizado com sucesso"),
                                 data: repository
                             }];
                     case 2:
@@ -555,16 +554,16 @@ exports.repositoriesTool = {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 2, , 3]);
-                        if (!params.owner || !params.repo) {
-                            throw new Error('Owner e nome do repositório são obrigatórios');
+                        if (!!params.repo) {
+                            throw new Error('e nome do repositório são obrigatórios');
                         }
-                        return [4 /*yield*/, provider.deleteRepository(params.owner, params.repo)];
+                        return [4 /*yield*/, provider.deleteRepository((await provider.getCurrentUser()).login, params.repo)];
                     case 1:
                         _a.sent();
                         return [2 /*return*/, {
                                 success: true,
                                 action: 'delete',
-                                message: "Reposit\u00F3rio '".concat(params.owner, "/").concat(params.repo, "' deletado com sucesso"),
+                                message: "Reposit\u00F3rio '".concat(owner, "/").concat(params.repo, "' deletado com sucesso"),
                                 data: { deleted: true }
                             }];
                     case 2:
@@ -582,16 +581,16 @@ exports.repositoriesTool = {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 2, , 3]);
-                        if (!params.owner || !params.repo) {
-                            throw new Error('Owner e nome do repositório são obrigatórios');
+                        if (!!params.repo) {
+                            throw new Error('e nome do repositório são obrigatórios');
                         }
-                        return [4 /*yield*/, provider.forkRepository(params.owner, params.repo, params.organization)];
+                        return [4 /*yield*/, provider.forkRepository((await provider.getCurrentUser()).login, params.repo, params.organization)];
                     case 1:
                         repository = _a.sent();
                         return [2 /*return*/, {
                                 success: true,
                                 action: 'fork',
-                                message: "Fork do reposit\u00F3rio '".concat(params.owner, "/").concat(params.repo, "' criado com sucesso"),
+                                message: "Fork do reposit\u00F3rio '".concat(owner, "/").concat(params.repo, "' criado com sucesso"),
                                 data: repository
                             }];
                     case 2:
@@ -656,7 +655,7 @@ exports.repositoriesTool = {
                                 }];
                         }
                         return [4 /*yield*/, provider.cloneRepository({
-                                owner: params.owner,
+                                owner: (await provider.getCurrentUser()).login,
                                 repo: params.repo,
                                 clone_url: params.clone_url,
                                 local_path: params.local_path
@@ -697,7 +696,7 @@ exports.repositoriesTool = {
                                 }];
                         }
                         return [4 /*yield*/, provider.archiveRepository({
-                                owner: params.owner,
+                                owner: (await provider.getCurrentUser()).login,
                                 repo: params.repo,
                                 archived: (_a = params.archive_status) !== null && _a !== void 0 ? _a : true
                             })];
@@ -736,7 +735,7 @@ exports.repositoriesTool = {
                                 }];
                         }
                         return [4 /*yield*/, provider.transferRepository({
-                                owner: params.owner,
+                                owner: (await provider.getCurrentUser()).login,
                                 repo: params.repo,
                                 new_owner: params.new_owner
                             })];
@@ -777,7 +776,7 @@ exports.repositoriesTool = {
                         return [4 /*yield*/, provider.createFromTemplate({
                                 template_owner: params.template_owner,
                                 template_repo: params.template_repo,
-                                owner: params.owner,
+                                owner: (await provider.getCurrentUser()).login,
                                 name: params.name,
                                 description: params.description,
                                 private: params.private,
@@ -818,7 +817,7 @@ exports.repositoriesTool = {
                                 }];
                         }
                         return [4 /*yield*/, provider.mirrorRepository({
-                                owner: params.owner,
+                                owner: (await provider.getCurrentUser()).login,
                                 repo: params.repo,
                                 mirror_url: params.mirror_url,
                                 mirror_username: params.mirror_username,

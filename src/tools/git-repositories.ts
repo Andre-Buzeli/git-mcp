@@ -118,10 +118,9 @@ const GitRepositoriesInputSchema = z.object({
   action: z.enum(['create', 'list', 'get', 'update', 'delete', 'fork', 'search', 'init', 'clone']),
 
   // Parâmetros comuns
-  owner: z.string(),
-  repo: z.string(),
+  repo: z.string().optional(),
   provider: z.enum(['gitea', 'github']).describe('Provider to use (gitea or github)'),
-  projectPath: z.string().describe('Local project path for git operations'),
+  projectPath: z.string().describe('Local project path for git operations').optional(),
   name: z.string().optional(),
   description: z.string().optional(),
   private: z.boolean().optional(),
@@ -424,16 +423,19 @@ export const gitRepositoriesTool = {
 
   async getRepository(params: GitRepositoriesInput, provider: VcsOperations): Promise<GitRepositoriesResult> {
     try {
-      if (!params.owner || !params.repo) {
-        throw new Error('Owner e nome do repositório são obrigatórios');
+      if (!params.repo) {
+        throw new Error('Nome do repositório é obrigatório');
       }
 
-      const repository = await provider.getRepository(params.owner, params.repo);
+      const currentUser = await provider.getCurrentUser();
+      const owner = currentUser.login;
+
+      const repository = await provider.getRepository((await provider.getCurrentUser()).login, params.repo);
 
       return {
         success: true,
         action: 'get',
-        message: `Repositório '${params.owner}/${params.repo}' obtido com sucesso`,
+        message: `Repositório '${owner}/${params.repo}' obtido com sucesso`,
         data: repository
       };
     } catch (error) {
@@ -443,9 +445,12 @@ export const gitRepositoriesTool = {
 
   async updateRepository(params: GitRepositoriesInput, provider: VcsOperations): Promise<GitRepositoriesResult> {
     try {
-      if (!params.owner || !params.repo) {
-        throw new Error('Owner e nome do repositório são obrigatórios');
+      if (!params.repo) {
+        throw new Error('Nome do repositório é obrigatório');
       }
+
+      const currentUser = await provider.getCurrentUser();
+      const owner = currentUser.login;
 
       const updateData: any = {};
       if (params.new_name) updateData.name = params.new_name;
@@ -457,12 +462,12 @@ export const gitRepositoriesTool = {
         throw new Error('Nenhum campo para atualizar foi fornecido');
       }
 
-      const repository = await provider.updateRepository(params.owner, params.repo, updateData);
+      const repository = await provider.updateRepository((await provider.getCurrentUser()).login, params.repo, updateData);
 
       return {
         success: true,
         action: 'update',
-        message: `Repositório '${params.owner}/${params.repo}' atualizado com sucesso`,
+        message: `Repositório '${owner}/${params.repo}' atualizado com sucesso`,
         data: repository
       };
     } catch (error) {
@@ -472,16 +477,19 @@ export const gitRepositoriesTool = {
 
   async deleteRepository(params: GitRepositoriesInput, provider: VcsOperations): Promise<GitRepositoriesResult> {
     try {
-      if (!params.owner || !params.repo) {
-        throw new Error('Owner e nome do repositório são obrigatórios');
+      if (!params.repo) {
+        throw new Error('Nome do repositório é obrigatório');
       }
 
-      await provider.deleteRepository(params.owner, params.repo);
+      const currentUser = await provider.getCurrentUser();
+      const owner = currentUser.login;
+
+      await provider.deleteRepository((await provider.getCurrentUser()).login, params.repo);
 
       return {
         success: true,
         action: 'delete',
-        message: `Repositório '${params.owner}/${params.repo}' deletado com sucesso`,
+        message: `Repositório '${owner}/${params.repo}' deletado com sucesso`,
         data: { deleted: true }
       };
     } catch (error) {
@@ -491,16 +499,19 @@ export const gitRepositoriesTool = {
 
   async forkRepository(params: GitRepositoriesInput, provider: VcsOperations): Promise<GitRepositoriesResult> {
     try {
-      if (!params.owner || !params.repo) {
-        throw new Error('Owner e nome do repositório são obrigatórios');
+      if (!params.repo) {
+        throw new Error('Nome do repositório é obrigatório');
       }
 
-      const repository = await provider.forkRepository(params.owner, params.repo, params.organization);
+      const currentUser = await provider.getCurrentUser();
+      const owner = currentUser.login;
+
+      const repository = await provider.forkRepository((await provider.getCurrentUser()).login, params.repo, params.organization);
 
       return {
         success: true,
         action: 'fork',
-        message: `Fork do repositório '${params.owner}/${params.repo}' criado com sucesso`,
+        message: `Fork do repositório '${owner}/${params.repo}' criado com sucesso`,
         data: repository
       };
     } catch (error) {
@@ -574,10 +585,12 @@ export const gitRepositoriesTool = {
       }
 
       // Se owner/repo foram especificados, configura remote
-      if (params.owner && params.repo) {
+      if (params.repo && provider) {
+        const currentUser = await provider.getCurrentUser();
+        const owner = currentUser.login;
         const remoteUrl = params.provider === 'gitea'
-          ? `http://nas-ubuntu:3000/${params.owner}/${params.repo}.git`
-          : `https://github.com/${params.owner}/${params.repo}.git`;
+          ? `http://nas-ubuntu:3000/${owner}/${params.repo}.git`
+          : `https://github.com/${owner}/${params.repo}.git`;
 
         const remoteResult = await runTerminalCmd({
           command: `cd "${params.projectPath}" && git remote add origin "${remoteUrl}"`,
@@ -597,7 +610,7 @@ export const gitRepositoriesTool = {
         data: {
           path: params.projectPath,
           initialized: true,
-          remoteConfigured: !!(params.owner && params.repo && provider)
+          remoteConfigured: !!(params.repo && provider)
         }
       };
     } catch (error) {
@@ -626,14 +639,17 @@ export const gitRepositoriesTool = {
    */
   async cloneRepository(params: GitRepositoriesInput, provider: VcsOperations): Promise<GitRepositoriesResult> {
     try {
-      if (!params.owner || !params.repo || !params.projectPath) {
-        throw new Error('owner, repo e projectPath são obrigatórios para clonagem');
+      if (!params.repo || !params.projectPath) {
+        throw new Error('repo e projectPath são obrigatórios para clonagem');
       }
+
+      const currentUser = await provider.getCurrentUser();
+      const owner = currentUser.login;
 
       // Obtém URL do repositório
       const repoUrl = params.provider === 'gitea'
-        ? `http://nas-ubuntu:3000/${params.owner}/${params.repo}.git`
-        : `https://github.com/${params.owner}/${params.repo}.git`;
+        ? `http://nas-ubuntu:3000/${owner}/${params.repo}.git`
+        : `https://github.com/${owner}/${params.repo}.git`;
 
       // Executa git clone
       const cloneResult = await runTerminalCmd({
@@ -649,9 +665,9 @@ export const gitRepositoriesTool = {
       return {
         success: true,
         action: 'clone',
-        message: `Repositório '${params.owner}/${params.repo}' clonado com sucesso para '${params.projectPath}'`,
+        message: `Repositório '${owner}/${params.repo}' clonado com sucesso para '${params.projectPath}'`,
         data: {
-          source: `${params.owner}/${params.repo}`,
+          source: `${owner}/${params.repo}`,
           destination: params.projectPath,
           cloned: true,
           url: repoUrl

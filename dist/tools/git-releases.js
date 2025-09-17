@@ -47,7 +47,6 @@ const user_detection_js_1 = require("../utils/user-detection.js");
 const ReleasesInputSchema = zod_1.z.object({
     action: zod_1.z.enum(['create', 'list', 'get', 'update', 'delete', 'publish']),
     // Parâmetros comuns
-    owner: zod_1.z.string(),
     repo: zod_1.z.string(),
     // Para multi-provider
     provider: zod_1.z.enum(['gitea', 'github']).describe('Provider to use (gitea or github)'), // Provider específico: gitea, github ou both
@@ -165,7 +164,6 @@ exports.releasesTool = {
                 enum: ['create', 'list', 'get', 'update', 'delete', 'publish'],
                 description: 'Action to perform on releases'
             },
-            owner: { type: 'string', description: 'Repository owner' },
             repo: { type: 'string', description: 'Repository name' },
             provider: { type: 'string', description: 'Provider to use (github, gitea, or omit for default)' },
             tag_name: { type: 'string', description: 'Release tag name' },
@@ -285,7 +283,7 @@ exports.releasesTool = {
      */
     async createRelease(params, provider) {
         try {
-            if (!params.owner || !params.repo || !params.tag_name) {
+            if (!owner || !params.repo || !params.tag_name) {
                 throw new Error('Owner, repo e tag_name são obrigatórios');
             }
             const releaseData = {
@@ -337,12 +335,12 @@ exports.releasesTool = {
      */
     async listReleases(params, provider) {
         try {
-            if (!params.owner || !params.repo) {
+            if (!params.repo) {
                 throw new Error('Owner e repo são obrigatórios');
             }
             const page = params.page || 1;
             const limit = params.limit || 30;
-            const releases = await provider.listReleases(params.owner, params.repo, page, limit);
+            const releases = await provider.listReleases(owner, params.repo, page, limit);
             return {
                 success: true,
                 action: 'list',
@@ -385,10 +383,10 @@ exports.releasesTool = {
      */
     async getRelease(params, provider) {
         try {
-            if (!params.owner || !params.repo || !params.release_id) {
+            if (!owner || !params.repo || !params.release_id) {
                 throw new Error('Owner, repo e release_id são obrigatórios');
             }
-            const release = await provider.getRelease(params.owner, params.repo, params.release_id);
+            const release = await provider.getRelease(owner, params.repo, params.release_id);
             return {
                 success: true,
                 action: 'get',
@@ -434,7 +432,7 @@ exports.releasesTool = {
      */
     async updateRelease(params, provider) {
         try {
-            if (!params.owner || !params.repo || !params.release_id) {
+            if (!owner || !params.repo || !params.release_id) {
                 throw new Error('Owner, repo e release_id são obrigatórios');
             }
             const updateData = {};
@@ -491,7 +489,7 @@ exports.releasesTool = {
      */
     async deleteRelease(params, provider) {
         try {
-            if (!params.owner || !params.repo || !params.release_id) {
+            if (!owner || !params.repo || !params.release_id) {
                 throw new Error('Owner, repo e release_id são obrigatórios');
             }
             await provider.deleteRelease(params.release_id);
@@ -532,7 +530,7 @@ exports.releasesTool = {
      */
     async publishRelease(params, provider) {
         try {
-            if (!params.owner || !params.repo || !params.release_id) {
+            if (!owner || !params.repo || !params.release_id) {
                 throw new Error('Owner, repo e release_id são obrigatórios');
             }
             // Publicar release alterando status de draft para false

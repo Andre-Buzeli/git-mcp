@@ -96,7 +96,7 @@ export type SecurityResult = z.infer<typeof SecurityResultSchema>;
  */
 export const securityTool = {
   name: 'gh-security',
-  description: 'Gerenciamento completo de GitHub Security (EXCLUSIVO GITHUB). PARÂMETROS OBRIGATÓRIOS: action, owner, repo, provider (deve ser github). AÇÕES: scan (escaneia), vulnerabilities (vulnerabilidades), alerts (alertas), policies (políticas), compliance (conformidade), dependencies (dependências), advisories (avisos). Boas práticas: execute scans regularmente, configure alertas automáticos, mantenha dependências atualizadas.',
+  description: 'Gerenciamento completo de GitHub Security (EXCLUSIVO GITHUB).\n\nACTIONS DISPONÍVEIS:\n• scan: Executa scan de segurança\n  - OBRIGATÓRIOS: repo, scan_type\n  - OPCIONAIS: ref\n\n• vulnerabilities: Lista vulnerabilidades\n  - OBRIGATÓRIOS: repo\n  - OPCIONAIS: severity, state, ecosystem, package_name, page, limit\n\n• alerts: Lista alertas de segurança\n  - OBRIGATÓRIOS: repo\n  - OPCIONAIS: alert_id, alert_number, state, page, limit\n\n• policies: Gerencia políticas de segurança\n  - OBRIGATÓRIOS: repo\n  - OPCIONAIS: policy_name, policy_type, policy_config\n\n• compliance: Verifica conformidade\n  - OBRIGATÓRIOS: repo\n  - OPCIONAIS: compliance_framework, report_format\n\n• dependencies: Analisa dependências\n  - OBRIGATÓRIOS: repo\n  - OPCIONAIS: ecosystem, package_name, page, limit\n\n• advisories: Lista avisos de segurança\n  - OBRIGATÓRIOS: repo\n  - OPCIONAIS: ecosystem, package_name, page, limit\n\nPARÂMETROS COMUNS:\n• repo: Nome do repositório\n• provider: Fixo como "github"\n• owner: Fixo como usuário do GitHub\n\nBoas práticas: execute scans regularmente, configure alertas automáticos, mantenha dependências atualizadas.',
   inputSchema: {
     type: 'object',
     properties: {
@@ -106,7 +106,6 @@ export const securityTool = {
         description: 'Action to perform on security'
       },
       repo: { type: 'string', description: 'Repository name' },
-      provider: { type: 'string', description: 'Specific provider (github, gitea) or use default' },
       scan_type: { type: 'string', enum: ['code', 'dependencies', 'secrets', 'infrastructure'], description: 'Type of security scan' },
       ref: { type: 'string', description: 'Git reference to scan' },
       severity: { type: 'string', enum: ['low', 'medium', 'high', 'critical'], description: 'Vulnerability severity filter' },
@@ -129,23 +128,19 @@ export const securityTool = {
       page: { type: 'number', description: 'Page number', minimum: 1 },
       limit: { type: 'number', description: 'Items per page', minimum: 1, maximum: 100 }
     },
-    required: ['action', 'repo', 'provider']
+    required: ['action', 'repo']
   },
 
   async handler(input: SecurityInput): Promise<SecurityResult> {
     try {
       const validatedInput = SecurityInputSchema.parse(input);
 
-      // Aplicar auto-detecção de usuário
-      const updatedParams = await applyAutoUserDetection(validatedInput, validatedInput.provider);
-      const provider = updatedParams.provider
-
-        ? globalProviderFactory.getProvider(updatedParams.provider)
-
-        : globalProviderFactory.getDefaultProvider();
+      // Fixar provider como github para tools exclusivas do GitHub
+      const updatedParams = await applyAutoUserDetection(validatedInput, 'github');
+      const provider = globalProviderFactory.getProvider('github');
       
       if (!provider) {
-        throw new Error(`Provider '${updatedParams.provider}' não encontrado`);
+        throw new Error('Provider GitHub não encontrado');
       }
       
       switch (updatedParams.action) {

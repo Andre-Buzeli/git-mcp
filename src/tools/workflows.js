@@ -82,7 +82,6 @@ var validator_js_1 = require("./validator.js");
 var WorkflowsInputSchema = zod_1.z.object({
     action: zod_1.z.enum(['list', 'create', 'trigger', 'status', 'logs', 'disable', 'enable']),
     // Parâmetros comuns
-    owner: validator_js_1.CommonSchemas.owner,
     repo: validator_js_1.CommonSchemas.repo,
     provider: validator_js_1.CommonSchemas.provider,
     // Parâmetros para listagem
@@ -106,12 +105,12 @@ var WorkflowsInputSchema = zod_1.z.object({
 }).refine(function (data) {
     // Validações específicas por ação
     if (['create'].includes(data.action)) {
-        return data.owner && data.repo && data.name && data.workflow_content;
+        return data.owner || (await provider.getCurrentUser()).login && data.repo && data.name && data.workflow_content;
     }
     if (['trigger', 'status', 'logs', 'disable', 'enable'].includes(data.action)) {
-        return data.owner && data.repo && (data.workflow_id || data.workflow_name);
+        return data.owner || (await provider.getCurrentUser()).login && data.repo && (data.workflow_id || data.workflow_name);
     }
-    return data.owner && data.repo;
+    return data.owner || (await provider.getCurrentUser()).login && data.repo;
 }, {
     message: "Parâmetros obrigatórios não fornecidos para a ação especificada"
 });
@@ -152,7 +151,7 @@ var WorkflowsResultSchema = zod_1.z.object({
  */
 exports.workflowsTool = {
     name: 'workflows',
-    description: 'Manage CI/CD workflows with multiple actions: list, create, trigger, status, logs, disable, enable. Suporte completo a GitHub Actions e Gitea Actions simultaneamente. Boas práticas: use para automatizar CI/CD pipelines, monitorar execuções, configurar triggers apropriados e manter workflows simples e focados.',
+    description: 'Gerenciamento completo de workflows CI/CD.\n\nACTIONS DISPONÍVEIS:\n• list: Lista workflows do repositório\n  - OBRIGATÓRIOS: repo\n  - OPCIONAIS: page, limit\n\n• create: Cria novo workflow\n  - OBRIGATÓRIOS: repo, name, workflow_content\n  - OPCIONAIS: description, branch\n\n• trigger: Dispara workflow manualmente\n  - OBRIGATÓRIOS: repo, workflow_id\n  - OPCIONAIS: ref, inputs\n\n• status: Verifica status de execução\n  - OBRIGATÓRIOS: repo, run_id\n\n• logs: Obtém logs de execução\n  - OBRIGATÓRIOS: repo, run_id\n  - OPCIONAIS: job_id, step_number\n\n• disable: Desabilita workflow\n  - OBRIGATÓRIOS: repo, workflow_id\n\n• enable: Habilita workflow\n  - OBRIGATÓRIOS: repo, workflow_id\n\nPARÂMETROS COMUNS:\n• provider: "github" ou "gitea" (opcional)\n• repo: Nome do repositório\n\nBoas práticas: use para automatizar CI/CD pipelines, monitorar execuções, configurar triggers apropriados e manter workflows simples e focados.',
     inputSchema: {
         type: 'object',
         properties: {
@@ -161,7 +160,6 @@ exports.workflowsTool = {
                 enum: ['list', 'create', 'trigger', 'status', 'logs', 'disable', 'enable'],
                 description: 'Action to perform on workflows'
             },
-            owner: { type: 'string', description: 'Repository owner' },
             repo: { type: 'string', description: 'Repository name' },
             provider: { type: 'string', description: 'Specific provider (github, gitea) or use default' },
             name: { type: 'string', description: 'Workflow name for creation' },
@@ -281,7 +279,7 @@ exports.workflowsTool = {
                                 }];
                         }
                         return [4 /*yield*/, provider.listWorkflows({
-                                owner: params.owner,
+                                owner: (await provider.getCurrentUser()).login,
                                 repo: params.repo,
                                 page: params.page,
                                 limit: params.limit
@@ -321,7 +319,7 @@ exports.workflowsTool = {
                                 }];
                         }
                         return [4 /*yield*/, provider.createWorkflow({
-                                owner: params.owner,
+                                owner: (await provider.getCurrentUser()).login,
                                 repo: params.repo,
                                 name: params.name,
                                 description: params.description,
@@ -363,7 +361,7 @@ exports.workflowsTool = {
                                 }];
                         }
                         return [4 /*yield*/, provider.triggerWorkflow({
-                                owner: params.owner,
+                                owner: (await provider.getCurrentUser()).login,
                                 repo: params.repo,
                                 workflow_id: params.workflow_id,
                                 workflow_name: params.workflow_name,
@@ -405,7 +403,7 @@ exports.workflowsTool = {
                                 }];
                         }
                         return [4 /*yield*/, provider.getWorkflowStatus({
-                                owner: params.owner,
+                                owner: (await provider.getCurrentUser()).login,
                                 repo: params.repo,
                                 run_id: params.run_id,
                                 workflow_id: params.workflow_id
@@ -445,7 +443,7 @@ exports.workflowsTool = {
                                 }];
                         }
                         return [4 /*yield*/, provider.getWorkflowLogs({
-                                owner: params.owner,
+                                owner: (await provider.getCurrentUser()).login,
                                 repo: params.repo,
                                 run_id: params.run_id,
                                 job_id: params.job_id,
@@ -486,7 +484,7 @@ exports.workflowsTool = {
                                 }];
                         }
                         return [4 /*yield*/, provider.disableWorkflow({
-                                owner: params.owner,
+                                owner: (await provider.getCurrentUser()).login,
                                 repo: params.repo,
                                 workflow_id: params.workflow_id,
                                 workflow_name: params.workflow_name
@@ -526,7 +524,7 @@ exports.workflowsTool = {
                                 }];
                         }
                         return [4 /*yield*/, provider.enableWorkflow({
-                                owner: params.owner,
+                                owner: (await provider.getCurrentUser()).login,
                                 repo: params.repo,
                                 workflow_id: params.workflow_id,
                                 workflow_name: params.workflow_name

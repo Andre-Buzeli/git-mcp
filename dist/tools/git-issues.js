@@ -47,7 +47,6 @@ const user_detection_js_1 = require("../utils/user-detection.js");
 const IssuesInputSchema = zod_1.z.object({
     action: zod_1.z.enum(['create', 'list', 'get', 'update', 'close', 'comment', 'search']),
     // Parâmetros comuns
-    owner: zod_1.z.string(),
     repo: zod_1.z.string(),
     // Para multi-provider
     provider: zod_1.z.enum(['gitea', 'github']).describe('Provider to use (gitea or github)'), // Provider específico: gitea, github ou both
@@ -180,7 +179,6 @@ exports.issuesTool = {
                 enum: ['create', 'list', 'get', 'update', 'close', 'comment', 'search'],
                 description: 'Action to perform on issues'
             },
-            owner: { type: 'string', description: 'Repository owner' },
             repo: { type: 'string', description: 'Repository name' },
             provider: { type: 'string', description: 'Provider to use (github, gitea, or omit for default)' },
             title: { type: 'string', description: 'Issue title' },
@@ -324,7 +322,7 @@ exports.issuesTool = {
      */
     async createIssue(params, provider) {
         try {
-            if (!params.owner) {
+            if (!owner) {
                 throw new Error('Owner é obrigatório');
             }
             if (!params.repo) {
@@ -333,7 +331,7 @@ exports.issuesTool = {
             if (!params.title) {
                 throw new Error('Title é obrigatório');
             }
-            const issue = await provider.createIssue(params.owner, params.repo, params.title, params.body, params.assignees, params.labels);
+            const issue = await provider.createIssue(owner, params.repo, params.title, params.body, params.assignees, params.labels);
             return {
                 success: true,
                 action: 'create',
@@ -376,7 +374,7 @@ exports.issuesTool = {
      */
     async listIssues(params, provider) {
         try {
-            if (!params.owner) {
+            if (!owner) {
                 throw new Error('Owner é obrigatório');
             }
             if (!params.repo) {
@@ -385,7 +383,7 @@ exports.issuesTool = {
             const state = params.state || 'open';
             const page = params.page || 1;
             const limit = params.limit || 30;
-            const issues = await provider.listIssues(params.owner, params.repo, state, page, limit);
+            const issues = await provider.listIssues(owner, params.repo, state, page, limit);
             return {
                 success: true,
                 action: 'list',
@@ -430,7 +428,7 @@ exports.issuesTool = {
     async getIssue(params, provider) {
         try {
             // Aplicar auto-detecção se necessário
-            if (!params.owner) {
+            if (!owner) {
                 throw new Error('Owner é obrigatório');
             }
             if (!params.repo) {
@@ -439,7 +437,7 @@ exports.issuesTool = {
             if (!params.issue_number) {
                 throw new Error('Issue_number é obrigatório');
             }
-            const issue = await provider.getIssue(params.owner, params.repo, params.issue_number);
+            const issue = await provider.getIssue(owner, params.repo, params.issue_number);
             return {
                 success: true,
                 action: 'get',
@@ -485,7 +483,7 @@ exports.issuesTool = {
      */
     async updateIssue(params, provider) {
         try {
-            if (!params.owner) {
+            if (!owner) {
                 throw new Error('Owner é obrigatório');
             }
             if (!params.repo) {
@@ -510,7 +508,7 @@ exports.issuesTool = {
             if (Object.keys(updateData).length === 0) {
                 throw new Error('Nenhum campo para atualizar foi fornecido');
             }
-            const issue = await provider.updateIssue(params.owner, params.repo, params.issue_number, updateData);
+            const issue = await provider.updateIssue(owner, params.repo, params.issue_number, updateData);
             return {
                 success: true,
                 action: 'update',
@@ -548,7 +546,7 @@ exports.issuesTool = {
      */
     async closeIssue(params, provider) {
         try {
-            if (!params.owner) {
+            if (!owner) {
                 throw new Error('Owner é obrigatório');
             }
             if (!params.repo) {
@@ -557,7 +555,7 @@ exports.issuesTool = {
             if (!params.issue_number) {
                 throw new Error('Issue_number é obrigatório');
             }
-            const issue = await provider.updateIssue(params.owner, params.repo, params.issue_number, { state: 'closed' });
+            const issue = await provider.updateIssue(owner, params.repo, params.issue_number, { state: 'closed' });
             return {
                 success: true,
                 action: 'close',
@@ -596,7 +594,7 @@ exports.issuesTool = {
      */
     async addComment(params, provider) {
         try {
-            if (!params.owner) {
+            if (!owner) {
                 throw new Error('Owner é obrigatório');
             }
             if (!params.repo) {
@@ -659,7 +657,7 @@ exports.issuesTool = {
      */
     async searchIssues(params, provider) {
         try {
-            if (!params.owner) {
+            if (!owner) {
                 throw new Error('Owner é obrigatório');
             }
             if (!params.repo) {

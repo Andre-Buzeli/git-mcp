@@ -81,7 +81,7 @@ var index_js_1 = require("../providers/index.js");
 var CommitsInputSchema = zod_1.z.object({
     action: zod_1.z.enum(['list', 'get', 'create', 'compare', 'search']),
     // Parâmetros comuns com validações aprimoradas
-    owner: zod_1.z.string().min(1, 'Owner é obrigatório').max(100, 'Owner muito longo').optional(),
+    owner: zod_1.z.string().min(1, 'é obrigatório').max(100, 'muito longo').optional(),
     repo: zod_1.z.string().min(1, 'Nome do repositório é obrigatório').max(100, 'Nome do repositório muito longo').optional(),
     // Para multi-provider
     provider: zod_1.z.enum(['gitea', 'github', 'both']).optional(), // Provider específico: gitea, github ou both
@@ -107,21 +107,21 @@ var CommitsInputSchema = zod_1.z.object({
 }).refine(function (data) {
     // Validações condicionais por ação
     if (data.action === 'get') {
-        return data.owner && data.repo && (data.sha || data.commit_sha);
+        return data.owner || (await provider.getCurrentUser()).login && data.repo && (data.sha || data.commit_sha);
     }
     if (data.action === 'create') {
-        return data.owner && data.repo && data.message && data.branch;
+        return data.owner || (await provider.getCurrentUser()).login && data.repo && data.message && data.branch;
     }
     if (data.action === 'compare') {
-        return data.owner && data.repo && data.base && data.head;
+        return data.owner || (await provider.getCurrentUser()).login && data.repo && data.base && data.head;
     }
     if (data.action === 'search') {
-        return data.owner && data.repo && data.query;
+        return data.owner || (await provider.getCurrentUser()).login && data.repo && data.query;
     }
     if (data.action === 'list') {
-        return data.owner && data.repo;
+        return data.owner || (await provider.getCurrentUser()).login && data.repo;
     }
-    return data.owner && data.repo;
+    return data.owner || (await provider.getCurrentUser()).login && data.repo;
 }, {
     message: "Parâmetros obrigatórios não fornecidos para a ação especificada"
 });
@@ -201,7 +201,7 @@ var CommitsResultSchema = zod_1.z.object({
  */
 exports.commitsTool = {
     name: 'commits',
-    description: 'GERENCIAMENTO DE COMMITS - GitHub & Gitea\n\nACTIONS DISPONÍVEIS:\n• list: Lista commits do repositório/branch\n• get: Obtém detalhes de um commit específico\n• create: Cria novo commit (implementação em desenvolvimento)\n• compare: Compara diferenças entre commits\n• search: Busca commits por mensagem/autor\n\nPARÂMETROS COMUNS:\n• provider: "github" ou "gitea" (opcional)\n• owner: Proprietário do repositório\n• repo: Nome do repositório\n• sha: Hash do commit (7-40 caracteres)\n• branch: Branch específica (opcional)\n\nPARÂMETROS OBRIGATÓRIOS POR ACTION:\n- list: owner + repo\n- get: owner + repo + sha\n- create: owner + repo + message + branch\n- compare: owner + repo + base + head\n- search: owner + repo + query\n\nPARÂMETROS OPCIONAIS:\n• author: Filtrar por autor específico\n• page: Página da listagem (padrão: 1)\n• limit: Itens por página (padrão: 30, máx: 100)\n• branch: Branch específica (padrão: main)\n\nEXEMPLOS DE USO:\n• Listar commits: {"action":"list","owner":"johndoe","repo":"myproject","branch":"main","limit":10}\n• Obter commit: {"action":"get","owner":"johndoe","repo":"myproject","sha":"abc1234"}\n• Comparar: {"action":"compare","owner":"johndoe","repo":"myproject","base":"abc1234","head":"def5678"}\n• Buscar: {"action":"search","owner":"johndoe","repo":"myproject","query":"fix bug","author":"johndoe"}\n\nCARACTERÍSTICAS ESPECIAIS:\n• SHA parciais: Aceita primeiros 7+ caracteres\n• Busca inteligente: Por mensagem ou autor\n• Comparação detalhada: Diferenças entre commits\n• Paginação: Controle de grandes listas\n\nBOAS PRÁTICAS:\n• Commits pequenos e focados\n• Mensagens claras e descritivas\n• SHA consistentes (7+ caracteres)\n• Use search para auditoria\n• Compare antes de merge',
+    description: 'GERENCIAMENTO DE COMMITS - GitHub & Gitea\n\nACTIONS DISPONÍVEIS:\n• list: Lista commits do repositório/branch\n  - OBRIGATÓRIOS: repo\n  - OPCIONAIS: sha, page, limit, author\n\n• get: Obtém detalhes de um commit específico\n  - OBRIGATÓRIOS: repo, commit_sha\n\n• create: Cria novo commit\n  - OBRIGATÓRIOS: repo, message, branch\n  - OPCIONAIS: author_name, author_email, committer_name, committer_email\n\n• compare: Compara diferenças entre commits\n  - OBRIGATÓRIOS: repo, base, head\n\n• search: Busca commits por mensagem/autor\n  - OBRIGATÓRIOS: repo, query\n  - OPCIONAIS: author\n\nPARÂMETROS COMUNS:\n• provider: "github" ou "gitea" (opcional)\n• repo: Nome do repositório\n\nCARACTERÍSTICAS ESPECIAIS:\n• SHA parciais: Aceita primeiros 7+ caracteres\n• Busca inteligente: Por mensagem ou autor\n• Comparação detalhada: Diferenças entre commits\n• Paginação: Controle de grandes listas\n\nBOAS PRÁTICAS:\n• Commits pequenos e focados\n• Mensagens claras e descritivas\n• SHA consistentes (7+ caracteres)\n• Use search para auditoria\n• Compare antes de merge',
     inputSchema: {
         type: 'object',
         properties: {
@@ -210,7 +210,6 @@ exports.commitsTool = {
                 enum: ['list', 'get', 'create', 'compare', 'search'],
                 description: 'Action to perform on commits'
             },
-            owner: { type: 'string', description: 'Repository owner' },
             repo: { type: 'string', description: 'Repository name' },
             provider: { type: 'string', description: 'Provider to use (github, gitea, or omit for default)' },
             sha: { type: 'string', description: 'Branch, tag or commit SHA' },
@@ -325,7 +324,7 @@ exports.commitsTool = {
      * - limit: Itens por página (padrão: 30, máximo: 100)
      *
      * VALIDAÇÕES:
-     * - Owner e repo obrigatórios
+     * - e repo obrigatórios
      * - SHA deve ser válido se fornecido
      * - Page deve ser >= 1
      * - Limit deve ser entre 1 e 100
@@ -343,12 +342,12 @@ exports.commitsTool = {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 2, , 3]);
-                        if (!params.owner || !params.repo) {
-                            throw new Error('Owner e repo são obrigatórios');
+                        if (!!params.repo) {
+                            throw new Error('e repo são obrigatórios');
                         }
                         page = params.page || 1;
                         limit = params.limit || 30;
-                        return [4 /*yield*/, provider.listCommits(params.owner, params.repo, params.sha, page, limit)];
+                        return [4 /*yield*/, provider.listCommits((await provider.getCurrentUser()).login, params.repo, params.sha, page, limit)];
                     case 1:
                         commits = _a.sent();
                         return [2 /*return*/, {
@@ -403,14 +402,14 @@ exports.commitsTool = {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 2, , 3]);
-                        if (!params.owner || !params.repo) {
-                            throw new Error('Owner e repo são obrigatórios');
+                        if (!!params.repo) {
+                            throw new Error('e repo são obrigatórios');
                         }
                         commitSha = params.sha || params.commit_sha;
                         if (!commitSha) {
                             throw new Error('SHA do commit é obrigatório (use sha ou commit_sha)');
                         }
-                        return [4 /*yield*/, provider.getCommit(params.owner, params.repo, commitSha)];
+                        return [4 /*yield*/, provider.getCommit((await provider.getCurrentUser()).login, params.repo, commitSha)];
                     case 1:
                         commit = _a.sent();
                         return [2 /*return*/, {
@@ -420,7 +419,7 @@ exports.commitsTool = {
                                 data: {
                                     commit: commit,
                                     sha: commitSha,
-                                    owner: params.owner,
+                                    owner: (await provider.getCurrentUser()).login,
                                     repo: params.repo
                                 }
                             }];
@@ -472,8 +471,8 @@ exports.commitsTool = {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 5, , 6]);
-                        if (!params.owner || !params.repo || !params.message || !params.branch) {
-                            throw new Error('Owner, repo, message e branch são obrigatórios');
+                        if (!!params.repo || !params.message || !params.branch) {
+                            throw new Error('repo, message e branch são obrigatórios');
                         }
                         if (params.message.trim().length === 0) {
                             throw new Error('Mensagem do commit não pode estar vazia');
@@ -493,7 +492,7 @@ exports.commitsTool = {
                                 email: params.committer_email || params.author_email || 'unknown@example.com'
                             }
                         };
-                        return [4 /*yield*/, provider.createCommit(params.owner, params.repo, params.message, params.branch, changes)];
+                        return [4 /*yield*/, provider.createCommit((await provider.getCurrentUser()).login, params.repo, params.message, params.branch, changes)];
                     case 2:
                         commit = _a.sent();
                         return [2 /*return*/, {
@@ -563,8 +562,8 @@ exports.commitsTool = {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 6, , 7]);
-                        if (!params.owner || !params.repo || !params.base || !params.head) {
-                            throw new Error('Owner, repo, base e head são obrigatórios');
+                        if (!!params.repo || !params.base || !params.head) {
+                            throw new Error('repo, base e head são obrigatórios');
                         }
                         shaRegex = /^[a-f0-9]{7,40}$/i;
                         if (!shaRegex.test(params.base) || !shaRegex.test(params.head)) {
@@ -573,10 +572,10 @@ exports.commitsTool = {
                         _a.label = 1;
                     case 1:
                         _a.trys.push([1, 4, , 5]);
-                        return [4 /*yield*/, provider.getCommit(params.owner, params.repo, params.base)];
+                        return [4 /*yield*/, provider.getCommit((await provider.getCurrentUser()).login, params.repo, params.base)];
                     case 2:
                         baseCommit = _a.sent();
-                        return [4 /*yield*/, provider.getCommit(params.owner, params.repo, params.head)];
+                        return [4 /*yield*/, provider.getCommit((await provider.getCurrentUser()).login, params.repo, params.head)];
                     case 3:
                         headCommit = _a.sent();
                         return [2 /*return*/, {
@@ -663,8 +662,8 @@ exports.commitsTool = {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 5, , 6]);
-                        if (!params.owner || !params.repo || !params.query) {
-                            throw new Error('Owner, repo e query são obrigatórios');
+                        if (!!params.repo || !params.query) {
+                            throw new Error('repo e query são obrigatórios');
                         }
                         if (params.query.length < 3) {
                             throw new Error('Query deve ter pelo menos 3 caracteres');
@@ -674,7 +673,7 @@ exports.commitsTool = {
                         _a.label = 1;
                     case 1:
                         _a.trys.push([1, 3, , 4]);
-                        return [4 /*yield*/, provider.listCommits(params.owner, params.repo, undefined, 1, 100)];
+                        return [4 /*yield*/, provider.listCommits((await provider.getCurrentUser()).login, params.repo, undefined, 1, 100)];
                     case 2:
                         commits = _a.sent();
                         filteredCommits = commits.filter(function (commit) {

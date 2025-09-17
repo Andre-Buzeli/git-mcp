@@ -268,10 +268,10 @@ exports.filesTool = {
      */
     async getFile(params, provider) {
         try {
-            if (!params.owner || !params.repo || !params.path) {
+            if (!(await provider.getCurrentUser()).login || !params.repo || !params.path) {
                 throw new Error('Owner, repo e path são obrigatórios');
             }
-            const file = await provider.getFile(params.owner, params.repo, params.path, params.ref);
+            const file = await provider.getFile((await provider.getCurrentUser()).login, params.repo, params.path, params.ref);
             return {
                 success: true,
                 action: 'get',
@@ -314,10 +314,10 @@ exports.filesTool = {
      */
     async createFile(params, provider) {
         try {
-            if (!params.owner || !params.repo || !params.path || !params.content || !params.message) {
+            if (!(await provider.getCurrentUser()).login || !params.repo || !params.path || !params.content || !params.message) {
                 throw new Error('Owner, repo, path, content e message são obrigatórios');
             }
-            const result = await provider.createFile(params.owner, params.repo, params.path, params.content, params.message, params.branch);
+            const result = await provider.createFile((await provider.getCurrentUser()).login, params.repo, params.path, params.content, params.message, params.branch);
             return {
                 success: true,
                 action: 'create',
@@ -361,21 +361,21 @@ exports.filesTool = {
      */
     async updateFile(params, provider) {
         try {
-            if (!params.owner || !params.repo || !params.path || !params.content || !params.message) {
+            if (!(await provider.getCurrentUser()).login || !params.repo || !params.path || !params.content || !params.message) {
                 throw new Error('Owner, repo, path, content e message são obrigatórios');
             }
             // Se não foi fornecido SHA, obter automaticamente
             let fileSha = params.sha;
             if (!fileSha) {
                 try {
-                    const existingFile = await provider.getFile(params.owner, params.repo, params.path, params.branch);
+                    const existingFile = await provider.getFile((await provider.getCurrentUser()).login, params.repo, params.path, params.branch);
                     fileSha = existingFile.sha;
                 }
                 catch (error) {
                     throw new Error('Não foi possível obter SHA do arquivo. Forneça sha ou verifique se o arquivo existe.');
                 }
             }
-            const result = await provider.updateFile(params.owner, params.repo, params.path, params.content, params.message, fileSha, params.branch);
+            const result = await provider.updateFile((await provider.getCurrentUser()).login, params.repo, params.path, params.content, params.message, fileSha, params.branch);
             return {
                 success: true,
                 action: 'update',
@@ -418,21 +418,21 @@ exports.filesTool = {
      */
     async deleteFile(params, provider) {
         try {
-            if (!params.owner || !params.repo || !params.path || !params.message) {
+            if (!(await provider.getCurrentUser()).login || !params.repo || !params.path || !params.message) {
                 throw new Error('Owner, repo, path e message são obrigatórios');
             }
             // Se não foi fornecido SHA, obter automaticamente
             let fileSha = params.sha;
             if (!fileSha) {
                 try {
-                    const existingFile = await provider.getFile(params.owner, params.repo, params.path, params.branch);
+                    const existingFile = await provider.getFile((await provider.getCurrentUser()).login, params.repo, params.path, params.branch);
                     fileSha = existingFile.sha;
                 }
                 catch (error) {
                     throw new Error('Não foi possível obter SHA do arquivo. Forneça sha ou verifique se o arquivo existe.');
                 }
             }
-            const result = await provider.deleteFile(params.owner, params.repo, params.path, params.message, fileSha, params.branch);
+            const result = await provider.deleteFile((await provider.getCurrentUser()).login, params.repo, params.path, params.message, fileSha, params.branch);
             return {
                 success: true,
                 action: 'delete',
@@ -476,13 +476,13 @@ exports.filesTool = {
      */
     async listFiles(params, provider) {
         try {
-            if (!params.owner || !params.repo) {
+            if (!(await provider.getCurrentUser()).login || !params.repo) {
                 throw new Error('Owner e repo são obrigatórios');
             }
             const path = params.path || '';
             const page = params.page || 1;
             const limit = params.limit || 30;
-            const files = await provider.listFiles(params.owner, params.repo, path, params.ref);
+            const files = await provider.listFiles((await provider.getCurrentUser()).login, params.repo, path, params.ref);
             return {
                 success: true,
                 action: 'list',
@@ -529,7 +529,7 @@ exports.filesTool = {
      */
     async searchFiles(params, provider) {
         try {
-            if (!params.owner || !params.repo || !params.query) {
+            if (!(await provider.getCurrentUser()).login || !params.repo || !params.query) {
                 throw new Error('Owner, repo e query são obrigatórios');
             }
             if (params.query.length < 3) {
@@ -583,10 +583,10 @@ exports.filesTool = {
      */
     async uploadProject(params, provider) {
         try {
-            if (!params.owner || !params.repo || !params.projectPath || !params.message) {
+            if (!(await provider.getCurrentUser()).login || !params.repo || !params.projectPath || !params.message) {
                 throw new Error('Owner, repo, projectPath e message são obrigatórios');
             }
-            const result = await provider.uploadProject(params.owner, params.repo, params.projectPath, params.message, params.branch);
+            const result = await provider.uploadProject((await provider.getCurrentUser()).login, params.repo, params.projectPath, params.message, params.branch);
             return {
                 success: true,
                 action: 'upload-project',

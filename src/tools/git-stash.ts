@@ -30,7 +30,7 @@ import { runGitCommand } from '../utils/terminal-controller.js';
 
 const GitStashInputSchema = z.object({
   action: z.enum(['stash', 'pop', 'apply', 'list', 'show', 'drop', 'clear']),
-  owner: z.string(),
+  // owner: obtido automaticamente do provider,
   repo: z.string(),
   provider: z.enum(['gitea', 'github']).describe('Provider to use (gitea or github)'),
   projectPath: z.string().describe('Local project path for git operations'),

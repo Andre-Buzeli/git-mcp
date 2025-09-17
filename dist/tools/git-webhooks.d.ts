@@ -54,7 +54,6 @@ import { VcsOperations } from '../providers/index.js';
  */
 declare const WebhooksInputSchema: z.ZodObject<{
     action: z.ZodEnum<["create", "list", "get", "update", "delete", "test"]>;
-    owner: z.ZodString;
     repo: z.ZodString;
     provider: z.ZodEnum<["gitea", "github"]>;
     url: z.ZodOptional<z.ZodString>;
@@ -72,7 +71,6 @@ declare const WebhooksInputSchema: z.ZodObject<{
     new_active: z.ZodOptional<z.ZodBoolean>;
 }, "strip", z.ZodTypeAny, {
     provider: "gitea" | "github";
-    owner: string;
     repo: string;
     action: "delete" | "get" | "list" | "create" | "update" | "test";
     active?: boolean | undefined;
@@ -90,7 +88,6 @@ declare const WebhooksInputSchema: z.ZodObject<{
     new_active?: boolean | undefined;
 }, {
     provider: "gitea" | "github";
-    owner: string;
     repo: string;
     action: "delete" | "get" | "list" | "create" | "update" | "test";
     active?: boolean | undefined;
@@ -210,10 +207,6 @@ export declare const webhooksTool: {
             action: {
                 type: string;
                 enum: string[];
-                description: string;
-            };
-            owner: {
-                type: string;
                 description: string;
             };
             repo: {

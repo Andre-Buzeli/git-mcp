@@ -47,7 +47,7 @@ const RepositoriesInputSchema = z.object({
   action: z.enum(['create', 'list', 'get', 'update', 'delete', 'fork', 'search', 'init', 'clone']),
 
   // Parâmetros comuns
-  owner: z.string(),
+  // owner: obtido automaticamente do provider,
   repo: z.string(),
   provider: z.enum(['gitea', 'github']).describe('Provider to use (gitea or github)'),
   projectPath: z.string().describe('Local project path for git operations'),
@@ -361,7 +361,7 @@ export const repositoriesTool = {
   async getRepository(params: RepositoriesInput, provider: VcsOperations): Promise<RepositoriesResult> {
     try {
       if (!params.owner || !params.repo) {
-        throw new Error('Owner e nome do repositório são obrigatórios');
+        throw new Error('e nome do repositório são obrigatórios');
       }
 
       const repository = await provider.getRepository(params.owner, params.repo);
@@ -380,7 +380,7 @@ export const repositoriesTool = {
   async updateRepository(params: RepositoriesInput, provider: VcsOperations): Promise<RepositoriesResult> {
     try {
       if (!params.owner || !params.repo) {
-        throw new Error('Owner e nome do repositório são obrigatórios');
+        throw new Error('e nome do repositório são obrigatórios');
       }
 
       const updateData: any = {};
@@ -409,7 +409,7 @@ export const repositoriesTool = {
   async deleteRepository(params: RepositoriesInput, provider: VcsOperations): Promise<RepositoriesResult> {
     try {
       if (!params.owner || !params.repo) {
-        throw new Error('Owner e nome do repositório são obrigatórios');
+        throw new Error('e nome do repositório são obrigatórios');
       }
 
       await provider.deleteRepository(params.owner, params.repo);
@@ -428,7 +428,7 @@ export const repositoriesTool = {
   async forkRepository(params: RepositoriesInput, provider: VcsOperations): Promise<RepositoriesResult> {
     try {
       if (!params.owner || !params.repo) {
-        throw new Error('Owner e nome do repositório são obrigatórios');
+        throw new Error('e nome do repositório são obrigatórios');
       }
 
       const repository = await provider.forkRepository(params.owner, params.repo, params.organization);

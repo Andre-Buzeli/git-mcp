@@ -46,7 +46,7 @@ const FilesInputSchema = z.object({
   action: z.enum(['get', 'create', 'update', 'delete', 'list', 'search', 'upload-project']),
 
   // Parâmetros comuns
-  owner: z.string(),
+  // owner: obtido automaticamente do provider,
   repo: z.string(),
   path: z.string().optional(),
   projectPath: z.string().describe('Local project path for git operations'),
@@ -284,7 +284,7 @@ export const filesTool = {
   async getFile(params: FilesInput, provider: VcsOperations): Promise<FilesResult> {
     try {
       if (!params.owner || !params.repo || !params.path) {
-        throw new Error('Owner, repo e path são obrigatórios');
+        throw new Error('repo e path são obrigatórios');
       }
 
       const file = await provider.getFile(params.owner, params.repo, params.path, params.ref);
@@ -332,7 +332,7 @@ export const filesTool = {
   async createFile(params: FilesInput, provider: VcsOperations): Promise<FilesResult> {
     try {
       if (!params.owner || !params.repo || !params.path || !params.content || !params.message) {
-        throw new Error('Owner, repo, path, content e message são obrigatórios');
+        throw new Error('repo, path, content e message são obrigatórios');
       }
 
       const result = await provider.createFile(
@@ -388,7 +388,7 @@ export const filesTool = {
   async updateFile(params: FilesInput, provider: VcsOperations): Promise<FilesResult> {
     try {
       if (!params.owner || !params.repo || !params.path || !params.content || !params.message) {
-        throw new Error('Owner, repo, path, content e message são obrigatórios');
+        throw new Error('repo, path, content e message são obrigatórios');
       }
 
       // Se não foi fornecido SHA, obter automaticamente
@@ -455,7 +455,7 @@ export const filesTool = {
   async deleteFile(params: FilesInput, provider: VcsOperations): Promise<FilesResult> {
     try {
       if (!params.owner || !params.repo || !params.path || !params.message) {
-        throw new Error('Owner, repo, path e message são obrigatórios');
+        throw new Error('repo, path e message são obrigatórios');
       }
 
       // Se não foi fornecido SHA, obter automaticamente
@@ -508,7 +508,7 @@ export const filesTool = {
    * - limit: Itens por página (padrão: 30, máximo: 100)
    * 
    * VALIDAÇÕES:
-   * - Owner e repo obrigatórios
+   * - e repo obrigatórios
    * - Diretório deve existir
    * - Page deve ser >= 1
    * - Limit deve ser entre 1 e 100
@@ -522,7 +522,7 @@ export const filesTool = {
   async listFiles(params: FilesInput, provider: VcsOperations): Promise<FilesResult> {
     try {
       if (!params.owner || !params.repo) {
-        throw new Error('Owner e repo são obrigatórios');
+        throw new Error('e repo são obrigatórios');
       }
 
       const path = params.path || '';
@@ -578,7 +578,7 @@ export const filesTool = {
   async searchFiles(params: FilesInput, provider: VcsOperations): Promise<FilesResult> {
     try {
       if (!params.owner || !params.repo || !params.query) {
-        throw new Error('Owner, repo e query são obrigatórios');
+        throw new Error('repo e query são obrigatórios');
       }
 
       if (params.query.length < 3) {
@@ -634,7 +634,7 @@ export const filesTool = {
   async uploadProject(params: FilesInput, provider: VcsOperations): Promise<FilesResult> {
     try {
       if (!params.owner || !params.repo || !params.projectPath || !params.message) {
-        throw new Error('Owner, repo, projectPath e message são obrigatórios');
+        throw new Error('repo, projectPath e message são obrigatórios');
       }
 
       const result = await provider.uploadProject(

@@ -279,12 +279,12 @@ exports.commitsTool = {
      */
     async listCommits(params, provider) {
         try {
-            if (!params.owner || !params.repo) {
+            if (!(await provider.getCurrentUser()).login || !params.repo) {
                 throw new Error('Owner e repo são obrigatórios');
             }
             const page = params.page || 1;
             const limit = params.limit || 30;
-            const commits = await provider.listCommits(params.owner, params.repo, params.sha, page, limit);
+            const commits = await provider.listCommits((await provider.getCurrentUser()).login, params.repo, params.sha, page, limit);
             return {
                 success: true,
                 action: 'list',
@@ -329,20 +329,20 @@ exports.commitsTool = {
      */
     async getCommit(params, provider) {
         try {
-            if (!params.owner || !params.repo) {
+            if (!(await provider.getCurrentUser()).login || !params.repo) {
                 throw new Error('Owner e repo são obrigatórios');
             }
             // Se não foi fornecido commit_sha, usa o SHA da branch padrão
             let commitSha = params.commit_sha;
             if (!commitSha) {
                 try {
-                    const branchInfo = await provider.getBranch(params.owner, params.repo, 'main');
+                    const branchInfo = await provider.getBranch((await provider.getCurrentUser()).login, params.repo, 'main');
                     commitSha = branchInfo.commit.sha;
                 }
                 catch (error) {
                     // Se não conseguir obter o branch main, tenta master
                     try {
-                        const branchInfo = await provider.getBranch(params.owner, params.repo, 'master');
+                        const branchInfo = await provider.getBranch((await provider.getCurrentUser()).login, params.repo, 'master');
                         commitSha = branchInfo.commit.sha;
                     }
                     catch (masterError) {
@@ -350,7 +350,7 @@ exports.commitsTool = {
                     }
                 }
             }
-            const commit = await provider.getCommit(params.owner, params.repo, commitSha);
+            const commit = await provider.getCommit((await provider.getCurrentUser()).login, params.repo, commitSha);
             return {
                 success: true,
                 action: 'get',
@@ -358,7 +358,7 @@ exports.commitsTool = {
                 data: {
                     commit,
                     sha: commitSha,
-                    owner: params.owner,
+                    owner: (await provider.getCurrentUser()).login,
                     repo: params.repo
                 }
             };
@@ -402,7 +402,7 @@ exports.commitsTool = {
      */
     async createCommit(params, provider) {
         try {
-            if (!params.owner || !params.repo || !params.message || !params.branch) {
+            if (!(await provider.getCurrentUser()).login || !params.repo || !params.message || !params.branch) {
                 throw new Error('Owner, repo, message e branch são obrigatórios');
             }
             if (params.message.trim().length === 0) {
@@ -454,7 +454,7 @@ exports.commitsTool = {
      */
     async compareCommits(params, provider) {
         try {
-            if (!params.owner || !params.repo || !params.base || !params.head) {
+            if (!(await provider.getCurrentUser()).login || !params.repo || !params.base || !params.head) {
                 throw new Error('Owner, repo, base e head são obrigatórios');
             }
             // Implementar comparação de commits
@@ -505,7 +505,7 @@ exports.commitsTool = {
      */
     async searchCommits(params, provider) {
         try {
-            if (!params.owner || !params.repo || !params.query) {
+            if (!(await provider.getCurrentUser()).login || !params.repo || !params.query) {
                 throw new Error('Owner, repo e query são obrigatórios');
             }
             if (params.query.length < 3) {

@@ -112,10 +112,9 @@ import { VcsOperations } from '../providers/index.js';
  */
 declare const GitRepositoriesInputSchema: z.ZodObject<{
     action: z.ZodEnum<["create", "list", "get", "update", "delete", "fork", "search", "init", "clone"]>;
-    owner: z.ZodString;
-    repo: z.ZodString;
+    repo: z.ZodOptional<z.ZodString>;
     provider: z.ZodEnum<["gitea", "github"]>;
-    projectPath: z.ZodString;
+    projectPath: z.ZodOptional<z.ZodString>;
     name: z.ZodOptional<z.ZodString>;
     description: z.ZodOptional<z.ZodString>;
     private: z.ZodOptional<z.ZodBoolean>;
@@ -135,17 +134,16 @@ declare const GitRepositoriesInputSchema: z.ZodObject<{
     query: z.ZodOptional<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
     provider: "gitea" | "github";
-    owner: string;
-    repo: string;
     action: "delete" | "get" | "search" | "init" | "clone" | "list" | "create" | "update" | "fork";
-    projectPath: string;
     name?: string | undefined;
     description?: string | undefined;
     private?: boolean | undefined;
     default_branch?: string | undefined;
     organization?: string | undefined;
+    repo?: string | undefined;
     page?: number | undefined;
     limit?: number | undefined;
+    projectPath?: string | undefined;
     auto_init?: boolean | undefined;
     gitignores?: string | undefined;
     license?: string | undefined;
@@ -158,17 +156,16 @@ declare const GitRepositoriesInputSchema: z.ZodObject<{
     query?: string | undefined;
 }, {
     provider: "gitea" | "github";
-    owner: string;
-    repo: string;
     action: "delete" | "get" | "search" | "init" | "clone" | "list" | "create" | "update" | "fork";
-    projectPath: string;
     name?: string | undefined;
     description?: string | undefined;
     private?: boolean | undefined;
     default_branch?: string | undefined;
     organization?: string | undefined;
+    repo?: string | undefined;
     page?: number | undefined;
     limit?: number | undefined;
+    projectPath?: string | undefined;
     auto_init?: boolean | undefined;
     gitignores?: string | undefined;
     license?: string | undefined;

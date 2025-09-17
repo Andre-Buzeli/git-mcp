@@ -127,7 +127,7 @@ export type WorkflowsResult = z.infer<typeof WorkflowsResultSchema>;
  */
 export const workflowsTool = {
   name: 'gh-workflows',
-  description: 'Gerenciamento completo de GitHub Actions workflows CI/CD (EXCLUSIVO GITHUB). PARÂMETROS OBRIGATÓRIOS: action, owner, repo, provider (deve ser github). AÇÕES: list (lista workflows), create (cria YAML), trigger (dispara), status (verifica), logs (obtém), disable/enable (controle). Boas práticas: automatize CI/CD, monitore execuções, configure triggers apropriados.',
+  description: 'Gerenciamento completo de GitHub Actions workflows CI/CD (EXCLUSIVO GITHUB).\n\nACTIONS DISPONÍVEIS:\n• list: Lista workflows do repositório\n  - OBRIGATÓRIOS: repo\n  - OPCIONAIS: page, limit\n\n• create: Cria novo workflow\n  - OBRIGATÓRIOS: repo, name, workflow_content\n  - OPCIONAIS: description, branch\n\n• trigger: Dispara workflow manualmente\n  - OBRIGATÓRIOS: repo, workflow_id\n  - OPCIONAIS: ref, inputs\n\n• status: Verifica status de execução\n  - OBRIGATÓRIOS: repo, run_id\n\n• logs: Obtém logs de execução\n  - OBRIGATÓRIOS: repo, run_id\n  - OPCIONAIS: job_id, step_number\n\n• disable: Desabilita workflow\n  - OBRIGATÓRIOS: repo, workflow_id\n\n• enable: Habilita workflow\n  - OBRIGATÓRIOS: repo, workflow_id\n\nPARÂMETROS COMUNS:\n• repo: Nome do repositório\n• provider: Fixo como "github"\n• owner: Fixo como usuário do GitHub\n\nBoas práticas: automatize CI/CD, monitore execuções, configure triggers apropriados.',
   inputSchema: {
     type: 'object',
     properties: {
@@ -137,7 +137,6 @@ export const workflowsTool = {
         description: 'Action to perform on workflows'
       },
       repo: { type: 'string', description: 'Repository name' },
-      provider: { type: 'string', description: 'Specific provider (github, gitea) or use default' },
       name: { type: 'string', description: 'Workflow name for creation' },
       description: { type: 'string', description: 'Workflow description' },
       workflow_content: { type: 'string', description: 'Workflow YAML content' },
@@ -151,7 +150,7 @@ export const workflowsTool = {
       page: { type: 'number', description: 'Page number', minimum: 1 },
       limit: { type: 'number', description: 'Items per page', minimum: 1, maximum: 100 }
     },
-    required: ['action', 'repo', 'provider']
+    required: ['action', 'repo']
   },
 
   /**
@@ -178,18 +177,12 @@ export const workflowsTool = {
       // Validação da entrada
       const validatedInput = WorkflowsInputSchema.parse(input);
 
-      // Aplicar auto-detecção de usuário
-      const updatedParams = await applyAutoUserDetection(validatedInput, validatedInput.provider);
-      
-      // Seleção do provider
-      const provider = updatedParams.provider
-
-        ? globalProviderFactory.getProvider(updatedParams.provider)
-
-        : globalProviderFactory.getDefaultProvider();
+      // Fixar provider como github para tools exclusivas do GitHub
+      const updatedParams = await applyAutoUserDetection(validatedInput, 'github');
+      const provider = globalProviderFactory.getProvider('github');
       
       if (!provider) {
-        throw new Error(`Provider '${updatedParams.provider}' não encontrado`);
+        throw new Error('Provider GitHub não encontrado');
       }
       
       // Execução da ação específica

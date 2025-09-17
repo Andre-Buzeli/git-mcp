@@ -98,7 +98,7 @@ export type AnalyticsResult = z.infer<typeof AnalyticsResultSchema>;
  */
 export const analyticsTool = {
   name: 'gh-analytics',
-  description: 'Geração completa de insights e métricas de repositório GitHub (EXCLUSIVO GITHUB). PARÂMETROS OBRIGATÓRIOS: action, owner, repo, provider (deve ser github). AÇÕES: traffic (estatísticas de tráfego), contributors (análise de contribuidores), activity (atividade), performance (métricas), reports (relatórios), trends (tendências), insights (insights gerais). Boas práticas: monitore métricas regularmente, use insights para melhorar workflow.',
+  description: 'Geração completa de insights e métricas de repositório GitHub (EXCLUSIVO GITHUB).\n\nACTIONS DISPONÍVEIS:\n• traffic: Estatísticas de tráfego do repositório\n  - OBRIGATÓRIOS: repo\n  - OPCIONAIS: metric_type, period, start_date, end_date\n\n• contributors: Análise de contribuidores\n  - OBRIGATÓRIOS: repo\n  - OPCIONAIS: contributor_type, sort_by, period, start_date, end_date, page, limit\n\n• activity: Atividade do repositório\n  - OBRIGATÓRIOS: repo\n  - OPCIONAIS: activity_type, branch, author, period, start_date, end_date\n\n• performance: Métricas de performance\n  - OBRIGATÓRIOS: repo\n  - OPCIONAIS: performance_metric, period, start_date, end_date\n\n• reports: Relatórios customizados\n  - OBRIGATÓRIOS: repo\n  - OPCIONAIS: report_type, report_format, include_charts, period, start_date, end_date\n\n• trends: Análise de tendências\n  - OBRIGATÓRIOS: repo\n  - OPCIONAIS: trend_metric, trend_period, period, start_date, end_date\n\n• insights: Insights gerais do repositório\n  - OBRIGATÓRIOS: repo\n  - OPCIONAIS: period, start_date, end_date, include_charts\n\nPARÂMETROS COMUNS:\n• repo: Nome do repositório\n• provider: Fixo como "github"\n• owner: Fixo como usuário do GitHub\n\nBoas práticas: monitore métricas regularmente, use insights para melhorar workflow.',
   inputSchema: {
     type: 'object',
     properties: {
@@ -110,10 +110,6 @@ export const analyticsTool = {
       repo: {
         type: 'string',
         description: 'Nome do repositório (OBRIGATÓRIO para todas as ações)'
-      },
-      provider: {
-        type: 'string',
-        description: 'Provider específico (github, gitea) ou usa padrão'
       },
       period: { type: 'string', enum: ['day', 'week', 'month', 'quarter', 'year'], description: 'Período de análise' },
       start_date: { type: 'string', description: 'Data inicial para análise' },
@@ -135,23 +131,19 @@ export const analyticsTool = {
       page: { type: 'number', description: 'Página', minimum: 1 },
       limit: { type: 'number', description: 'Itens por página', minimum: 1, maximum: 100 }
     },
-    required: ['action', 'repo', 'provider']
+    required: ['action', 'repo']
   },
 
   async handler(input: AnalyticsInput): Promise<AnalyticsResult> {
     try {
       const validatedInput = AnalyticsInputSchema.parse(input);
 
-      // Aplicar auto-detecção de usuário
-      const updatedParams = await applyAutoUserDetection(validatedInput, validatedInput.provider);
-      const provider = updatedParams.provider
-
-        ? globalProviderFactory.getProvider(updatedParams.provider)
-
-        : globalProviderFactory.getDefaultProvider();
+      // Fixar provider como github para tools exclusivas do GitHub
+      const updatedParams = await applyAutoUserDetection(validatedInput, 'github');
+      const provider = globalProviderFactory.getProvider('github');
       
       if (!provider) {
-        throw new Error(`Provider '${updatedParams.provider}' não encontrado`);
+        throw new Error('Provider GitHub não encontrado');
       }
       
       switch (updatedParams.action) {

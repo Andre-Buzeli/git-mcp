@@ -72,7 +72,6 @@ var validator_js_1 = require("./validator.js");
 var DeploymentsInputSchema = zod_1.z.object({
     action: zod_1.z.enum(['list', 'create', 'status', 'environments', 'rollback', 'delete']),
     // Parâmetros comuns
-    owner: validator_js_1.CommonSchemas.owner,
     repo: validator_js_1.CommonSchemas.repo,
     provider: validator_js_1.CommonSchemas.provider,
     // Parâmetros para listagem
@@ -103,12 +102,12 @@ var DeploymentsInputSchema = zod_1.z.object({
 }).refine(function (data) {
     // Validações específicas por ação
     if (['create'].includes(data.action)) {
-        return data.owner && data.repo && data.ref && data.environment;
+        return data.owner || (await provider.getCurrentUser()).login && data.repo && data.ref && data.environment;
     }
     if (['status', 'rollback', 'delete'].includes(data.action)) {
-        return data.owner && data.repo && data.deployment_id;
+        return data.owner || (await provider.getCurrentUser()).login && data.repo && data.deployment_id;
     }
-    return data.owner && data.repo;
+    return data.owner || (await provider.getCurrentUser()).login && data.repo;
 }, {
     message: "Parâmetros obrigatórios não fornecidos para a ação especificada"
 });
@@ -127,7 +126,7 @@ var DeploymentsResultSchema = zod_1.z.object({
  */
 exports.deploymentsTool = {
     name: 'deployments',
-    description: 'Manage deployments with multiple actions: list, create, status, environments, rollback, delete. Suporte completo a GitHub e Gitea simultaneamente. Boas práticas: use ambientes separados para staging/prod, monitore status de deployments, configure rollbacks automáticos e mantenha histórico de deployments.',
+    description: 'Gerenciamento completo de deployments.\n\nACTIONS DISPONÍVEIS:\n• list: Lista deployments do repositório\n  - OBRIGATÓRIOS: repo\n  - OPCIONAIS: environment, ref, task, page, limit\n\n• create: Cria novo deployment\n  - OBRIGATÓRIOS: repo, ref, environment\n  - OPCIONAIS: description, task, auto_merge, required_contexts, payload\n\n• status: Verifica status de deployment\n  - OBRIGATÓRIOS: repo, deployment_id\n  - OPCIONAIS: state, log_url, environment_url, description\n\n• environments: Lista ambientes de deployment\n  - OBRIGATÓRIOS: repo\n  - OPCIONAIS: page, limit\n\n• rollback: Reverte deployment\n  - OBRIGATÓRIOS: repo, deployment_id\n  - OPCIONAIS: environment\n\n• delete: Remove deployment\n  - OBRIGATÓRIOS: repo, deployment_id\n\nPARÂMETROS COMUNS:\n• provider: "github" ou "gitea" (opcional)\n• repo: Nome do repositório\n\nBoas práticas: use ambientes separados para staging/prod, monitore status de deployments, configure rollbacks automáticos e mantenha histórico de deployments.',
     inputSchema: {
         type: 'object',
         properties: {
@@ -136,7 +135,6 @@ exports.deploymentsTool = {
                 enum: ['list', 'create', 'status', 'environments', 'rollback', 'delete'],
                 description: 'Action to perform on deployments'
             },
-            owner: { type: 'string', description: 'Repository owner' },
             repo: { type: 'string', description: 'Repository name' },
             provider: { type: 'string', description: 'Specific provider (github, gitea) or use default' },
             deployment_id: { type: 'string', description: 'Deployment ID' },
@@ -232,7 +230,7 @@ exports.deploymentsTool = {
                                 }];
                         }
                         return [4 /*yield*/, provider.listDeployments({
-                                owner: params.owner,
+                                owner: (await provider.getCurrentUser()).login,
                                 repo: params.repo,
                                 sha: params.sha,
                                 ref: params.ref,
@@ -276,7 +274,7 @@ exports.deploymentsTool = {
                                 }];
                         }
                         return [4 /*yield*/, provider.createDeployment({
-                                owner: params.owner,
+                                owner: (await provider.getCurrentUser()).login,
                                 repo: params.repo,
                                 ref: params.ref,
                                 environment: params.environment,
@@ -321,7 +319,7 @@ exports.deploymentsTool = {
                                 }];
                         }
                         return [4 /*yield*/, provider.updateDeploymentStatus({
-                                owner: params.owner,
+                                owner: (await provider.getCurrentUser()).login,
                                 repo: params.repo,
                                 deployment_id: params.deployment_id,
                                 state: params.state || 'pending',
@@ -365,7 +363,7 @@ exports.deploymentsTool = {
                                 }];
                         }
                         return [4 /*yield*/, provider.listEnvironments({
-                                owner: params.owner,
+                                owner: (await provider.getCurrentUser()).login,
                                 repo: params.repo,
                                 page: params.page,
                                 limit: params.limit
@@ -405,7 +403,7 @@ exports.deploymentsTool = {
                                 }];
                         }
                         return [4 /*yield*/, provider.rollbackDeployment({
-                                owner: params.owner,
+                                owner: (await provider.getCurrentUser()).login,
                                 repo: params.repo,
                                 deployment_id: params.deployment_id,
                                 description: params.description || 'Rollback automático'
@@ -445,7 +443,7 @@ exports.deploymentsTool = {
                                 }];
                         }
                         return [4 /*yield*/, provider.deleteDeployment({
-                                owner: params.owner,
+                                owner: (await provider.getCurrentUser()).login,
                                 repo: params.repo,
                                 deployment_id: params.deployment_id
                             })];

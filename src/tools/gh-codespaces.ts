@@ -31,7 +31,7 @@ import { globalProviderFactory, VcsOperations } from '../providers/index.js';
 
 const GhCodespacesInputSchema = z.object({
   action: z.enum(['list', 'create', 'delete', 'start', 'stop', 'rebuild', 'logs']),
-  owner: z.string(),
+  // owner: obtido automaticamente do provider,
   repo: z.string(),
   provider: z.enum(['github']).describe('Provider to use (github only)'),
   projectPath: z.string().describe('Local project path for git operations'),
@@ -63,7 +63,7 @@ export type GhCodespacesResult = z.infer<typeof GhCodespacesResultSchema>;
 
 export const ghCodespacesTool = {
   name: 'gh-codespaces',
-  description: 'Manage GitHub Codespaces (GitHub only) with multiple actions: list, create, delete, start, stop, rebuild, logs. Exclusivo para GitHub. Boas práticas (solo): use para desenvolvimento em nuvem, ambientes de desenvolvimento consistentes, colaboração remota; use para projetos que precisam de ambientes específicos, configure devcontainers adequadamente.',
+  description: 'Gerenciamento de GitHub Codespaces (EXCLUSIVO GITHUB).\n\nACTIONS DISPONÍVEIS:\n• list: Lista codespaces\n  - OPCIONAIS: repo\n\n• create: Cria novo codespace\n  - OBRIGATÓRIOS: repo\n  - OPCIONAIS: codespace_name, branch, machine_type, display_name\n\n• delete: Remove codespace\n  - OBRIGATÓRIOS: codespace_id\n\n• start: Inicia codespace\n  - OBRIGATÓRIOS: codespace_id\n\n• stop: Para codespace\n  - OBRIGATÓRIOS: codespace_id\n\n• rebuild: Reconstrói codespace\n  - OBRIGATÓRIOS: codespace_id\n\n• logs: Obtém logs do codespace\n  - OBRIGATÓRIOS: codespace_id\n  - OPCIONAIS: log_type\n\nPARÂMETROS COMUNS:\n• provider: Fixo como "github"\n• owner: Fixo como usuário do GitHub\n\nBoas práticas: use para desenvolvimento em nuvem, ambientes de desenvolvimento consistentes, colaboração remota; use para projetos que precisam de ambientes específicos, configure devcontainers adequadamente.',
   inputSchema: {
     type: 'object',
     properties: {
@@ -72,9 +72,7 @@ export const ghCodespacesTool = {
         enum: ['list', 'create', 'delete', 'start', 'stop', 'rebuild', 'logs'],
         description: 'Action to perform on codespaces'
       },
-      owner: { type: 'string', description: 'Repository owner' },
       repo: { type: 'string', description: 'Repository name' },
-      provider: { type: 'string', enum: ['github'], description: 'Provider to use (github only)' },
       projectPath: { type: 'string', description: 'Local project path for git operations' },
       codespace_name: { type: 'string', description: 'Codespace name' },
       branch: { type: 'string', description: 'Branch for codespace' },
@@ -83,16 +81,14 @@ export const ghCodespacesTool = {
       codespace_id: { type: 'string', description: 'Codespace ID' },
       log_type: { type: 'string', enum: ['build', 'start', 'stop'], description: 'Log type' }
     },
-    required: ['action', 'owner', 'repo', 'provider', 'projectPath']
+    required: ['action', 'projectPath']
   },
 
   async handler(input: GhCodespacesInput): Promise<GhCodespacesResult> {
     try {
       const validatedInput = GhCodespacesInputSchema.parse(input);
       
-      if (validatedInput.provider !== 'github') {
-        throw new Error('gh-codespaces é exclusivo para GitHub');
-      }
+      // Fixar provider como github para tools exclusivas do GitHub
 
       const provider = globalProviderFactory.getProvider('github');
       if (!provider) {

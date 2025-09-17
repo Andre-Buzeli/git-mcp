@@ -72,7 +72,6 @@ var validator_js_1 = require("./validator.js");
 var AnalyticsInputSchema = zod_1.z.object({
     action: zod_1.z.enum(['traffic', 'contributors', 'activity', 'performance', 'reports', 'trends', 'insights']),
     // Parâmetros comuns
-    owner: validator_js_1.CommonSchemas.owner,
     repo: validator_js_1.CommonSchemas.repo,
     provider: validator_js_1.CommonSchemas.provider,
     // Parâmetros para listagem
@@ -104,7 +103,7 @@ var AnalyticsInputSchema = zod_1.z.object({
     path: validator_js_1.CommonSchemas.mediumString,
     file_type: validator_js_1.CommonSchemas.shortString
 }).refine(function (data) {
-    return data.owner && data.repo;
+    return data.owner || (await provider.getCurrentUser()).login && data.repo;
 }, {
     message: "Owner e repo são obrigatórios"
 });
@@ -123,7 +122,7 @@ var AnalyticsResultSchema = zod_1.z.object({
  */
 exports.analyticsTool = {
     name: 'analytics',
-    description: 'Geração completa de insights e métricas de repositório: traffic (estatísticas de tráfego), contributors (análise de contribuidores), activity (atividade do repositório), performance (métricas de performance), reports (relatórios customizados), trends (análise de tendências). Suporte simultâneo para GitHub Insights e Gitea Analytics. Boas práticas: monitore métricas regularmente, use insights para melhorar workflow, gere relatórios periódicos e analise tendências de contribuição. Uso eficiente: análise de performance, tomada de decisões baseada em dados, otimização de processos de desenvolvimento.',
+    description: 'Geração completa de insights e métricas de repositório.\n\nACTIONS DISPONÍVEIS:\n• traffic: Estatísticas de tráfego do repositório\n  - OBRIGATÓRIOS: repo\n  - OPCIONAIS: metric_type, period, start_date, end_date\n\n• contributors: Análise de contribuidores\n  - OBRIGATÓRIOS: repo\n  - OPCIONAIS: contributor_type, sort_by, period, start_date, end_date, page, limit\n\n• activity: Atividade do repositório\n  - OBRIGATÓRIOS: repo\n  - OPCIONAIS: activity_type, branch, author, period, start_date, end_date\n\n• performance: Métricas de performance\n  - OBRIGATÓRIOS: repo\n  - OPCIONAIS: performance_metric, period, start_date, end_date\n\n• reports: Relatórios customizados\n  - OBRIGATÓRIOS: repo\n  - OPCIONAIS: report_type, report_format, include_charts, period, start_date, end_date\n\n• trends: Análise de tendências\n  - OBRIGATÓRIOS: repo\n  - OPCIONAIS: trend_metric, trend_period, period, start_date, end_date\n\n• insights: Insights gerais do repositório\n  - OBRIGATÓRIOS: repo\n  - OPCIONAIS: period, start_date, end_date, include_charts\n\nPARÂMETROS COMUNS:\n• provider: "github" ou "gitea" (opcional)\n• repo: Nome do repositório\n\nBoas práticas: monitore métricas regularmente, use insights para melhorar workflow, gere relatórios periódicos e analise tendências de contribuição.',
     inputSchema: {
         type: 'object',
         properties: {
@@ -309,7 +308,7 @@ exports.analyticsTool = {
                                 }];
                         }
                         return [4 /*yield*/, provider.getTrafficStats({
-                                owner: params.owner,
+                                owner: (await provider.getCurrentUser()).login,
                                 repo: params.repo,
                                 metric_type: params.metric_type || 'views',
                                 period: params.period || 'week',
@@ -351,7 +350,7 @@ exports.analyticsTool = {
                                 }];
                         }
                         return [4 /*yield*/, provider.analyzeContributors({
-                                owner: params.owner,
+                                owner: (await provider.getCurrentUser()).login,
                                 repo: params.repo,
                                 contributor_type: params.contributor_type || 'all',
                                 sort_by: params.sort_by || 'commits',
@@ -396,7 +395,7 @@ exports.analyticsTool = {
                                 }];
                         }
                         return [4 /*yield*/, provider.getActivityStats({
-                                owner: params.owner,
+                                owner: (await provider.getCurrentUser()).login,
                                 repo: params.repo,
                                 activity_type: params.activity_type || 'all',
                                 branch: params.branch,
@@ -440,7 +439,7 @@ exports.analyticsTool = {
                                 }];
                         }
                         return [4 /*yield*/, provider.getPerformanceMetrics({
-                                owner: params.owner,
+                                owner: (await provider.getCurrentUser()).login,
                                 repo: params.repo,
                                 performance_metric: params.performance_metric,
                                 period: params.period || 'month',
@@ -482,7 +481,7 @@ exports.analyticsTool = {
                                 }];
                         }
                         return [4 /*yield*/, provider.generateReports({
-                                owner: params.owner,
+                                owner: (await provider.getCurrentUser()).login,
                                 repo: params.repo,
                                 report_type: params.report_type || 'summary',
                                 report_format: params.report_format || 'json',
@@ -526,7 +525,7 @@ exports.analyticsTool = {
                                 }];
                         }
                         return [4 /*yield*/, provider.analyzeTrends({
-                                owner: params.owner,
+                                owner: (await provider.getCurrentUser()).login,
                                 repo: params.repo,
                                 trend_metric: params.trend_metric || 'commits',
                                 trend_period: params.trend_period || 'weekly',
@@ -569,7 +568,7 @@ exports.analyticsTool = {
                                 }];
                         }
                         return [4 /*yield*/, provider.getRepositoryInsights({
-                                owner: params.owner,
+                                owner: (await provider.getCurrentUser()).login,
                                 repo: params.repo,
                                 period: params.period || 'month',
                                 start_date: params.start_date,

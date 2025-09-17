@@ -160,7 +160,7 @@ var UsersResultSchema = zod_1.z.object({
  */
 exports.usersTool = {
     name: 'users',
-    description: 'Manage users with multi-provider support (GitHub and Gitea): get, list, search, orgs, repos. Dicas (solo): útil para automações pessoais, conferência rápida de acesso e organizações; use apenas permissões necessárias e evite expor dados sensíveis.',
+    description: 'Gerenciamento de usuários.\n\nACTIONS DISPONÍVEIS:\n• get: Obtém informações de usuário\n  - OPCIONAIS: username, current\n\n• list: Lista usuários\n  - OPCIONAIS: page, limit\n\n• search: Busca usuários\n  - OBRIGATÓRIOS: query\n  - OPCIONAIS: page, limit\n\n• orgs: Lista organizações do usuário\n  - OBRIGATÓRIOS: username\n  - OPCIONAIS: page, limit\n\n• repos: Lista repositórios do usuário\n  - OBRIGATÓRIOS: username\n  - OPCIONAIS: repo_type, sort, direction, page, limit\n\nPARÂMETROS COMUNS:\n• provider: "github" ou "gitea" (opcional)\n\nDicas: útil para automações pessoais, conferência rápida de acesso e organizações; use apenas permissões necessárias e evite expor dados sensíveis.',
     inputSchema: {
         type: 'object',
         properties: {

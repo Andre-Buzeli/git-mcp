@@ -31,7 +31,7 @@ import { globalProviderFactory, VcsOperations } from '../providers/index.js';
 
 const GhProjectsInputSchema = z.object({
   action: z.enum(['list', 'create', 'get', 'update', 'delete', 'items', 'fields']),
-  owner: z.string(),
+  // owner: obtido automaticamente do provider,
   repo: z.string(),
   provider: z.enum(['github']).describe('Provider to use (github only)'),
   projectPath: z.string().describe('Local project path for git operations'),
@@ -74,7 +74,7 @@ export type GhProjectsResult = z.infer<typeof GhProjectsResultSchema>;
 
 export const ghProjectsTool = {
   name: 'gh-projects',
-  description: 'Manage GitHub Projects (GitHub only) with multiple actions: list, create, get, update, delete, items, fields. Exclusivo para GitHub. Boas práticas (solo): use para gerenciamento de projetos, organização de tarefas, planejamento de sprints; use para projetos de médio a longo prazo, configure campos personalizados adequadamente.',
+  description: 'Gerenciamento de GitHub Projects (EXCLUSIVO GITHUB).\n\nACTIONS DISPONÍVEIS:\n• list: Lista projetos\n  - OPCIONAIS: page, limit\n\n• create: Cria novo projeto\n  - OBRIGATÓRIOS: title\n  - OPCIONAIS: body, state, public\n\n• get: Obtém detalhes de um projeto específico\n  - OBRIGATÓRIOS: project_id\n\n• update: Atualiza projeto existente\n  - OBRIGATÓRIOS: project_id\n  - OPCIONAIS: title, body, state, public\n\n• delete: Remove projeto\n  - OBRIGATÓRIOS: project_id\n\n• items: Gerencia itens do projeto\n  - OBRIGATÓRIOS: project_id\n  - OPCIONAIS: item_id, content_id, content_type, field_id, field_value\n\n• fields: Gerencia campos do projeto\n  - OBRIGATÓRIOS: project_id\n  - OPCIONAIS: field_id, field_name, field_type, field_options\n\nPARÂMETROS COMUNS:\n• provider: Fixo como "github"\n• owner: Fixo como usuário do GitHub\n\nBoas práticas: use para gerenciamento de projetos, organização de tarefas, planejamento de sprints; use para projetos de médio a longo prazo, configure campos personalizados adequadamente.',
   inputSchema: {
     type: 'object',
     properties: {
@@ -83,9 +83,6 @@ export const ghProjectsTool = {
         enum: ['list', 'create', 'get', 'update', 'delete', 'items', 'fields'],
         description: 'Action to perform on projects'
       },
-      owner: { type: 'string', description: 'Repository owner' },
-      repo: { type: 'string', description: 'Repository name' },
-      provider: { type: 'string', enum: ['github'], description: 'Provider to use (github only)' },
       projectPath: { type: 'string', description: 'Local project path for git operations' },
       project_id: { type: 'string', description: 'Project ID' },
       title: { type: 'string', description: 'Project title' },
@@ -103,16 +100,14 @@ export const ghProjectsTool = {
       page: { type: 'number', description: 'Page number', minimum: 1 },
       limit: { type: 'number', description: 'Items per page', minimum: 1, maximum: 100 }
     },
-    required: ['action', 'owner', 'repo', 'provider', 'projectPath']
+    required: ['action', 'projectPath']
   },
 
   async handler(input: GhProjectsInput): Promise<GhProjectsResult> {
     try {
       const validatedInput = GhProjectsInputSchema.parse(input);
       
-      if (validatedInput.provider !== 'github') {
-        throw new Error('gh-projects é exclusivo para GitHub');
-      }
+      // Fixar provider como github para tools exclusivas do GitHub
 
       const provider = globalProviderFactory.getProvider('github');
       if (!provider) {

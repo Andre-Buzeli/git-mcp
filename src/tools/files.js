@@ -185,7 +185,7 @@ var FilesResultSchema = zod_1.z.object({
  */
 exports.filesTool = {
     name: 'files',
-    description: 'GERENCIAMENTO DE ARQUIVOS - GitHub & Gitea\n\nACTIONS DISPONÍVEIS:\n• get: Obtém conteúdo de um arquivo específico\n• create: Cria novo arquivo no repositório\n• update: Atualiza conteúdo de arquivo existente (SHA automático)\n• delete: Remove arquivo do repositório (SHA automático)\n• list: Lista arquivos em um diretório\n• search: Busca arquivos por conteúdo\n\nPARÂMETROS COMUNS:\n• provider: "github" ou "gitea" (opcional)\n• owner: Proprietário do repositório\n• repo: Nome do repositório\n• path: Caminho do arquivo/diretório\n• branch: Branch alvo (padrão: main/master)\n\nPARÂMETROS OBRIGATÓRIOS POR ACTION:\n- get: owner + repo + path\n- create: owner + repo + path + content + message\n- update: owner + repo + path + content + message\n- delete: owner + repo + path + message\n- list: owner + repo\n- search: owner + repo + query\n\nPARÂMETROS OPCIONAIS:\n• sha: Hash do arquivo (automático para update/delete)\n• branch: Branch específica (padrão: main)\n\nEXEMPLOS DE USO:\n• Obter arquivo: {"action":"get","owner":"johndoe","repo":"myproject","path":"README.md"}\n• Criar arquivo: {"action":"create","owner":"johndoe","repo":"myproject","path":"src/main.js","content":"console.log(\'Hello\');","message":"Add main file"}\n• Atualizar: {"action":"update","owner":"johndoe","repo":"myproject","path":"README.md","content":"Novo conteúdo","message":"Update README"}\n• Buscar: {"action":"search","owner":"johndoe","repo":"myproject","query":"function"}\n\nCARACTERÍSTICAS ESPECIAIS:\n• SHA automático: Não precisa fornecer SHA para update/delete\n• Commits automáticos: Mensagens claras de commit\n• Busca por conteúdo: Localiza arquivos por texto\n• Suporte a branches: Trabalhe em branches específicas',
+    description: 'GERENCIAMENTO DE ARQUIVOS - GitHub & Gitea\n\nACTIONS DISPONÍVEIS:\n• get: Obtém conteúdo de um arquivo específico\n  - OBRIGATÓRIOS: repo, path\n  - OPCIONAIS: ref\n\n• create: Cria novo arquivo no repositório\n  - OBRIGATÓRIOS: repo, path, content, message\n  - OPCIONAIS: branch\n\n• update: Atualiza conteúdo de arquivo existente\n  - OBRIGATÓRIOS: repo, path, content, message, sha\n  - OPCIONAIS: branch\n\n• delete: Remove arquivo do repositório\n  - OBRIGATÓRIOS: repo, path, message, sha\n  - OPCIONAIS: branch\n\n• list: Lista arquivos em um diretório\n  - OBRIGATÓRIOS: repo\n  - OPCIONAIS: path, ref, page, limit\n\n• search: Busca arquivos por conteúdo\n  - OBRIGATÓRIOS: repo, query\n  - OPCIONAIS: page, limit\n\nPARÂMETROS COMUNS:\n• provider: "github" ou "gitea" (opcional)\n• repo: Nome do repositório\n\nCARACTERÍSTICAS ESPECIAIS:\n• SHA automático: Não precisa fornecer SHA para update/delete\n• Commits automáticos: Mensagens claras de commit\n• Busca por conteúdo: Localiza arquivos por texto\n• Suporte a branches: Trabalhe em branches específicas',
     inputSchema: {
         type: 'object',
         properties: {
@@ -194,7 +194,6 @@ exports.filesTool = {
                 enum: ['get', 'create', 'update', 'delete', 'list', 'search'],
                 description: 'Action to perform on files'
             },
-            owner: { type: 'string', description: 'Repository owner' },
             repo: { type: 'string', description: 'Repository name' },
             path: { type: 'string', description: 'File or directory path' },
             provider: { type: 'string', description: 'Specific provider (github, gitea) or use default' },
@@ -321,10 +320,10 @@ exports.filesTool = {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 2, , 3]);
-                        if (!params.owner || !params.repo || !params.path) {
-                            throw new Error('Owner, repo e path são obrigatórios');
+                        if (!!params.repo || !params.path) {
+                            throw new Error('repo e path são obrigatórios');
                         }
-                        return [4 /*yield*/, provider.getFile(params.owner, params.repo, params.path, params.ref)];
+                        return [4 /*yield*/, provider.getFile((await provider.getCurrentUser()).login, params.repo, params.path, params.ref)];
                     case 1:
                         file = _a.sent();
                         return [2 /*return*/, {
@@ -377,10 +376,10 @@ exports.filesTool = {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 2, , 3]);
-                        if (!params.owner || !params.repo || !params.path || !params.content || !params.message) {
-                            throw new Error('Owner, repo, path, content e message são obrigatórios');
+                        if (!!params.repo || !params.path || !params.content || !params.message) {
+                            throw new Error('repo, path, content e message são obrigatórios');
                         }
-                        return [4 /*yield*/, provider.createFile(params.owner, params.repo, params.path, params.content, params.message, params.branch)];
+                        return [4 /*yield*/, provider.createFile((await provider.getCurrentUser()).login, params.repo, params.path, params.content, params.message, params.branch)];
                     case 1:
                         result = _a.sent();
                         return [2 /*return*/, {
@@ -434,15 +433,15 @@ exports.filesTool = {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 6, , 7]);
-                        if (!params.owner || !params.repo || !params.path || !params.content || !params.message) {
-                            throw new Error('Owner, repo, path, content e message são obrigatórios');
+                        if (!!params.repo || !params.path || !params.content || !params.message) {
+                            throw new Error('repo, path, content e message são obrigatórios');
                         }
                         fileSha = params.sha;
                         if (!!fileSha) return [3 /*break*/, 4];
                         _a.label = 1;
                     case 1:
                         _a.trys.push([1, 3, , 4]);
-                        return [4 /*yield*/, provider.getFile(params.owner, params.repo, params.path, params.branch)];
+                        return [4 /*yield*/, provider.getFile((await provider.getCurrentUser()).login, params.repo, params.path, params.branch)];
                     case 2:
                         fileInfo = _a.sent();
                         fileSha = fileInfo.sha;
@@ -450,7 +449,7 @@ exports.filesTool = {
                     case 3:
                         error_4 = _a.sent();
                         throw new Error("N\u00E3o foi poss\u00EDvel obter SHA automaticamente para '".concat(params.path, "'. Forne\u00E7a o par\u00E2metro 'sha' manualmente."));
-                    case 4: return [4 /*yield*/, provider.updateFile(params.owner, params.repo, params.path, params.content, params.message, fileSha, params.branch)];
+                    case 4: return [4 /*yield*/, provider.updateFile((await provider.getCurrentUser()).login, params.repo, params.path, params.content, params.message, fileSha, params.branch)];
                     case 5:
                         result = _a.sent();
                         return [2 /*return*/, {
@@ -503,15 +502,15 @@ exports.filesTool = {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 6, , 7]);
-                        if (!params.owner || !params.repo || !params.path || !params.message) {
-                            throw new Error('Owner, repo, path e message são obrigatórios');
+                        if (!!params.repo || !params.path || !params.message) {
+                            throw new Error('repo, path e message são obrigatórios');
                         }
                         fileSha = params.sha;
                         if (!!fileSha) return [3 /*break*/, 4];
                         _a.label = 1;
                     case 1:
                         _a.trys.push([1, 3, , 4]);
-                        return [4 /*yield*/, provider.getFile(params.owner, params.repo, params.path, params.branch)];
+                        return [4 /*yield*/, provider.getFile((await provider.getCurrentUser()).login, params.repo, params.path, params.branch)];
                     case 2:
                         fileInfo = _a.sent();
                         fileSha = fileInfo.sha;
@@ -519,7 +518,7 @@ exports.filesTool = {
                     case 3:
                         error_6 = _a.sent();
                         throw new Error("N\u00E3o foi poss\u00EDvel obter SHA automaticamente para '".concat(params.path, "'. Forne\u00E7a o par\u00E2metro 'sha' manualmente."));
-                    case 4: return [4 /*yield*/, provider.deleteFile(params.owner, params.repo, params.path, params.message, fileSha, params.branch)];
+                    case 4: return [4 /*yield*/, provider.deleteFile((await provider.getCurrentUser()).login, params.repo, params.path, params.message, fileSha, params.branch)];
                     case 5:
                         result = _a.sent();
                         return [2 /*return*/, {
@@ -555,7 +554,7 @@ exports.filesTool = {
      * - limit: Itens por página (padrão: 30, máximo: 100)
      *
      * VALIDAÇÕES:
-     * - Owner e repo obrigatórios
+     * - e repo obrigatórios
      * - Diretório deve existir
      * - Page deve ser >= 1
      * - Limit deve ser entre 1 e 100
@@ -573,13 +572,13 @@ exports.filesTool = {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 2, , 3]);
-                        if (!params.owner || !params.repo) {
-                            throw new Error('Owner e repo são obrigatórios');
+                        if (!!params.repo) {
+                            throw new Error('e repo são obrigatórios');
                         }
                         path = params.path || '';
                         page = params.page || 1;
                         limit = params.limit || 30;
-                        return [4 /*yield*/, provider.listFiles(params.owner, params.repo, path, params.ref)];
+                        return [4 /*yield*/, provider.listFiles((await provider.getCurrentUser()).login, params.repo, path, params.ref)];
                     case 1:
                         files = _a.sent();
                         return [2 /*return*/, {
@@ -633,8 +632,8 @@ exports.filesTool = {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 try {
-                    if (!params.owner || !params.repo || !params.query) {
-                        throw new Error('Owner, repo e query são obrigatórios');
+                    if (!!params.repo || !params.query) {
+                        throw new Error('repo e query são obrigatórios');
                     }
                     if (params.query.length < 3) {
                         throw new Error('Query deve ter pelo menos 3 caracteres');

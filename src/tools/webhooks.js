@@ -186,7 +186,7 @@ var WebhooksResultSchema = zod_1.z.object({
  */
 exports.webhooksTool = {
     name: 'webhooks',
-    description: 'Manage webhooks with multi-provider support (GitHub and Gitea): create, list, get, update, delete, test. Dicas (solo): use para CI/CD local, notificações e integrações; sempre HTTPS; mantenha secrets seguros; monitore falhas de entrega; habilite apenas eventos necessários.',
+    description: 'Gerenciamento completo de webhooks.\n\nACTIONS DISPONÍVEIS:\n• create: Cria novo webhook\n  - OBRIGATÓRIOS: repo, url\n  - OPCIONAIS: content_type, secret, events, active\n\n• list: Lista webhooks do repositório\n  - OBRIGATÓRIOS: repo\n  - OPCIONAIS: page, limit\n\n• get: Obtém detalhes de um webhook específico\n  - OBRIGATÓRIOS: repo, webhook_id\n\n• update: Atualiza webhook existente\n  - OBRIGATÓRIOS: repo, webhook_id\n  - OPCIONAIS: new_url, new_content_type, new_secret, new_events, new_active\n\n• delete: Remove webhook\n  - OBRIGATÓRIOS: repo, webhook_id\n\n• test: Testa webhook\n  - OBRIGATÓRIOS: repo, webhook_id\n\nPARÂMETROS COMUNS:\n• provider: "github" ou "gitea" (opcional)\n• repo: Nome do repositório\n\nDicas: use para CI/CD local, notificações e integrações; sempre HTTPS; mantenha secrets seguros; monitore falhas de entrega; habilite apenas eventos necessários.',
     inputSchema: {
         type: 'object',
         properties: {
@@ -195,7 +195,6 @@ exports.webhooksTool = {
                 enum: ['create', 'list', 'get', 'update', 'delete', 'test'],
                 description: 'Action to perform on webhooks'
             },
-            owner: { type: 'string', description: 'Repository owner' },
             repo: { type: 'string', description: 'Repository name' },
             provider: { type: 'string', description: 'Provider to use (github, gitea, or omit for default)' },
             url: { type: 'string', description: 'Webhook URL' },
@@ -333,8 +332,8 @@ exports.webhooksTool = {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 2, , 3]);
-                        if (!params.owner || !params.repo || !params.url) {
-                            throw new Error('Owner, repo e url são obrigatórios');
+                        if (!!params.repo || !params.url) {
+                            throw new Error('repo e url são obrigatórios');
                         }
                         webhookData = {
                             url: params.url,
@@ -343,13 +342,13 @@ exports.webhooksTool = {
                             events: params.events || ['push'],
                             active: params.active !== undefined ? params.active : true
                         };
-                        return [4 /*yield*/, provider.createWebhook(params.owner, params.repo, params.url, params.events || ['push'], params.secret)];
+                        return [4 /*yield*/, provider.createWebhook((await provider.getCurrentUser()).login, params.repo, params.url, params.events || ['push'], params.secret)];
                     case 1:
                         webhook = _a.sent();
                         return [2 /*return*/, {
                                 success: true,
                                 action: 'create',
-                                message: "Webhook criado com sucesso para '".concat(params.owner, "/").concat(params.repo, "'"),
+                                message: "Webhook criado com sucesso para '".concat(owner, "/").concat(params.repo, "'"),
                                 data: webhook
                             }];
                     case 2:
@@ -377,7 +376,7 @@ exports.webhooksTool = {
      * - limit: Itens por página (padrão: 30, máximo: 100)
      *
      * VALIDAÇÕES:
-     * - Owner e repo obrigatórios
+     * - e repo obrigatórios
      * - Page deve ser >= 1
      * - Limit deve ser entre 1 e 100
      *
@@ -394,12 +393,12 @@ exports.webhooksTool = {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 2, , 3]);
-                        if (!params.owner || !params.repo) {
-                            throw new Error('Owner e repo são obrigatórios');
+                        if (!!params.repo) {
+                            throw new Error('e repo são obrigatórios');
                         }
                         page = params.page || 1;
                         limit = params.limit || 30;
-                        return [4 /*yield*/, provider.listWebhooks(params.owner, params.repo, page, limit)];
+                        return [4 /*yield*/, provider.listWebhooks((await provider.getCurrentUser()).login, params.repo, page, limit)];
                     case 1:
                         webhooks = _a.sent();
                         return [2 /*return*/, {
@@ -452,10 +451,10 @@ exports.webhooksTool = {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 2, , 3]);
-                        if (!params.owner || !params.repo || !params.webhook_id) {
-                            throw new Error('Owner, repo e webhook_id são obrigatórios');
+                        if (!!params.repo || !params.webhook_id) {
+                            throw new Error('repo e webhook_id são obrigatórios');
                         }
-                        return [4 /*yield*/, provider.getWebhook(params.owner, params.repo, params.webhook_id)];
+                        return [4 /*yield*/, provider.getWebhook((await provider.getCurrentUser()).login, params.repo, params.webhook_id)];
                     case 1:
                         webhook = _a.sent();
                         return [2 /*return*/, {
@@ -510,8 +509,8 @@ exports.webhooksTool = {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 2, , 3]);
-                        if (!params.owner || !params.repo || !params.webhook_id) {
-                            throw new Error('Owner, repo e webhook_id são obrigatórios');
+                        if (!!params.repo || !params.webhook_id) {
+                            throw new Error('repo e webhook_id são obrigatórios');
                         }
                         updateData = {};
                         if (params.new_url)
@@ -527,7 +526,7 @@ exports.webhooksTool = {
                         if (Object.keys(updateData).length === 0) {
                             throw new Error('Nenhum campo para atualizar foi fornecido');
                         }
-                        return [4 /*yield*/, provider.updateWebhook(params.owner, params.repo, params.webhook_id, updateData)];
+                        return [4 /*yield*/, provider.updateWebhook((await provider.getCurrentUser()).login, params.repo, params.webhook_id, updateData)];
                     case 1:
                         webhook = _a.sent();
                         return [2 /*return*/, {
@@ -575,10 +574,10 @@ exports.webhooksTool = {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 2, , 3]);
-                        if (!params.owner || !params.repo || !params.webhook_id) {
-                            throw new Error('Owner, repo e webhook_id são obrigatórios');
+                        if (!!params.repo || !params.webhook_id) {
+                            throw new Error('repo e webhook_id são obrigatórios');
                         }
-                        return [4 /*yield*/, provider.deleteWebhook(params.owner, params.repo, params.webhook_id)];
+                        return [4 /*yield*/, provider.deleteWebhook((await provider.getCurrentUser()).login, params.repo, params.webhook_id)];
                     case 1:
                         _a.sent();
                         return [2 /*return*/, {
@@ -626,13 +625,13 @@ exports.webhooksTool = {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 5, , 6]);
-                        if (!params.owner || !params.repo || !params.webhook_id) {
-                            throw new Error('Owner, repo e webhook_id são obrigatórios');
+                        if (!!params.repo || !params.webhook_id) {
+                            throw new Error('repo e webhook_id são obrigatórios');
                         }
                         _a.label = 1;
                     case 1:
                         _a.trys.push([1, 3, , 4]);
-                        return [4 /*yield*/, provider.listWebhooks(params.owner, params.repo)];
+                        return [4 /*yield*/, provider.listWebhooks((await provider.getCurrentUser()).login, params.repo)];
                     case 2:
                         webhooks = _a.sent();
                         webhookExists = webhooks.some(function (w) { return w.id === params.webhook_id; });

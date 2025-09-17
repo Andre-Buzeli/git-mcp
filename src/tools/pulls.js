@@ -234,7 +234,7 @@ var PullsResultSchema = zod_1.z.object({
  */
 exports.pullsTool = {
     name: 'pulls',
-    description: 'GERENCIAMENTO DE PULL REQUESTS - GitHub & Gitea\n\nACTIONS DISPONÍVEIS:\n• create: Cria novo Pull Request (valida diferenças entre branches)\n• list: Lista PRs abertas/fechadas/mescladas\n• get: Obtém detalhes de um PR específico\n• update: Atualiza título/descrição/labels\n• merge: Faz merge do PR (merge, rebase, squash)\n• close: Fecha PR sem merge\n• review: Adiciona review (APPROVE, REQUEST_CHANGES, COMMENT)\n• search: Busca PRs por texto/autor/labels\n\nPARÂMETROS COMUNS:\n• provider: "github" ou "gitea" (opcional)\n• owner: Proprietário do repositório\n• repo: Nome do repositório\n• pull_number: Número do PR\n• title: Título do PR\n• body: Descrição do PR\n• head: Branch de origem\n• base: Branch de destino\n\nPARÂMETROS OBRIGATÓRIOS POR ACTION:\n- create: owner + repo + title + head + base\n- list: owner + repo\n- get: owner + repo + pull_number\n- update: owner + repo + pull_number\n- merge: owner + repo + pull_number + merge_method\n- close: owner + repo + pull_number\n- review: owner + repo + pull_number + review_event\n- search: owner + repo + query\n\nPARÂMETROS OPCIONAIS:\n• merge_method: "merge", "rebase", "squash"\n• review_event: "APPROVE", "REQUEST_CHANGES", "COMMENT"\n• review_body: Comentário da review\n• state: Estado ("open", "closed", "merged", "all")\n• labels: Array de labels\n• page: Página da listagem\n\nEXEMPLOS DE USO:\n• Criar PR: {"action":"create","owner":"johndoe","repo":"myproject","title":"Add login feature","head":"feature/login","base":"main","body":"Implementa sistema de login"}\n• Listar: {"action":"list","owner":"johndoe","repo":"myproject","state":"open"}\n• Review: {"action":"review","owner":"johndoe","repo":"myproject","pull_number":1,"review_event":"APPROVE","review_body":"Aprovado! Código limpo."}\n• Merge: {"action":"merge","owner":"johndoe","repo":"myproject","pull_number":1,"merge_method":"squash"}\n\nCARACTERÍSTICAS ESPECIAIS:\n• Validação automática: Verifica diferenças entre branches\n• Merge inteligente: Escolhe método apropriado\n• Reviews estruturados: Aprovação ou mudanças solicitadas\n• Histórico completo: Mantém track de todas as ações\n\nBOAS PRÁTICAS:\n• PRs pequenos e focados (máx 500 linhas)\n• Títulos descritivos e objetivos\n• Descrição detalhada das mudanças\n• Use labels para categorizar\n• Aguarde review antes de merge',
+    description: 'GERENCIAMENTO DE PULL REQUESTS - GitHub & Gitea\n\nACTIONS DISPONÍVEIS:\n• create: Cria novo Pull Request\n  - OBRIGATÓRIOS: repo, title, head, base\n  - OPCIONAIS: body, draft, labels, assignees, reviewers, milestone\n\n• list: Lista PRs abertas/fechadas/mescladas\n  - OBRIGATÓRIOS: repo\n  - OPCIONAIS: state, page, limit, author, assignee, reviewer, label\n\n• get: Obtém detalhes de um PR específico\n  - OBRIGATÓRIOS: repo, pull_number\n\n• update: Atualiza título/descrição/labels\n  - OBRIGATÓRIOS: repo, pull_number\n  - OPCIONAIS: new_title, new_body, new_base, new_labels, new_assignees, new_milestone\n\n• merge: Faz merge do PR\n  - OBRIGATÓRIOS: repo, pull_number, merge_method\n  - OPCIONAIS: merge_commit_title, merge_commit_message\n\n• close: Fecha PR sem merge\n  - OBRIGATÓRIOS: repo, pull_number\n\n• review: Adiciona review\n  - OBRIGATÓRIOS: repo, pull_number, review_event\n  - OPCIONAIS: review_body\n\n• search: Busca PRs por texto/autor/labels\n  - OBRIGATÓRIOS: repo, query\n  - OPCIONAIS: author, assignee, reviewer, label\n\nPARÂMETROS COMUNS:\n• provider: "github" ou "gitea" (opcional)\n• repo: Nome do repositório\n\nCARACTERÍSTICAS ESPECIAIS:\n• Validação automática: Verifica diferenças entre branches\n• Merge inteligente: Escolhe método apropriado\n• Reviews estruturados: Aprovação ou mudanças solicitadas\n• Histórico completo: Mantém track de todas as ações\n\nBOAS PRÁTICAS:\n• PRs pequenos e focados (máx 500 linhas)\n• Títulos descritivos e objetivos\n• Descrição detalhada das mudanças\n• Use labels para categorizar\n• Aguarde review antes de merge',
     inputSchema: {
         type: 'object',
         properties: {
@@ -243,7 +243,6 @@ exports.pullsTool = {
                 enum: ['create', 'list', 'get', 'update', 'merge', 'close', 'review', 'search'],
                 description: 'Action to perform on pull requests'
             },
-            owner: { type: 'string', description: 'Repository owner' },
             repo: { type: 'string', description: 'Repository name' },
             provider: { type: 'string', description: 'Provider to use (github, gitea, or omit for default)' },
             title: { type: 'string', description: 'Pull request title' },
@@ -408,8 +407,8 @@ exports.pullsTool = {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 5, , 6]);
-                        if (!params.owner || !params.repo || !params.title || !params.head || !params.base) {
-                            throw new Error('Owner, repo, title, head e base são obrigatórios');
+                        if (!!params.repo || !params.title || !params.head || !params.base) {
+                            throw new Error('repo, title, head e base são obrigatórios');
                         }
                         // Verificar se as branches são diferentes
                         if (params.head === params.base) {
@@ -418,7 +417,7 @@ exports.pullsTool = {
                         _a.label = 1;
                     case 1:
                         _a.trys.push([1, 3, , 4]);
-                        return [4 /*yield*/, provider.createPullRequest(params.owner, params.repo, params.title, params.body || '', params.head, params.base)];
+                        return [4 /*yield*/, provider.createPullRequest((await provider.getCurrentUser()).login, params.repo, params.title, params.body || '', params.head, params.base)];
                     case 2:
                         pullRequest = _a.sent();
                         return [2 /*return*/, {
@@ -450,7 +449,7 @@ exports.pullsTool = {
                                 message: 'Falha ao criar Pull Request',
                                 error: errorMessage,
                                 data: {
-                                    owner: params.owner,
+                                    owner: (await provider.getCurrentUser()).login,
                                     repo: params.repo,
                                     title: params.title,
                                     head: params.head,
@@ -480,7 +479,7 @@ exports.pullsTool = {
      * - limit: Itens por página (padrão: 30, máximo: 100)
      *
      * VALIDAÇÕES:
-     * - Owner e repo obrigatórios
+     * - e repo obrigatórios
      * - State deve ser um dos valores válidos
      * - Page deve ser >= 1
      * - Limit deve ser entre 1 e 100
@@ -498,13 +497,13 @@ exports.pullsTool = {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 2, , 3]);
-                        if (!params.owner || !params.repo) {
-                            throw new Error('Owner e repo são obrigatórios');
+                        if (!!params.repo) {
+                            throw new Error('e repo são obrigatórios');
                         }
                         state = params.state || 'open';
                         page = params.page || 1;
                         limit = params.limit || 30;
-                        return [4 /*yield*/, provider.listPullRequests(params.owner, params.repo, state, page, limit)];
+                        return [4 /*yield*/, provider.listPullRequests((await provider.getCurrentUser()).login, params.repo, state, page, limit)];
                     case 1:
                         pullRequests = _a.sent();
                         return [2 /*return*/, {
@@ -558,10 +557,10 @@ exports.pullsTool = {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 2, , 3]);
-                        if (!params.owner || !params.repo || !params.pull_number) {
-                            throw new Error('Owner, repo e pull_number são obrigatórios');
+                        if (!!params.repo || !params.pull_number) {
+                            throw new Error('repo e pull_number são obrigatórios');
                         }
-                        return [4 /*yield*/, provider.getPullRequest(params.owner, params.repo, params.pull_number)];
+                        return [4 /*yield*/, provider.getPullRequest((await provider.getCurrentUser()).login, params.repo, params.pull_number)];
                     case 1:
                         pullRequest = _a.sent();
                         return [2 /*return*/, {
@@ -617,8 +616,8 @@ exports.pullsTool = {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 2, , 3]);
-                        if (!params.owner || !params.repo || !params.pull_number) {
-                            throw new Error('Owner, repo e pull_number são obrigatórios');
+                        if (!!params.repo || !params.pull_number) {
+                            throw new Error('repo e pull_number são obrigatórios');
                         }
                         updateData = {};
                         if (params.new_title)
@@ -636,7 +635,7 @@ exports.pullsTool = {
                         if (Object.keys(updateData).length === 0) {
                             throw new Error('Nenhum campo para atualizar foi fornecido');
                         }
-                        return [4 /*yield*/, provider.updatePullRequest(params.owner, params.repo, params.pull_number, updateData)];
+                        return [4 /*yield*/, provider.updatePullRequest((await provider.getCurrentUser()).login, params.repo, params.pull_number, updateData)];
                     case 1:
                         pullRequest = _a.sent();
                         return [2 /*return*/, {
@@ -690,8 +689,8 @@ exports.pullsTool = {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 2, , 3]);
-                        if (!params.owner || !params.repo || !params.pull_number) {
-                            throw new Error('Owner, repo e pull_number são obrigatórios');
+                        if (!!params.repo || !params.pull_number) {
+                            throw new Error('repo e pull_number são obrigatórios');
                         }
                         mergeData = {
                             merge_method: params.merge_method || 'merge'
@@ -700,7 +699,7 @@ exports.pullsTool = {
                             mergeData.merge_commit_title = params.merge_commit_title;
                         if (params.merge_commit_message)
                             mergeData.merge_commit_message = params.merge_commit_message;
-                        return [4 /*yield*/, provider.mergePullRequest(params.owner, params.repo, params.pull_number, mergeData)];
+                        return [4 /*yield*/, provider.mergePullRequest((await provider.getCurrentUser()).login, params.repo, params.pull_number, mergeData)];
                     case 1:
                         result = _a.sent();
                         return [2 /*return*/, {
@@ -748,10 +747,10 @@ exports.pullsTool = {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 2, , 3]);
-                        if (!params.owner || !params.repo || !params.pull_number) {
-                            throw new Error('Owner, repo e pull_number são obrigatórios');
+                        if (!!params.repo || !params.pull_number) {
+                            throw new Error('repo e pull_number são obrigatórios');
                         }
-                        return [4 /*yield*/, provider.updatePullRequest(params.owner, params.repo, params.pull_number, { state: 'closed' })];
+                        return [4 /*yield*/, provider.updatePullRequest((await provider.getCurrentUser()).login, params.repo, params.pull_number, { state: 'closed' })];
                     case 1:
                         pullRequest = _a.sent();
                         return [2 /*return*/, {
@@ -800,8 +799,8 @@ exports.pullsTool = {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 try {
-                    if (!params.owner || !params.repo || !params.pull_number || !params.review_event) {
-                        throw new Error('Owner, repo, pull_number e review_event são obrigatórios');
+                    if (!!params.repo || !params.pull_number || !params.review_event) {
+                        throw new Error('repo, pull_number e review_event são obrigatórios');
                     }
                     // Implementar adição de review
                     // Por enquanto, retorna mensagem de funcionalidade
@@ -858,8 +857,8 @@ exports.pullsTool = {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 try {
-                    if (!params.owner || !params.repo || !params.query) {
-                        throw new Error('Owner, repo e query são obrigatórios');
+                    if (!!params.repo || !params.query) {
+                        throw new Error('repo e query são obrigatórios');
                     }
                     if (params.query.length < 3) {
                         throw new Error('Query deve ter pelo menos 3 caracteres');

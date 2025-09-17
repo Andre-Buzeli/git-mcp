@@ -206,7 +206,7 @@ var IssuesResultSchema = zod_1.z.object({
  */
 exports.issuesTool = {
     name: 'issues',
-    description: 'GERENCIAMENTO DE ISSUES - GitHub & Gitea\n\nACTIONS DISPONÍVEIS:\n• create: Cria nova issue no repositório\n• list: Lista issues abertas/fechadas\n• get: Obtém detalhes de uma issue específica\n• update: Atualiza título/corpo/labels da issue\n• close: Fecha uma issue\n• comment: Adiciona comentário a uma issue\n• search: Busca issues por texto/labels/autor\n\nPARÂMETROS COMUNS:\n• provider: "github" ou "gitea" (opcional)\n• owner: Proprietário do repositório\n• repo: Nome do repositório\n• issue_number: Número da issue\n• title: Título da issue\n• body: Corpo/descricão da issue\n\nPARÂMETROS OBRIGATÓRIOS POR ACTION:\n- create: owner + repo + title\n- list: owner + repo\n- get: owner + repo + issue_number\n- update: owner + repo + issue_number\n- close: owner + repo + issue_number\n- comment: owner + repo + issue_number + comment_body\n- search: owner + repo + query\n\nPARÂMETROS OPCIONAIS:\n• labels: Array de labels (ex: ["bug","urgent"])\n• assignees: Usuários responsáveis\n• state: Estado ("open","closed","all")\n• author: Filtrar por autor\n• page: Página da listagem\n• limit: Itens por página\n\nEXEMPLOS DE USO:\n• Criar issue: {"action":"create","owner":"johndoe","repo":"myproject","title":"Bug no login","body":"Usuário não consegue fazer login","labels":["bug","urgent"]}\n• Listar abertas: {"action":"list","owner":"johndoe","repo":"myproject","state":"open"}\n• Comentar: {"action":"comment","owner":"johndoe","repo":"myproject","issue_number":1,"comment_body":"Bug corrigido na versão 1.2.3"}\n• Buscar: {"action":"search","owner":"johndoe","repo":"myproject","query":"login","labels":["bug"]}\n\nCARACTERÍSTICAS ESPECIAIS:\n• Labels automáticos: Categorização inteligente\n• Comentários detalhados: Histórico completo\n• Busca avançada: Por texto, labels, autor\n• Estados flexíveis: Open, closed, all\n• Atribuição: Múltiplos responsáveis\n\nBOAS PRÁTICAS:\n• Títulos descritivos e objetivos\n• Labels consistentes (bug, feature, urgent)\n• Corpo detalhado com passos para reproduzir\n• Feche com comentários de resolução\n• Use search para acompanhamento',
+    description: 'GERENCIAMENTO DE ISSUES - GitHub & Gitea\n\nACTIONS DISPONÍVEIS:\n• create: Cria nova issue no repositório\n  - OBRIGATÓRIOS: repo, title\n  - OPCIONAIS: body, labels, assignees, milestone\n\n• list: Lista issues abertas/fechadas\n  - OBRIGATÓRIOS: repo\n  - OPCIONAIS: state, page, limit, author, assignee, label\n\n• get: Obtém detalhes de uma issue específica\n  - OBRIGATÓRIOS: repo, issue_number\n\n• update: Atualiza título/corpo/labels da issue\n  - OBRIGATÓRIOS: repo, issue_number\n  - OPCIONAIS: new_title, new_body, new_state, new_labels, new_assignees, new_milestone\n\n• close: Fecha uma issue\n  - OBRIGATÓRIOS: repo, issue_number\n\n• comment: Adiciona comentário a uma issue\n  - OBRIGATÓRIOS: repo, issue_number, comment_body\n\n• search: Busca issues por texto/labels/autor\n  - OBRIGATÓRIOS: repo, query\n  - OPCIONAIS: author, assignee, label\n\nPARÂMETROS COMUNS:\n• provider: "github" ou "gitea" (opcional)\n• repo: Nome do repositório\n\nCARACTERÍSTICAS ESPECIAIS:\n• Labels automáticos: Categorização inteligente\n• Comentários detalhados: Histórico completo\n• Busca avançada: Por texto, labels, autor\n• Estados flexíveis: Open, closed, all\n• Atribuição: Múltiplos responsáveis\n\nBOAS PRÁTICAS:\n• Títulos descritivos e objetivos\n• Labels consistentes (bug, feature, urgent)\n• Corpo detalhado com passos para reproduzir\n• Feche com comentários de resolução\n• Use search para acompanhamento',
     inputSchema: {
         type: 'object',
         properties: {
@@ -215,7 +215,6 @@ exports.issuesTool = {
                 enum: ['create', 'list', 'get', 'update', 'close', 'comment', 'search'],
                 description: 'Action to perform on issues'
             },
-            owner: { type: 'string', description: 'Repository owner' },
             repo: { type: 'string', description: 'Repository name' },
             provider: { type: 'string', description: 'Provider to use (github, gitea, or omit for default)' },
             title: { type: 'string', description: 'Issue title' },
@@ -364,10 +363,10 @@ exports.issuesTool = {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 2, , 3]);
-                        if (!params.owner || !params.repo || !params.title) {
-                            throw new Error('Owner, repo e title são obrigatórios');
+                        if (!!params.repo || !params.title) {
+                            throw new Error('repo e title são obrigatórios');
                         }
-                        return [4 /*yield*/, provider.createIssue(params.owner, params.repo, params.title, params.body, params.assignees, params.labels)];
+                        return [4 /*yield*/, provider.createIssue((await provider.getCurrentUser()).login, params.repo, params.title, params.body, params.assignees, params.labels)];
                     case 1:
                         issue = _a.sent();
                         return [2 /*return*/, {
@@ -402,7 +401,7 @@ exports.issuesTool = {
      * - limit: Itens por página (padrão: 30, máximo: 100)
      *
      * VALIDAÇÕES:
-     * - Owner e repo obrigatórios
+     * - e repo obrigatórios
      * - State deve ser um dos valores válidos
      * - Page deve ser >= 1
      * - Limit deve ser entre 1 e 100
@@ -420,13 +419,13 @@ exports.issuesTool = {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 2, , 3]);
-                        if (!params.owner || !params.repo) {
-                            throw new Error('Owner e repo são obrigatórios');
+                        if (!!params.repo) {
+                            throw new Error('e repo são obrigatórios');
                         }
                         state = params.state || 'open';
                         page = params.page || 1;
                         limit = params.limit || 30;
-                        return [4 /*yield*/, provider.listIssues(params.owner, params.repo, state, page, limit)];
+                        return [4 /*yield*/, provider.listIssues((await provider.getCurrentUser()).login, params.repo, state, page, limit)];
                     case 1:
                         issues = _a.sent();
                         return [2 /*return*/, {
@@ -480,10 +479,10 @@ exports.issuesTool = {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 2, , 3]);
-                        if (!params.owner || !params.repo || !params.issue_number) {
-                            throw new Error('Owner, repo e issue_number são obrigatórios');
+                        if (!!params.repo || !params.issue_number) {
+                            throw new Error('repo e issue_number são obrigatórios');
                         }
-                        return [4 /*yield*/, provider.getIssue(params.owner, params.repo, params.issue_number)];
+                        return [4 /*yield*/, provider.getIssue((await provider.getCurrentUser()).login, params.repo, params.issue_number)];
                     case 1:
                         issue = _a.sent();
                         return [2 /*return*/, {
@@ -539,8 +538,8 @@ exports.issuesTool = {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 2, , 3]);
-                        if (!params.owner || !params.repo || !params.issue_number) {
-                            throw new Error('Owner, repo e issue_number são obrigatórios');
+                        if (!!params.repo || !params.issue_number) {
+                            throw new Error('repo e issue_number são obrigatórios');
                         }
                         updateData = {};
                         if (params.new_title)
@@ -558,7 +557,7 @@ exports.issuesTool = {
                         if (Object.keys(updateData).length === 0) {
                             throw new Error('Nenhum campo para atualizar foi fornecido');
                         }
-                        return [4 /*yield*/, provider.updateIssue(params.owner, params.repo, params.issue_number, updateData)];
+                        return [4 /*yield*/, provider.updateIssue((await provider.getCurrentUser()).login, params.repo, params.issue_number, updateData)];
                     case 1:
                         issue = _a.sent();
                         return [2 /*return*/, {
@@ -606,10 +605,10 @@ exports.issuesTool = {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 2, , 3]);
-                        if (!params.owner || !params.repo || !params.issue_number) {
-                            throw new Error('Owner, repo e issue_number são obrigatórios');
+                        if (!!params.repo || !params.issue_number) {
+                            throw new Error('repo e issue_number são obrigatórios');
                         }
-                        return [4 /*yield*/, provider.updateIssue(params.owner, params.repo, params.issue_number, { state: 'closed' })];
+                        return [4 /*yield*/, provider.updateIssue((await provider.getCurrentUser()).login, params.repo, params.issue_number, { state: 'closed' })];
                     case 1:
                         issue = _a.sent();
                         return [2 /*return*/, {
@@ -656,8 +655,8 @@ exports.issuesTool = {
             var comment;
             return __generator(this, function (_a) {
                 try {
-                    if (!params.owner || !params.repo || !params.issue_number || !params.comment_body) {
-                        throw new Error('Owner, repo, issue_number e comment_body são obrigatórios');
+                    if (!!params.repo || !params.issue_number || !params.comment_body) {
+                        throw new Error('repo, issue_number e comment_body são obrigatórios');
                     }
                     comment = {
                         id: Date.now(),
@@ -713,8 +712,8 @@ exports.issuesTool = {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 try {
-                    if (!params.owner || !params.repo || !params.query) {
-                        throw new Error('Owner, repo e query são obrigatórios');
+                    if (!!params.repo || !params.query) {
+                        throw new Error('repo e query são obrigatórios');
                     }
                     if (params.query.length < 3) {
                         throw new Error('Query deve ter pelo menos 3 caracteres');

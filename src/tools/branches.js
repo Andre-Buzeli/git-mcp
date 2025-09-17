@@ -103,21 +103,21 @@ var BranchesInputSchema = zod_1.z.object({
 }).refine(function (data) {
     // Validações condicionais por ação
     if (data.action === 'create') {
-        return data.owner && data.repo && data.branch_name && data.from_branch;
+        return data.owner || (await provider.getCurrentUser()).login && data.repo && data.branch_name && data.from_branch;
     }
     if (['get', 'delete'].includes(data.action)) {
-        return data.owner && data.repo && data.branch;
+        return data.owner || (await provider.getCurrentUser()).login && data.repo && data.branch;
     }
     if (data.action === 'merge') {
-        return data.owner && data.repo && data.head && data.base;
+        return data.owner || (await provider.getCurrentUser()).login && data.repo && data.head && data.base;
     }
     if (data.action === 'compare') {
-        return data.owner && data.repo && data.base_branch && data.head_branch;
+        return data.owner || (await provider.getCurrentUser()).login && data.repo && data.base_branch && data.head_branch;
     }
     if (data.action === 'list') {
-        return data.owner && data.repo;
+        return data.owner || (await provider.getCurrentUser()).login && data.repo;
     }
-    return data.owner && data.repo;
+    return data.owner || (await provider.getCurrentUser()).login && data.repo;
 }, {
     message: "Parâmetros obrigatórios não fornecidos para a ação especificada"
 });
@@ -197,7 +197,7 @@ var BranchesResultSchema = zod_1.z.object({
  */
 exports.branchesTool = {
     name: 'branches',
-    description: 'GERENCIAMENTO DE BRANCHES - GitHub & Gitea\n\nACTIONS DISPONÍVEIS:\n• create: Cria nova branch a partir de outra\n• list: Lista todas as branches do repositório\n• get: Obtém informações de uma branch específica\n• delete: Remove uma branch\n• merge: Faz merge entre branches\n• compare: Compara diferenças entre branches\n\nPARÂMETROS COMUNS:\n• provider: "github" ou "gitea" (opcional)\n• owner: Proprietário do repositório\n• repo: Nome do repositório\n• branch: Nome da branch\n\nPARÂMETROS OBRIGATÓRIOS POR ACTION:\n- create: owner + repo + branch_name + from_branch\n- list: owner + repo\n- get: owner + repo + branch\n- delete: owner + repo + branch\n- merge: owner + repo + head + base + merge_method\n- compare: owner + repo + base_branch + head_branch\n\nEXEMPLOS DE USO:\n• Criar branch: {"action":"create","owner":"johndoe","repo":"myproject","branch_name":"feature/new-ui","from_branch":"main"}\n• Listar branches: {"action":"list","owner":"johndoe","repo":"myproject"}\n• Comparar: {"action":"compare","owner":"johndoe","repo":"myproject","base_branch":"main","head_branch":"feature/new-ui"}\n\nBOAS PRÁTICAS:\n• Use nomes descritivos: feature/login, fix/bug-123, hotfix/security\n• Mantenha branches principais protegidas\n• Faça merges pequenos e frequentes\n• Delete branches após merge\n• Use compare antes de integrar',
+    description: 'GERENCIAMENTO DE BRANCHES - GitHub & Gitea\n\nACTIONS DISPONÍVEIS:\n• create: Cria nova branch a partir de outra\n  - OBRIGATÓRIOS: repo, branch_name, from_branch\n\n• list: Lista todas as branches do repositório\n  - OBRIGATÓRIOS: repo\n  - OPCIONAIS: page, limit\n\n• get: Obtém informações de uma branch específica\n  - OBRIGATÓRIOS: repo, branch\n\n• delete: Remove uma branch\n  - OBRIGATÓRIOS: repo, branch\n\n• merge: Faz merge entre branches\n  - OBRIGATÓRIOS: repo, head, base\n  - OPCIONAIS: merge_method\n\n• compare: Compara diferenças entre branches\n  - OBRIGATÓRIOS: repo, base_branch, head_branch\n\nPARÂMETROS COMUNS:\n• provider: "github" ou "gitea" (opcional)\n• repo: Nome do repositório\n\nBOAS PRÁTICAS:\n• Use nomes descritivos: feature/login, fix/bug-123, hotfix/security\n• Mantenha branches principais protegidas\n• Faça merges pequenos e frequentes\n• Delete branches após merge\n• Use compare antes de integrar',
     inputSchema: {
         type: 'object',
         properties: {
@@ -206,7 +206,6 @@ exports.branchesTool = {
                 enum: ['create', 'list', 'get', 'delete', 'merge', 'compare'],
                 description: 'Action to perform on branches'
             },
-            owner: { type: 'string', description: 'Repository owner' },
             repo: { type: 'string', description: 'Repository name' },
             provider: { type: 'string', description: 'Specific provider (github, gitea) or use default' },
             branch_name: { type: 'string', description: 'Name of the new branch' },
@@ -337,10 +336,11 @@ exports.branchesTool = {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 2, , 3]);
-                        if (!params.owner || !params.repo || !params.branch_name || !params.from_branch) {
-                            throw new Error('Owner, repo, branch_name e from_branch são obrigatórios');
+                        if (!params.repo || !params.branch_name || !params.from_branch) {
+                            throw new Error('Repo, branch_name e from_branch são obrigatórios');
                         }
-                        return [4 /*yield*/, provider.createBranch(params.owner, params.repo, params.branch_name, params.from_branch)];
+                        const owner = (await provider.getCurrentUser()).login;
+                        return [4 /*yield*/, provider.createBranch(owner, params.repo, params.branch_name, params.from_branch)];
                     case 1:
                         branch = _a.sent();
                         return [2 /*return*/, {
@@ -390,12 +390,13 @@ exports.branchesTool = {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 2, , 3]);
-                        if (!params.owner || !params.repo) {
-                            throw new Error('Owner e repo são obrigatórios');
+                        if (!params.repo) {
+                            throw new Error('Repo é obrigatório');
                         }
                         page = params.page || 1;
                         limit = params.limit || 30;
-                        return [4 /*yield*/, provider.listBranches(params.owner, params.repo, page, limit)];
+                        const owner = (await provider.getCurrentUser()).login;
+                        return [4 /*yield*/, provider.listBranches(owner, params.repo, page, limit)];
                     case 1:
                         branches = _a.sent();
                         return [2 /*return*/, {
@@ -446,10 +447,11 @@ exports.branchesTool = {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 2, , 3]);
-                        if (!params.owner || !params.repo || !params.branch) {
-                            throw new Error('Owner, repo e branch são obrigatórios');
+                        if (!params.repo || !params.branch) {
+                            throw new Error('Repo e branch são obrigatórios');
                         }
-                        return [4 /*yield*/, provider.getBranch(params.owner, params.repo, params.branch)];
+                        const owner = (await provider.getCurrentUser()).login;
+                        return [4 /*yield*/, provider.getBranch(owner, params.repo, params.branch)];
                     case 1:
                         branch = _a.sent();
                         return [2 /*return*/, {
@@ -497,10 +499,11 @@ exports.branchesTool = {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 2, , 3]);
-                        if (!params.owner || !params.repo || !params.branch) {
-                            throw new Error('Owner, repo e branch são obrigatórios');
+                        if (!params.repo || !params.branch) {
+                            throw new Error('Repo e branch são obrigatórios');
                         }
-                        return [4 /*yield*/, provider.deleteBranch(params.owner, params.repo, params.branch)];
+                        const owner = (await provider.getCurrentUser()).login;
+                        return [4 /*yield*/, provider.deleteBranch(owner, params.repo, params.branch)];
                     case 1:
                         _a.sent();
                         return [2 /*return*/, {
@@ -549,8 +552,8 @@ exports.branchesTool = {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 try {
-                    if (!params.owner || !params.repo || !params.head || !params.base) {
-                        throw new Error('Owner, repo, head e base são obrigatórios');
+                    if (!params.repo || !params.head || !params.base) {
+                        throw new Error('Repo, head e base são obrigatórios');
                     }
                     // Por enquanto, retorna mensagem de funcionalidade não implementada
                     // TODO: Implementar merge direto de branches via provider
@@ -600,8 +603,8 @@ exports.branchesTool = {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 try {
-                    if (!params.owner || !params.repo || !params.base_branch || !params.head_branch) {
-                        throw new Error('Owner, repo, base_branch e head_branch são obrigatórios');
+                    if (!params.repo || !params.base_branch || !params.head_branch) {
+                        throw new Error('Repo, base_branch e head_branch são obrigatórios');
                     }
                     // Implementar comparação de branches
                     // Por enquanto, retorna mensagem de funcionalidade

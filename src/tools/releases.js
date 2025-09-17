@@ -191,7 +191,7 @@ var ReleasesResultSchema = zod_1.z.object({
  */
 exports.releasesTool = {
     name: 'releases',
-    description: 'Manage releases with multi-provider support (GitHub and Gitea): create, list, get, update, delete, publish. Boas práticas (solo): use versionamento semântico (vMAJOR.MINOR.PATCH); documente mudanças no body (changelog); utilize prerelease/draft; crie releases para cada entrega "rodável"; para rollback, redeploy do release anterior.',
+    description: 'Gerenciamento completo de releases.\n\nACTIONS DISPONÍVEIS:\n• create: Cria novo release\n  - OBRIGATÓRIOS: repo, tag_name\n  - OPCIONAIS: name, body, draft, prerelease, target_commitish\n\n• list: Lista releases do repositório\n  - OBRIGATÓRIOS: repo\n  - OPCIONAIS: page, limit\n\n• get: Obtém detalhes de um release específico\n  - OBRIGATÓRIOS: repo, release_id\n  - OPCIONAIS: latest\n\n• update: Atualiza release existente\n  - OBRIGATÓRIOS: repo, release_id\n  - OPCIONAIS: new_tag_name, new_name, new_body, new_draft, new_prerelease, new_target_commitish\n\n• delete: Remove release\n  - OBRIGATÓRIOS: repo, release_id\n\n• publish: Publica release draft\n  - OBRIGATÓRIOS: repo, release_id\n\nPARÂMETROS COMUNS:\n• provider: "github" ou "gitea" (opcional)\n• repo: Nome do repositório\n\nBoas práticas: use versionamento semântico (vMAJOR.MINOR.PATCH); documente mudanças no body (changelog); utilize prerelease/draft; crie releases para cada entrega "rodável"; para rollback, redeploy do release anterior.',
     inputSchema: {
         type: 'object',
         properties: {
@@ -200,7 +200,6 @@ exports.releasesTool = {
                 enum: ['create', 'list', 'get', 'update', 'delete', 'publish'],
                 description: 'Action to perform on releases'
             },
-            owner: { type: 'string', description: 'Repository owner' },
             repo: { type: 'string', description: 'Repository name' },
             provider: { type: 'string', description: 'Provider to use (github, gitea, or omit for default)' },
             tag_name: { type: 'string', description: 'Release tag name' },
@@ -343,8 +342,8 @@ exports.releasesTool = {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 2, , 3]);
-                        if (!params.owner || !params.repo || !params.tag_name) {
-                            throw new Error('Owner, repo e tag_name são obrigatórios');
+                        if (!!params.repo || !params.tag_name) {
+                            throw new Error('repo e tag_name são obrigatórios');
                         }
                         releaseData = {
                             tag_name: params.tag_name,
@@ -388,7 +387,7 @@ exports.releasesTool = {
      * - limit: Itens por página (padrão: 30, máximo: 100)
      *
      * VALIDAÇÕES:
-     * - Owner e repo obrigatórios
+     * - e repo obrigatórios
      * - Page deve ser >= 1
      * - Limit deve ser entre 1 e 100
      *
@@ -405,12 +404,12 @@ exports.releasesTool = {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 2, , 3]);
-                        if (!params.owner || !params.repo) {
-                            throw new Error('Owner e repo são obrigatórios');
+                        if (!!params.repo) {
+                            throw new Error('e repo são obrigatórios');
                         }
                         page = params.page || 1;
                         limit = params.limit || 30;
-                        return [4 /*yield*/, provider.listReleases(params.owner, params.repo, page, limit)];
+                        return [4 /*yield*/, provider.listReleases((await provider.getCurrentUser()).login, params.repo, page, limit)];
                     case 1:
                         releases = _a.sent();
                         return [2 /*return*/, {
@@ -463,10 +462,10 @@ exports.releasesTool = {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 2, , 3]);
-                        if (!params.owner || !params.repo || !params.release_id) {
-                            throw new Error('Owner, repo e release_id são obrigatórios');
+                        if (!!params.repo || !params.release_id) {
+                            throw new Error('repo e release_id são obrigatórios');
                         }
-                        return [4 /*yield*/, provider.getRelease(params.owner, params.repo, params.release_id)];
+                        return [4 /*yield*/, provider.getRelease((await provider.getCurrentUser()).login, params.repo, params.release_id)];
                     case 1:
                         release = _a.sent();
                         return [2 /*return*/, {
@@ -522,8 +521,8 @@ exports.releasesTool = {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 2, , 3]);
-                        if (!params.owner || !params.repo || !params.release_id) {
-                            throw new Error('Owner, repo e release_id são obrigatórios');
+                        if (!!params.repo || !params.release_id) {
+                            throw new Error('repo e release_id são obrigatórios');
                         }
                         updateData = {};
                         if (params.new_tag_name)
@@ -589,8 +588,8 @@ exports.releasesTool = {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 2, , 3]);
-                        if (!params.owner || !params.repo || !params.release_id) {
-                            throw new Error('Owner, repo e release_id são obrigatórios');
+                        if (!!params.repo || !params.release_id) {
+                            throw new Error('repo e release_id são obrigatórios');
                         }
                         return [4 /*yield*/, provider.deleteRelease(params.release_id)];
                     case 1:
@@ -640,8 +639,8 @@ exports.releasesTool = {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 2, , 3]);
-                        if (!params.owner || !params.repo || !params.release_id) {
-                            throw new Error('Owner, repo e release_id são obrigatórios');
+                        if (!!params.repo || !params.release_id) {
+                            throw new Error('repo e release_id são obrigatórios');
                         }
                         return [4 /*yield*/, provider.updateRelease(params.release_id, { draft: false })];
                     case 1:

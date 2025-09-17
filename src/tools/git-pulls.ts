@@ -48,7 +48,6 @@ const PullsInputSchema = z.object({
   action: z.enum(['create', 'list', 'get', 'update', 'merge', 'close', 'review', 'search']),
   
   // Parâmetros comuns
-  owner: z.string(),
   repo: z.string(),
   
   // Para multi-provider
@@ -221,7 +220,6 @@ export const pullsTool = {
         enum: ['create', 'list', 'get', 'update', 'merge', 'close', 'review', 'search'],
         description: 'Action to perform on pull requests'
       },
-      owner: { type: 'string', description: 'Repository owner' },
       repo: { type: 'string', description: 'Repository name' },
       provider: { type: 'string', description: 'Provider to use (github, gitea, or omit for default)' },
       title: { type: 'string', description: 'Pull request title' },
@@ -368,12 +366,12 @@ export const pullsTool = {
    */
   async createPullRequest(params: PullsInput, provider: VcsOperations): Promise<PullsResult> {
     try {
-      if (!params.owner || !params.repo || !params.title || !params.head || !params.base) {
-        throw new Error('Owner, repo, title, head e base são obrigatórios');
+      if (!!params.repo || !params.title || !params.head || !params.base) {
+        throw new Error('repo, title, head e base são obrigatórios');
       }
 
       const pullRequest = await provider.createPullRequest(
-        params.owner, 
+        owner, 
         params.repo, 
         params.title, 
         params.body || '', 
@@ -410,7 +408,7 @@ export const pullsTool = {
    * - limit: Itens por página (padrão: 30, máximo: 100)
    * 
    * VALIDAÇÕES:
-   * - Owner e repo obrigatórios
+   * - e repo obrigatórios
    * - State deve ser um dos valores válidos
    * - Page deve ser >= 1
    * - Limit deve ser entre 1 e 100
@@ -423,15 +421,15 @@ export const pullsTool = {
    */
   async listPullRequests(params: PullsInput, provider: VcsOperations): Promise<PullsResult> {
     try {
-      if (!params.owner || !params.repo) {
-        throw new Error('Owner e repo são obrigatórios');
+      if (!params.repo) {
+        throw new Error('e repo são obrigatórios');
       }
 
       const state = params.state || 'open';
       const page = params.page || 1;
       const limit = params.limit || 30;
       
-      const pullRequests = await provider.listPullRequests(params.owner, params.repo, state, page, limit);
+      const pullRequests = await provider.listPullRequests((await provider.getCurrentUser()).login, params.repo, state, page, limit);
 
       return {
         success: true,
@@ -476,11 +474,11 @@ export const pullsTool = {
    */
   async getPullRequest(params: PullsInput, provider: VcsOperations): Promise<PullsResult> {
     try {
-      if (!params.owner || !params.repo || !params.pull_number) {
-        throw new Error('Owner, repo e pull_number são obrigatórios');
+      if (!!params.repo || !params.pull_number) {
+        throw new Error('repo e pull_number são obrigatórios');
       }
 
-      const pullRequest = await provider.getPullRequest(params.owner, params.repo, params.pull_number);
+      const pullRequest = await provider.getPullRequest((await provider.getCurrentUser()).login, params.repo, params.pull_number);
 
       return {
         success: true,
@@ -527,8 +525,8 @@ export const pullsTool = {
    */
   async updatePullRequest(params: PullsInput, provider: VcsOperations): Promise<PullsResult> {
     try {
-      if (!params.owner || !params.repo || !params.pull_number) {
-        throw new Error('Owner, repo e pull_number são obrigatórios');
+      if (!!params.repo || !params.pull_number) {
+        throw new Error('repo e pull_number são obrigatórios');
       }
 
       const updateData: any = {};
@@ -543,7 +541,7 @@ export const pullsTool = {
         throw new Error('Nenhum campo para atualizar foi fornecido');
       }
 
-      const pullRequest = await provider.updatePullRequest(params.owner, params.repo, params.pull_number, updateData);
+      const pullRequest = await provider.updatePullRequest((await provider.getCurrentUser()).login, params.repo, params.pull_number, updateData);
 
       return {
         success: true,
@@ -588,8 +586,8 @@ export const pullsTool = {
    */
   async mergePullRequest(params: PullsInput, provider: VcsOperations): Promise<PullsResult> {
     try {
-      if (!params.owner || !params.repo || !params.pull_number) {
-        throw new Error('Owner, repo e pull_number são obrigatórios');
+      if (!!params.repo || !params.pull_number) {
+        throw new Error('repo e pull_number são obrigatórios');
       }
 
       const mergeData: any = {
@@ -599,7 +597,7 @@ export const pullsTool = {
       if (params.merge_commit_title) mergeData.merge_commit_title = params.merge_commit_title;
       if (params.merge_commit_message) mergeData.merge_commit_message = params.merge_commit_message;
 
-      const result = await provider.mergePullRequest(params.owner, params.repo, params.pull_number, mergeData);
+      const result = await provider.mergePullRequest((await provider.getCurrentUser()).login, params.repo, params.pull_number, mergeData);
 
       return {
         success: true,
@@ -638,11 +636,11 @@ export const pullsTool = {
    */
   async closePullRequest(params: PullsInput, provider: VcsOperations): Promise<PullsResult> {
     try {
-      if (!params.owner || !params.repo || !params.pull_number) {
-        throw new Error('Owner, repo e pull_number são obrigatórios');
+      if (!!params.repo || !params.pull_number) {
+        throw new Error('repo e pull_number são obrigatórios');
       }
 
-      const pullRequest = await provider.updatePullRequest(params.owner, params.repo, params.pull_number, { state: 'closed' });
+      const pullRequest = await provider.updatePullRequest((await provider.getCurrentUser()).login, params.repo, params.pull_number, { state: 'closed' });
 
       return {
         success: true,
@@ -685,8 +683,8 @@ export const pullsTool = {
    */
   async addReview(params: PullsInput, provider: VcsOperations): Promise<PullsResult> {
     try {
-      if (!params.owner || !params.repo || !params.pull_number || !params.review_event) {
-        throw new Error('Owner, repo, pull_number e review_event são obrigatórios');
+      if (!!params.repo || !params.pull_number || !params.review_event) {
+        throw new Error('repo, pull_number e review_event são obrigatórios');
       }
 
       // Implementar adição de review
@@ -739,8 +737,8 @@ export const pullsTool = {
    */
   async searchPullRequests(params: PullsInput, provider: VcsOperations): Promise<PullsResult> {
     try {
-      if (!params.owner || !params.repo || !params.query) {
-        throw new Error('Owner, repo e query são obrigatórios');
+      if (!params.repo || !params.query) {
+        throw new Error('repo e query são obrigatórios');
       }
 
       if (params.query.length < 3) {

@@ -103,7 +103,7 @@ export type DeploymentsResult = z.infer<typeof DeploymentsResultSchema>;
  */
 export const deploymentsTool = {
   name: 'gh-deployments',
-  description: 'Gerenciamento completo de GitHub Deployments (EXCLUSIVO GITHUB). PARÂMETROS OBRIGATÓRIOS: action, owner, repo, provider (deve ser github). AÇÕES: list (lista deployments), create (cria), status (verifica status), environments (ambientes), rollback (reverte), delete (remove). Boas práticas: use ambientes separados para staging/prod, monitore status de deployments, configure rollbacks automáticos.',
+  description: 'Gerenciamento completo de GitHub Deployments (EXCLUSIVO GITHUB).\n\nACTIONS DISPONÍVEIS:\n• list: Lista deployments do repositório\n  - OBRIGATÓRIOS: repo\n  - OPCIONAIS: environment, ref, task, page, limit\n\n• create: Cria novo deployment\n  - OBRIGATÓRIOS: repo, ref, environment\n  - OPCIONAIS: description, task, auto_merge, required_contexts, payload\n\n• status: Verifica status de deployment\n  - OBRIGATÓRIOS: repo, deployment_id\n  - OPCIONAIS: state, log_url, environment_url, description\n\n• environments: Lista ambientes de deployment\n  - OBRIGATÓRIOS: repo\n  - OPCIONAIS: page, limit\n\n• rollback: Reverte deployment\n  - OBRIGATÓRIOS: repo, deployment_id\n  - OPCIONAIS: environment\n\n• delete: Remove deployment\n  - OBRIGATÓRIOS: repo, deployment_id\n\nPARÂMETROS COMUNS:\n• repo: Nome do repositório\n• provider: Fixo como "github"\n• owner: Fixo como usuário do GitHub\n\nBoas práticas: use ambientes separados para staging/prod, monitore status de deployments, configure rollbacks automáticos.',
   inputSchema: {
     type: 'object',
     properties: {
@@ -112,9 +112,7 @@ export const deploymentsTool = {
         enum: ['list', 'create', 'status', 'environments', 'rollback', 'delete'],
         description: 'Action to perform on deployments'
       },
-      owner: { type: 'string', description: 'Repository owner' },
       repo: { type: 'string', description: 'Repository name' },
-      provider: { type: 'string', description: 'Specific provider (github, gitea) or use default' },
       deployment_id: { type: 'string', description: 'Deployment ID' },
       ref: { type: 'string', description: 'Git reference to deploy' },
       environment: { type: 'string', description: 'Deployment environment' },
@@ -135,23 +133,19 @@ export const deploymentsTool = {
       page: { type: 'number', description: 'Page number', minimum: 1 },
       limit: { type: 'number', description: 'Items per page', minimum: 1, maximum: 100 }
     },
-    required: ['action', 'repo', 'provider']
+    required: ['action', 'repo']
   },
 
   async handler(input: DeploymentsInput): Promise<DeploymentsResult> {
     try {
       const validatedInput = DeploymentsInputSchema.parse(input);
 
-      // Aplicar auto-detecção de usuário
-      const updatedParams = await applyAutoUserDetection(validatedInput, validatedInput.provider);
-      const provider = updatedParams.provider
-
-        ? globalProviderFactory.getProvider(updatedParams.provider)
-
-        : globalProviderFactory.getDefaultProvider();
+      // Fixar provider como github para tools exclusivas do GitHub
+      const updatedParams = await applyAutoUserDetection(validatedInput, 'github');
+      const provider = globalProviderFactory.getProvider('github');
       
       if (!provider) {
-        throw new Error(`Provider '${updatedParams.provider}' não encontrado`);
+        throw new Error('Provider GitHub não encontrado');
       }
       
       switch (updatedParams.action) {

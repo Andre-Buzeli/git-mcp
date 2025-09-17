@@ -48,22 +48,7 @@ async function getCurrentUsername(provider) {
  * @returns Parâmetros atualizados com usuário detectado
  */
 async function applyAutoUserDetection(params, provider) {
-    const updatedParams = { ...params };
-    try {
-        // Se owner não foi fornecido, usar usuário atual
-        if (!updatedParams.owner) {
-            updatedParams.owner = await getCurrentUsername(provider);
-        }
-        // Se username não foi fornecido, usar usuário atual
-        if (!updatedParams.username) {
-            updatedParams.username = await getCurrentUsername(provider);
-        }
-        return updatedParams;
-    }
-    catch (error) {
-        // Se falhar na auto-detecção, retornar parâmetros originais
-        console.warn('Auto-user detection failed:', error instanceof Error ? error.message : 'Unknown error');
-        return updatedParams;
-    }
+    // Retornar os parâmetros originais pois o owner agora é detectado internamente nos métodos
+    return params;
 }
 //# sourceMappingURL=user-detection.js.map

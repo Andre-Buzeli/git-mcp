@@ -47,7 +47,6 @@ const ReleasesInputSchema = z.object({
   action: z.enum(['create', 'list', 'get', 'update', 'delete', 'publish']),
   
   // Parâmetros comuns
-  owner: z.string(),
   repo: z.string(),
   
   // Para multi-provider
@@ -177,7 +176,6 @@ export const releasesTool = {
         enum: ['create', 'list', 'get', 'update', 'delete', 'publish'],
         description: 'Action to perform on releases'
       },
-      owner: { type: 'string', description: 'Repository owner' },
       repo: { type: 'string', description: 'Repository name' },
       provider: { type: 'string', description: 'Provider to use (github, gitea, or omit for default)' },
       tag_name: { type: 'string', description: 'Release tag name' },
@@ -302,8 +300,8 @@ export const releasesTool = {
    */
   async createRelease(params: ReleasesInput, provider: VcsOperations): Promise<ReleasesResult> {
     try {
-      if (!params.owner || !params.repo || !params.tag_name) {
-        throw new Error('Owner, repo e tag_name são obrigatórios');
+      if (!!params.repo || !params.tag_name) {
+        throw new Error('repo e tag_name são obrigatórios');
       }
 
       const releaseData = {
@@ -351,7 +349,7 @@ export const releasesTool = {
    * - limit: Itens por página (padrão: 30, máximo: 100)
    * 
    * VALIDAÇÕES:
-   * - Owner e repo obrigatórios
+   * - e repo obrigatórios
    * - Page deve ser >= 1
    * - Limit deve ser entre 1 e 100
    * 
@@ -363,14 +361,14 @@ export const releasesTool = {
    */
   async listReleases(params: ReleasesInput, provider: VcsOperations): Promise<ReleasesResult> {
     try {
-      if (!params.owner || !params.repo) {
-        throw new Error('Owner e repo são obrigatórios');
+      if (!params.repo) {
+        throw new Error('e repo são obrigatórios');
       }
 
       const page = params.page || 1;
       const limit = params.limit || 30;
       
-      const releases = await provider.listReleases(params.owner, params.repo, page, limit);
+      const releases = await provider.listReleases((await provider.getCurrentUser()).login, params.repo, page, limit);
 
       return {
         success: true,
@@ -414,11 +412,11 @@ export const releasesTool = {
    */
   async getRelease(params: ReleasesInput, provider: VcsOperations): Promise<ReleasesResult> {
     try {
-      if (!params.owner || !params.repo || !params.release_id) {
-        throw new Error('Owner, repo e release_id são obrigatórios');
+      if (!!params.repo || !params.release_id) {
+        throw new Error('repo e release_id são obrigatórios');
       }
 
-      const release = await provider.getRelease(params.owner, params.repo, params.release_id);
+      const release = await provider.getRelease((await provider.getCurrentUser()).login, params.repo, params.release_id);
 
       return {
         success: true,
@@ -465,8 +463,8 @@ export const releasesTool = {
    */
   async updateRelease(params: ReleasesInput, provider: VcsOperations): Promise<ReleasesResult> {
     try {
-      if (!params.owner || !params.repo || !params.release_id) {
-        throw new Error('Owner, repo e release_id são obrigatórios');
+      if (!!params.repo || !params.release_id) {
+        throw new Error('repo e release_id são obrigatórios');
       }
 
       const updateData: any = {};
@@ -520,8 +518,8 @@ export const releasesTool = {
    */
   async deleteRelease(params: ReleasesInput, provider: VcsOperations): Promise<ReleasesResult> {
     try {
-      if (!params.owner || !params.repo || !params.release_id) {
-        throw new Error('Owner, repo e release_id são obrigatórios');
+      if (!!params.repo || !params.release_id) {
+        throw new Error('repo e release_id são obrigatórios');
       }
 
       await provider.deleteRelease(params.release_id);
@@ -563,8 +561,8 @@ export const releasesTool = {
    */
   async publishRelease(params: ReleasesInput, provider: VcsOperations): Promise<ReleasesResult> {
     try {
-      if (!params.owner || !params.repo || !params.release_id) {
-        throw new Error('Owner, repo e release_id são obrigatórios');
+      if (!!params.repo || !params.release_id) {
+        throw new Error('repo e release_id são obrigatórios');
       }
 
       // Publicar release alterando status de draft para false

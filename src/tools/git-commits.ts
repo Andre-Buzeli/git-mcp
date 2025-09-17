@@ -47,7 +47,7 @@ const CommitsInputSchema = z.object({
   action: z.enum(['list', 'get', 'create', 'compare', 'search', 'push', 'pull']),
 
   // Parâmetros comuns
-  owner: z.string(),
+  // owner: obtido automaticamente do provider,
   repo: z.string(),
   projectPath: z.string().describe('Local project path for git operations'),
 
@@ -284,7 +284,7 @@ export const commitsTool = {
    * - limit: Itens por página (padrão: 30, máximo: 100)
    * 
    * VALIDAÇÕES:
-   * - Owner e repo obrigatórios
+   * - e repo obrigatórios
    * - SHA deve ser válido se fornecido
    * - Page deve ser >= 1
    * - Limit deve ser entre 1 e 100
@@ -298,7 +298,7 @@ export const commitsTool = {
   async listCommits(params: CommitsInput, provider: VcsOperations): Promise<CommitsResult> {
     try {
       if (!params.owner || !params.repo) {
-        throw new Error('Owner e repo são obrigatórios');
+        throw new Error('e repo são obrigatórios');
       }
 
       const page = params.page || 1;
@@ -351,7 +351,7 @@ export const commitsTool = {
   async getCommit(params: CommitsInput, provider: VcsOperations): Promise<CommitsResult> {
     try {
       if (!params.owner || !params.repo) {
-        throw new Error('Owner e repo são obrigatórios');
+        throw new Error('e repo são obrigatórios');
       }
 
       // Se não foi fornecido commit_sha, usa o SHA da branch padrão
@@ -425,7 +425,7 @@ export const commitsTool = {
   async createCommit(params: CommitsInput, provider: VcsOperations): Promise<CommitsResult> {
     try {
       if (!params.owner || !params.repo || !params.message || !params.branch) {
-        throw new Error('Owner, repo, message e branch são obrigatórios');
+        throw new Error('repo, message e branch são obrigatórios');
       }
 
       if (params.message.trim().length === 0) {
@@ -479,7 +479,7 @@ export const commitsTool = {
   async compareCommits(params: CommitsInput, provider: VcsOperations): Promise<CommitsResult> {
     try {
       if (!params.owner || !params.repo || !params.base || !params.head) {
-        throw new Error('Owner, repo, base e head são obrigatórios');
+        throw new Error('repo, base e head são obrigatórios');
       }
 
       // Implementar comparação de commits
@@ -531,7 +531,7 @@ export const commitsTool = {
   async searchCommits(params: CommitsInput, provider: VcsOperations): Promise<CommitsResult> {
     try {
       if (!params.owner || !params.repo || !params.query) {
-        throw new Error('Owner, repo e query são obrigatórios');
+        throw new Error('repo e query são obrigatórios');
       }
 
       if (params.query.length < 3) {

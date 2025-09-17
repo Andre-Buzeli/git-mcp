@@ -72,7 +72,6 @@ var validator_js_1 = require("./validator.js");
 var ActionsInputSchema = zod_1.z.object({
     action: zod_1.z.enum(['list-runs', 'cancel', 'rerun', 'artifacts', 'secrets', 'jobs', 'download-artifact']),
     // Parâmetros comuns
-    owner: validator_js_1.CommonSchemas.owner,
     repo: validator_js_1.CommonSchemas.repo,
     provider: validator_js_1.CommonSchemas.provider,
     // Parâmetros para listagem
@@ -98,12 +97,12 @@ var ActionsInputSchema = zod_1.z.object({
 }).refine(function (data) {
     // Validações específicas por ação
     if (['cancel', 'rerun', 'jobs'].includes(data.action)) {
-        return data.owner && data.repo && data.run_id;
+        return data.repo && data.run_id;
     }
     if (['download-artifact'].includes(data.action)) {
-        return data.owner && data.repo && (data.artifact_id || data.artifact_name);
+        return data.repo && (data.artifact_id || data.artifact_name);
     }
-    return data.owner && data.repo;
+    return data.repo;
 }, {
     message: "Parâmetros obrigatórios não fornecidos para a ação especificada"
 });
@@ -122,7 +121,7 @@ var ActionsResultSchema = zod_1.z.object({
  */
 exports.actionsTool = {
     name: 'actions',
-    description: 'Gerenciamento completo de GitHub Actions e Gitea Actions com múltiplas operações: list-runs (lista execuções), cancel (cancela execução), rerun (re-executa workflow), artifacts (gerencia artefatos), secrets (lista secrets), jobs (lista jobs). Suporte simultâneo para GitHub Actions e Gitea Actions. Boas práticas: monitore execuções regularmente, limpe artefatos antigos, use re-execução apenas quando necessário e mantenha secrets seguros. Uso eficiente: ideal para CI/CD, debugging de pipelines e automação de workflows.',
+    description: 'Gerenciamento completo de GitHub Actions e Gitea Actions com múltiplas operações.\n\nACTIONS DISPONÍVEIS:\n• list-runs: Lista execuções de workflows\n  - OBRIGATÓRIOS: repo\n  - OPCIONAIS: workflow_id, status, branch, event, created_after, created_before, page, limit\n\n• cancel: Cancela execução de workflow\n  - OBRIGATÓRIOS: repo, run_id\n\n• rerun: Re-executa workflow\n  - OBRIGATÓRIOS: repo, run_id\n\n• artifacts: Lista artefatos de execução\n  - OBRIGATÓRIOS: repo, run_id\n  - OPCIONAIS: page, limit\n\n• secrets: Lista secrets do repositório\n  - OBRIGATÓRIOS: repo\n  - OPCIONAIS: secret_name, page, limit\n\n• jobs: Lista jobs de execução\n  - OBRIGATÓRIOS: repo, run_id\n  - OPCIONAIS: page, limit\n\n• download-artifact: Baixa artefato\n  - OBRIGATÓRIOS: repo, download_path\n  - OBRIGATÓRIOS (um dos dois): artifact_id OU artifact_name\n\nPARÂMETROS COMUNS:\n• provider: "github" ou "gitea" (opcional)\n• repo: Nome do repositório\n\nBoas práticas: monitore execuções regularmente, limpe artefatos antigos, use re-execução apenas quando necessário e mantenha secrets seguros.',
     inputSchema: {
         type: 'object',
         properties: {
@@ -130,10 +129,6 @@ exports.actionsTool = {
                 type: 'string',
                 enum: ['list-runs', 'cancel', 'rerun', 'artifacts', 'secrets', 'jobs', 'download-artifact'],
                 description: 'Ação a executar: list-runs (lista execuções), cancel (cancela), rerun (re-executa), artifacts (artefatos), secrets (lista secrets), jobs (lista jobs), download-artifact (baixa artefato)'
-            },
-            owner: {
-                type: 'string',
-                description: 'Proprietário do repositório (OBRIGATÓRIO para todas as ações)'
             },
             repo: {
                 type: 'string',
@@ -280,7 +275,7 @@ exports.actionsTool = {
                                 }];
                         }
                         return [4 /*yield*/, provider.listWorkflowRuns({
-                                owner: params.owner,
+                                owner: (await provider.getCurrentUser()).login,
                                 repo: params.repo,
                                 workflow_id: params.workflow_id,
                                 status: params.status,
@@ -326,7 +321,7 @@ exports.actionsTool = {
                                 }];
                         }
                         return [4 /*yield*/, provider.cancelWorkflowRun({
-                                owner: params.owner,
+                                owner: (await provider.getCurrentUser()).login,
                                 repo: params.repo,
                                 run_id: params.run_id
                             })];
@@ -365,7 +360,7 @@ exports.actionsTool = {
                                 }];
                         }
                         return [4 /*yield*/, provider.rerunWorkflow({
-                                owner: params.owner,
+                                owner: (await provider.getCurrentUser()).login,
                                 repo: params.repo,
                                 run_id: params.run_id
                             })];
@@ -405,7 +400,7 @@ exports.actionsTool = {
                                 }];
                         }
                         return [4 /*yield*/, provider.listArtifacts({
-                                owner: params.owner,
+                                owner: (await provider.getCurrentUser()).login,
                                 repo: params.repo,
                                 run_id: params.run_id,
                                 page: params.page,
@@ -447,7 +442,7 @@ exports.actionsTool = {
                                 }];
                         }
                         return [4 /*yield*/, provider.listSecrets({
-                                owner: params.owner,
+                                owner: (await provider.getCurrentUser()).login,
                                 repo: params.repo,
                                 page: params.page,
                                 limit: params.limit
@@ -488,7 +483,7 @@ exports.actionsTool = {
                                 }];
                         }
                         return [4 /*yield*/, provider.listJobs({
-                                owner: params.owner,
+                                owner: (await provider.getCurrentUser()).login,
                                 repo: params.repo,
                                 run_id: params.run_id,
                                 page: params.page,
@@ -529,7 +524,7 @@ exports.actionsTool = {
                                 }];
                         }
                         return [4 /*yield*/, provider.downloadArtifact({
-                                owner: params.owner,
+                                owner: (await provider.getCurrentUser()).login,
                                 repo: params.repo,
                                 artifact_id: params.artifact_id,
                                 artifact_name: params.artifact_name,

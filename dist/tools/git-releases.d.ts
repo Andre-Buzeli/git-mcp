@@ -42,7 +42,6 @@ import { VcsOperations } from '../providers/index.js';
  */
 declare const ReleasesInputSchema: z.ZodObject<{
     action: z.ZodEnum<["create", "list", "get", "update", "delete", "publish"]>;
-    owner: z.ZodString;
     repo: z.ZodString;
     provider: z.ZodEnum<["gitea", "github"]>;
     tag_name: z.ZodOptional<z.ZodString>;
@@ -63,7 +62,6 @@ declare const ReleasesInputSchema: z.ZodObject<{
     latest: z.ZodOptional<z.ZodBoolean>;
 }, "strip", z.ZodTypeAny, {
     provider: "gitea" | "github";
-    owner: string;
     repo: string;
     action: "delete" | "get" | "list" | "create" | "update" | "publish";
     name?: string | undefined;
@@ -84,7 +82,6 @@ declare const ReleasesInputSchema: z.ZodObject<{
     latest?: boolean | undefined;
 }, {
     provider: "gitea" | "github";
-    owner: string;
     repo: string;
     action: "delete" | "get" | "list" | "create" | "update" | "publish";
     name?: string | undefined;
@@ -208,10 +205,6 @@ export declare const releasesTool: {
             action: {
                 type: string;
                 enum: string[];
-                description: string;
-            };
-            owner: {
-                type: string;
                 description: string;
             };
             repo: {

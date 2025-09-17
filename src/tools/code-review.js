@@ -102,18 +102,18 @@ var CodeReviewInputSchema = zod_1.z.object({
 }).refine(function (data) {
     // Validações específicas por ação
     if (['analyze'].includes(data.action)) {
-        return data.code || (data.owner && data.repo && data.path);
+        return data.code || (data.owner || (await provider.getCurrentUser()).login && data.repo && data.path);
     }
     if (['review-file', 'review-commit'].includes(data.action)) {
-        return data.owner && data.repo && (data.path || data.sha);
+        return data.owner || (await provider.getCurrentUser()).login && data.repo && (data.path || data.sha);
     }
     if (['review-pr'].includes(data.action)) {
-        return data.owner && data.repo && data.pull_number;
+        return data.owner || (await provider.getCurrentUser()).login && data.repo && data.pull_number;
     }
     if (['apply-suggestions'].includes(data.action)) {
-        return data.owner && data.repo && data.suggestions && data.suggestions.length > 0;
+        return data.owner || (await provider.getCurrentUser()).login && data.repo && data.suggestions && data.suggestions.length > 0;
     }
-    return data.owner && data.repo;
+    return data.owner || (await provider.getCurrentUser()).login && data.repo;
 }, {
     message: "Parâmetros obrigatórios não fornecidos para a ação especificada"
 });
@@ -132,7 +132,7 @@ var CodeReviewResultSchema = zod_1.z.object({
  */
 exports.codeReviewTool = {
     name: 'code-review',
-    description: 'Análise completa de código com detecção de problemas, sugestões de melhoria e geração de relatórios: analyze (análise geral), review-file (revisão de arquivo), review-commit (revisão de commit), review-pr (revisão de PR), generate-report (relatório), apply-suggestions (aplicar correções). Suporte para múltiplas linguagens. Uso eficiente: revisão automatizada de qualidade, detecção de bugs, sugestões de otimização e relatórios de compliance.',
+    description: 'Análise completa de código com detecção de problemas, sugestões de melhoria e geração de relatórios.\n\nACTIONS DISPONÍVEIS:\n• analyze: Análise geral de código\n  - OBRIGATÓRIOS: code, language\n  - OPCIONAIS: context, problem, rules, exclude_patterns\n\n• review-file: Revisão de arquivo específico\n  - OBRIGATÓRIOS: repo, file_path\n  - OPCIONAIS: branch, rules, exclude_patterns\n\n• review-commit: Revisão de commit específico\n  - OBRIGATÓRIOS: repo, sha\n  - OPCIONAIS: branch, rules, exclude_patterns\n\n• review-pr: Revisão de Pull Request\n  - OBRIGATÓRIOS: repo, pull_number\n  - OPCIONAIS: rules, exclude_patterns\n\n• generate-report: Geração de relatório\n  - OBRIGATÓRIOS: repo\n  - OPCIONAIS: report_type, include_suggestions, branch\n\n• apply-suggestions: Aplicar sugestões de correção\n  - OBRIGATÓRIOS: repo, suggestions\n  - OPCIONAIS: branch\n\nPARÂMETROS COMUNS:\n• provider: "github" ou "gitea" (opcional)\n• repo: Nome do repositório\n\nSuporte para múltiplas linguagens. Uso eficiente: revisão automatizada de qualidade, detecção de bugs, sugestões de otimização e relatórios de compliance.',
     inputSchema: {
         type: 'object',
         properties: {
@@ -289,12 +289,12 @@ exports.codeReviewTool = {
                         _a.trys.push([0, 3, , 4]);
                         codeToAnalyze = params.code;
                         fileName = 'code.txt';
-                        if (!(!codeToAnalyze && params.owner && params.repo && params.file_path)) return [3 /*break*/, 2];
+                        if (!(!codeToAnalyze && owner && params.repo && params.file_path)) return [3 /*break*/, 2];
                         provider = params.provider
                             ? index_js_1.globalProviderFactory.getProvider(params.provider)
                             : index_js_1.globalProviderFactory.getDefaultProvider();
                         if (!provider) return [3 /*break*/, 2];
-                        return [4 /*yield*/, provider.getFile(params.owner, params.repo, params.file_path)];
+                        return [4 /*yield*/, provider.getFile((await provider.getCurrentUser()).login, params.repo, params.file_path)];
                     case 1:
                         file = _a.sent();
                         codeToAnalyze = file.content || '';
@@ -329,10 +329,10 @@ exports.codeReviewTool = {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 2, , 3]);
-                        if (!params.owner || !params.repo || !params.path) {
-                            throw new Error('Owner, repo e path são obrigatórios');
+                        if (!!params.repo || !params.path) {
+                            throw new Error('repo e path são obrigatórios');
                         }
-                        return [4 /*yield*/, provider.getFile(params.owner, params.repo, params.path, params.branch)];
+                        return [4 /*yield*/, provider.getFile((await provider.getCurrentUser()).login, params.repo, params.path, params.branch)];
                     case 1:
                         file = _a.sent();
                         if (!file.content) {
@@ -367,10 +367,10 @@ exports.codeReviewTool = {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 2, , 3]);
-                        if (!params.owner || !params.repo || !params.sha) {
-                            throw new Error('Owner, repo e sha são obrigatórios');
+                        if (!!params.repo || !params.sha) {
+                            throw new Error('repo e sha são obrigatórios');
                         }
-                        return [4 /*yield*/, provider.getCommit(params.owner, params.repo, params.sha)];
+                        return [4 /*yield*/, provider.getCommit((await provider.getCurrentUser()).login, params.repo, params.sha)];
                     case 1:
                         commit = _a.sent();
                         messageAnalysis = this.analyzeCommitMessage(commit.message);
@@ -403,10 +403,10 @@ exports.codeReviewTool = {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 2, , 3]);
-                        if (!params.owner || !params.repo || !params.pull_number) {
-                            throw new Error('Owner, repo e pull_number são obrigatórios');
+                        if (!!params.repo || !params.pull_number) {
+                            throw new Error('repo e pull_number são obrigatórios');
                         }
-                        return [4 /*yield*/, provider.getPullRequest(params.owner, params.repo, params.pull_number)];
+                        return [4 /*yield*/, provider.getPullRequest((await provider.getCurrentUser()).login, params.repo, params.pull_number)];
                     case 1:
                         pr = _a.sent();
                         review = {
@@ -447,13 +447,13 @@ exports.codeReviewTool = {
             var reportType, includeSuggestions, report;
             return __generator(this, function (_a) {
                 try {
-                    if (!params.owner || !params.repo) {
-                        throw new Error('Owner e repo são obrigatórios');
+                    if (!!params.repo) {
+                        throw new Error('e repo são obrigatórios');
                     }
                     reportType = params.report_type || 'summary';
                     includeSuggestions = params.include_suggestions !== false;
                     report = {
-                        repository: "".concat(params.owner, "/").concat(params.repo),
+                        repository: "".concat(owner, "/").concat(params.repo),
                         report_type: reportType,
                         generated_at: new Date().toISOString(),
                         summary: {
@@ -493,8 +493,8 @@ exports.codeReviewTool = {
                 switch (_b.label) {
                     case 0:
                         _b.trys.push([0, 7, , 8]);
-                        if (!params.owner || !params.repo || !params.suggestions) {
-                            throw new Error('Owner, repo e suggestions são obrigatórios');
+                        if (!!params.repo || !params.suggestions) {
+                            throw new Error('repo e suggestions são obrigatórios');
                         }
                         applied = [];
                         failed = [];
@@ -506,7 +506,7 @@ exports.codeReviewTool = {
                         _b.label = 2;
                     case 2:
                         _b.trys.push([2, 4, , 5]);
-                        return [4 /*yield*/, provider.getFile(params.owner, params.repo, suggestion.file_path)];
+                        return [4 /*yield*/, provider.getFile((await provider.getCurrentUser()).login, params.repo, suggestion.file_path)];
                     case 3:
                         file = _b.sent();
                         if (file.content) {

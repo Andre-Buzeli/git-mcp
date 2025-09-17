@@ -43,7 +43,6 @@ import { VcsOperations } from '../providers/index.js';
  */
 declare const PullsInputSchema: z.ZodObject<{
     action: z.ZodEnum<["create", "list", "get", "update", "merge", "close", "review", "search"]>;
-    owner: z.ZodString;
     repo: z.ZodString;
     provider: z.ZodEnum<["gitea", "github"]>;
     title: z.ZodOptional<z.ZodString>;
@@ -77,7 +76,6 @@ declare const PullsInputSchema: z.ZodObject<{
     label: z.ZodOptional<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
     provider: "gitea" | "github";
-    owner: string;
     repo: string;
     action: "merge" | "get" | "search" | "list" | "create" | "close" | "update" | "review";
     title?: string | undefined;
@@ -111,7 +109,6 @@ declare const PullsInputSchema: z.ZodObject<{
     reviewer?: string | undefined;
 }, {
     provider: "gitea" | "github";
-    owner: string;
     repo: string;
     action: "merge" | "get" | "search" | "list" | "create" | "close" | "update" | "review";
     title?: string | undefined;
@@ -274,10 +271,6 @@ export declare const pullsTool: {
             action: {
                 type: string;
                 enum: string[];
-                description: string;
-            };
-            owner: {
-                type: string;
                 description: string;
             };
             repo: {

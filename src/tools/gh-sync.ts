@@ -30,7 +30,7 @@ import { globalProviderFactory, VcsOperations } from '../providers/index.js';
 
 const GhSyncInputSchema = z.object({
   action: z.enum(['sync-repos', 'sync-issues', 'sync-pulls', 'sync-releases', 'sync-webhooks', 'sync-config']),
-  owner: z.string(),
+  // owner: obtido automaticamente do provider,
   repo: z.string(),
   provider: z.enum(['github']).describe('Provider to use (github only)'),
   projectPath: z.string().describe('Local project path for git operations'),
@@ -81,7 +81,7 @@ export type GhSyncResult = z.infer<typeof GhSyncResultSchema>;
 
 export const ghSyncTool = {
   name: 'gh-sync',
-  description: 'GitHub synchronization (GitHub only) with multiple actions: sync-repos, sync-issues, sync-pulls, sync-releases, sync-webhooks, sync-config. Exclusivo para GitHub. Boas práticas (solo): use para manter repositórios em sincronia, backup de configurações, migração de dados; use para repositórios críticos, configure sincronização automática.',
+  description: 'Sincronização GitHub (EXCLUSIVO GITHUB).\n\nACTIONS DISPONÍVEIS:\n• sync-repos: Sincroniza repositórios\n  - OBRIGATÓRIOS: source_repo, target_repo\n  - OPCIONAIS: sync_branches, sync_tags\n\n• sync-issues: Sincroniza issues\n  - OBRIGATÓRIOS: repo, issue_number\n  - OPCIONAIS: sync_comments, sync_labels\n\n• sync-pulls: Sincroniza pull requests\n  - OBRIGATÓRIOS: repo, pull_number\n  - OPCIONAIS: sync_reviews, sync_commits\n\n• sync-releases: Sincroniza releases\n  - OBRIGATÓRIOS: repo, release_tag\n  - OPCIONAIS: sync_assets\n\n• sync-webhooks: Sincroniza webhooks\n  - OBRIGATÓRIOS: repo, webhook_id\n  - OPCIONAIS: sync_events\n\n• sync-config: Sincroniza configurações\n  - OBRIGATÓRIOS: repo\n  - OPCIONAIS: config_type\n\nPARÂMETROS COMUNS:\n• provider: Fixo como "github"\n• owner: Fixo como usuário do GitHub\n\nBoas práticas: use para manter repositórios em sincronia, backup de configurações, migração de dados; use para repositórios críticos, configure sincronização automática.',
   inputSchema: {
     type: 'object',
     properties: {
@@ -90,9 +90,7 @@ export const ghSyncTool = {
         enum: ['sync-repos', 'sync-issues', 'sync-pulls', 'sync-releases', 'sync-webhooks', 'sync-config'],
         description: 'Action to perform on sync'
       },
-      owner: { type: 'string', description: 'Repository owner' },
       repo: { type: 'string', description: 'Repository name' },
-      provider: { type: 'string', enum: ['github'], description: 'Provider to use (github only)' },
       projectPath: { type: 'string', description: 'Local project path for git operations' },
       source_repo: { type: 'string', description: 'Source repository' },
       target_repo: { type: 'string', description: 'Target repository' },
@@ -112,16 +110,14 @@ export const ghSyncTool = {
       dry_run: { type: 'boolean', description: 'Dry run mode' },
       force: { type: 'boolean', description: 'Force sync' }
     },
-    required: ['action', 'owner', 'repo', 'provider', 'projectPath']
+    required: ['action', 'projectPath']
   },
 
   async handler(input: GhSyncInput): Promise<GhSyncResult> {
     try {
       const validatedInput = GhSyncInputSchema.parse(input);
       
-      if (validatedInput.provider !== 'github') {
-        throw new Error('gh-sync é exclusivo para GitHub');
-      }
+      // Fixar provider como github para tools exclusivas do GitHub
 
       const provider = globalProviderFactory.getProvider('github');
       if (!provider) {

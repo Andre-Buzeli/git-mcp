@@ -23,8 +23,8 @@ import { z } from 'zod';
 
 const GitSyncInputSchema = z.object({
   action: z.enum(['configure', 'status', 'one-shot']),
-  source: z.object({ provider: z.enum(['gitea', 'github']), owner: z.string(), repo: z.string() }),
-  target: z.object({ provider: z.enum(['gitea', 'github']), owner: z.string(), repo: z.string() }),
+  source: z.object({ provider: z.enum(['gitea', 'github']), // owner: obtido automaticamente do provider, repo: z.string() }),
+  target: z.object({ provider: z.enum(['gitea', 'github']), // owner: obtido automaticamente do provider, repo: z.string() }),
   direction: z.enum(['one-way', 'two-way']).optional(),
   include: z.array(z.enum(['git', 'issues', 'labels', 'milestones', 'releases', 'pulls'])).optional(),
   strategy: z.enum(['source-wins', 'timestamp', 'skip-conflicts']).optional(),
