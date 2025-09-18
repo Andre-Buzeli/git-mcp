@@ -26,7 +26,6 @@ import { z } from 'zod';
  */
 declare const GitRemoteInputSchema: z.ZodObject<{
     action: z.ZodEnum<["add", "remove", "rename", "show", "set-url", "prune"]>;
-    owner: z.ZodString;
     repo: z.ZodString;
     provider: z.ZodEnum<["gitea", "github"]>;
     projectPath: z.ZodString;
@@ -37,7 +36,6 @@ declare const GitRemoteInputSchema: z.ZodObject<{
     remote_to_prune: z.ZodOptional<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
     provider: "gitea" | "github";
-    owner: string;
     repo: string;
     action: "add" | "show" | "remove" | "prune" | "rename" | "set-url";
     projectPath: string;
@@ -48,7 +46,6 @@ declare const GitRemoteInputSchema: z.ZodObject<{
     remote_to_prune?: string | undefined;
 }, {
     provider: "gitea" | "github";
-    owner: string;
     repo: string;
     action: "add" | "show" | "remove" | "prune" | "rename" | "set-url";
     projectPath: string;

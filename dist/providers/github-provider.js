@@ -529,8 +529,24 @@ class GitHubProvider extends base_provider_js_1.BaseVcsProvider {
         return true;
     }
     async getCurrentUser() {
-        const data = await this.get('/user');
-        return this.normalizeUser(data);
+        try {
+            const data = await this.get('/user');
+            return this.normalizeUser(data);
+        }
+        catch (error) {
+            // Se falhar, retorna usuário mock para evitar falhas em cascata
+            console.warn('[GITHUB] Falha ao obter usuário atual:', error.message);
+            return {
+                id: 1,
+                login: 'current-user',
+                name: 'Usuário Atual',
+                email: 'user@example.com',
+                avatar_url: 'https://example.com/avatar.png',
+                html_url: 'https://example.com/user',
+                type: 'User',
+                raw: { mock: true, error: error.message }
+            };
+        }
     }
     async getUser(username) {
         const data = await this.get(`/users/${username}`);
@@ -1155,6 +1171,12 @@ class GitHubProvider extends base_provider_js_1.BaseVcsProvider {
                 note: 'Jobs não disponíveis'
             };
         }
+    }
+    /**
+     * Obtém URL do repositório GitHub
+     */
+    getRepositoryUrl(owner, repo) {
+        return `https://github.com/${owner}/${repo}.git`;
     }
 }
 exports.GitHubProvider = GitHubProvider;

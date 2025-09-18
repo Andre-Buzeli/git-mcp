@@ -97,5 +97,9 @@ export declare class GitHubProvider extends BaseVcsProvider {
     downloadArtifact(params: any): Promise<any>;
     listSecrets(params: any): Promise<any>;
     listJobs(params: any): Promise<any>;
+    /**
+     * Obtém URL do repositório GitHub
+     */
+    getRepositoryUrl(owner: string, repo: string): string;
 }
 //# sourceMappingURL=github-provider.d.ts.map

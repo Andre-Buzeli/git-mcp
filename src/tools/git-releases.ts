@@ -167,7 +167,7 @@ export type ReleasesResult = z.infer<typeof ReleasesResultSchema>;
  */
 export const releasesTool = {
   name: 'git-releases',
-  description: 'Gerenciamento completo de releases com suporte multi-provider (GitHub e Gitea). PARÂMETROS OBRIGATÓRIOS: action, owner, repo, provider. AÇÕES: create (cria release), list (lista releases), get (detalhes), update (atualiza), delete (remove), publish (publica). Boas práticas: use versionamento semântico, documente mudanças no body, utilize prerelease/draft, crie releases para cada entrega "rodável".',
+  description: 'tool: Gerencia releases Git para distribuição de versões\n──────────────\naction create: cria nova release\naction create requires: repo, tag_name, name, body, draft, prerelease, target_commitish, provider\n───────────────\naction list: lista releases do repositório\naction list requires: repo, page, limit, provider\n───────────────\naction get: obtém detalhes de release\naction get requires: repo, release_id, provider\n───────────────\naction update: atualiza release existente\naction update requires: repo, release_id, new_tag_name, new_name, new_body, new_draft, new_prerelease, new_target_commitish, provider\n───────────────\naction delete: remove release\naction delete requires: repo, release_id, provider\n───────────────\naction publish: publica release\naction publish requires: repo, release_id, latest, provider',
   inputSchema: {
     type: 'object',
     properties: {
@@ -195,7 +195,7 @@ export const releasesTool = {
       new_target_commitish: { type: 'string', description: 'New target branch or commit' },
       latest: { type: 'boolean', description: 'Get latest release' }
     },
-    required: ['action', 'owner', 'repo', 'provider']
+    required: ['action', 'repo', 'provider']
   },
 
   /**

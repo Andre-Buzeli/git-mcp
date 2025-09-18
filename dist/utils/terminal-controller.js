@@ -216,7 +216,23 @@ async function runGitCommand(gitCommand, projectPath, explanation) {
                 result = await gitOps.archive(args[0], args[1], args[2]);
                 break;
             case 'bundle':
-                result = await gitOps.bundle(args[0]);
+                const bundleAction = args[0];
+                const bundleOptions = {};
+                if (bundleAction === 'create') {
+                    bundleOptions.file = args[1];
+                    if (args[2])
+                        bundleOptions.revlist = args[2];
+                }
+                else if (bundleAction === 'verify') {
+                    bundleOptions.file = args[1];
+                }
+                else if (bundleAction === 'list-heads') {
+                    bundleOptions.file = args[1];
+                }
+                else if (bundleAction === 'unbundle') {
+                    bundleOptions.file = args[1];
+                }
+                result = await gitOps.bundle(bundleAction, bundleOptions);
                 break;
             default:
                 // Fallback para comando direto

@@ -183,7 +183,7 @@ export type IssuesResult = z.infer<typeof IssuesResultSchema>;
  */
 export const issuesTool = {
   name: 'git-issues',
-  description: 'Gerenciamento completo de issues com suporte multi-provider (GitHub e Gitea). PARÂMETROS OBRIGATÓRIOS: action, owner, repo, provider. AÇÕES: create (cria issue), list (lista issues), get (detalhes), update (atualiza), close (fecha), comment (comenta), search (busca). Boas práticas: use issues como notas/tarefas pesquisáveis, títulos descritivos, labels para prioridade/categoria.',
+  description: 'tool: Gerencia issues Git, bugs, features e tarefas\n──────────────\naction create: cria nova issue\naction create requires: repo, title, body, labels, assignees, milestone, provider\n───────────────\naction list: lista issues do repositório\naction list requires: repo, state, page, limit, provider\n───────────────\naction get: obtém detalhes de issue\naction get requires: repo, issue_number, provider\n───────────────\naction update: atualiza issue existente\naction update requires: repo, issue_number, new_title, new_body, new_state, new_labels, new_assignees, new_milestone, provider\n───────────────\naction close: fecha issue\naction close requires: repo, issue_number, provider\n───────────────\naction comment: adiciona comentário\naction comment requires: repo, issue_number, comment_body, provider\n───────────────\naction search: busca issues por critérios\naction search requires: repo, query, author, assignee, label, provider',
   inputSchema: {
     type: 'object',
     properties: {
@@ -215,7 +215,7 @@ export const issuesTool = {
       assignee: { type: 'string', description: 'Issue assignee filter' },
       label: { type: 'string', description: 'Issue label filter' }
     },
-    required: ['action', 'owner', 'repo', 'provider']
+    required: ['action', 'repo', 'provider']
   },
 
   /**
@@ -275,22 +275,25 @@ export const issuesTool = {
         console.error('[ISSUES] Erro ao obter provider:', providerError);
         throw new Error(`Erro de configuração do provider: ${providerError instanceof Error ? providerError.message : 'Provider não disponível'}`);
       }
+
+      // Obter o owner do provider
+      const owner = (await provider.getCurrentUser()).login;
       
       switch (processedInput.action) {
         case 'create':
-          return await this.createIssue(processedInput, provider);
+          return await this.createIssue(processedInput, provider, owner);
         case 'list':
-          return await this.listIssues(processedInput, provider);
+          return await this.listIssues(processedInput, provider, owner);
         case 'get':
-          return await this.getIssue(processedInput, provider);
+          return await this.getIssue(processedInput, provider, owner);
         case 'update':
-          return await this.updateIssue(processedInput, provider);
+          return await this.updateIssue(processedInput, provider, owner);
         case 'close':
-          return await this.closeIssue(processedInput, provider);
+          return await this.closeIssue(processedInput, provider, owner);
         case 'comment':
-          return await this.addComment(processedInput, provider);
+          return await this.addComment(processedInput, provider, owner);
         case 'search':
-          return await this.searchIssues(processedInput, provider);
+          return await this.searchIssues(processedInput, provider, owner);
         default:
           throw new Error(`Ação não suportada: ${processedInput.action}`);
       }
@@ -335,7 +338,7 @@ export const issuesTool = {
    * - Use labels para categorização
    * - Atribua responsáveis adequadamente
    */
-  async createIssue(params: IssuesInput, provider: VcsOperations): Promise<IssuesResult> {
+  async createIssue(params: IssuesInput, provider: VcsOperations, owner: string): Promise<IssuesResult> {
     try {
       if (!owner) {
         throw new Error('é obrigatório');
@@ -396,7 +399,7 @@ export const issuesTool = {
    * - Filtre por estado para organização
    * - Mantenha issues organizadas
    */
-  async listIssues(params: IssuesInput, provider: VcsOperations): Promise<IssuesResult> {
+  async listIssues(params: IssuesInput, provider: VcsOperations, owner: string): Promise<IssuesResult> {
     try {
       if (!owner) {
         throw new Error('é obrigatório');
@@ -452,7 +455,7 @@ export const issuesTool = {
    * - Analise comentários e histórico
    * - Monitore mudanças importantes
    */
-  async getIssue(params: IssuesInput, provider: VcsOperations): Promise<IssuesResult> {
+  async getIssue(params: IssuesInput, provider: VcsOperations, owner: string): Promise<IssuesResult> {
     try {
       // Aplicar auto-detecção se necessário
       if (!owner) {
@@ -510,7 +513,7 @@ export const issuesTool = {
    * - Documente mudanças importantes
    * - Notifique responsáveis sobre mudanças
    */
-  async updateIssue(params: IssuesInput, provider: VcsOperations): Promise<IssuesResult> {
+  async updateIssue(params: IssuesInput, provider: VcsOperations, owner: string): Promise<IssuesResult> {
     try {
       if (!owner) {
         throw new Error('é obrigatório');
@@ -571,7 +574,7 @@ export const issuesTool = {
    * - Use comentário explicativo
    * - Verifique se não há dependências
    */
-  async closeIssue(params: IssuesInput, provider: VcsOperations): Promise<IssuesResult> {
+  async closeIssue(params: IssuesInput, provider: VcsOperations, owner: string): Promise<IssuesResult> {
     try {
       if (!owner) {
         throw new Error('é obrigatório');
@@ -621,7 +624,7 @@ export const issuesTool = {
    * - Use formatação Markdown adequadamente
    * - Mantenha comentários relevantes
    */
-  async addComment(params: IssuesInput, provider: VcsOperations): Promise<IssuesResult> {
+  async addComment(params: IssuesInput, provider: VcsOperations, owner: string): Promise<IssuesResult> {
     try {
       if (!owner) {
         throw new Error('é obrigatório');
@@ -686,7 +689,7 @@ export const issuesTool = {
    * - Analise relevância dos resultados
    * - Use para encontrar issues relacionadas
    */
-  async searchIssues(params: IssuesInput, provider: VcsOperations): Promise<IssuesResult> {
+  async searchIssues(params: IssuesInput, provider: VcsOperations, owner: string): Promise<IssuesResult> {
     try {
       if (!owner) {
         throw new Error('é obrigatório');

@@ -38,7 +38,6 @@ const DeploymentsInputSchema = zod_1.z.object({
     action: zod_1.z.enum(['list', 'create', 'status', 'environments', 'rollback', 'delete']),
     // Parâmetros comuns
     repo: validator_js_1.CommonSchemas.repo,
-    provider: validator_js_1.CommonSchemas.provider,
     // Parâmetros para listagem
     page: validator_js_1.CommonSchemas.page,
     limit: validator_js_1.CommonSchemas.limit,
@@ -91,7 +90,7 @@ const DeploymentsResultSchema = zod_1.z.object({
  */
 exports.deploymentsTool = {
     name: 'gh-deployments',
-    description: 'Gerenciamento completo de GitHub Deployments (EXCLUSIVO GITHUB). PARÂMETROS OBRIGATÓRIOS: action, owner, repo, provider (deve ser github). AÇÕES: list (lista deployments), create (cria), status (verifica status), environments (ambientes), rollback (reverte), delete (remove). Boas práticas: use ambientes separados para staging/prod, monitore status de deployments, configure rollbacks automáticos.',
+    description: 'tool: Gerencia deployments GitHub para controle de versões em produção\n──────────────\naction list: lista deployments do repositório\naction list requires: repo, environment, ref, task, page, limit\n───────────────\naction create: cria novo deployment\naction create requires: repo, ref, environment, description, task, auto_merge, required_contexts, payload\n───────────────\naction status: verifica status de deployment\naction status requires: repo, deployment_id, state, log_url, environment_url, description\n───────────────\naction environments: lista ambientes de deployment\naction environments requires: repo, page, limit\n───────────────\naction rollback: reverte deployment\naction rollback requires: repo, deployment_id, environment\n───────────────\naction delete: remove deployment\naction delete requires: repo, deployment_id',
     inputSchema: {
         type: 'object',
         properties: {
@@ -100,9 +99,7 @@ exports.deploymentsTool = {
                 enum: ['list', 'create', 'status', 'environments', 'rollback', 'delete'],
                 description: 'Action to perform on deployments'
             },
-            owner: { type: 'string', description: 'Repository owner' },
             repo: { type: 'string', description: 'Repository name' },
-            provider: { type: 'string', description: 'Specific provider (github, gitea) or use default' },
             deployment_id: { type: 'string', description: 'Deployment ID' },
             ref: { type: 'string', description: 'Git reference to deploy' },
             environment: { type: 'string', description: 'Deployment environment' },
@@ -123,18 +120,16 @@ exports.deploymentsTool = {
             page: { type: 'number', description: 'Page number', minimum: 1 },
             limit: { type: 'number', description: 'Items per page', minimum: 1, maximum: 100 }
         },
-        required: ['action', 'repo', 'provider']
+        required: ['action', 'repo']
     },
     async handler(input) {
         try {
             const validatedInput = DeploymentsInputSchema.parse(input);
-            // Aplicar auto-detecção de usuário
-            const updatedParams = await (0, user_detection_js_1.applyAutoUserDetection)(validatedInput, validatedInput.provider);
-            const provider = updatedParams.provider
-                ? index_js_1.globalProviderFactory.getProvider(updatedParams.provider)
-                : index_js_1.globalProviderFactory.getDefaultProvider();
+            // Fixar provider como github para tools exclusivas do GitHub
+            const updatedParams = await (0, user_detection_js_1.applyAutoUserDetection)(validatedInput, 'github');
+            const provider = index_js_1.globalProviderFactory.getProvider('github');
             if (!provider) {
-                throw new Error(`Provider '${updatedParams.provider}' não encontrado`);
+                throw new Error('Provider GitHub não encontrado');
             }
             switch (updatedParams.action) {
                 case 'list':

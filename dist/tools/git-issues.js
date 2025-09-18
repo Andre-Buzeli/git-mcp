@@ -170,7 +170,7 @@ const IssuesResultSchema = zod_1.z.object({
  */
 exports.issuesTool = {
     name: 'git-issues',
-    description: 'Gerenciamento completo de issues com suporte multi-provider (GitHub e Gitea). PARÂMETROS OBRIGATÓRIOS: action, owner, repo, provider. AÇÕES: create (cria issue), list (lista issues), get (detalhes), update (atualiza), close (fecha), comment (comenta), search (busca). Boas práticas: use issues como notas/tarefas pesquisáveis, títulos descritivos, labels para prioridade/categoria.',
+    description: 'tool: Gerencia issues Git, bugs, features e tarefas\n──────────────\naction create: cria nova issue\naction create requires: repo, title, body, labels, assignees, milestone, provider\n───────────────\naction list: lista issues do repositório\naction list requires: repo, state, page, limit, provider\n───────────────\naction get: obtém detalhes de issue\naction get requires: repo, issue_number, provider\n───────────────\naction update: atualiza issue existente\naction update requires: repo, issue_number, new_title, new_body, new_state, new_labels, new_assignees, new_milestone, provider\n───────────────\naction close: fecha issue\naction close requires: repo, issue_number, provider\n───────────────\naction comment: adiciona comentário\naction comment requires: repo, issue_number, comment_body, provider\n───────────────\naction search: busca issues por critérios\naction search requires: repo, query, author, assignee, label, provider',
     inputSchema: {
         type: 'object',
         properties: {
@@ -202,7 +202,7 @@ exports.issuesTool = {
             assignee: { type: 'string', description: 'Issue assignee filter' },
             label: { type: 'string', description: 'Issue label filter' }
         },
-        required: ['action', 'owner', 'repo', 'provider']
+        required: ['action', 'repo', 'provider']
     },
     /**
      * Handler principal da tool issues
@@ -261,21 +261,23 @@ exports.issuesTool = {
                 console.error('[ISSUES] Erro ao obter provider:', providerError);
                 throw new Error(`Erro de configuração do provider: ${providerError instanceof Error ? providerError.message : 'Provider não disponível'}`);
             }
+            // Obter o owner do provider
+            const owner = (await provider.getCurrentUser()).login;
             switch (processedInput.action) {
                 case 'create':
-                    return await this.createIssue(processedInput, provider);
+                    return await this.createIssue(processedInput, provider, owner);
                 case 'list':
-                    return await this.listIssues(processedInput, provider);
+                    return await this.listIssues(processedInput, provider, owner);
                 case 'get':
-                    return await this.getIssue(processedInput, provider);
+                    return await this.getIssue(processedInput, provider, owner);
                 case 'update':
-                    return await this.updateIssue(processedInput, provider);
+                    return await this.updateIssue(processedInput, provider, owner);
                 case 'close':
-                    return await this.closeIssue(processedInput, provider);
+                    return await this.closeIssue(processedInput, provider, owner);
                 case 'comment':
-                    return await this.addComment(processedInput, provider);
+                    return await this.addComment(processedInput, provider, owner);
                 case 'search':
-                    return await this.searchIssues(processedInput, provider);
+                    return await this.searchIssues(processedInput, provider, owner);
                 default:
                     throw new Error(`Ação não suportada: ${processedInput.action}`);
             }
@@ -320,10 +322,10 @@ exports.issuesTool = {
      * - Use labels para categorização
      * - Atribua responsáveis adequadamente
      */
-    async createIssue(params, provider) {
+    async createIssue(params, provider, owner) {
         try {
             if (!owner) {
-                throw new Error('Owner é obrigatório');
+                throw new Error('é obrigatório');
             }
             if (!params.repo) {
                 throw new Error('Repo é obrigatório');
@@ -361,7 +363,7 @@ exports.issuesTool = {
      * - limit: Itens por página (padrão: 30, máximo: 100)
      *
      * VALIDAÇÕES:
-     * - Owner e repo obrigatórios
+     * - e repo obrigatórios
      * - State deve ser um dos valores válidos
      * - Page deve ser >= 1
      * - Limit deve ser entre 1 e 100
@@ -372,10 +374,10 @@ exports.issuesTool = {
      * - Filtre por estado para organização
      * - Mantenha issues organizadas
      */
-    async listIssues(params, provider) {
+    async listIssues(params, provider, owner) {
         try {
             if (!owner) {
-                throw new Error('Owner é obrigatório');
+                throw new Error('é obrigatório');
             }
             if (!params.repo) {
                 throw new Error('Repo é obrigatório');
@@ -383,7 +385,7 @@ exports.issuesTool = {
             const state = params.state || 'open';
             const page = params.page || 1;
             const limit = params.limit || 30;
-            const issues = await provider.listIssues(owner, params.repo, state, page, limit);
+            const issues = await provider.listIssues((await provider.getCurrentUser()).login, params.repo, state, page, limit);
             return {
                 success: true,
                 action: 'list',
@@ -425,11 +427,11 @@ exports.issuesTool = {
      * - Analise comentários e histórico
      * - Monitore mudanças importantes
      */
-    async getIssue(params, provider) {
+    async getIssue(params, provider, owner) {
         try {
             // Aplicar auto-detecção se necessário
             if (!owner) {
-                throw new Error('Owner é obrigatório');
+                throw new Error('é obrigatório');
             }
             if (!params.repo) {
                 throw new Error('Repo é obrigatório');
@@ -437,7 +439,7 @@ exports.issuesTool = {
             if (!params.issue_number) {
                 throw new Error('Issue_number é obrigatório');
             }
-            const issue = await provider.getIssue(owner, params.repo, params.issue_number);
+            const issue = await provider.getIssue((await provider.getCurrentUser()).login, params.repo, params.issue_number);
             return {
                 success: true,
                 action: 'get',
@@ -481,10 +483,10 @@ exports.issuesTool = {
      * - Documente mudanças importantes
      * - Notifique responsáveis sobre mudanças
      */
-    async updateIssue(params, provider) {
+    async updateIssue(params, provider, owner) {
         try {
             if (!owner) {
-                throw new Error('Owner é obrigatório');
+                throw new Error('é obrigatório');
             }
             if (!params.repo) {
                 throw new Error('Repo é obrigatório');
@@ -508,7 +510,7 @@ exports.issuesTool = {
             if (Object.keys(updateData).length === 0) {
                 throw new Error('Nenhum campo para atualizar foi fornecido');
             }
-            const issue = await provider.updateIssue(owner, params.repo, params.issue_number, updateData);
+            const issue = await provider.updateIssue((await provider.getCurrentUser()).login, params.repo, params.issue_number, updateData);
             return {
                 success: true,
                 action: 'update',
@@ -544,10 +546,10 @@ exports.issuesTool = {
      * - Use comentário explicativo
      * - Verifique se não há dependências
      */
-    async closeIssue(params, provider) {
+    async closeIssue(params, provider, owner) {
         try {
             if (!owner) {
-                throw new Error('Owner é obrigatório');
+                throw new Error('é obrigatório');
             }
             if (!params.repo) {
                 throw new Error('Repo é obrigatório');
@@ -555,7 +557,7 @@ exports.issuesTool = {
             if (!params.issue_number) {
                 throw new Error('Issue_number é obrigatório');
             }
-            const issue = await provider.updateIssue(owner, params.repo, params.issue_number, { state: 'closed' });
+            const issue = await provider.updateIssue((await provider.getCurrentUser()).login, params.repo, params.issue_number, { state: 'closed' });
             return {
                 success: true,
                 action: 'close',
@@ -592,10 +594,10 @@ exports.issuesTool = {
      * - Use formatação Markdown adequadamente
      * - Mantenha comentários relevantes
      */
-    async addComment(params, provider) {
+    async addComment(params, provider, owner) {
         try {
             if (!owner) {
-                throw new Error('Owner é obrigatório');
+                throw new Error('é obrigatório');
             }
             if (!params.repo) {
                 throw new Error('Repo é obrigatório');
@@ -655,10 +657,10 @@ exports.issuesTool = {
      * - Analise relevância dos resultados
      * - Use para encontrar issues relacionadas
      */
-    async searchIssues(params, provider) {
+    async searchIssues(params, provider, owner) {
         try {
             if (!owner) {
-                throw new Error('Owner é obrigatório');
+                throw new Error('é obrigatório');
             }
             if (!params.repo) {
                 throw new Error('Repo é obrigatório');

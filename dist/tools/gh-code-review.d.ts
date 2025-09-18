@@ -33,7 +33,6 @@ import { VcsOperations } from '../providers/index.js';
 declare const CodeReviewInputSchema: z.ZodEffects<z.ZodObject<{
     action: z.ZodEnum<["analyze", "review-file", "review-commit", "review-pr", "generate-report", "apply-suggestions"]>;
     repo: z.ZodString;
-    provider: z.ZodEnum<["gitea", "github", "both"]>;
     code: z.ZodOptional<z.ZodString>;
     language: z.ZodOptional<z.ZodString>;
     file_path: z.ZodOptional<z.ZodString>;
@@ -62,7 +61,6 @@ declare const CodeReviewInputSchema: z.ZodEffects<z.ZodObject<{
     rules: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
     exclude_patterns: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
 }, "strip", z.ZodTypeAny, {
-    provider: "gitea" | "github" | "both";
     repo: string;
     action: "analyze" | "review-file" | "review-commit" | "review-pr" | "generate-report" | "apply-suggestions";
     code?: string | undefined;
@@ -83,7 +81,6 @@ declare const CodeReviewInputSchema: z.ZodEffects<z.ZodObject<{
     rules?: string[] | undefined;
     exclude_patterns?: string[] | undefined;
 }, {
-    provider: "gitea" | "github" | "both";
     repo: string;
     action: "analyze" | "review-file" | "review-commit" | "review-pr" | "generate-report" | "apply-suggestions";
     code?: string | undefined;
@@ -104,7 +101,6 @@ declare const CodeReviewInputSchema: z.ZodEffects<z.ZodObject<{
     rules?: string[] | undefined;
     exclude_patterns?: string[] | undefined;
 }>, {
-    provider: "gitea" | "github" | "both";
     repo: string;
     action: "analyze" | "review-file" | "review-commit" | "review-pr" | "generate-report" | "apply-suggestions";
     code?: string | undefined;
@@ -125,7 +121,6 @@ declare const CodeReviewInputSchema: z.ZodEffects<z.ZodObject<{
     rules?: string[] | undefined;
     exclude_patterns?: string[] | undefined;
 }, {
-    provider: "gitea" | "github" | "both";
     repo: string;
     action: "analyze" | "review-file" | "review-commit" | "review-pr" | "generate-report" | "apply-suggestions";
     code?: string | undefined;
@@ -185,10 +180,6 @@ export declare const codeReviewTool: {
                 description: string;
             };
             repo: {
-                type: string;
-                description: string;
-            };
-            provider: {
                 type: string;
                 description: string;
             };

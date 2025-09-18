@@ -41,7 +41,6 @@ import { VcsOperations } from '../providers/index.js';
  */
 declare const FilesInputSchema: z.ZodObject<{
     action: z.ZodEnum<["get", "create", "update", "delete", "list", "search", "upload-project"]>;
-    owner: z.ZodString;
     repo: z.ZodString;
     path: z.ZodOptional<z.ZodString>;
     projectPath: z.ZodString;
@@ -56,7 +55,6 @@ declare const FilesInputSchema: z.ZodObject<{
     limit: z.ZodOptional<z.ZodNumber>;
 }, "strip", z.ZodTypeAny, {
     provider: "gitea" | "github";
-    owner: string;
     repo: string;
     action: "delete" | "get" | "search" | "list" | "create" | "update" | "upload-project";
     projectPath: string;
@@ -71,7 +69,6 @@ declare const FilesInputSchema: z.ZodObject<{
     content?: string | undefined;
 }, {
     provider: "gitea" | "github";
-    owner: string;
     repo: string;
     action: "delete" | "get" | "search" | "list" | "create" | "update" | "upload-project";
     projectPath: string;
@@ -304,7 +301,7 @@ export declare const filesTool: {
      * - Use referências específicas para versões
      * - Trate arquivos binários adequadamente
      */
-    getFile(params: FilesInput, provider: VcsOperations): Promise<FilesResult>;
+    getFile(params: FilesInput, provider: VcsOperations, owner: string): Promise<FilesResult>;
     /**
      * Cria um novo arquivo no repositório
      *
@@ -334,7 +331,7 @@ export declare const filesTool: {
      * - Use branches para mudanças grandes
      * - Documente propósito do arquivo
      */
-    createFile(params: FilesInput, provider: VcsOperations): Promise<FilesResult>;
+    createFile(params: FilesInput, provider: VcsOperations, owner: string): Promise<FilesResult>;
     /**
      * Atualiza um arquivo existente no repositório
      *
@@ -365,7 +362,7 @@ export declare const filesTool: {
      * - Verifique se arquivo não foi modificado por outro usuário
      * - Teste mudanças antes de commitar
      */
-    updateFile(params: FilesInput, provider: VcsOperations): Promise<FilesResult>;
+    updateFile(params: FilesInput, provider: VcsOperations, owner: string): Promise<FilesResult>;
     /**
      * Deleta um arquivo do repositório
      *
@@ -395,7 +392,7 @@ export declare const filesTool: {
      * - Verifique dependências do arquivo
      * - Mantenha backup se necessário
      */
-    deleteFile(params: FilesInput, provider: VcsOperations): Promise<FilesResult>;
+    deleteFile(params: FilesInput, provider: VcsOperations, owner: string): Promise<FilesResult>;
     /**
      * Lista conteúdo de um diretório
      *
@@ -415,7 +412,7 @@ export declare const filesTool: {
      * - limit: Itens por página (padrão: 30, máximo: 100)
      *
      * VALIDAÇÕES:
-     * - Owner e repo obrigatórios
+     * - e repo obrigatórios
      * - Diretório deve existir
      * - Page deve ser >= 1
      * - Limit deve ser entre 1 e 100
@@ -426,7 +423,7 @@ export declare const filesTool: {
      * - Use referências específicas para versões
      * - Organize estrutura de diretórios
      */
-    listFiles(params: FilesInput, provider: VcsOperations): Promise<FilesResult>;
+    listFiles(params: FilesInput, provider: VcsOperations, owner: string): Promise<FilesResult>;
     /**
      * Busca arquivos por conteúdo
      *
@@ -454,7 +451,7 @@ export declare const filesTool: {
      * - Use referências para versões específicas
      * - Analise resultados para relevância
      */
-    searchFiles(params: FilesInput, provider: VcsOperations): Promise<FilesResult>;
+    searchFiles(params: FilesInput, provider: VcsOperations, owner: string): Promise<FilesResult>;
     /**
      * Faz upload de todo o projeto para o repositório
      *
@@ -484,7 +481,7 @@ export declare const filesTool: {
      * - Use branches para mudanças grandes
      * - Monitore erros de upload
      */
-    uploadProject(params: FilesInput, provider: VcsOperations): Promise<FilesResult>;
+    uploadProject(params: FilesInput, provider: VcsOperations, owner: string): Promise<FilesResult>;
 };
 export {};
 //# sourceMappingURL=git-files.d.ts.map

@@ -38,7 +38,6 @@ const AnalyticsInputSchema = zod_1.z.object({
     action: zod_1.z.enum(['traffic', 'contributors', 'activity', 'performance', 'reports', 'trends', 'insights']),
     // Parâmetros comuns
     repo: validator_js_1.CommonSchemas.repo,
-    provider: validator_js_1.CommonSchemas.provider,
     // Parâmetros para listagem
     page: validator_js_1.CommonSchemas.page,
     limit: validator_js_1.CommonSchemas.limit,
@@ -83,7 +82,7 @@ const AnalyticsResultSchema = zod_1.z.object({
  */
 exports.analyticsTool = {
     name: 'gh-analytics',
-    description: 'Geração completa de insights e métricas de repositório GitHub (EXCLUSIVO GITHUB). PARÂMETROS OBRIGATÓRIOS: action, owner, repo, provider (deve ser github). AÇÕES: traffic (estatísticas de tráfego), contributors (análise de contribuidores), activity (atividade), performance (métricas), reports (relatórios), trends (tendências), insights (insights gerais). Boas práticas: monitore métricas regularmente, use insights para melhorar workflow.',
+    description: 'tool: Gera insights e métricas de repositório GitHub para análise\n──────────────\naction traffic: estatísticas de tráfego do repositório\naction traffic requires: repo, metric_type, period, start_date, end_date\n───────────────\naction contributors: análise de contribuidores\naction contributors requires: repo, contributor_type, sort_by, period, start_date, end_date, page, limit\n───────────────\naction activity: atividade do repositório\naction activity requires: repo, activity_type, branch, author, period, start_date, end_date\n───────────────\naction performance: métricas de performance\naction performance requires: repo, performance_metric, period, start_date, end_date\n───────────────\naction reports: relatórios customizados\naction reports requires: repo, report_type, report_format, include_charts, period, start_date, end_date\n───────────────\naction trends: análise de tendências\naction trends requires: repo, trend_metric, trend_period, period, start_date, end_date\n───────────────\naction insights: insights gerais do repositório\naction insights requires: repo, period, start_date, end_date, include_charts',
     inputSchema: {
         type: 'object',
         properties: {
@@ -95,10 +94,6 @@ exports.analyticsTool = {
             repo: {
                 type: 'string',
                 description: 'Nome do repositório (OBRIGATÓRIO para todas as ações)'
-            },
-            provider: {
-                type: 'string',
-                description: 'Provider específico (github, gitea) ou usa padrão'
             },
             period: { type: 'string', enum: ['day', 'week', 'month', 'quarter', 'year'], description: 'Período de análise' },
             start_date: { type: 'string', description: 'Data inicial para análise' },
@@ -120,18 +115,16 @@ exports.analyticsTool = {
             page: { type: 'number', description: 'Página', minimum: 1 },
             limit: { type: 'number', description: 'Itens por página', minimum: 1, maximum: 100 }
         },
-        required: ['action', 'repo', 'provider']
+        required: ['action', 'repo']
     },
     async handler(input) {
         try {
             const validatedInput = AnalyticsInputSchema.parse(input);
-            // Aplicar auto-detecção de usuário
-            const updatedParams = await (0, user_detection_js_1.applyAutoUserDetection)(validatedInput, validatedInput.provider);
-            const provider = updatedParams.provider
-                ? index_js_1.globalProviderFactory.getProvider(updatedParams.provider)
-                : index_js_1.globalProviderFactory.getDefaultProvider();
+            // Fixar provider como github para tools exclusivas do GitHub
+            const updatedParams = await (0, user_detection_js_1.applyAutoUserDetection)(validatedInput, 'github');
+            const provider = index_js_1.globalProviderFactory.getProvider('github');
             if (!provider) {
-                throw new Error(`Provider '${updatedParams.provider}' não encontrado`);
+                throw new Error('Provider GitHub não encontrado');
             }
             switch (updatedParams.action) {
                 case 'traffic':

@@ -33,9 +33,8 @@ const index_js_1 = require("../providers/index.js");
  */
 const GhGistsInputSchema = zod_1.z.object({
     action: zod_1.z.enum(['create', 'list', 'get', 'update', 'delete', 'fork', 'star', 'comment']),
-    owner: zod_1.z.string(),
+    // owner: obtido automaticamente do provider,
     repo: zod_1.z.string(),
-    provider: zod_1.z.enum(['github']).describe('Provider to use (github only)'),
     projectPath: zod_1.z.string().describe('Local project path for git operations'),
     // Para create/update
     gist_id: zod_1.z.string().optional(),
@@ -63,7 +62,7 @@ const GhGistsResultSchema = zod_1.z.object({
 });
 exports.ghGistsTool = {
     name: 'gh-gists',
-    description: 'Manage GitHub Gists (GitHub only) with multiple actions: create, list, get, update, delete, fork, star, comment. Exclusivo para GitHub. Boas práticas (solo): use para compartilhar código rapidamente, snippets de código, documentação rápida; use para código pequeno e focado, adicione descrições claras.',
+    description: 'tool: Gerencia GitHub Gists para compartilhamento de código\n──────────────\naction create: cria novo gist\naction create requires: files, description, public\n───────────────\naction list: lista gists\naction list requires: username, page, limit\n───────────────\naction get: obtém detalhes de gist específico\naction get requires: gist_id\n───────────────\naction update: atualiza gist existente\naction update requires: gist_id, description, files, public\n───────────────\naction delete: remove gist\naction delete requires: gist_id\n───────────────\naction fork: faz fork de gist\naction fork requires: gist_id\n───────────────\naction star: adiciona/remove estrela\naction star requires: gist_id, star\n───────────────\naction comment: adiciona comentário\naction comment requires: gist_id, comment_body',
     inputSchema: {
         type: 'object',
         properties: {
@@ -72,9 +71,6 @@ exports.ghGistsTool = {
                 enum: ['create', 'list', 'get', 'update', 'delete', 'fork', 'star', 'comment'],
                 description: 'Action to perform on gists'
             },
-            owner: { type: 'string', description: 'Repository owner' },
-            repo: { type: 'string', description: 'Repository name' },
-            provider: { type: 'string', enum: ['github'], description: 'Provider to use (github only)' },
             projectPath: { type: 'string', description: 'Local project path for git operations' },
             gist_id: { type: 'string', description: 'Gist ID' },
             description: { type: 'string', description: 'Gist description' },
@@ -86,14 +82,12 @@ exports.ghGistsTool = {
             star: { type: 'boolean', description: 'Star/unstar gist' },
             comment_body: { type: 'string', description: 'Comment content' }
         },
-        required: ['action', 'owner', 'repo', 'provider', 'projectPath']
+        required: ['action', 'projectPath']
     },
     async handler(input) {
         try {
             const validatedInput = GhGistsInputSchema.parse(input);
-            if (validatedInput.provider !== 'github') {
-                throw new Error('gh-gists é exclusivo para GitHub');
-            }
+            // Fixar provider como github para tools exclusivas do GitHub
             const provider = index_js_1.globalProviderFactory.getProvider('github');
             if (!provider) {
                 throw new Error('Provider GitHub não encontrado');

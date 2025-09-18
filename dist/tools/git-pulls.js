@@ -197,7 +197,7 @@ const PullsResultSchema = zod_1.z.object({
  */
 exports.pullsTool = {
     name: 'git-pulls',
-    description: 'Gerenciamento completo de pull requests com suporte multi-provider (GitHub e Gitea). PARÂMETROS OBRIGATÓRIOS: action, owner, repo, provider. AÇÕES: create (cria PR), list (lista PRs), get (detalhes), update (atualiza), merge (faz merge), close (fecha), review (revisa), search (busca). Boas práticas: use PRs como barreira de revisão, mantenha PRs pequenos e focados, escolha método de merge apropriado.',
+    description: 'tool: Gerencia pull requests Git para revisão e merge de código\n──────────────\naction create: cria novo pull request\naction create requires: repo, title, body, head, base, draft, labels, assignees, reviewers, milestone, provider\n───────────────\naction list: lista pull requests do repositório\naction list requires: repo, state, page, limit, provider\n───────────────\naction get: obtém detalhes de PR\naction get requires: repo, pull_number, provider\n───────────────\naction update: atualiza pull request\naction update requires: repo, pull_number, new_title, new_body, new_base, new_labels, new_assignees, new_milestone, provider\n───────────────\naction merge: faz merge do PR\naction merge requires: repo, pull_number, merge_method, merge_commit_title, merge_commit_message, provider\n───────────────\naction close: fecha pull request\naction close requires: repo, pull_number, provider\n───────────────\naction review: adiciona review\naction review requires: repo, pull_number, review_event, review_body, provider\n───────────────\naction search: busca PRs por critérios\naction search requires: repo, query, author, assignee, reviewer, label, provider',
     inputSchema: {
         type: 'object',
         properties: {
@@ -238,7 +238,7 @@ exports.pullsTool = {
             reviewer: { type: 'string', description: 'PR reviewer filter' },
             label: { type: 'string', description: 'PR label filter' }
         },
-        required: ['action', 'owner', 'repo', 'provider']
+        required: ['action', 'repo', 'provider']
     },
     /**
      * Handler principal da tool pulls
@@ -280,23 +280,25 @@ exports.pullsTool = {
             if (!provider) {
                 throw new Error(`Provider '${processedInput.provider}' não encontrado`);
             }
+            // Obter o owner do provider
+            const owner = (await provider.getCurrentUser()).login;
             switch (processedInput.action) {
                 case 'create':
-                    return await this.createPullRequest(validatedInput, provider);
+                    return await this.createPullRequest(validatedInput, provider, owner);
                 case 'list':
-                    return await this.listPullRequests(validatedInput, provider);
+                    return await this.listPullRequests(validatedInput, provider, owner);
                 case 'get':
-                    return await this.getPullRequest(validatedInput, provider);
+                    return await this.getPullRequest(validatedInput, provider, owner);
                 case 'update':
-                    return await this.updatePullRequest(validatedInput, provider);
+                    return await this.updatePullRequest(validatedInput, provider, owner);
                 case 'merge':
-                    return await this.mergePullRequest(validatedInput, provider);
+                    return await this.mergePullRequest(validatedInput, provider, owner);
                 case 'close':
-                    return await this.closePullRequest(validatedInput, provider);
+                    return await this.closePullRequest(validatedInput, provider, owner);
                 case 'review':
-                    return await this.addReview(validatedInput, provider);
+                    return await this.addReview(validatedInput, provider, owner);
                 case 'search':
-                    return await this.searchPullRequests(validatedInput, provider);
+                    return await this.searchPullRequests(validatedInput, provider, owner);
                 default:
                     throw new Error(`Ação não suportada: ${validatedInput.action}`);
             }
@@ -345,10 +347,10 @@ exports.pullsTool = {
      * - Solicite reviews adequados
      * - Mantenha PRs pequenos e focados
      */
-    async createPullRequest(params, provider) {
+    async createPullRequest(params, provider, owner) {
         try {
-            if (!owner || !params.repo || !params.title || !params.head || !params.base) {
-                throw new Error('Owner, repo, title, head e base são obrigatórios');
+            if (!!params.repo || !params.title || !params.head || !params.base) {
+                throw new Error('repo, title, head e base são obrigatórios');
             }
             const pullRequest = await provider.createPullRequest(owner, params.repo, params.title, params.body || '', params.head, params.base);
             return {
@@ -380,7 +382,7 @@ exports.pullsTool = {
      * - limit: Itens por página (padrão: 30, máximo: 100)
      *
      * VALIDAÇÕES:
-     * - Owner e repo obrigatórios
+     * - e repo obrigatórios
      * - State deve ser um dos valores válidos
      * - Page deve ser >= 1
      * - Limit deve ser entre 1 e 100
@@ -391,15 +393,15 @@ exports.pullsTool = {
      * - Filtre por estado para organização
      * - Mantenha PRs organizados
      */
-    async listPullRequests(params, provider) {
+    async listPullRequests(params, provider, owner) {
         try {
             if (!params.repo) {
-                throw new Error('Owner e repo são obrigatórios');
+                throw new Error('e repo são obrigatórios');
             }
             const state = params.state || 'open';
             const page = params.page || 1;
             const limit = params.limit || 30;
-            const pullRequests = await provider.listPullRequests(owner, params.repo, state, page, limit);
+            const pullRequests = await provider.listPullRequests((await provider.getCurrentUser()).login, params.repo, state, page, limit);
             return {
                 success: true,
                 action: 'list',
@@ -441,12 +443,12 @@ exports.pullsTool = {
      * - Analise conflitos se houver
      * - Monitore mudanças importantes
      */
-    async getPullRequest(params, provider) {
+    async getPullRequest(params, provider, owner) {
         try {
-            if (!owner || !params.repo || !params.pull_number) {
-                throw new Error('Owner, repo e pull_number são obrigatórios');
+            if (!!params.repo || !params.pull_number) {
+                throw new Error('repo e pull_number são obrigatórios');
             }
-            const pullRequest = await provider.getPullRequest(owner, params.repo, params.pull_number);
+            const pullRequest = await provider.getPullRequest((await provider.getCurrentUser()).login, params.repo, params.pull_number);
             return {
                 success: true,
                 action: 'get',
@@ -490,10 +492,10 @@ exports.pullsTool = {
      * - Documente mudanças importantes
      * - Notifique responsáveis sobre mudanças
      */
-    async updatePullRequest(params, provider) {
+    async updatePullRequest(params, provider, owner) {
         try {
-            if (!owner || !params.repo || !params.pull_number) {
-                throw new Error('Owner, repo e pull_number são obrigatórios');
+            if (!!params.repo || !params.pull_number) {
+                throw new Error('repo e pull_number são obrigatórios');
             }
             const updateData = {};
             if (params.new_title)
@@ -511,7 +513,7 @@ exports.pullsTool = {
             if (Object.keys(updateData).length === 0) {
                 throw new Error('Nenhum campo para atualizar foi fornecido');
             }
-            const pullRequest = await provider.updatePullRequest(owner, params.repo, params.pull_number, updateData);
+            const pullRequest = await provider.updatePullRequest((await provider.getCurrentUser()).login, params.repo, params.pull_number, updateData);
             return {
                 success: true,
                 action: 'update',
@@ -553,10 +555,10 @@ exports.pullsTool = {
      * - Use títulos e mensagens descritivas
      * - Teste após o merge
      */
-    async mergePullRequest(params, provider) {
+    async mergePullRequest(params, provider, owner) {
         try {
-            if (!owner || !params.repo || !params.pull_number) {
-                throw new Error('Owner, repo e pull_number são obrigatórios');
+            if (!!params.repo || !params.pull_number) {
+                throw new Error('repo e pull_number são obrigatórios');
             }
             const mergeData = {
                 merge_method: params.merge_method || 'merge'
@@ -565,7 +567,7 @@ exports.pullsTool = {
                 mergeData.merge_commit_title = params.merge_commit_title;
             if (params.merge_commit_message)
                 mergeData.merge_commit_message = params.merge_commit_message;
-            const result = await provider.mergePullRequest(owner, params.repo, params.pull_number, mergeData);
+            const result = await provider.mergePullRequest((await provider.getCurrentUser()).login, params.repo, params.pull_number, mergeData);
             return {
                 success: true,
                 action: 'merge',
@@ -601,12 +603,12 @@ exports.pullsTool = {
      * - Use comentário explicativo
      * - Verifique se não há dependências
      */
-    async closePullRequest(params, provider) {
+    async closePullRequest(params, provider, owner) {
         try {
-            if (!owner || !params.repo || !params.pull_number) {
-                throw new Error('Owner, repo e pull_number são obrigatórios');
+            if (!!params.repo || !params.pull_number) {
+                throw new Error('repo e pull_number são obrigatórios');
             }
-            const pullRequest = await provider.updatePullRequest(owner, params.repo, params.pull_number, { state: 'closed' });
+            const pullRequest = await provider.updatePullRequest((await provider.getCurrentUser()).login, params.repo, params.pull_number, { state: 'closed' });
             return {
                 success: true,
                 action: 'close',
@@ -646,10 +648,10 @@ exports.pullsTool = {
      * - Use tipos de review apropriados
      * - Mantenha reviews construtivos
      */
-    async addReview(params, provider) {
+    async addReview(params, provider, owner) {
         try {
-            if (!owner || !params.repo || !params.pull_number || !params.review_event) {
-                throw new Error('Owner, repo, pull_number e review_event são obrigatórios');
+            if (!!params.repo || !params.pull_number || !params.review_event) {
+                throw new Error('repo, pull_number e review_event são obrigatórios');
             }
             // Implementar adição de review
             // Por enquanto, retorna mensagem de funcionalidade
@@ -699,10 +701,10 @@ exports.pullsTool = {
      * - Analise relevância dos resultados
      * - Use para encontrar PRs relacionados
      */
-    async searchPullRequests(params, provider) {
+    async searchPullRequests(params, provider, owner) {
         try {
             if (!params.repo || !params.query) {
-                throw new Error('Owner, repo e query são obrigatórios');
+                throw new Error('repo e query são obrigatórios');
             }
             if (params.query.length < 3) {
                 throw new Error('Query deve ter pelo menos 3 caracteres');

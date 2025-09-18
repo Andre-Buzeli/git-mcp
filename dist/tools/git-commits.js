@@ -47,7 +47,7 @@ const terminal_controller_js_1 = require("../utils/terminal-controller.js");
 const CommitsInputSchema = zod_1.z.object({
     action: zod_1.z.enum(['list', 'get', 'create', 'compare', 'search', 'push', 'pull']),
     // Parâmetros comuns
-    owner: zod_1.z.string(),
+    // owner: obtido automaticamente do provider,
     repo: zod_1.z.string(),
     projectPath: zod_1.z.string().describe('Local project path for git operations'),
     // Para multi-provider
@@ -148,7 +148,7 @@ const CommitsResultSchema = zod_1.z.object({
  */
 exports.commitsTool = {
     name: 'git-commits',
-    description: 'Gerenciamento completo de commits com suporte multi-provider (GitHub e Gitea). PARÂMETROS OBRIGATÓRIOS: action, owner, repo, provider, projectPath. AÇÕES: list (lista commits), get (detalhes por SHA), create (novo commit), compare (diferenças), search (busca), push (envia remoto), pull (baixa remoto). Boas práticas: commits atômicos, mensagens claras, use compare para auditoria.',
+    description: 'tool: Gerencia commits Git completos, histórico, criação e sincronização\n──────────────\naction list: lista commits do repositório\naction list requires: repo, page, limit, provider\n───────────────\naction get: obtém detalhes de commit específico\naction get requires: repo, sha, provider\n───────────────\naction create: cria novo commit\naction create requires: repo, message, branch, provider\n───────────────\naction compare: compara commits/branches\naction compare requires: repo, base, head, provider\n───────────────\naction search: busca commits por critérios\naction search requires: repo, query, author, provider\n───────────────\naction push: envia commits para remoto\naction push requires: repo, branch, provider\n───────────────\naction pull: baixa commits do remoto\naction pull requires: repo, branch, provider',
     inputSchema: {
         type: 'object',
         properties: {
@@ -216,21 +216,23 @@ exports.commitsTool = {
             if (!provider) {
                 throw new Error(`Provider '${processedInput.provider}' não encontrado`);
             }
+            // Obter o owner do provider
+            const owner = (await provider.getCurrentUser()).login;
             // Para ações que precisam de owner, verificar se foi determinado
-            if (!processedInput.owner && ['list', 'get', 'create', 'compare', 'search'].includes(processedInput.action)) {
+            if (!owner && ['list', 'get', 'create', 'compare', 'search'].includes(processedInput.action)) {
                 throw new Error('Não foi possível determinar o owner automaticamente. Verifique se o token está configurado corretamente.');
             }
             switch (processedInput.action) {
                 case 'list':
-                    return await this.listCommits(processedInput, provider);
+                    return await this.listCommits(processedInput, provider, owner);
                 case 'get':
-                    return await this.getCommit(processedInput, provider);
+                    return await this.getCommit(processedInput, provider, owner);
                 case 'create':
-                    return await this.createCommit(processedInput, provider);
+                    return await this.createCommit(processedInput, provider, owner);
                 case 'compare':
-                    return await this.compareCommits(processedInput, provider);
+                    return await this.compareCommits(processedInput, provider, owner);
                 case 'search':
-                    return await this.searchCommits(processedInput, provider);
+                    return await this.searchCommits(processedInput, provider, owner);
                 case 'push':
                     return await this.pushCommits(processedInput, provider);
                 case 'pull':
@@ -266,7 +268,7 @@ exports.commitsTool = {
      * - limit: Itens por página (padrão: 30, máximo: 100)
      *
      * VALIDAÇÕES:
-     * - Owner e repo obrigatórios
+     * - e repo obrigatórios
      * - SHA deve ser válido se fornecido
      * - Page deve ser >= 1
      * - Limit deve ser entre 1 e 100
@@ -277,14 +279,14 @@ exports.commitsTool = {
      * - Use SHA específico para análise
      * - Mantenha histórico organizado
      */
-    async listCommits(params, provider) {
+    async listCommits(params, provider, owner) {
         try {
-            if (!(await provider.getCurrentUser()).login || !params.repo) {
-                throw new Error('Owner e repo são obrigatórios');
+            if (!owner || !params.repo) {
+                throw new Error('e repo são obrigatórios');
             }
             const page = params.page || 1;
             const limit = params.limit || 30;
-            const commits = await provider.listCommits((await provider.getCurrentUser()).login, params.repo, params.sha, page, limit);
+            const commits = await provider.listCommits(owner, params.repo, params.sha, page, limit);
             return {
                 success: true,
                 action: 'list',
@@ -327,22 +329,22 @@ exports.commitsTool = {
      * - Analise mensagem e autor
      * - Documente mudanças importantes
      */
-    async getCommit(params, provider) {
+    async getCommit(params, provider, owner) {
         try {
-            if (!(await provider.getCurrentUser()).login || !params.repo) {
-                throw new Error('Owner e repo são obrigatórios');
+            if (!owner || !params.repo) {
+                throw new Error('e repo são obrigatórios');
             }
             // Se não foi fornecido commit_sha, usa o SHA da branch padrão
             let commitSha = params.commit_sha;
             if (!commitSha) {
                 try {
-                    const branchInfo = await provider.getBranch((await provider.getCurrentUser()).login, params.repo, 'main');
+                    const branchInfo = await provider.getBranch(owner, params.repo, 'main');
                     commitSha = branchInfo.commit.sha;
                 }
                 catch (error) {
                     // Se não conseguir obter o branch main, tenta master
                     try {
-                        const branchInfo = await provider.getBranch((await provider.getCurrentUser()).login, params.repo, 'master');
+                        const branchInfo = await provider.getBranch(owner, params.repo, 'master');
                         commitSha = branchInfo.commit.sha;
                     }
                     catch (masterError) {
@@ -350,7 +352,7 @@ exports.commitsTool = {
                     }
                 }
             }
-            const commit = await provider.getCommit((await provider.getCurrentUser()).login, params.repo, commitSha);
+            const commit = await provider.getCommit(owner, params.repo, commitSha);
             return {
                 success: true,
                 action: 'get',
@@ -358,7 +360,7 @@ exports.commitsTool = {
                 data: {
                     commit,
                     sha: commitSha,
-                    owner: (await provider.getCurrentUser()).login,
+                    owner: owner,
                     repo: params.repo
                 }
             };
@@ -400,10 +402,10 @@ exports.commitsTool = {
      * - Documente mudanças importantes
      * - Use branches apropriadas
      */
-    async createCommit(params, provider) {
+    async createCommit(params, provider, owner) {
         try {
-            if (!(await provider.getCurrentUser()).login || !params.repo || !params.message || !params.branch) {
-                throw new Error('Owner, repo, message e branch são obrigatórios');
+            if (!owner || !params.repo || !params.message || !params.branch) {
+                throw new Error('repo, message e branch são obrigatórios');
             }
             if (params.message.trim().length === 0) {
                 throw new Error('Mensagem do commit não pode estar vazia');
@@ -452,10 +454,10 @@ exports.commitsTool = {
      * - Analise arquivos modificados
      * - Documente diferenças importantes
      */
-    async compareCommits(params, provider) {
+    async compareCommits(params, provider, owner) {
         try {
-            if (!(await provider.getCurrentUser()).login || !params.repo || !params.base || !params.head) {
-                throw new Error('Owner, repo, base e head são obrigatórios');
+            if (!owner || !params.repo || !params.base || !params.head) {
+                throw new Error('repo, base e head são obrigatórios');
             }
             // Implementar comparação de commits
             // Por enquanto, retorna mensagem de funcionalidade
@@ -503,10 +505,10 @@ exports.commitsTool = {
      * - Use paginação para resultados grandes
      * - Analise relevância dos resultados
      */
-    async searchCommits(params, provider) {
+    async searchCommits(params, provider, owner) {
         try {
-            if (!(await provider.getCurrentUser()).login || !params.repo || !params.query) {
-                throw new Error('Owner, repo e query são obrigatórios');
+            if (!owner || !params.repo || !params.query) {
+                throw new Error('repo e query são obrigatórios');
             }
             if (params.query.length < 3) {
                 throw new Error('Query deve ter pelo menos 3 caracteres');

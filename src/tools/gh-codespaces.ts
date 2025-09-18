@@ -33,7 +33,6 @@ const GhCodespacesInputSchema = z.object({
   action: z.enum(['list', 'create', 'delete', 'start', 'stop', 'rebuild', 'logs']),
   // owner: obtido automaticamente do provider,
   repo: z.string(),
-  provider: z.enum(['github']).describe('Provider to use (github only)'),
   projectPath: z.string().describe('Local project path for git operations'),
   
   // Para create
@@ -63,7 +62,7 @@ export type GhCodespacesResult = z.infer<typeof GhCodespacesResultSchema>;
 
 export const ghCodespacesTool = {
   name: 'gh-codespaces',
-  description: 'Gerenciamento de GitHub Codespaces (EXCLUSIVO GITHUB).\n\nACTIONS DISPONÍVEIS:\n• list: Lista codespaces\n  - OPCIONAIS: repo\n\n• create: Cria novo codespace\n  - OBRIGATÓRIOS: repo\n  - OPCIONAIS: codespace_name, branch, machine_type, display_name\n\n• delete: Remove codespace\n  - OBRIGATÓRIOS: codespace_id\n\n• start: Inicia codespace\n  - OBRIGATÓRIOS: codespace_id\n\n• stop: Para codespace\n  - OBRIGATÓRIOS: codespace_id\n\n• rebuild: Reconstrói codespace\n  - OBRIGATÓRIOS: codespace_id\n\n• logs: Obtém logs do codespace\n  - OBRIGATÓRIOS: codespace_id\n  - OPCIONAIS: log_type\n\nPARÂMETROS COMUNS:\n• provider: Fixo como "github"\n• owner: Fixo como usuário do GitHub\n\nBoas práticas: use para desenvolvimento em nuvem, ambientes de desenvolvimento consistentes, colaboração remota; use para projetos que precisam de ambientes específicos, configure devcontainers adequadamente.',
+  description: 'tool: Gerencia GitHub Codespaces para desenvolvimento em nuvem\n──────────────\naction list: lista codespaces\naction list requires: repo\n───────────────\naction create: cria novo codespace\naction create requires: repo, codespace_name, branch, machine_type, display_name\n───────────────\naction delete: remove codespace\naction delete requires: codespace_id\n───────────────\naction start: inicia codespace\naction start requires: codespace_id\n───────────────\naction stop: para codespace\naction stop requires: codespace_id\n───────────────\naction rebuild: reconstrói codespace\naction rebuild requires: codespace_id\n───────────────\naction logs: obtém logs do codespace\naction logs requires: codespace_id, log_type',
   inputSchema: {
     type: 'object',
     properties: {
@@ -125,13 +124,14 @@ export const ghCodespacesTool = {
 
   async list(params: GhCodespacesInput, provider: VcsOperations): Promise<GhCodespacesResult> {
     try {
+      const owner = (await provider.getCurrentUser()).login;
       // Simular listagem de codespaces
       const codespaces = [
         {
           id: 'codespace-1',
           name: 'my-codespace',
           display_name: 'My Development Environment',
-          repository: `${params.owner}/${params.repo}`,
+          repository: `${owner}/${params.repo}`,
           branch: 'main',
           state: 'Available',
           created_at: new Date().toISOString(),
@@ -141,7 +141,7 @@ export const ghCodespacesTool = {
           id: 'codespace-2',
           name: 'feature-branch',
           display_name: 'Feature Development',
-          repository: `${params.owner}/${params.repo}`,
+          repository: `${owner}/${params.repo}`,
           branch: 'feature/new-feature',
           state: 'Running',
           created_at: new Date().toISOString(),
@@ -165,11 +165,12 @@ export const ghCodespacesTool = {
 
   async create(params: GhCodespacesInput, provider: VcsOperations): Promise<GhCodespacesResult> {
     try {
+      const owner = (await provider.getCurrentUser()).login;
       const codespace = {
         id: `codespace-${Date.now()}`,
         name: params.codespace_name || 'new-codespace',
         display_name: params.display_name || 'New Codespace',
-        repository: `${params.owner}/${params.repo}`,
+        repository: `${owner}/${params.repo}`,
         branch: params.branch || 'main',
         machine_type: params.machine_type || 'basicLinux32gb',
         state: 'Creating',

@@ -140,7 +140,7 @@ const BranchesResultSchema = zod_1.z.object({
  */
 exports.branchesTool = {
     name: 'git-branches',
-    description: 'Gerenciamento completo de branches com suporte multi-provider (GitHub e Gitea). PARÂMETROS OBRIGATÓRIOS: action, owner, repo, provider, projectPath. AÇÕES: create (nova branch), list (lista branches), get (detalhes), delete (remove), merge (integra), compare (diferenças). Boas práticas: use branches para isolar trabalhos, mantenha principais protegidas, merges pequenos e frequentes.',
+    description: 'tool: Gerencia branches Git, criação, listagem, merge e comparação\n──────────────\naction create: cria nova branch\naction create requires: repo, branch_name, from_branch, provider, projectPath\n───────────────\naction list: lista branches do repositório\naction list requires: repo, page, limit, provider, projectPath\n───────────────\naction get: obtém detalhes de branch\naction get requires: repo, branch, provider, projectPath\n───────────────\naction delete: remove branch\naction delete requires: repo, branch, provider, projectPath\n───────────────\naction merge: integra branches\naction merge requires: repo, head, base, merge_method, provider, projectPath\n───────────────\naction compare: compara branches\naction compare requires: repo, base_branch, head_branch, provider, projectPath',
     inputSchema: {
         type: 'object',
         properties: {
@@ -312,7 +312,7 @@ exports.branchesTool = {
      * - limit: Itens por página (padrão: 30, máximo: 100)
      *
      * VALIDAÇÕES:
-     * - Owner e repo obrigatórios
+     * - e repo obrigatórios
      * - Page deve ser >= 1
      * - Limit deve ser entre 1 e 100
      *
@@ -330,7 +330,7 @@ exports.branchesTool = {
             const owner = currentUser.login;
             const page = params.page || 1;
             const limit = params.limit || 30;
-            const branches = await provider.listBranches(owner, params.repo, page, limit);
+            const branches = await provider.listBranches((await provider.getCurrentUser()).login, params.repo, page, limit);
             return {
                 success: true,
                 action: 'list',
@@ -376,7 +376,7 @@ exports.branchesTool = {
             }
             const currentUser = await provider.getCurrentUser();
             const owner = currentUser.login;
-            const branch = await provider.getBranch(owner, params.repo, params.branch);
+            const branch = await provider.getBranch((await provider.getCurrentUser()).login, params.repo, params.branch);
             return {
                 success: true,
                 action: 'get',
@@ -419,7 +419,7 @@ exports.branchesTool = {
             }
             const currentUser = await provider.getCurrentUser();
             const owner = currentUser.login;
-            await provider.deleteBranch(owner, params.repo, params.branch);
+            await provider.deleteBranch((await provider.getCurrentUser()).login, params.repo, params.branch);
             return {
                 success: true,
                 action: 'delete',

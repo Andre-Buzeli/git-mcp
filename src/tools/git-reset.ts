@@ -56,7 +56,7 @@ export type GitResetResult = z.infer<typeof GitResetResultSchema>;
 
 export const gitResetTool = {
   name: 'git-reset',
-  description: 'Manage Git reset operations (GitHub + Gitea) with multiple actions: soft, mixed, hard, reset-to-commit, reset-branch. Suporte completo a GitHub e Gitea simultaneamente. Boas práticas (solo): use para desfazer commits, limpar staging area, voltar a estado anterior; use com cuidado especialmente reset hard, faça backup antes de resets destrutivos.',
+  description: 'tool: Gerencia operações Git reset para desfazer mudanças\n──────────────\naction soft: reset soft mantém mudanças no staging\naction soft requires: repo, commit_hash, provider, projectPath\n───────────────\naction mixed: reset mixed limpa staging area\naction mixed requires: repo, commit_hash, provider, projectPath\n───────────────\naction hard: reset hard remove todas as mudanças\naction hard requires: repo, commit_hash, provider, projectPath\n───────────────\naction reset-to-commit: reseta para commit específico\naction reset-to-commit requires: repo, commit_hash, reset_type, provider, projectPath\n───────────────\naction reset-branch: reseta branch específica\naction reset-branch requires: repo, branch_name, target_branch, provider, projectPath',
   inputSchema: {
     type: 'object',
     properties: {
@@ -74,7 +74,7 @@ export const gitResetTool = {
       reset_type: { type: 'string', enum: ['soft', 'mixed', 'hard'], description: 'Type of reset' },
       target_branch: { type: 'string', description: 'Target branch for reset' }
     },
-    required: ['action', 'owner', 'repo', 'provider', 'projectPath']
+    required: ['action', 'repo', 'provider', 'projectPath']
   },
 
   async handler(input: GitResetInput): Promise<GitResetResult> {

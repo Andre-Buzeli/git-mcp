@@ -30,7 +30,7 @@ const terminal_controller_js_1 = require("../utils/terminal-controller.js");
  */
 const GitSubmoduleInputSchema = zod_1.z.object({
     action: zod_1.z.enum(['add', 'update', 'init', 'deinit', 'status', 'sync']),
-    owner: zod_1.z.string(),
+    // owner: obtido automaticamente do provider,
     repo: zod_1.z.string(),
     provider: zod_1.z.enum(['gitea', 'github']).describe('Provider to use (gitea or github)'),
     projectPath: zod_1.z.string().describe('Local project path for git operations'),
@@ -55,7 +55,7 @@ const GitSubmoduleResultSchema = zod_1.z.object({
 });
 exports.gitSubmoduleTool = {
     name: 'git-submodule',
-    description: 'Manage Git submodules (GitHub + Gitea) with multiple actions: add, update, init, deinit, status, sync. Suporte completo a GitHub e Gitea simultaneamente. Boas práticas (solo): use para incluir repositórios externos, gerenciar dependências, manter versões específicas; use para dependências estáveis, mantenha versões específicas.',
+    description: 'tool: Gerencia submódulos Git para incluir repositórios externos\n──────────────\naction add: adiciona novo submódulo\naction add requires: repo, provider, projectPath, submodule_url, submodule_path, submodule_branch\n───────────────\naction update: atualiza submódulos\naction update requires: repo, provider, projectPath, submodule_name, recursive, remote\n───────────────\naction init: inicializa submódulos\naction init requires: repo, provider, projectPath, submodule_name, recursive\n───────────────\naction deinit: desinicializa submódulos\naction deinit requires: repo, provider, projectPath, submodule_name, recursive\n───────────────\naction status: verifica status dos submódulos\naction status requires: repo, provider, projectPath, submodule_name, recursive\n───────────────\naction sync: sincroniza submódulos\naction sync requires: repo, provider, projectPath, submodule_name, recursive_sync',
     inputSchema: {
         type: 'object',
         properties: {
@@ -76,7 +76,7 @@ exports.gitSubmoduleTool = {
             remote: { type: 'boolean', description: 'Update from remote' },
             recursive_sync: { type: 'boolean', description: 'Recursive sync' }
         },
-        required: ['action', 'owner', 'repo', 'provider', 'projectPath']
+        required: ['action', 'repo', 'provider', 'projectPath']
     },
     async handler(input) {
         try {

@@ -209,6 +209,7 @@ export interface VcsOperations {
         uploaded: number;
         errors: string[];
     }>;
+    getRepositoryUrl(owner: string, repo: string): string;
     listCommits(owner: string, repo: string, branch?: string, page?: number, limit?: number): Promise<CommitInfo[]>;
     getCommit(owner: string, repo: string, sha: string): Promise<CommitInfo>;
     createCommit(owner: string, repo: string, message: string, branch: string, changes?: any): Promise<CommitInfo>;
@@ -287,6 +288,7 @@ export interface VcsOperations {
     reviewCommit?(params: any): Promise<any>;
     generateReviewReport?(params: any): Promise<any>;
     applyReviewSuggestions?(params: any): Promise<any>;
+    getConfig?(): VcsProvider;
 }
 export interface VcsProviderFactory {
     createProvider(config: VcsProvider): VcsOperations;

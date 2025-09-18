@@ -26,7 +26,6 @@ import { z } from 'zod';
  */
 declare const GitWorktreeInputSchema: z.ZodObject<{
     action: z.ZodEnum<["add", "remove", "list", "prune", "move", "repair"]>;
-    owner: z.ZodString;
     repo: z.ZodString;
     provider: z.ZodEnum<["gitea", "github"]>;
     projectPath: z.ZodString;
@@ -40,7 +39,6 @@ declare const GitWorktreeInputSchema: z.ZodObject<{
     worktree_to_repair: z.ZodOptional<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
     provider: "gitea" | "github";
-    owner: string;
     repo: string;
     action: "add" | "list" | "remove" | "prune" | "move" | "repair";
     projectPath: string;
@@ -54,7 +52,6 @@ declare const GitWorktreeInputSchema: z.ZodObject<{
     worktree_to_repair?: string | undefined;
 }, {
     provider: "gitea" | "github";
-    owner: string;
     repo: string;
     action: "add" | "list" | "remove" | "prune" | "move" | "repair";
     projectPath: string;

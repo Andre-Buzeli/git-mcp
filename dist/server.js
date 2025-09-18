@@ -7,14 +7,16 @@ const types_js_1 = require("@modelcontextprotocol/sdk/types.js");
 const config_js_1 = require("./config.js");
 const index_js_2 = require("./providers/index.js");
 /**
- * Importação de todas as ferramentas MCP disponíveis (30 tools)
+ * Importação de todas as ferramentas MCP disponíveis (31 tools)
  *
- * GIT CORE (15 tools) - Funcionam com GitHub + Gitea:
+ * GIT CORE (16 tools) - Funcionam com GitHub + Gitea:
  * - git-repositories: Gerenciamento de repositórios
  * - git-commits: Operações com commits
  * - git-branches: Operações com branches
  * - git-tags: Gerenciamento de tags
  * - git-files: Gerenciamento de arquivos
+ * - git-upload-project: Upload completo de projeto
+ * - git-initialize: Inicialização completa de repositório
  * - git-issues: Gerenciamento de issues
  * - git-pulls: Pull requests e merges
  * - git-releases: Gerenciamento de releases
@@ -52,6 +54,7 @@ const git_branches_js_1 = require("./tools/git-branches.js");
 const git_tags_js_1 = require("./tools/git-tags.js");
 const git_files_js_1 = require("./tools/git-files.js");
 const git_upload_project_js_1 = require("./tools/git-upload-project.js");
+const git_initialize_js_1 = require("./tools/git-initialize.js");
 const git_issues_js_1 = require("./tools/git-issues.js");
 const git_pulls_js_1 = require("./tools/git-pulls.js");
 const git_releases_js_1 = require("./tools/git-releases.js");
@@ -80,7 +83,7 @@ const gh_codespaces_js_1 = require("./tools/gh-codespaces.js");
 const gh_projects_js_1 = require("./tools/gh-projects.js");
 const gh_sync_js_1 = require("./tools/gh-sync.js");
 /**
- * Array de todas as ferramentas disponíveis (30 tools)
+ * Array de todas as ferramentas disponíveis (31 tools)
  *
  * ESTRUTURA:
  * - Cada tool deve implementar a interface Tool
@@ -88,7 +91,7 @@ const gh_sync_js_1 = require("./tools/gh-sync.js");
  * - Handler deve ser assíncrono e retornar resultado
  *
  * ORGANIZAÇÃO:
- * - Git Core (15): Funcionam com GitHub + Gitea
+ * - Git Core (16): Funcionam com GitHub + Gitea
  * - Git Avançado (5): Funcionam com GitHub + Gitea
  * - GitHub Exclusivo (10): Apenas GitHub
  *
@@ -98,13 +101,14 @@ const gh_sync_js_1 = require("./tools/gh-sync.js");
  * - Para validação de parâmetros
  */
 const tools = [
-    // Git Core Tools (15) - GitHub + Gitea
+    // Git Core Tools (16) - GitHub + Gitea
     git_repositories_js_1.gitRepositoriesTool,
     git_commits_js_1.commitsTool,
     git_branches_js_1.branchesTool,
     git_tags_js_1.tagsTool,
     git_files_js_1.filesTool,
     git_upload_project_js_1.uploadProjectTool,
+    git_initialize_js_1.initializeTool,
     git_issues_js_1.issuesTool,
     git_pulls_js_1.pullsTool,
     git_releases_js_1.releasesTool,

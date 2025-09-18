@@ -90,5 +90,9 @@ export declare class GiteaProvider extends BaseVcsProvider {
     listSecrets(params: any): Promise<any>;
     listVariables(params: any): Promise<any>;
     mirrorRepository(params: any): Promise<any>;
+    /**
+     * Obtém URL do repositório Gitea
+     */
+    getRepositoryUrl(owner: string, repo: string): string;
 }
 //# sourceMappingURL=gitea-provider.d.ts.map

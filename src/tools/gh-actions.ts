@@ -39,7 +39,6 @@ const ActionsInputSchema = z.object({
   // Parâmetros comuns
   repo: CommonSchemas.repo,
   
-  
   // Parâmetros para listagem
   page: CommonSchemas.page,
   limit: CommonSchemas.limit,
@@ -98,7 +97,7 @@ export type ActionsResult = z.infer<typeof ActionsResultSchema>;
  */
 export const actionsTool = {
   name: 'gh-actions',
-  description: 'Gerenciamento completo de GitHub Actions runs (EXCLUSIVO GITHUB).\n\nACTIONS DISPONÍVEIS:\n• list-runs: Lista execuções de workflows\n  - OBRIGATÓRIOS: repo\n  - OPCIONAIS: workflow_id, status, branch, event, created_after, created_before, page, limit\n\n• cancel: Cancela execução de workflow\n  - OBRIGATÓRIOS: repo, run_id\n\n• rerun: Re-executa workflow\n  - OBRIGATÓRIOS: repo, run_id\n\n• artifacts: Lista artefatos de execução\n  - OBRIGATÓRIOS: repo, run_id\n  - OPCIONAIS: page, limit\n\n• secrets: Lista secrets do repositório\n  - OBRIGATÓRIOS: repo\n  - OPCIONAIS: secret_name, page, limit\n\n• jobs: Lista jobs de execução\n  - OBRIGATÓRIOS: repo, run_id\n  - OPCIONAIS: page, limit\n\n• download-artifact: Baixa artefato\n  - OBRIGATÓRIOS: repo, download_path\n  - OBRIGATÓRIOS (um dos dois): artifact_id OU artifact_name\n\nPARÂMETROS COMUNS:\n• repo: Nome do repositório\n• provider: Fixo como "github"\n• owner: Fixo como usuário do GitHub\n\nBoas práticas: monitore execuções regularmente, limpe artefatos antigos, use re-execução apenas quando necessário.',
+  description: 'tool: Gerencia execuções de GitHub Actions para monitoramento e controle\n──────────────\naction list-runs: lista execuções de workflows\naction list-runs requires: repo, workflow_id, status, branch, event, created_after, created_before, page, limit\n───────────────\naction cancel: cancela execução de workflow\naction cancel requires: repo, run_id\n───────────────\naction rerun: re-executa workflow\naction rerun requires: repo, run_id\n───────────────\naction artifacts: lista artefatos de execução\naction artifacts requires: repo, run_id, page, limit\n───────────────\naction secrets: lista secrets do repositório\naction secrets requires: repo, secret_name, page, limit\n───────────────\naction jobs: lista jobs de execução\naction jobs requires: repo, run_id, page, limit\n───────────────\naction download-artifact: baixa artefato\naction download-artifact requires: repo, download_path, artifact_id, artifact_name',
   inputSchema: {
     type: 'object',
     properties: {

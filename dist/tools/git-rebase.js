@@ -30,7 +30,7 @@ const terminal_controller_js_1 = require("../utils/terminal-controller.js");
  */
 const GitRebaseInputSchema = zod_1.z.object({
     action: zod_1.z.enum(['rebase', 'interactive-rebase', 'abort', 'continue', 'skip']),
-    owner: zod_1.z.string(),
+    // owner: obtido automaticamente do provider,
     repo: zod_1.z.string(),
     provider: zod_1.z.enum(['gitea', 'github']).describe('Provider to use (gitea or github)'),
     projectPath: zod_1.z.string().describe('Local project path for git operations'),
@@ -51,7 +51,7 @@ const GitRebaseResultSchema = zod_1.z.object({
 });
 exports.gitRebaseTool = {
     name: 'git-rebase',
-    description: 'Manage Git rebase operations (GitHub + Gitea) with multiple actions: rebase, interactive-rebase, abort, continue, skip. Suporte completo a GitHub e Gitea simultaneamente. Boas práticas (solo): use para reescrever histórico, limpar commits antes do merge, reorganizar commits; faça backup antes de rebases complexos, teste em branches locais primeiro.',
+    description: 'tool: Gerencia operações Git rebase para reorganização de commits\n──────────────\naction rebase: executa rebase simples\naction rebase requires: repo, target_branch, base_branch, provider, projectPath\n───────────────\naction interactive-rebase: rebase interativo\naction interactive-rebase requires: repo, target_branch, base_branch, interactive, commit_range, rebase_commands, provider, projectPath\n───────────────\naction abort: aborta rebase em andamento\naction abort requires: repo, provider, projectPath\n───────────────\naction continue: continua rebase pausado\naction continue requires: repo, provider, projectPath\n───────────────\naction skip: pula commit problemático\naction skip requires: repo, provider, projectPath',
     inputSchema: {
         type: 'object',
         properties: {
@@ -70,7 +70,7 @@ exports.gitRebaseTool = {
             commit_range: { type: 'string', description: 'Commit range for interactive rebase' },
             rebase_commands: { type: 'string', description: 'Rebase commands for interactive mode' }
         },
-        required: ['action', 'owner', 'repo', 'provider', 'projectPath']
+        required: ['action', 'repo', 'provider', 'projectPath']
     },
     async handler(input) {
         try {

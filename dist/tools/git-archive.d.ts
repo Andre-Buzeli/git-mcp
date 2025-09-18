@@ -26,7 +26,6 @@ import { z } from 'zod';
  */
 declare const GitArchiveInputSchema: z.ZodObject<{
     action: z.ZodEnum<["create", "extract", "list", "verify"]>;
-    owner: z.ZodString;
     repo: z.ZodString;
     provider: z.ZodEnum<["gitea", "github"]>;
     projectPath: z.ZodString;
@@ -41,9 +40,8 @@ declare const GitArchiveInputSchema: z.ZodObject<{
     output: z.ZodOptional<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
     provider: "gitea" | "github";
-    owner: string;
     repo: string;
-    action: "list" | "create" | "extract" | "verify";
+    action: "list" | "create" | "verify" | "extract";
     projectPath: string;
     output?: string | undefined;
     archive_path?: string | undefined;
@@ -56,9 +54,8 @@ declare const GitArchiveInputSchema: z.ZodObject<{
     prefix?: string | undefined;
 }, {
     provider: "gitea" | "github";
-    owner: string;
     repo: string;
-    action: "list" | "create" | "extract" | "verify";
+    action: "list" | "create" | "verify" | "extract";
     projectPath: string;
     output?: string | undefined;
     archive_path?: string | undefined;

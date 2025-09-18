@@ -35,7 +35,8 @@ export class GitOperations {
    */
   private async runGitCommand(command: string, args: string[] = []): Promise<GitResult> {
     return new Promise((resolve) => {
-      const fullCommand = `git ${command} ${args.join(' ')}`;
+      const allArgs = [command, ...args];
+      const fullCommand = `git ${allArgs.map(arg => `"${arg}"`).join(' ')}`;
       
       exec(fullCommand, { 
         cwd: this.projectPath,
@@ -524,17 +525,28 @@ export class GitOperations {
    * Bundle operations
    */
   async bundle(action: string, options: any = {}): Promise<GitResult> {
-    const args = [action];
+    const args = [];
     
-    if (options.verify) args.push('--verify');
-    if (options.listHeads) args.push('--list-heads');
-    if (options.unbundle) args.push('--unbundle');
-    if (options.create) args.push('create');
-    
-    if (options.file) args.push(options.file);
-    if (options.revlist) args.push(options.revlist);
+    if (action === 'create') {
+      args.push('bundle', 'create');
+      if (options.file) args.push(options.file);
+      if (options.revlist) args.push(options.revlist);
+    } else if (action === 'verify') {
+      args.push('bundle', 'verify');
+      if (options.file) args.push(options.file);
+    } else if (action === 'list-heads') {
+      args.push('bundle', 'list-heads');
+      if (options.file) args.push(options.file);
+    } else if (action === 'unbundle') {
+      args.push('bundle', 'unbundle');
+      if (options.file) args.push(options.file);
+    } else {
+      args.push('bundle', action);
+      if (options.file) args.push(options.file);
+      if (options.revlist) args.push(options.revlist);
+    }
 
-    return await this.runGitCommand('bundle', args);
+    return await this.runGitCommand(args[0], args.slice(1));
   }
 
   /**

@@ -25,7 +25,6 @@ import { z } from 'zod';
  */
 declare const GitResetInputSchema: z.ZodObject<{
     action: z.ZodEnum<["soft", "mixed", "hard", "reset-to-commit", "reset-branch"]>;
-    owner: z.ZodString;
     repo: z.ZodString;
     provider: z.ZodEnum<["gitea", "github"]>;
     projectPath: z.ZodString;
@@ -35,7 +34,6 @@ declare const GitResetInputSchema: z.ZodObject<{
     target_branch: z.ZodOptional<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
     provider: "gitea" | "github";
-    owner: string;
     repo: string;
     action: "soft" | "mixed" | "hard" | "reset-to-commit" | "reset-branch";
     projectPath: string;
@@ -45,7 +43,6 @@ declare const GitResetInputSchema: z.ZodObject<{
     reset_type?: "soft" | "mixed" | "hard" | undefined;
 }, {
     provider: "gitea" | "github";
-    owner: string;
     repo: string;
     action: "soft" | "mixed" | "hard" | "reset-to-commit" | "reset-branch";
     projectPath: string;

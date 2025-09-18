@@ -23,28 +23,22 @@ declare const GitSyncInputSchema: z.ZodObject<{
     action: z.ZodEnum<["configure", "status", "one-shot"]>;
     source: z.ZodObject<{
         provider: z.ZodEnum<["gitea", "github"]>;
-        owner: z.ZodString;
         repo: z.ZodString;
     }, "strip", z.ZodTypeAny, {
         provider: "gitea" | "github";
-        owner: string;
         repo: string;
     }, {
         provider: "gitea" | "github";
-        owner: string;
         repo: string;
     }>;
     target: z.ZodObject<{
         provider: z.ZodEnum<["gitea", "github"]>;
-        owner: z.ZodString;
         repo: z.ZodString;
     }, "strip", z.ZodTypeAny, {
         provider: "gitea" | "github";
-        owner: string;
         repo: string;
     }, {
         provider: "gitea" | "github";
-        owner: string;
         repo: string;
     }>;
     direction: z.ZodOptional<z.ZodEnum<["one-way", "two-way"]>>;
@@ -55,12 +49,10 @@ declare const GitSyncInputSchema: z.ZodObject<{
     action: "status" | "configure" | "one-shot";
     target: {
         provider: "gitea" | "github";
-        owner: string;
         repo: string;
     };
     source: {
         provider: "gitea" | "github";
-        owner: string;
         repo: string;
     };
     strategy?: "timestamp" | "source-wins" | "skip-conflicts" | undefined;
@@ -71,12 +63,10 @@ declare const GitSyncInputSchema: z.ZodObject<{
     action: "status" | "configure" | "one-shot";
     target: {
         provider: "gitea" | "github";
-        owner: string;
         repo: string;
     };
     source: {
         provider: "gitea" | "github";
-        owner: string;
         repo: string;
     };
     strategy?: "timestamp" | "source-wins" | "skip-conflicts" | undefined;

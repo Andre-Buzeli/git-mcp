@@ -32,7 +32,6 @@ import { VcsOperations } from '../providers/index.js';
 declare const AnalyticsInputSchema: z.ZodObject<{
     action: z.ZodEnum<["traffic", "contributors", "activity", "performance", "reports", "trends", "insights"]>;
     repo: z.ZodString;
-    provider: z.ZodEnum<["gitea", "github", "both"]>;
     page: z.ZodOptional<z.ZodNumber>;
     limit: z.ZodOptional<z.ZodNumber>;
     period: z.ZodOptional<z.ZodEnum<["day", "week", "month", "quarter", "year"]>>;
@@ -53,7 +52,6 @@ declare const AnalyticsInputSchema: z.ZodObject<{
     path: z.ZodOptional<z.ZodString>;
     file_type: z.ZodOptional<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
-    provider: "gitea" | "github" | "both";
     repo: string;
     action: "traffic" | "contributors" | "activity" | "performance" | "reports" | "trends" | "insights";
     path?: string | undefined;
@@ -76,7 +74,6 @@ declare const AnalyticsInputSchema: z.ZodObject<{
     trend_period?: "daily" | "weekly" | "monthly" | undefined;
     file_type?: string | undefined;
 }, {
-    provider: "gitea" | "github" | "both";
     repo: string;
     action: "traffic" | "contributors" | "activity" | "performance" | "reports" | "trends" | "insights";
     path?: string | undefined;
@@ -138,10 +135,6 @@ export declare const analyticsTool: {
                 description: string;
             };
             repo: {
-                type: string;
-                description: string;
-            };
-            provider: {
                 type: string;
                 description: string;
             };

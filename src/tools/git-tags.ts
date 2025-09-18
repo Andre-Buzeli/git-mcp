@@ -148,7 +148,7 @@ export type TagsResult = z.infer<typeof TagsResultSchema>;
  */
 export const tagsTool = {
   name: 'git-tags',
-  description: 'Gerenciamento completo de tags com suporte multi-provider (GitHub e Gitea). PARÂMETROS OBRIGATÓRIOS: action, owner, repo, provider. AÇÕES: create (cria tag), list (lista tags), get (detalhes), delete (remove), search (busca). Boas práticas: use tags como "fotografias" imutáveis, facilite rollback e builds reproduzíveis.',
+  description: 'tool: Gerencia tags Git para versionamento e releases\n──────────────\naction create: cria nova tag\naction create requires: repo, tag_name, message, target, type, tagger_name, tagger_email, provider\n───────────────\naction list: lista tags do repositório\naction list requires: repo, page, limit, provider\n───────────────\naction get: obtém detalhes de tag\naction get requires: repo, tag, provider\n───────────────\naction delete: remove tag\naction delete requires: repo, tag, provider\n───────────────\naction search: busca tags por critérios\naction search requires: repo, query, pattern, provider',
   inputSchema: {
     type: 'object',
     properties: {

@@ -318,7 +318,7 @@ export declare const tagsTool: {
      * - limit: Itens por página (padrão: 30, máximo: 100)
      *
      * VALIDAÇÕES:
-     * - Owner e repo obrigatórios
+     * - e repo obrigatórios
      * - Page deve ser >= 1
      * - Limit deve ser entre 1 e 100
      *
@@ -396,7 +396,7 @@ export declare const tagsTool: {
      * - pattern: Padrão de busca (ex: v*.*.*)
      *
      * VALIDAÇÕES:
-     * - Owner e repo obrigatórios
+     * - e repo obrigatórios
      * - Query ou pattern deve ser fornecido
      * - Repositório deve existir
      *

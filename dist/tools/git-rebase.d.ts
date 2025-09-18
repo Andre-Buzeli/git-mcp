@@ -26,7 +26,6 @@ import { z } from 'zod';
  */
 declare const GitRebaseInputSchema: z.ZodObject<{
     action: z.ZodEnum<["rebase", "interactive-rebase", "abort", "continue", "skip"]>;
-    owner: z.ZodString;
     repo: z.ZodString;
     provider: z.ZodEnum<["gitea", "github"]>;
     projectPath: z.ZodString;
@@ -37,7 +36,6 @@ declare const GitRebaseInputSchema: z.ZodObject<{
     rebase_commands: z.ZodOptional<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
     provider: "gitea" | "github";
-    owner: string;
     repo: string;
     action: "rebase" | "interactive-rebase" | "abort" | "continue" | "skip";
     projectPath: string;
@@ -48,7 +46,6 @@ declare const GitRebaseInputSchema: z.ZodObject<{
     rebase_commands?: string | undefined;
 }, {
     provider: "gitea" | "github";
-    owner: string;
     repo: string;
     action: "rebase" | "interactive-rebase" | "abort" | "continue" | "skip";
     projectPath: string;

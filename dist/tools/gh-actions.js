@@ -38,7 +38,6 @@ const ActionsInputSchema = zod_1.z.object({
     action: zod_1.z.enum(['list-runs', 'cancel', 'rerun', 'artifacts', 'secrets', 'jobs', 'download-artifact']),
     // Parâmetros comuns
     repo: validator_js_1.CommonSchemas.repo,
-    provider: validator_js_1.CommonSchemas.provider,
     // Parâmetros para listagem
     page: validator_js_1.CommonSchemas.page,
     limit: validator_js_1.CommonSchemas.limit,
@@ -86,7 +85,7 @@ const ActionsResultSchema = zod_1.z.object({
  */
 exports.actionsTool = {
     name: 'gh-actions',
-    description: 'Gerenciamento completo de GitHub Actions runs (EXCLUSIVO GITHUB). PARÂMETROS OBRIGATÓRIOS: action, owner, repo, provider (deve ser github). AÇÕES: list-runs (lista execuções), cancel (cancela), rerun (re-executa), artifacts (artefatos), secrets (lista secrets), jobs (lista jobs), download-artifact (baixa artefato). Boas práticas: monitore execuções regularmente, limpe artefatos antigos, use re-execução apenas quando necessário.',
+    description: 'tool: Gerencia execuções de GitHub Actions para monitoramento e controle\n──────────────\naction list-runs: lista execuções de workflows\naction list-runs requires: repo, workflow_id, status, branch, event, created_after, created_before, page, limit\n───────────────\naction cancel: cancela execução de workflow\naction cancel requires: repo, run_id\n───────────────\naction rerun: re-executa workflow\naction rerun requires: repo, run_id\n───────────────\naction artifacts: lista artefatos de execução\naction artifacts requires: repo, run_id, page, limit\n───────────────\naction secrets: lista secrets do repositório\naction secrets requires: repo, secret_name, page, limit\n───────────────\naction jobs: lista jobs de execução\naction jobs requires: repo, run_id, page, limit\n───────────────\naction download-artifact: baixa artefato\naction download-artifact requires: repo, download_path, artifact_id, artifact_name',
     inputSchema: {
         type: 'object',
         properties: {
@@ -96,7 +95,6 @@ exports.actionsTool = {
                 description: 'Action to perform on GitHub Actions'
             },
             repo: { type: 'string', description: 'Repository name' },
-            provider: { type: 'string', description: 'Specific provider (github, gitea) or use default' },
             run_id: { type: 'string', description: 'Workflow run ID' },
             workflow_id: { type: 'string', description: 'Workflow ID' },
             status: { type: 'string', description: 'Status filter' },
@@ -112,18 +110,16 @@ exports.actionsTool = {
             page: { type: 'number', description: 'Page number', minimum: 1 },
             limit: { type: 'number', description: 'Items per page', minimum: 1, maximum: 100 }
         },
-        required: ['action', 'repo', 'provider']
+        required: ['action', 'repo']
     },
     async handler(input) {
         try {
             const validatedInput = ActionsInputSchema.parse(input);
-            // Aplicar auto-detecção de usuário
-            const updatedParams = await (0, user_detection_js_1.applyAutoUserDetection)(validatedInput, validatedInput.provider);
-            const provider = updatedParams.provider
-                ? index_js_1.globalProviderFactory.getProvider(updatedParams.provider)
-                : index_js_1.globalProviderFactory.getDefaultProvider();
+            // Fixar provider como github para tools exclusivas do GitHub
+            const updatedParams = await (0, user_detection_js_1.applyAutoUserDetection)(validatedInput, 'github');
+            const provider = index_js_1.globalProviderFactory.getProvider('github');
             if (!provider) {
-                throw new Error(`Provider '${updatedParams.provider}' não encontrado`);
+                throw new Error('Provider GitHub não encontrado');
             }
             switch (updatedParams.action) {
                 case 'list-runs':

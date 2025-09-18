@@ -150,7 +150,7 @@ export type BranchesResult = z.infer<typeof BranchesResultSchema>;
  */
 export const branchesTool = {
   name: 'git-branches',
-  description: 'Gerenciamento completo de branches com suporte multi-provider (GitHub e Gitea). PARÂMETROS OBRIGATÓRIOS: action, owner, repo, provider, projectPath. AÇÕES: create (nova branch), list (lista branches), get (detalhes), delete (remove), merge (integra), compare (diferenças). Boas práticas: use branches para isolar trabalhos, mantenha principais protegidas, merges pequenos e frequentes.',
+  description: 'tool: Gerencia branches Git, criação, listagem, merge e comparação\n──────────────\naction create: cria nova branch\naction create requires: repo, branch_name, from_branch, provider, projectPath\n───────────────\naction list: lista branches do repositório\naction list requires: repo, page, limit, provider, projectPath\n───────────────\naction get: obtém detalhes de branch\naction get requires: repo, branch, provider, projectPath\n───────────────\naction delete: remove branch\naction delete requires: repo, branch, provider, projectPath\n───────────────\naction merge: integra branches\naction merge requires: repo, head, base, merge_method, provider, projectPath\n───────────────\naction compare: compara branches\naction compare requires: repo, base_branch, head_branch, provider, projectPath',
   inputSchema: {
     type: 'object',
     properties: {

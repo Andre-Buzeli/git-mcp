@@ -47,7 +47,7 @@ const terminal_controller_js_1 = require("../utils/terminal-controller.js");
 const RepositoriesInputSchema = zod_1.z.object({
     action: zod_1.z.enum(['create', 'list', 'get', 'update', 'delete', 'fork', 'search', 'init', 'clone']),
     // Parâmetros comuns
-    owner: zod_1.z.string(),
+    // owner: obtido automaticamente do provider,
     repo: zod_1.z.string(),
     provider: zod_1.z.enum(['gitea', 'github']).describe('Provider to use (gitea or github)'),
     projectPath: zod_1.z.string().describe('Local project path for git operations'),
@@ -236,25 +236,27 @@ exports.repositoriesTool = {
                 console.error('[REPOSITORIES] Erro ao obter provider:', providerError);
                 throw new Error(`Erro de configuração do provider: ${providerError instanceof Error ? providerError.message : 'Provider não disponível'}`);
             }
+            // Obter o owner do provider
+            const owner = (await provider.getCurrentUser()).login;
             switch (processedInput.action) {
                 case 'create':
-                    return await this.createRepository(processedInput, provider);
+                    return await this.createRepository(processedInput, provider, owner);
                 case 'list':
-                    return await this.listRepositories(processedInput, provider);
+                    return await this.listRepositories(processedInput, provider, owner);
                 case 'get':
-                    return await this.getRepository(processedInput, provider);
+                    return await this.getRepository(processedInput, provider, owner);
                 case 'update':
-                    return await this.updateRepository(processedInput, provider);
+                    return await this.updateRepository(processedInput, provider, owner);
                 case 'delete':
-                    return await this.deleteRepository(processedInput, provider);
+                    return await this.deleteRepository(processedInput, provider, owner);
                 case 'fork':
-                    return await this.forkRepository(processedInput, provider);
+                    return await this.forkRepository(processedInput, provider, owner);
                 case 'search':
-                    return await this.searchRepositories(processedInput, provider);
+                    return await this.searchRepositories(processedInput, provider, owner);
                 case 'init':
-                    return await this.initRepository(processedInput, provider);
+                    return await this.initRepository(processedInput, provider, owner);
                 case 'clone':
-                    return await this.cloneRepository(processedInput, provider);
+                    return await this.cloneRepository(processedInput, provider, owner);
                 default:
                     throw new Error(`Ação não suportada: ${processedInput.action}`);
             }
@@ -300,7 +302,7 @@ exports.repositoriesTool = {
      * - Inicialize com README para projetos novos
      * - Use templates para consistência
      */
-    async createRepository(params, provider) {
+    async createRepository(params, provider, owner) {
         try {
             if (!params.name) {
                 throw new Error('Nome do repositório é obrigatório');
@@ -317,7 +319,7 @@ exports.repositoriesTool = {
             throw new Error(`Falha ao criar repositório: ${error instanceof Error ? error.message : String(error)}`);
         }
     },
-    async listRepositories(params, provider) {
+    async listRepositories(params, provider, owner) {
         try {
             const page = params.page || 1;
             const limit = params.limit || 30;
@@ -338,16 +340,16 @@ exports.repositoriesTool = {
             throw new Error(`Falha ao listar repositórios: ${error instanceof Error ? error.message : String(error)}`);
         }
     },
-    async getRepository(params, provider) {
+    async getRepository(params, provider, owner) {
         try {
-            if (!(await provider.getCurrentUser()).login || !params.repo) {
-                throw new Error('Owner e nome do repositório são obrigatórios');
+            if (!owner || !params.repo) {
+                throw new Error('e nome do repositório são obrigatórios');
             }
-            const repository = await provider.getRepository((await provider.getCurrentUser()).login, params.repo);
+            const repository = await provider.getRepository(owner, params.repo);
             return {
                 success: true,
                 action: 'get',
-                message: `Repositório '${(await provider.getCurrentUser()).login}/${params.repo}' obtido com sucesso`,
+                message: `Repositório '${owner}/${params.repo}' obtido com sucesso`,
                 data: repository
             };
         }
@@ -355,10 +357,10 @@ exports.repositoriesTool = {
             throw new Error(`Falha ao obter repositório: ${error instanceof Error ? error.message : String(error)}`);
         }
     },
-    async updateRepository(params, provider) {
+    async updateRepository(params, provider, owner) {
         try {
-            if (!(await provider.getCurrentUser()).login || !params.repo) {
-                throw new Error('Owner e nome do repositório são obrigatórios');
+            if (!owner || !params.repo) {
+                throw new Error('e nome do repositório são obrigatórios');
             }
             const updateData = {};
             if (params.new_name)
@@ -372,11 +374,11 @@ exports.repositoriesTool = {
             if (Object.keys(updateData).length === 0) {
                 throw new Error('Nenhum campo para atualizar foi fornecido');
             }
-            const repository = await provider.updateRepository((await provider.getCurrentUser()).login, params.repo, updateData);
+            const repository = await provider.updateRepository(owner, params.repo, updateData);
             return {
                 success: true,
                 action: 'update',
-                message: `Repositório '${(await provider.getCurrentUser()).login}/${params.repo}' atualizado com sucesso`,
+                message: `Repositório '${owner}/${params.repo}' atualizado com sucesso`,
                 data: repository
             };
         }
@@ -384,16 +386,16 @@ exports.repositoriesTool = {
             throw new Error(`Falha ao atualizar repositório: ${error instanceof Error ? error.message : String(error)}`);
         }
     },
-    async deleteRepository(params, provider) {
+    async deleteRepository(params, provider, owner) {
         try {
-            if (!(await provider.getCurrentUser()).login || !params.repo) {
-                throw new Error('Owner e nome do repositório são obrigatórios');
+            if (!owner || !params.repo) {
+                throw new Error('e nome do repositório são obrigatórios');
             }
-            await provider.deleteRepository((await provider.getCurrentUser()).login, params.repo);
+            await provider.deleteRepository(owner, params.repo);
             return {
                 success: true,
                 action: 'delete',
-                message: `Repositório '${(await provider.getCurrentUser()).login}/${params.repo}' deletado com sucesso`,
+                message: `Repositório '${owner}/${params.repo}' deletado com sucesso`,
                 data: { deleted: true }
             };
         }
@@ -401,16 +403,16 @@ exports.repositoriesTool = {
             throw new Error(`Falha ao deletar repositório: ${error instanceof Error ? error.message : String(error)}`);
         }
     },
-    async forkRepository(params, provider) {
+    async forkRepository(params, provider, owner) {
         try {
-            if (!(await provider.getCurrentUser()).login || !params.repo) {
-                throw new Error('Owner e nome do repositório são obrigatórios');
+            if (!owner || !params.repo) {
+                throw new Error('e nome do repositório são obrigatórios');
             }
-            const repository = await provider.forkRepository((await provider.getCurrentUser()).login, params.repo, params.organization);
+            const repository = await provider.forkRepository(owner, params.repo, params.organization);
             return {
                 success: true,
                 action: 'fork',
-                message: `Fork do repositório '${(await provider.getCurrentUser()).login}/${params.repo}' criado com sucesso`,
+                message: `Fork do repositório '${owner}/${params.repo}' criado com sucesso`,
                 data: repository
             };
         }
@@ -418,7 +420,7 @@ exports.repositoriesTool = {
             throw new Error(`Falha ao fazer fork do repositório: ${error instanceof Error ? error.message : String(error)}`);
         }
     },
-    async searchRepositories(params, provider) {
+    async searchRepositories(params, provider, owner) {
         try {
             if (!params.query) {
                 throw new Error('Query de busca é obrigatória');
@@ -463,7 +465,7 @@ exports.repositoriesTool = {
      * - Use caminhos absolutos
      * - Configure remote após inicialização
      */
-    async initRepository(params, provider) {
+    async initRepository(params, provider, owner) {
         try {
             if (!params.projectPath) {
                 throw new Error('projectPath é obrigatório para inicialização do repositório');
@@ -478,10 +480,13 @@ exports.repositoriesTool = {
                 throw new Error(`Falha ao inicializar repositório: ${initResult.output}`);
             }
             // Se owner/repo foram especificados, configura remote
-            if ((await provider.getCurrentUser()).login && params.repo) {
+            if (owner && params.repo) {
+                // Obtém URL base do provider
+                const providerConfig = provider?.getConfig ? provider.getConfig() : null;
+                const baseUrl = providerConfig?.apiUrl || (params.provider === 'gitea' ? 'http://nas-ubuntu:3000' : 'https://github.com');
                 const remoteUrl = params.provider === 'gitea'
-                    ? `http://nas-ubuntu:3000/${(await provider.getCurrentUser()).login}/${params.repo}.git`
-                    : `https://github.com/${(await provider.getCurrentUser()).login}/${params.repo}.git`;
+                    ? `${baseUrl.replace('/api/v1', '')}/${owner}/${params.repo}.git`
+                    : `https://github.com/${owner}/${params.repo}.git`;
                 const remoteResult = await (0, terminal_controller_js_1.runTerminalCmd)({
                     command: `cd "${params.projectPath}" && git remote add origin "${remoteUrl}"`,
                     is_background: false,
@@ -498,7 +503,7 @@ exports.repositoriesTool = {
                 data: {
                     path: params.projectPath,
                     initialized: true,
-                    remoteConfigured: !!((await provider.getCurrentUser()).login && params.repo && provider)
+                    remoteConfigured: !!(owner && params.repo && provider)
                 }
             };
         }
@@ -525,15 +530,17 @@ exports.repositoriesTool = {
      * - Use caminhos absolutos
      * - Considere profundidade de clone para repositórios grandes
      */
-    async cloneRepository(params, provider) {
+    async cloneRepository(params, provider, owner) {
         try {
-            if (!(await provider.getCurrentUser()).login || !params.repo || !params.projectPath) {
+            if (!owner || !params.repo || !params.projectPath) {
                 throw new Error('owner, repo e projectPath são obrigatórios para clonagem');
             }
             // Obtém URL do repositório
+            const providerConfig = provider?.getConfig ? provider.getConfig() : null;
+            const baseUrl = providerConfig?.apiUrl || (params.provider === 'gitea' ? 'http://nas-ubuntu:3000' : 'https://github.com');
             const repoUrl = params.provider === 'gitea'
-                ? `http://nas-ubuntu:3000/${(await provider.getCurrentUser()).login}/${params.repo}.git`
-                : `https://github.com/${(await provider.getCurrentUser()).login}/${params.repo}.git`;
+                ? `${baseUrl.replace('/api/v1', '')}/${owner}/${params.repo}.git`
+                : `https://github.com/${owner}/${params.repo}.git`;
             // Executa git clone
             const cloneResult = await (0, terminal_controller_js_1.runTerminalCmd)({
                 command: `git clone "${repoUrl}" "${params.projectPath}"`,
@@ -546,9 +553,9 @@ exports.repositoriesTool = {
             return {
                 success: true,
                 action: 'clone',
-                message: `Repositório '${(await provider.getCurrentUser()).login}/${params.repo}' clonado com sucesso para '${params.projectPath}'`,
+                message: `Repositório '${owner}/${params.repo}' clonado com sucesso para '${params.projectPath}'`,
                 data: {
-                    source: `${(await provider.getCurrentUser()).login}/${params.repo}`,
+                    source: `${owner}/${params.repo}`,
                     destination: params.projectPath,
                     cloned: true,
                     url: repoUrl

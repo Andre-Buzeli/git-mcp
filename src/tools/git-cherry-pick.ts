@@ -63,7 +63,7 @@ export type GitCherryPickResult = z.infer<typeof GitCherryPickResultSchema>;
 
 export const gitCherryPickTool = {
   name: 'git-cherry-pick',
-  description: 'Manage Git cherry-pick operations (GitHub + Gitea) with multiple actions: cherry-pick, cherry-pick-range, abort, continue. Suporte completo a GitHub e Gitea simultaneamente. Boas práticas (solo): use para aplicar commits específicos, portar correções entre branches, selecionar mudanças específicas; use para commits pequenos e focados, teste antes de aplicar em produção.',
+  description: 'tool: Gerencia operações Git cherry-pick para aplicar commits específicos\n──────────────\naction cherry-pick: aplica commit específico\naction cherry-pick requires: repo, provider, projectPath, commit_hash, no_commit, strategy, mainline, signoff\n───────────────\naction cherry-pick-range: aplica range de commits\naction cherry-pick-range requires: repo, provider, projectPath, commit_range, start_commit, end_commit, no_commit, strategy, signoff\n───────────────\naction abort: aborta cherry-pick em andamento\naction abort requires: repo, provider, projectPath\n───────────────\naction continue: continua cherry-pick pausado\naction continue requires: repo, provider, projectPath',
   inputSchema: {
     type: 'object',
     properties: {
@@ -85,7 +85,7 @@ export const gitCherryPickTool = {
       mainline: { type: 'number', description: 'Mainline for merge commits' },
       signoff: { type: 'boolean', description: 'Add signoff to commit' }
     },
-    required: ['action', 'owner', 'repo', 'provider', 'projectPath']
+    required: ['action', 'repo', 'provider', 'projectPath']
   },
 
   async handler(input: GitCherryPickInput): Promise<GitCherryPickResult> {

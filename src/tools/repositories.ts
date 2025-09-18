@@ -247,26 +247,29 @@ export const repositoriesTool = {
         console.error('[REPOSITORIES] Erro ao obter provider:', providerError);
         throw new Error(`Erro de configuração do provider: ${providerError instanceof Error ? providerError.message : 'Provider não disponível'}`);
       }
+
+      // Obter o owner do provider
+      const owner = (await provider.getCurrentUser()).login;
       
       switch (processedInput.action) {
         case 'create':
-          return await this.createRepository(processedInput, provider);
+          return await this.createRepository(processedInput, provider, owner);
         case 'list':
-          return await this.listRepositories(processedInput, provider);
+          return await this.listRepositories(processedInput, provider, owner);
         case 'get':
-          return await this.getRepository(processedInput, provider);
+          return await this.getRepository(processedInput, provider, owner);
         case 'update':
-          return await this.updateRepository(processedInput, provider);
+          return await this.updateRepository(processedInput, provider, owner);
         case 'delete':
-          return await this.deleteRepository(processedInput, provider);
+          return await this.deleteRepository(processedInput, provider, owner);
         case 'fork':
-          return await this.forkRepository(processedInput, provider);
+          return await this.forkRepository(processedInput, provider, owner);
         case 'search':
-          return await this.searchRepositories(processedInput, provider);
+          return await this.searchRepositories(processedInput, provider, owner);
         case 'init':
-          return await this.initRepository(processedInput, provider);
+          return await this.initRepository(processedInput, provider, owner);
         case 'clone':
-          return await this.cloneRepository(processedInput, provider);
+          return await this.cloneRepository(processedInput, provider, owner);
         default:
           throw new Error(`Ação não suportada: ${processedInput.action}`);
       }
@@ -312,7 +315,7 @@ export const repositoriesTool = {
    * - Inicialize com README para projetos novos
    * - Use templates para consistência
    */
-  async createRepository(params: RepositoriesInput, provider: VcsOperations): Promise<RepositoriesResult> {
+  async createRepository(params: RepositoriesInput, provider: VcsOperations, owner: string): Promise<RepositoriesResult> {
     try {
       if (!params.name) {
         throw new Error('Nome do repositório é obrigatório');
@@ -335,7 +338,7 @@ export const repositoriesTool = {
     }
   },
 
-  async listRepositories(params: RepositoriesInput, provider: VcsOperations): Promise<RepositoriesResult> {
+  async listRepositories(params: RepositoriesInput, provider: VcsOperations, owner: string): Promise<RepositoriesResult> {
     try {
       const page = params.page || 1;
       const limit = params.limit || 30;
@@ -358,18 +361,18 @@ export const repositoriesTool = {
     }
   },
 
-  async getRepository(params: RepositoriesInput, provider: VcsOperations): Promise<RepositoriesResult> {
+  async getRepository(params: RepositoriesInput, provider: VcsOperations, owner: string): Promise<RepositoriesResult> {
     try {
-      if (!params.owner || !params.repo) {
+      if (!owner || !params.repo) {
         throw new Error('e nome do repositório são obrigatórios');
       }
 
-      const repository = await provider.getRepository(params.owner, params.repo);
+      const repository = await provider.getRepository(owner, params.repo);
 
       return {
         success: true,
         action: 'get',
-        message: `Repositório '${params.owner}/${params.repo}' obtido com sucesso`,
+        message: `Repositório '${owner}/${params.repo}' obtido com sucesso`,
         data: repository
       };
     } catch (error) {
@@ -377,9 +380,9 @@ export const repositoriesTool = {
     }
   },
 
-  async updateRepository(params: RepositoriesInput, provider: VcsOperations): Promise<RepositoriesResult> {
+  async updateRepository(params: RepositoriesInput, provider: VcsOperations, owner: string): Promise<RepositoriesResult> {
     try {
-      if (!params.owner || !params.repo) {
+      if (!owner || !params.repo) {
         throw new Error('e nome do repositório são obrigatórios');
       }
 
@@ -393,12 +396,12 @@ export const repositoriesTool = {
         throw new Error('Nenhum campo para atualizar foi fornecido');
       }
 
-      const repository = await provider.updateRepository(params.owner, params.repo, updateData);
+      const repository = await provider.updateRepository(owner, params.repo, updateData);
 
       return {
         success: true,
         action: 'update',
-        message: `Repositório '${params.owner}/${params.repo}' atualizado com sucesso`,
+        message: `Repositório '${owner}/${params.repo}' atualizado com sucesso`,
         data: repository
       };
     } catch (error) {
@@ -406,18 +409,18 @@ export const repositoriesTool = {
     }
   },
 
-  async deleteRepository(params: RepositoriesInput, provider: VcsOperations): Promise<RepositoriesResult> {
+  async deleteRepository(params: RepositoriesInput, provider: VcsOperations, owner: string): Promise<RepositoriesResult> {
     try {
-      if (!params.owner || !params.repo) {
+      if (!owner || !params.repo) {
         throw new Error('e nome do repositório são obrigatórios');
       }
 
-      await provider.deleteRepository(params.owner, params.repo);
+      await provider.deleteRepository(owner, params.repo);
 
       return {
         success: true,
         action: 'delete',
-        message: `Repositório '${params.owner}/${params.repo}' deletado com sucesso`,
+        message: `Repositório '${owner}/${params.repo}' deletado com sucesso`,
         data: { deleted: true }
       };
     } catch (error) {
@@ -425,18 +428,18 @@ export const repositoriesTool = {
     }
   },
 
-  async forkRepository(params: RepositoriesInput, provider: VcsOperations): Promise<RepositoriesResult> {
+  async forkRepository(params: RepositoriesInput, provider: VcsOperations, owner: string): Promise<RepositoriesResult> {
     try {
-      if (!params.owner || !params.repo) {
+      if (!owner || !params.repo) {
         throw new Error('e nome do repositório são obrigatórios');
       }
 
-      const repository = await provider.forkRepository(params.owner, params.repo, params.organization);
+      const repository = await provider.forkRepository(owner, params.repo, params.organization);
 
       return {
         success: true,
         action: 'fork',
-        message: `Fork do repositório '${params.owner}/${params.repo}' criado com sucesso`,
+        message: `Fork do repositório '${owner}/${params.repo}' criado com sucesso`,
         data: repository
       };
     } catch (error) {
@@ -444,7 +447,7 @@ export const repositoriesTool = {
     }
   },
 
-  async searchRepositories(params: RepositoriesInput, provider: VcsOperations): Promise<RepositoriesResult> {
+  async searchRepositories(params: RepositoriesInput, provider: VcsOperations, owner: string): Promise<RepositoriesResult> {
     try {
       if (!params.query) {
         throw new Error('Query de busca é obrigatória');
@@ -492,7 +495,7 @@ export const repositoriesTool = {
    * - Use caminhos absolutos
    * - Configure remote após inicialização
    */
-  async initRepository(params: RepositoriesInput, provider?: VcsOperations): Promise<RepositoriesResult> {
+  async initRepository(params: RepositoriesInput, provider?: VcsOperations, owner?: string): Promise<RepositoriesResult> {
     try {
       if (!params.projectPath) {
         throw new Error('projectPath é obrigatório para inicialização do repositório');
@@ -510,10 +513,13 @@ export const repositoriesTool = {
       }
 
       // Se owner/repo foram especificados, configura remote
-      if (params.owner && params.repo) {
+      if (owner && params.repo) {
+        // Obtém URL base do provider
+        const providerConfig = provider?.getConfig ? provider.getConfig() : null;
+        const baseUrl = providerConfig?.apiUrl || (params.provider === 'gitea' ? 'http://nas-ubuntu:3000' : 'https://github.com');
         const remoteUrl = params.provider === 'gitea'
-          ? `http://nas-ubuntu:3000/${params.owner}/${params.repo}.git`
-          : `https://github.com/${params.owner}/${params.repo}.git`;
+          ? `${baseUrl.replace('/api/v1', '')}/${owner}/${params.repo}.git`
+          : `https://github.com/${owner}/${params.repo}.git`;
 
         const remoteResult = await runTerminalCmd({
           command: `cd "${params.projectPath}" && git remote add origin "${remoteUrl}"`,
@@ -533,7 +539,7 @@ export const repositoriesTool = {
         data: {
           path: params.projectPath,
           initialized: true,
-          remoteConfigured: !!(params.owner && params.repo && provider)
+          remoteConfigured: !!(owner && params.repo && provider)
         }
       };
     } catch (error) {
@@ -560,16 +566,18 @@ export const repositoriesTool = {
    * - Use caminhos absolutos
    * - Considere profundidade de clone para repositórios grandes
    */
-  async cloneRepository(params: RepositoriesInput, provider: VcsOperations): Promise<RepositoriesResult> {
+  async cloneRepository(params: RepositoriesInput, provider: VcsOperations, owner: string): Promise<RepositoriesResult> {
     try {
-      if (!params.owner || !params.repo || !params.projectPath) {
+      if (!owner || !params.repo || !params.projectPath) {
         throw new Error('owner, repo e projectPath são obrigatórios para clonagem');
       }
 
       // Obtém URL do repositório
+      const providerConfig = provider?.getConfig ? provider.getConfig() : null;
+      const baseUrl = providerConfig?.apiUrl || (params.provider === 'gitea' ? 'http://nas-ubuntu:3000' : 'https://github.com');
       const repoUrl = params.provider === 'gitea'
-        ? `http://nas-ubuntu:3000/${params.owner}/${params.repo}.git`
-        : `https://github.com/${params.owner}/${params.repo}.git`;
+        ? `${baseUrl.replace('/api/v1', '')}/${owner}/${params.repo}.git`
+        : `https://github.com/${owner}/${params.repo}.git`;
 
       // Executa git clone
       const cloneResult = await runTerminalCmd({
@@ -585,9 +593,9 @@ export const repositoriesTool = {
       return {
         success: true,
         action: 'clone',
-        message: `Repositório '${params.owner}/${params.repo}' clonado com sucesso para '${params.projectPath}'`,
+        message: `Repositório '${owner}/${params.repo}' clonado com sucesso para '${params.projectPath}'`,
         data: {
-          source: `${params.owner}/${params.repo}`,
+          source: `${owner}/${params.repo}`,
           destination: params.projectPath,
           cloned: true,
           url: repoUrl

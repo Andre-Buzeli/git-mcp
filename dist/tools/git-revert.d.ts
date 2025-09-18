@@ -25,7 +25,6 @@ import { z } from 'zod';
  */
 declare const GitRevertInputSchema: z.ZodObject<{
     action: z.ZodEnum<["revert-commit", "revert-merge", "revert-range"]>;
-    owner: z.ZodString;
     repo: z.ZodString;
     provider: z.ZodEnum<["gitea", "github"]>;
     projectPath: z.ZodString;
@@ -38,7 +37,6 @@ declare const GitRevertInputSchema: z.ZodObject<{
     strategy: z.ZodOptional<z.ZodEnum<["ours", "theirs"]>>;
 }, "strip", z.ZodTypeAny, {
     provider: "gitea" | "github";
-    owner: string;
     repo: string;
     action: "revert-commit" | "revert-merge" | "revert-range";
     projectPath: string;
@@ -51,7 +49,6 @@ declare const GitRevertInputSchema: z.ZodObject<{
     strategy?: "ours" | "theirs" | undefined;
 }, {
     provider: "gitea" | "github";
-    owner: string;
     repo: string;
     action: "revert-commit" | "revert-merge" | "revert-range";
     projectPath: string;

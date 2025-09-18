@@ -30,7 +30,7 @@ const terminal_controller_js_1 = require("../utils/terminal-controller.js");
  */
 const GitWorktreeInputSchema = zod_1.z.object({
     action: zod_1.z.enum(['add', 'remove', 'list', 'prune', 'move', 'repair']),
-    owner: zod_1.z.string(),
+    // owner: obtido automaticamente do provider,
     repo: zod_1.z.string(),
     provider: zod_1.z.enum(['gitea', 'github']).describe('Provider to use (gitea or github)'),
     projectPath: zod_1.z.string().describe('Local project path for git operations'),
@@ -56,7 +56,7 @@ const GitWorktreeResultSchema = zod_1.z.object({
 });
 exports.gitWorktreeTool = {
     name: 'git-worktree',
-    description: 'Manage Git worktrees (GitHub + Gitea) with multiple actions: add, remove, list, prune, move, repair. Suporte completo a GitHub e Gitea simultaneamente. Boas práticas (solo): use para trabalhar em múltiplas branches simultaneamente, testes em branches diferentes, desenvolvimento paralelo; use para branches de longa duração, mantenha worktrees organizados.',
+    description: 'tool: Gerencia worktrees Git para trabalhar em múltiplas branches\n──────────────\naction add: adiciona novo worktree\naction add requires: repo, provider, projectPath, worktree_path, branch_name, commit_hash\n───────────────\naction remove: remove worktree\naction remove requires: repo, provider, projectPath, worktree_to_remove, force\n───────────────\naction list: lista worktrees disponíveis\naction list requires: repo, provider, projectPath\n───────────────\naction prune: remove worktrees órfãos\naction prune requires: repo, provider, projectPath, force\n───────────────\naction move: move worktree para novo local\naction move requires: repo, provider, projectPath, old_path, new_path, force\n───────────────\naction repair: repara worktree corrompido\naction repair requires: repo, provider, projectPath, worktree_to_repair',
     inputSchema: {
         type: 'object',
         properties: {
@@ -78,7 +78,7 @@ exports.gitWorktreeTool = {
             new_path: { type: 'string', description: 'New worktree path' },
             worktree_to_repair: { type: 'string', description: 'Worktree to repair' }
         },
-        required: ['action', 'owner', 'repo', 'provider', 'projectPath']
+        required: ['action', 'repo', 'provider', 'projectPath']
     },
     async handler(input) {
         try {

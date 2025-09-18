@@ -38,7 +38,6 @@ const AnalyticsInputSchema = z.object({
   
   // Parâmetros comuns
   repo: CommonSchemas.repo,
-  provider: CommonSchemas.provider,
   
   // Parâmetros para listagem
   page: CommonSchemas.page,
@@ -98,7 +97,7 @@ export type AnalyticsResult = z.infer<typeof AnalyticsResultSchema>;
  */
 export const analyticsTool = {
   name: 'gh-analytics',
-  description: 'Geração completa de insights e métricas de repositório GitHub (EXCLUSIVO GITHUB).\n\nACTIONS DISPONÍVEIS:\n• traffic: Estatísticas de tráfego do repositório\n  - OBRIGATÓRIOS: repo\n  - OPCIONAIS: metric_type, period, start_date, end_date\n\n• contributors: Análise de contribuidores\n  - OBRIGATÓRIOS: repo\n  - OPCIONAIS: contributor_type, sort_by, period, start_date, end_date, page, limit\n\n• activity: Atividade do repositório\n  - OBRIGATÓRIOS: repo\n  - OPCIONAIS: activity_type, branch, author, period, start_date, end_date\n\n• performance: Métricas de performance\n  - OBRIGATÓRIOS: repo\n  - OPCIONAIS: performance_metric, period, start_date, end_date\n\n• reports: Relatórios customizados\n  - OBRIGATÓRIOS: repo\n  - OPCIONAIS: report_type, report_format, include_charts, period, start_date, end_date\n\n• trends: Análise de tendências\n  - OBRIGATÓRIOS: repo\n  - OPCIONAIS: trend_metric, trend_period, period, start_date, end_date\n\n• insights: Insights gerais do repositório\n  - OBRIGATÓRIOS: repo\n  - OPCIONAIS: period, start_date, end_date, include_charts\n\nPARÂMETROS COMUNS:\n• repo: Nome do repositório\n• provider: Fixo como "github"\n• owner: Fixo como usuário do GitHub\n\nBoas práticas: monitore métricas regularmente, use insights para melhorar workflow.',
+  description: 'tool: Gera insights e métricas de repositório GitHub para análise\n──────────────\naction traffic: estatísticas de tráfego do repositório\naction traffic requires: repo, metric_type, period, start_date, end_date\n───────────────\naction contributors: análise de contribuidores\naction contributors requires: repo, contributor_type, sort_by, period, start_date, end_date, page, limit\n───────────────\naction activity: atividade do repositório\naction activity requires: repo, activity_type, branch, author, period, start_date, end_date\n───────────────\naction performance: métricas de performance\naction performance requires: repo, performance_metric, period, start_date, end_date\n───────────────\naction reports: relatórios customizados\naction reports requires: repo, report_type, report_format, include_charts, period, start_date, end_date\n───────────────\naction trends: análise de tendências\naction trends requires: repo, trend_metric, trend_period, period, start_date, end_date\n───────────────\naction insights: insights gerais do repositório\naction insights requires: repo, period, start_date, end_date, include_charts',
   inputSchema: {
     type: 'object',
     properties: {

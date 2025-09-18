@@ -29,9 +29,7 @@ import { VcsOperations } from '../providers/index.js';
  */
 declare const GhProjectsInputSchema: z.ZodObject<{
     action: z.ZodEnum<["list", "create", "get", "update", "delete", "items", "fields"]>;
-    owner: z.ZodString;
     repo: z.ZodString;
-    provider: z.ZodEnum<["github"]>;
     projectPath: z.ZodString;
     project_id: z.ZodOptional<z.ZodString>;
     title: z.ZodOptional<z.ZodString>;
@@ -49,8 +47,6 @@ declare const GhProjectsInputSchema: z.ZodObject<{
     page: z.ZodOptional<z.ZodNumber>;
     limit: z.ZodOptional<z.ZodNumber>;
 }, "strip", z.ZodTypeAny, {
-    provider: "github";
-    owner: string;
     repo: string;
     action: "delete" | "get" | "list" | "create" | "update" | "items" | "fields";
     projectPath: string;
@@ -70,8 +66,6 @@ declare const GhProjectsInputSchema: z.ZodObject<{
     field_type?: "TEXT" | "SINGLE_SELECT" | "NUMBER" | "DATE" | undefined;
     field_options?: string[] | undefined;
 }, {
-    provider: "github";
-    owner: string;
     repo: string;
     action: "delete" | "get" | "list" | "create" | "update" | "items" | "fields";
     projectPath: string;
@@ -119,19 +113,6 @@ export declare const ghProjectsTool: {
         type: string;
         properties: {
             action: {
-                type: string;
-                enum: string[];
-                description: string;
-            };
-            owner: {
-                type: string;
-                description: string;
-            };
-            repo: {
-                type: string;
-                description: string;
-            };
-            provider: {
                 type: string;
                 enum: string[];
                 description: string;

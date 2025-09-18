@@ -27,7 +27,6 @@ import { z } from 'zod';
  */
 declare const GitConfigInputSchema: z.ZodObject<{
     action: z.ZodEnum<["get", "set", "unset", "list", "edit", "show"]>;
-    owner: z.ZodString;
     repo: z.ZodString;
     provider: z.ZodEnum<["gitea", "github"]>;
     projectPath: z.ZodString;
@@ -38,7 +37,6 @@ declare const GitConfigInputSchema: z.ZodObject<{
     show_origin: z.ZodOptional<z.ZodBoolean>;
 }, "strip", z.ZodTypeAny, {
     provider: "gitea" | "github";
-    owner: string;
     repo: string;
     action: "set" | "get" | "list" | "show" | "unset" | "edit";
     projectPath: string;
@@ -49,7 +47,6 @@ declare const GitConfigInputSchema: z.ZodObject<{
     show_origin?: boolean | undefined;
 }, {
     provider: "gitea" | "github";
-    owner: string;
     repo: string;
     action: "set" | "get" | "list" | "show" | "unset" | "edit";
     projectPath: string;

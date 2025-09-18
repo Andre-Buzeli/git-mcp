@@ -41,7 +41,6 @@ import { VcsOperations } from '../providers/index.js';
  */
 declare const RepositoriesInputSchema: z.ZodObject<{
     action: z.ZodEnum<["create", "list", "get", "update", "delete", "fork", "search", "init", "clone"]>;
-    owner: z.ZodString;
     repo: z.ZodString;
     provider: z.ZodEnum<["gitea", "github"]>;
     projectPath: z.ZodString;
@@ -64,7 +63,6 @@ declare const RepositoriesInputSchema: z.ZodObject<{
     query: z.ZodOptional<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
     provider: "gitea" | "github";
-    owner: string;
     repo: string;
     action: "delete" | "get" | "search" | "init" | "clone" | "list" | "create" | "update" | "fork";
     projectPath: string;
@@ -87,7 +85,6 @@ declare const RepositoriesInputSchema: z.ZodObject<{
     query?: string | undefined;
 }, {
     provider: "gitea" | "github";
-    owner: string;
     repo: string;
     action: "delete" | "get" | "search" | "init" | "clone" | "list" | "create" | "update" | "fork";
     projectPath: string;
@@ -356,13 +353,13 @@ export declare const repositoriesTool: {
      * - Inicialize com README para projetos novos
      * - Use templates para consistência
      */
-    createRepository(params: RepositoriesInput, provider: VcsOperations): Promise<RepositoriesResult>;
-    listRepositories(params: RepositoriesInput, provider: VcsOperations): Promise<RepositoriesResult>;
-    getRepository(params: RepositoriesInput, provider: VcsOperations): Promise<RepositoriesResult>;
-    updateRepository(params: RepositoriesInput, provider: VcsOperations): Promise<RepositoriesResult>;
-    deleteRepository(params: RepositoriesInput, provider: VcsOperations): Promise<RepositoriesResult>;
-    forkRepository(params: RepositoriesInput, provider: VcsOperations): Promise<RepositoriesResult>;
-    searchRepositories(params: RepositoriesInput, provider: VcsOperations): Promise<RepositoriesResult>;
+    createRepository(params: RepositoriesInput, provider: VcsOperations, owner: string): Promise<RepositoriesResult>;
+    listRepositories(params: RepositoriesInput, provider: VcsOperations, owner: string): Promise<RepositoriesResult>;
+    getRepository(params: RepositoriesInput, provider: VcsOperations, owner: string): Promise<RepositoriesResult>;
+    updateRepository(params: RepositoriesInput, provider: VcsOperations, owner: string): Promise<RepositoriesResult>;
+    deleteRepository(params: RepositoriesInput, provider: VcsOperations, owner: string): Promise<RepositoriesResult>;
+    forkRepository(params: RepositoriesInput, provider: VcsOperations, owner: string): Promise<RepositoriesResult>;
+    searchRepositories(params: RepositoriesInput, provider: VcsOperations, owner: string): Promise<RepositoriesResult>;
     /**
      * Inicializa um repositório Git local
      *
@@ -383,7 +380,7 @@ export declare const repositoriesTool: {
      * - Use caminhos absolutos
      * - Configure remote após inicialização
      */
-    initRepository(params: RepositoriesInput, provider?: VcsOperations): Promise<RepositoriesResult>;
+    initRepository(params: RepositoriesInput, provider?: VcsOperations, owner?: string): Promise<RepositoriesResult>;
     /**
      * Clona um repositório para o diretório local
      *
@@ -403,7 +400,7 @@ export declare const repositoriesTool: {
      * - Use caminhos absolutos
      * - Considere profundidade de clone para repositórios grandes
      */
-    cloneRepository(params: RepositoriesInput, provider: VcsOperations): Promise<RepositoriesResult>;
+    cloneRepository(params: RepositoriesInput, provider: VcsOperations, owner: string): Promise<RepositoriesResult>;
 };
 export {};
 //# sourceMappingURL=repositories.d.ts.map

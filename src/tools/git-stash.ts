@@ -61,7 +61,7 @@ export type GitStashResult = z.infer<typeof GitStashResultSchema>;
 
 export const gitStashTool = {
   name: 'git-stash',
-  description: 'Manage Git stash operations (GitHub + Gitea) with multiple actions: stash, pop, apply, list, show, drop, clear. Suporte completo a GitHub e Gitea simultaneamente. Boas práticas (solo): use para salvar mudanças temporariamente, trocar de branch rapidamente, limpar working directory; use mensagens descritivas para stashes, aplique stashes em ordem.',
+  description: 'tool: Gerencia operações Git stash para salvar mudanças temporariamente\n──────────────\naction stash: salva mudanças no stash\naction stash requires: repo, message, include_untracked, keep_index, provider, projectPath\n───────────────\naction pop: aplica e remove stash do topo\naction pop requires: repo, stash_index, provider, projectPath\n───────────────\naction apply: aplica stash sem remover\naction apply requires: repo, stash_index, provider, projectPath\n───────────────\naction list: lista stashes disponíveis\naction list requires: repo, provider, projectPath\n───────────────\naction show: mostra detalhes do stash\naction show requires: repo, stash_index, show_patch, provider, projectPath\n───────────────\naction drop: remove stash específico\naction drop requires: repo, stash_index, provider, projectPath\n───────────────\naction clear: remove todos os stashes\naction clear requires: repo, provider, projectPath',
   inputSchema: {
     type: 'object',
     properties: {
@@ -80,7 +80,7 @@ export const gitStashTool = {
       stash_index: { type: 'string', description: 'Stash index to operate on' },
       show_patch: { type: 'boolean', description: 'Show patch in stash show' }
     },
-    required: ['action', 'owner', 'repo', 'provider', 'projectPath']
+    required: ['action', 'repo', 'provider', 'projectPath']
   },
 
   async handler(input: GitStashInput): Promise<GitStashResult> {

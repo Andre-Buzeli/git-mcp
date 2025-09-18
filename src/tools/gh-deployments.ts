@@ -38,7 +38,6 @@ const DeploymentsInputSchema = z.object({
   
   // Parâmetros comuns
   repo: CommonSchemas.repo,
-  provider: CommonSchemas.provider,
   
   // Parâmetros para listagem
   page: CommonSchemas.page,
@@ -103,7 +102,7 @@ export type DeploymentsResult = z.infer<typeof DeploymentsResultSchema>;
  */
 export const deploymentsTool = {
   name: 'gh-deployments',
-  description: 'Gerenciamento completo de GitHub Deployments (EXCLUSIVO GITHUB).\n\nACTIONS DISPONÍVEIS:\n• list: Lista deployments do repositório\n  - OBRIGATÓRIOS: repo\n  - OPCIONAIS: environment, ref, task, page, limit\n\n• create: Cria novo deployment\n  - OBRIGATÓRIOS: repo, ref, environment\n  - OPCIONAIS: description, task, auto_merge, required_contexts, payload\n\n• status: Verifica status de deployment\n  - OBRIGATÓRIOS: repo, deployment_id\n  - OPCIONAIS: state, log_url, environment_url, description\n\n• environments: Lista ambientes de deployment\n  - OBRIGATÓRIOS: repo\n  - OPCIONAIS: page, limit\n\n• rollback: Reverte deployment\n  - OBRIGATÓRIOS: repo, deployment_id\n  - OPCIONAIS: environment\n\n• delete: Remove deployment\n  - OBRIGATÓRIOS: repo, deployment_id\n\nPARÂMETROS COMUNS:\n• repo: Nome do repositório\n• provider: Fixo como "github"\n• owner: Fixo como usuário do GitHub\n\nBoas práticas: use ambientes separados para staging/prod, monitore status de deployments, configure rollbacks automáticos.',
+  description: 'tool: Gerencia deployments GitHub para controle de versões em produção\n──────────────\naction list: lista deployments do repositório\naction list requires: repo, environment, ref, task, page, limit\n───────────────\naction create: cria novo deployment\naction create requires: repo, ref, environment, description, task, auto_merge, required_contexts, payload\n───────────────\naction status: verifica status de deployment\naction status requires: repo, deployment_id, state, log_url, environment_url, description\n───────────────\naction environments: lista ambientes de deployment\naction environments requires: repo, page, limit\n───────────────\naction rollback: reverte deployment\naction rollback requires: repo, deployment_id, environment\n───────────────\naction delete: remove deployment\naction delete requires: repo, deployment_id',
   inputSchema: {
     type: 'object',
     properties: {

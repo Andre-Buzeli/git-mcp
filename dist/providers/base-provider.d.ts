@@ -10,6 +10,10 @@ export declare abstract class BaseVcsProvider implements VcsOperations {
     protected baseUrl: string;
     constructor(config: VcsProvider);
     /**
+     * Obtém a configuração do provider
+     */
+    getConfig(): VcsProvider;
+    /**
      * Configura interceptors para logging e tratamento de erros
      */
     private setupInterceptors;
@@ -72,6 +76,10 @@ export declare abstract class BaseVcsProvider implements VcsOperations {
         uploaded: number;
         errors: string[];
     }>;
+    /**
+     * Obtém URL do repositório - deve ser implementado pelos providers específicos
+     */
+    abstract getRepositoryUrl(owner: string, repo: string): string;
     /**
      * Executa uma requisição HTTP com tratamento de erro
      */

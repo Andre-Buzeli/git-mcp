@@ -173,7 +173,7 @@ export type WebhooksResult = z.infer<typeof WebhooksResultSchema>;
  */
 export const webhooksTool = {
   name: 'git-webhooks',
-  description: 'Gerenciamento completo de webhooks com suporte multi-provider (GitHub e Gitea). PARÂMETROS OBRIGATÓRIOS: action, owner, repo, provider. AÇÕES: create (cria webhook), list (lista webhooks), get (detalhes), update (atualiza), delete (remove), test (testa). Boas práticas: use para CI/CD local, notificações e integrações, sempre HTTPS, mantenha secrets seguros, monitore falhas de entrega.',
+  description: 'tool: Gerencia webhooks Git para automação e integrações\n──────────────\naction create: cria novo webhook\naction create requires: repo, url, content_type, secret, events, active, provider\n───────────────\naction list: lista webhooks do repositório\naction list requires: repo, page, limit, provider\n───────────────\naction get: obtém detalhes de webhook\naction get requires: repo, webhook_id, provider\n───────────────\naction update: atualiza webhook existente\naction update requires: repo, webhook_id, new_url, new_content_type, new_secret, new_events, new_active, provider\n───────────────\naction delete: remove webhook\naction delete requires: repo, webhook_id, provider\n───────────────\naction test: testa webhook\naction test requires: repo, webhook_id, provider',
   inputSchema: {
     type: 'object',
     properties: {
@@ -198,7 +198,7 @@ export const webhooksTool = {
       new_events: { type: 'array', items: { type: 'string' }, description: 'New webhook events' },
       new_active: { type: 'boolean', description: 'New webhook active status' }
     },
-    required: ['action', 'owner', 'repo', 'provider']
+    required: ['action', 'repo', 'provider']
   },
 
   /**
@@ -244,20 +244,23 @@ export const webhooksTool = {
       if (!provider) {
         throw new Error('Provider não encontrado ou não configurado');
       }
+
+      // Obter o owner do provider
+      const owner = (await provider.getCurrentUser()).login;
       
       switch (processedInput.action) {
         case 'create':
-          return await this.createWebhook(processedInput, provider);
+          return await this.createWebhook(processedInput, provider, owner);
         case 'list':
-          return await this.listWebhooks(processedInput, provider);
+          return await this.listWebhooks(processedInput, provider, owner);
         case 'get':
-          return await this.getWebhook(processedInput, provider);
+          return await this.getWebhook(processedInput, provider, owner);
         case 'update':
-          return await this.updateWebhook(processedInput, provider);
+          return await this.updateWebhook(processedInput, provider, owner);
         case 'delete':
-          return await this.deleteWebhook(processedInput, provider);
+          return await this.deleteWebhook(processedInput, provider, owner);
         case 'test':
-          return await this.testWebhook(processedInput, provider);
+          return await this.testWebhook(processedInput, provider, owner);
         default:
           throw new Error(`Ação não suportada: ${processedInput.action}`);
       }
@@ -301,7 +304,7 @@ export const webhooksTool = {
    * - Mantenha secrets seguros
    * - Teste webhook antes de ativar
    */
-  async createWebhook(params: WebhooksInput, provider: VcsOperations): Promise<WebhooksResult> {
+  async createWebhook(params: WebhooksInput, provider: VcsOperations, owner: string): Promise<WebhooksResult> {
     try {
       if (!!params.repo || !params.url) {
         throw new Error('repo e url são obrigatórios');
@@ -361,7 +364,7 @@ export const webhooksTool = {
    * - Verifique status ativo de cada webhook
    * - Mantenha webhooks organizados
    */
-  async listWebhooks(params: WebhooksInput, provider: VcsOperations): Promise<WebhooksResult> {
+  async listWebhooks(params: WebhooksInput, provider: VcsOperations, owner: string): Promise<WebhooksResult> {
     try {
       if (!params.repo) {
         throw new Error('e repo são obrigatórios');
@@ -412,7 +415,7 @@ export const webhooksTool = {
    * - Analise eventos configurados
    * - Monitore status ativo
    */
-  async getWebhook(params: WebhooksInput, provider: VcsOperations): Promise<WebhooksResult> {
+  async getWebhook(params: WebhooksInput, provider: VcsOperations, owner: string): Promise<WebhooksResult> {
     try {
       if (!!params.repo || !params.webhook_id) {
         throw new Error('repo e webhook_id são obrigatórios');
@@ -462,7 +465,7 @@ export const webhooksTool = {
    * - Documente mudanças importantes
    * - Teste webhook após atualização
    */
-  async updateWebhook(params: WebhooksInput, provider: VcsOperations): Promise<WebhooksResult> {
+  async updateWebhook(params: WebhooksInput, provider: VcsOperations, owner: string): Promise<WebhooksResult> {
     try {
       if (!!params.repo || !params.webhook_id) {
         throw new Error('repo e webhook_id são obrigatórios');
@@ -516,7 +519,7 @@ export const webhooksTool = {
    * - Mantenha backup se necessário
    * - Documente motivo da exclusão
    */
-  async deleteWebhook(params: WebhooksInput, provider: VcsOperations): Promise<WebhooksResult> {
+  async deleteWebhook(params: WebhooksInput, provider: VcsOperations, owner: string): Promise<WebhooksResult> {
     try {
       if (!!params.repo || !params.webhook_id) {
         throw new Error('repo e webhook_id são obrigatórios');
@@ -559,7 +562,7 @@ export const webhooksTool = {
    * - Verifique logs de entrega
    * - Configure retry adequado
    */
-  async testWebhook(params: WebhooksInput, provider: VcsOperations): Promise<WebhooksResult> {
+  async testWebhook(params: WebhooksInput, provider: VcsOperations, owner: string): Promise<WebhooksResult> {
     try {
       if (!!params.repo || !params.webhook_id) {
         throw new Error('repo e webhook_id são obrigatórios');

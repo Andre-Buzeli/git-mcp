@@ -63,7 +63,7 @@ export type GitConfigResult = z.infer<typeof GitConfigResultSchema>;
 
 export const gitConfigTool = {
   name: 'git-config',
-  description: 'Manage Git configuration (GitHub + Gitea) with multiple actions: get, set, unset, list, edit, show. Suporte completo a GitHub e Gitea simultaneamente. Boas práticas (solo): use para configurar usuário e email, configurar aliases, configurar branches padrão; use configurações globais para usuário, configurações locais para projeto.',
+  description: 'tool: Gerencia configurações Git para personalização do ambiente\n──────────────\naction get: obtém valor de configuração\naction get requires: repo, key, scope, provider\n───────────────\naction set: define valor de configuração\naction set requires: repo, key, value, scope, provider\n───────────────\naction unset: remove configuração\naction unset requires: repo, key, scope, provider\n───────────────\naction list: lista configurações\naction list requires: repo, pattern, scope, provider\n───────────────\naction edit: edita arquivo de configuração\naction edit requires: repo, scope, provider\n───────────────\naction show: mostra configurações com origem\naction show requires: repo, show_origin, provider',
   inputSchema: {
     type: 'object',
     properties: {
@@ -82,7 +82,7 @@ export const gitConfigTool = {
       pattern: { type: 'string', description: 'Pattern for listing configs' },
       show_origin: { type: 'boolean', description: 'Show origin of config values' }
     },
-    required: ['action', 'owner', 'repo', 'provider', 'projectPath']
+    required: ['action', 'repo', 'provider', 'projectPath']
   },
 
   async handler(input: GitConfigInput): Promise<GitConfigResult> {

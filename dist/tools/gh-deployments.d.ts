@@ -32,7 +32,6 @@ import { VcsOperations } from '../providers/index.js';
 declare const DeploymentsInputSchema: z.ZodEffects<z.ZodObject<{
     action: z.ZodEnum<["list", "create", "status", "environments", "rollback", "delete"]>;
     repo: z.ZodString;
-    provider: z.ZodEnum<["gitea", "github", "both"]>;
     page: z.ZodOptional<z.ZodNumber>;
     limit: z.ZodOptional<z.ZodNumber>;
     deployment_id: z.ZodOptional<z.ZodString>;
@@ -53,7 +52,6 @@ declare const DeploymentsInputSchema: z.ZodEffects<z.ZodObject<{
     task_filter: z.ZodOptional<z.ZodString>;
     environment_filter: z.ZodOptional<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
-    provider: "gitea" | "github" | "both";
     repo: string;
     action: "status" | "delete" | "list" | "create" | "environments" | "rollback";
     description?: string | undefined;
@@ -76,7 +74,6 @@ declare const DeploymentsInputSchema: z.ZodEffects<z.ZodObject<{
     task_filter?: string | undefined;
     environment_filter?: string | undefined;
 }, {
-    provider: "gitea" | "github" | "both";
     repo: string;
     action: "status" | "delete" | "list" | "create" | "environments" | "rollback";
     description?: string | undefined;
@@ -99,7 +96,6 @@ declare const DeploymentsInputSchema: z.ZodEffects<z.ZodObject<{
     task_filter?: string | undefined;
     environment_filter?: string | undefined;
 }>, {
-    provider: "gitea" | "github" | "both";
     repo: string;
     action: "status" | "delete" | "list" | "create" | "environments" | "rollback";
     description?: string | undefined;
@@ -122,7 +118,6 @@ declare const DeploymentsInputSchema: z.ZodEffects<z.ZodObject<{
     task_filter?: string | undefined;
     environment_filter?: string | undefined;
 }, {
-    provider: "gitea" | "github" | "both";
     repo: string;
     action: "status" | "delete" | "list" | "create" | "environments" | "rollback";
     description?: string | undefined;
@@ -183,15 +178,7 @@ export declare const deploymentsTool: {
                 enum: string[];
                 description: string;
             };
-            owner: {
-                type: string;
-                description: string;
-            };
             repo: {
-                type: string;
-                description: string;
-            };
-            provider: {
                 type: string;
                 description: string;
             };

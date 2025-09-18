@@ -397,7 +397,7 @@ export declare const issuesTool: {
      * - Use labels para categorização
      * - Atribua responsáveis adequadamente
      */
-    createIssue(params: IssuesInput, provider: VcsOperations): Promise<IssuesResult>;
+    createIssue(params: IssuesInput, provider: VcsOperations, owner: string): Promise<IssuesResult>;
     /**
      * Lista issues do repositório
      *
@@ -416,7 +416,7 @@ export declare const issuesTool: {
      * - limit: Itens por página (padrão: 30, máximo: 100)
      *
      * VALIDAÇÕES:
-     * - Owner e repo obrigatórios
+     * - e repo obrigatórios
      * - State deve ser um dos valores válidos
      * - Page deve ser >= 1
      * - Limit deve ser entre 1 e 100
@@ -427,7 +427,7 @@ export declare const issuesTool: {
      * - Filtre por estado para organização
      * - Mantenha issues organizadas
      */
-    listIssues(params: IssuesInput, provider: VcsOperations): Promise<IssuesResult>;
+    listIssues(params: IssuesInput, provider: VcsOperations, owner: string): Promise<IssuesResult>;
     /**
      * Obtém detalhes de uma issue específica
      *
@@ -452,7 +452,7 @@ export declare const issuesTool: {
      * - Analise comentários e histórico
      * - Monitore mudanças importantes
      */
-    getIssue(params: IssuesInput, provider: VcsOperations): Promise<IssuesResult>;
+    getIssue(params: IssuesInput, provider: VcsOperations, owner: string): Promise<IssuesResult>;
     /**
      * Atualiza uma issue existente
      *
@@ -485,7 +485,7 @@ export declare const issuesTool: {
      * - Documente mudanças importantes
      * - Notifique responsáveis sobre mudanças
      */
-    updateIssue(params: IssuesInput, provider: VcsOperations): Promise<IssuesResult>;
+    updateIssue(params: IssuesInput, provider: VcsOperations, owner: string): Promise<IssuesResult>;
     /**
      * Fecha uma issue
      *
@@ -510,7 +510,7 @@ export declare const issuesTool: {
      * - Use comentário explicativo
      * - Verifique se não há dependências
      */
-    closeIssue(params: IssuesInput, provider: VcsOperations): Promise<IssuesResult>;
+    closeIssue(params: IssuesInput, provider: VcsOperations, owner: string): Promise<IssuesResult>;
     /**
      * Adiciona comentário a uma issue
      *
@@ -536,7 +536,7 @@ export declare const issuesTool: {
      * - Use formatação Markdown adequadamente
      * - Mantenha comentários relevantes
      */
-    addComment(params: IssuesInput, provider: VcsOperations): Promise<IssuesResult>;
+    addComment(params: IssuesInput, provider: VcsOperations, owner: string): Promise<IssuesResult>;
     /**
      * Busca issues por critérios específicos
      *
@@ -566,7 +566,7 @@ export declare const issuesTool: {
      * - Analise relevância dos resultados
      * - Use para encontrar issues relacionadas
      */
-    searchIssues(params: IssuesInput, provider: VcsOperations): Promise<IssuesResult>;
+    searchIssues(params: IssuesInput, provider: VcsOperations, owner: string): Promise<IssuesResult>;
 };
 export {};
 //# sourceMappingURL=git-issues.d.ts.map

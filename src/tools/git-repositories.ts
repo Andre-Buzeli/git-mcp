@@ -238,7 +238,7 @@ export type GitRepositoriesResult = z.infer<typeof GitRepositoriesResultSchema>;
  */
 export const gitRepositoriesTool = {
   name: 'git-repositories',
-  description: 'Manage Git repositories (GitHub + Gitea) with multiple actions: create, list, get, update, delete, fork, search, init, clone. Suporte completo a GitHub e Gitea simultaneamente. Boas práticas (solo): use para iniciar projetos, ajustar descrição/privacidade e manter organização; inicialize com README/LICENSE/.gitignore e defina a branch padrão. Crie tags e releases para pontos estáveis e rollback mais simples.',
+  description: 'tool: Gerencia repositórios Git completos, criação, configuração, busca e operações avançadas\n──────────────\naction create: cria repositório novo\naction create requires: name, description, private, auto_init, gitignores, license, readme, default_branch, provider\n───────────────\naction list: lista repositórios do usuário\naction list requires: page, limit, username, provider\n───────────────\naction get: obtém detalhes específicos\naction get requires: repo, provider\n───────────────\naction update: atualiza configurações\naction update requires: repo, new_name, new_description, new_private, archived, provider\n───────────────\naction delete: remove repositório\naction delete requires: repo, provider\n───────────────\naction fork: cria fork\naction fork requires: repo, organization, provider\n───────────────\naction search: busca repositórios\naction search requires: query, provider\n───────────────\naction init: inicializa repositório local\naction init requires: projectPath, provider\n───────────────\naction clone: clona repositório\naction clone requires: repo, projectPath, provider',
   inputSchema: {
     type: 'object',
     properties: {
@@ -588,8 +588,11 @@ export const gitRepositoriesTool = {
       if (params.repo && provider) {
         const currentUser = await provider.getCurrentUser();
         const owner = currentUser.login;
+        // Obtém URL base do provider
+        const providerConfig = provider.getConfig ? provider.getConfig() : null;
+        const baseUrl = providerConfig?.apiUrl || (params.provider === 'gitea' ? 'http://nas-ubuntu:3000' : 'https://github.com');
         const remoteUrl = params.provider === 'gitea'
-          ? `http://nas-ubuntu:3000/${owner}/${params.repo}.git`
+          ? `${baseUrl.replace('/api/v1', '')}/${owner}/${params.repo}.git`
           : `https://github.com/${owner}/${params.repo}.git`;
 
         const remoteResult = await runTerminalCmd({
@@ -647,8 +650,10 @@ export const gitRepositoriesTool = {
       const owner = currentUser.login;
 
       // Obtém URL do repositório
+      const providerConfig = provider.getConfig ? provider.getConfig() : null;
+      const baseUrl = providerConfig?.apiUrl || (params.provider === 'gitea' ? 'http://nas-ubuntu:3000' : 'https://github.com');
       const repoUrl = params.provider === 'gitea'
-        ? `http://nas-ubuntu:3000/${owner}/${params.repo}.git`
+        ? `${baseUrl.replace('/api/v1', '')}/${owner}/${params.repo}.git`
         : `https://github.com/${owner}/${params.repo}.git`;
 
       // Executa git clone

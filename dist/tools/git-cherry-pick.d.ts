@@ -26,7 +26,6 @@ import { z } from 'zod';
  */
 declare const GitCherryPickInputSchema: z.ZodObject<{
     action: z.ZodEnum<["cherry-pick", "cherry-pick-range", "abort", "continue"]>;
-    owner: z.ZodString;
     repo: z.ZodString;
     provider: z.ZodEnum<["gitea", "github"]>;
     projectPath: z.ZodString;
@@ -40,7 +39,6 @@ declare const GitCherryPickInputSchema: z.ZodObject<{
     signoff: z.ZodOptional<z.ZodBoolean>;
 }, "strip", z.ZodTypeAny, {
     provider: "gitea" | "github";
-    owner: string;
     repo: string;
     action: "cherry-pick" | "abort" | "continue" | "cherry-pick-range";
     projectPath: string;
@@ -54,7 +52,6 @@ declare const GitCherryPickInputSchema: z.ZodObject<{
     signoff?: boolean | undefined;
 }, {
     provider: "gitea" | "github";
-    owner: string;
     repo: string;
     action: "cherry-pick" | "abort" | "continue" | "cherry-pick-range";
     projectPath: string;

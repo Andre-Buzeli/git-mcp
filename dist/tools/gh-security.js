@@ -38,7 +38,6 @@ const SecurityInputSchema = zod_1.z.object({
     action: zod_1.z.enum(['scan', 'vulnerabilities', 'alerts', 'policies', 'compliance', 'dependencies', 'advisories']),
     // Parâmetros comuns
     repo: validator_js_1.CommonSchemas.repo,
-    provider: validator_js_1.CommonSchemas.provider,
     // Parâmetros para listagem
     page: validator_js_1.CommonSchemas.page,
     limit: validator_js_1.CommonSchemas.limit,
@@ -83,7 +82,7 @@ const SecurityResultSchema = zod_1.z.object({
  */
 exports.securityTool = {
     name: 'gh-security',
-    description: 'Gerenciamento completo de GitHub Security (EXCLUSIVO GITHUB). PARÂMETROS OBRIGATÓRIOS: action, owner, repo, provider (deve ser github). AÇÕES: scan (escaneia), vulnerabilities (vulnerabilidades), alerts (alertas), policies (políticas), compliance (conformidade), dependencies (dependências), advisories (avisos). Boas práticas: execute scans regularmente, configure alertas automáticos, mantenha dependências atualizadas.',
+    description: 'tool: Gerencia segurança GitHub para proteção e compliance\n──────────────\naction scan: executa scan de segurança\naction scan requires: repo, scan_type, ref\n───────────────\naction vulnerabilities: lista vulnerabilidades\naction vulnerabilities requires: repo, severity, state, ecosystem, package_name, page, limit\n───────────────\naction alerts: lista alertas de segurança\naction alerts requires: repo, alert_id, alert_number, state, page, limit\n───────────────\naction policies: gerencia políticas de segurança\naction policies requires: repo, policy_name, policy_type, policy_config\n───────────────\naction compliance: verifica conformidade\naction compliance requires: repo, compliance_framework, report_format\n───────────────\naction dependencies: analisa dependências\naction dependencies requires: repo, ecosystem, package_name, page, limit\n───────────────\naction advisories: lista avisos de segurança\naction advisories requires: repo, ecosystem, package_name, page, limit',
     inputSchema: {
         type: 'object',
         properties: {
@@ -93,7 +92,6 @@ exports.securityTool = {
                 description: 'Action to perform on security'
             },
             repo: { type: 'string', description: 'Repository name' },
-            provider: { type: 'string', description: 'Specific provider (github, gitea) or use default' },
             scan_type: { type: 'string', enum: ['code', 'dependencies', 'secrets', 'infrastructure'], description: 'Type of security scan' },
             ref: { type: 'string', description: 'Git reference to scan' },
             severity: { type: 'string', enum: ['low', 'medium', 'high', 'critical'], description: 'Vulnerability severity filter' },
@@ -116,18 +114,16 @@ exports.securityTool = {
             page: { type: 'number', description: 'Page number', minimum: 1 },
             limit: { type: 'number', description: 'Items per page', minimum: 1, maximum: 100 }
         },
-        required: ['action', 'repo', 'provider']
+        required: ['action', 'repo']
     },
     async handler(input) {
         try {
             const validatedInput = SecurityInputSchema.parse(input);
-            // Aplicar auto-detecção de usuário
-            const updatedParams = await (0, user_detection_js_1.applyAutoUserDetection)(validatedInput, validatedInput.provider);
-            const provider = updatedParams.provider
-                ? index_js_1.globalProviderFactory.getProvider(updatedParams.provider)
-                : index_js_1.globalProviderFactory.getDefaultProvider();
+            // Fixar provider como github para tools exclusivas do GitHub
+            const updatedParams = await (0, user_detection_js_1.applyAutoUserDetection)(validatedInput, 'github');
+            const provider = index_js_1.globalProviderFactory.getProvider('github');
             if (!provider) {
-                throw new Error(`Provider '${updatedParams.provider}' não encontrado`);
+                throw new Error('Provider GitHub não encontrado');
             }
             switch (updatedParams.action) {
                 case 'scan':

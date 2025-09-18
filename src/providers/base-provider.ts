@@ -25,6 +25,13 @@ export abstract class BaseVcsProvider implements VcsOperations {
   }
 
   /**
+   * Obtém a configuração do provider
+   */
+  getConfig(): VcsProvider {
+    return this.config;
+  }
+
+  /**
    * Configura interceptors para logging e tratamento de erros
    */
   private setupInterceptors(): void {
@@ -134,6 +141,11 @@ export abstract class BaseVcsProvider implements VcsOperations {
    * Upload de projeto completo - deve ser implementado pelos providers específicos
    */
   abstract uploadProject(owner: string, repo: string, projectPath: string, message: string, branch?: string): Promise<{ uploaded: number; errors: string[] }>;
+
+  /**
+   * Obtém URL do repositório - deve ser implementado pelos providers específicos
+   */
+  abstract getRepositoryUrl(owner: string, repo: string): string;
 
   /**
    * Executa uma requisição HTTP com tratamento de erro

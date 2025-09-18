@@ -485,7 +485,7 @@ export declare const pullsTool: {
      * - Solicite reviews adequados
      * - Mantenha PRs pequenos e focados
      */
-    createPullRequest(params: PullsInput, provider: VcsOperations): Promise<PullsResult>;
+    createPullRequest(params: PullsInput, provider: VcsOperations, owner: string): Promise<PullsResult>;
     /**
      * Lista Pull Requests do repositório
      *
@@ -504,7 +504,7 @@ export declare const pullsTool: {
      * - limit: Itens por página (padrão: 30, máximo: 100)
      *
      * VALIDAÇÕES:
-     * - Owner e repo obrigatórios
+     * - e repo obrigatórios
      * - State deve ser um dos valores válidos
      * - Page deve ser >= 1
      * - Limit deve ser entre 1 e 100
@@ -515,7 +515,7 @@ export declare const pullsTool: {
      * - Filtre por estado para organização
      * - Mantenha PRs organizados
      */
-    listPullRequests(params: PullsInput, provider: VcsOperations): Promise<PullsResult>;
+    listPullRequests(params: PullsInput, provider: VcsOperations, owner: string): Promise<PullsResult>;
     /**
      * Obtém detalhes de um Pull Request específico
      *
@@ -540,7 +540,7 @@ export declare const pullsTool: {
      * - Analise conflitos se houver
      * - Monitore mudanças importantes
      */
-    getPullRequest(params: PullsInput, provider: VcsOperations): Promise<PullsResult>;
+    getPullRequest(params: PullsInput, provider: VcsOperations, owner: string): Promise<PullsResult>;
     /**
      * Atualiza um Pull Request existente
      *
@@ -573,7 +573,7 @@ export declare const pullsTool: {
      * - Documente mudanças importantes
      * - Notifique responsáveis sobre mudanças
      */
-    updatePullRequest(params: PullsInput, provider: VcsOperations): Promise<PullsResult>;
+    updatePullRequest(params: PullsInput, provider: VcsOperations, owner: string): Promise<PullsResult>;
     /**
      * Faz merge de um Pull Request
      *
@@ -604,7 +604,7 @@ export declare const pullsTool: {
      * - Use títulos e mensagens descritivas
      * - Teste após o merge
      */
-    mergePullRequest(params: PullsInput, provider: VcsOperations): Promise<PullsResult>;
+    mergePullRequest(params: PullsInput, provider: VcsOperations, owner: string): Promise<PullsResult>;
     /**
      * Fecha um Pull Request
      *
@@ -629,7 +629,7 @@ export declare const pullsTool: {
      * - Use comentário explicativo
      * - Verifique se não há dependências
      */
-    closePullRequest(params: PullsInput, provider: VcsOperations): Promise<PullsResult>;
+    closePullRequest(params: PullsInput, provider: VcsOperations, owner: string): Promise<PullsResult>;
     /**
      * Adiciona review a um Pull Request
      *
@@ -658,7 +658,7 @@ export declare const pullsTool: {
      * - Use tipos de review apropriados
      * - Mantenha reviews construtivos
      */
-    addReview(params: PullsInput, provider: VcsOperations): Promise<PullsResult>;
+    addReview(params: PullsInput, provider: VcsOperations, owner: string): Promise<PullsResult>;
     /**
      * Busca Pull Requests por critérios específicos
      *
@@ -689,7 +689,7 @@ export declare const pullsTool: {
      * - Analise relevância dos resultados
      * - Use para encontrar PRs relacionados
      */
-    searchPullRequests(params: PullsInput, provider: VcsOperations): Promise<PullsResult>;
+    searchPullRequests(params: PullsInput, provider: VcsOperations, owner: string): Promise<PullsResult>;
 };
 export {};
 //# sourceMappingURL=git-pulls.d.ts.map

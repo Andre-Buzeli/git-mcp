@@ -42,7 +42,6 @@ import { VcsOperations } from '../providers/index.js';
 declare const WorkflowsInputSchema: z.ZodEffects<z.ZodObject<{
     action: z.ZodEnum<["list", "create", "trigger", "status", "logs", "disable", "enable"]>;
     repo: z.ZodString;
-    provider: z.ZodEnum<["gitea", "github", "both"]>;
     page: z.ZodOptional<z.ZodNumber>;
     limit: z.ZodOptional<z.ZodNumber>;
     name: z.ZodOptional<z.ZodString>;
@@ -57,7 +56,6 @@ declare const WorkflowsInputSchema: z.ZodEffects<z.ZodObject<{
     inputs: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodString>>;
     ref: z.ZodOptional<z.ZodOptional<z.ZodString>>;
 }, "strip", z.ZodTypeAny, {
-    provider: "gitea" | "github" | "both";
     repo: string;
     action: "status" | "list" | "create" | "trigger" | "logs" | "disable" | "enable";
     name?: string | undefined;
@@ -74,7 +72,6 @@ declare const WorkflowsInputSchema: z.ZodEffects<z.ZodObject<{
     branch?: string | undefined;
     workflow_name?: string | undefined;
 }, {
-    provider: "gitea" | "github" | "both";
     repo: string;
     action: "status" | "list" | "create" | "trigger" | "logs" | "disable" | "enable";
     name?: string | undefined;
@@ -91,7 +88,6 @@ declare const WorkflowsInputSchema: z.ZodEffects<z.ZodObject<{
     branch?: string | undefined;
     workflow_name?: string | undefined;
 }>, {
-    provider: "gitea" | "github" | "both";
     repo: string;
     action: "status" | "list" | "create" | "trigger" | "logs" | "disable" | "enable";
     name?: string | undefined;
@@ -108,7 +104,6 @@ declare const WorkflowsInputSchema: z.ZodEffects<z.ZodObject<{
     branch?: string | undefined;
     workflow_name?: string | undefined;
 }, {
-    provider: "gitea" | "github" | "both";
     repo: string;
     action: "status" | "list" | "create" | "trigger" | "logs" | "disable" | "enable";
     name?: string | undefined;
@@ -186,10 +181,6 @@ export declare const workflowsTool: {
                 description: string;
             };
             repo: {
-                type: string;
-                description: string;
-            };
-            provider: {
                 type: string;
                 description: string;
             };

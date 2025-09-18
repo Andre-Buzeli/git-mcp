@@ -34,7 +34,6 @@ const GhGistsInputSchema = z.object({
   action: z.enum(['create', 'list', 'get', 'update', 'delete', 'fork', 'star', 'comment']),
   // owner: obtido automaticamente do provider,
   repo: z.string(),
-  provider: z.enum(['github']).describe('Provider to use (github only)'),
   projectPath: z.string().describe('Local project path for git operations'),
   
   // Para create/update
@@ -72,7 +71,7 @@ export type GhGistsResult = z.infer<typeof GhGistsResultSchema>;
 
 export const ghGistsTool = {
   name: 'gh-gists',
-  description: 'Gerenciamento de GitHub Gists (EXCLUSIVO GITHUB).\n\nACTIONS DISPONÍVEIS:\n• create: Cria novo gist\n  - OBRIGATÓRIOS: files\n  - OPCIONAIS: description, public\n\n• list: Lista gists\n  - OPCIONAIS: username, page, limit\n\n• get: Obtém detalhes de um gist específico\n  - OBRIGATÓRIOS: gist_id\n\n• update: Atualiza gist existente\n  - OBRIGATÓRIOS: gist_id\n  - OPCIONAIS: description, files, public\n\n• delete: Remove gist\n  - OBRIGATÓRIOS: gist_id\n\n• fork: Faz fork de um gist\n  - OBRIGATÓRIOS: gist_id\n\n• star: Adiciona/remove estrela\n  - OBRIGATÓRIOS: gist_id, star\n\n• comment: Adiciona comentário\n  - OBRIGATÓRIOS: gist_id, comment_body\n\nPARÂMETROS COMUNS:\n• provider: Fixo como "github"\n• owner: Fixo como usuário do GitHub\n\nBoas práticas: use para compartilhar código rapidamente, snippets de código, documentação rápida; use para código pequeno e focado, adicione descrições claras.',
+  description: 'tool: Gerencia GitHub Gists para compartilhamento de código\n──────────────\naction create: cria novo gist\naction create requires: files, description, public\n───────────────\naction list: lista gists\naction list requires: username, page, limit\n───────────────\naction get: obtém detalhes de gist específico\naction get requires: gist_id\n───────────────\naction update: atualiza gist existente\naction update requires: gist_id, description, files, public\n───────────────\naction delete: remove gist\naction delete requires: gist_id\n───────────────\naction fork: faz fork de gist\naction fork requires: gist_id\n───────────────\naction star: adiciona/remove estrela\naction star requires: gist_id, star\n───────────────\naction comment: adiciona comentário\naction comment requires: gist_id, comment_body',
   inputSchema: {
     type: 'object',
     properties: {

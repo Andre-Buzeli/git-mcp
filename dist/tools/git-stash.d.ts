@@ -27,7 +27,6 @@ import { z } from 'zod';
  */
 declare const GitStashInputSchema: z.ZodObject<{
     action: z.ZodEnum<["stash", "pop", "apply", "list", "show", "drop", "clear"]>;
-    owner: z.ZodString;
     repo: z.ZodString;
     provider: z.ZodEnum<["gitea", "github"]>;
     projectPath: z.ZodString;
@@ -38,7 +37,6 @@ declare const GitStashInputSchema: z.ZodObject<{
     show_patch: z.ZodOptional<z.ZodBoolean>;
 }, "strip", z.ZodTypeAny, {
     provider: "gitea" | "github";
-    owner: string;
     repo: string;
     action: "pop" | "apply" | "list" | "show" | "drop" | "clear" | "stash";
     projectPath: string;
@@ -49,7 +47,6 @@ declare const GitStashInputSchema: z.ZodObject<{
     show_patch?: boolean | undefined;
 }, {
     provider: "gitea" | "github";
-    owner: string;
     repo: string;
     action: "pop" | "apply" | "list" | "show" | "drop" | "clear" | "stash";
     projectPath: string;

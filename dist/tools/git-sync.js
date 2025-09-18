@@ -24,8 +24,14 @@ const zod_1 = require("zod");
  */
 const GitSyncInputSchema = zod_1.z.object({
     action: zod_1.z.enum(['configure', 'status', 'one-shot']),
-    source: zod_1.z.object({ provider: zod_1.z.enum(['gitea', 'github']), owner: zod_1.z.string(), repo: zod_1.z.string() }),
-    target: zod_1.z.object({ provider: zod_1.z.enum(['gitea', 'github']), owner: zod_1.z.string(), repo: zod_1.z.string() }),
+    source: zod_1.z.object({
+        provider: zod_1.z.enum(['gitea', 'github']),
+        repo: zod_1.z.string()
+    }),
+    target: zod_1.z.object({
+        provider: zod_1.z.enum(['gitea', 'github']),
+        repo: zod_1.z.string()
+    }),
     direction: zod_1.z.enum(['one-way', 'two-way']).optional(),
     include: zod_1.z.array(zod_1.z.enum(['git', 'issues', 'labels', 'milestones', 'releases', 'pulls'])).optional(),
     strategy: zod_1.z.enum(['source-wins', 'timestamp', 'skip-conflicts']).optional(),

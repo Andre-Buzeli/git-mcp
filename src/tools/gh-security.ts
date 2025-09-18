@@ -38,7 +38,6 @@ const SecurityInputSchema = z.object({
   
   // Parâmetros comuns
   repo: CommonSchemas.repo,
-  provider: CommonSchemas.provider,
   
   // Parâmetros para listagem
   page: CommonSchemas.page,
@@ -96,7 +95,7 @@ export type SecurityResult = z.infer<typeof SecurityResultSchema>;
  */
 export const securityTool = {
   name: 'gh-security',
-  description: 'Gerenciamento completo de GitHub Security (EXCLUSIVO GITHUB).\n\nACTIONS DISPONÍVEIS:\n• scan: Executa scan de segurança\n  - OBRIGATÓRIOS: repo, scan_type\n  - OPCIONAIS: ref\n\n• vulnerabilities: Lista vulnerabilidades\n  - OBRIGATÓRIOS: repo\n  - OPCIONAIS: severity, state, ecosystem, package_name, page, limit\n\n• alerts: Lista alertas de segurança\n  - OBRIGATÓRIOS: repo\n  - OPCIONAIS: alert_id, alert_number, state, page, limit\n\n• policies: Gerencia políticas de segurança\n  - OBRIGATÓRIOS: repo\n  - OPCIONAIS: policy_name, policy_type, policy_config\n\n• compliance: Verifica conformidade\n  - OBRIGATÓRIOS: repo\n  - OPCIONAIS: compliance_framework, report_format\n\n• dependencies: Analisa dependências\n  - OBRIGATÓRIOS: repo\n  - OPCIONAIS: ecosystem, package_name, page, limit\n\n• advisories: Lista avisos de segurança\n  - OBRIGATÓRIOS: repo\n  - OPCIONAIS: ecosystem, package_name, page, limit\n\nPARÂMETROS COMUNS:\n• repo: Nome do repositório\n• provider: Fixo como "github"\n• owner: Fixo como usuário do GitHub\n\nBoas práticas: execute scans regularmente, configure alertas automáticos, mantenha dependências atualizadas.',
+  description: 'tool: Gerencia segurança GitHub para proteção e compliance\n──────────────\naction scan: executa scan de segurança\naction scan requires: repo, scan_type, ref\n───────────────\naction vulnerabilities: lista vulnerabilidades\naction vulnerabilities requires: repo, severity, state, ecosystem, package_name, page, limit\n───────────────\naction alerts: lista alertas de segurança\naction alerts requires: repo, alert_id, alert_number, state, page, limit\n───────────────\naction policies: gerencia políticas de segurança\naction policies requires: repo, policy_name, policy_type, policy_config\n───────────────\naction compliance: verifica conformidade\naction compliance requires: repo, compliance_framework, report_format\n───────────────\naction dependencies: analisa dependências\naction dependencies requires: repo, ecosystem, package_name, page, limit\n───────────────\naction advisories: lista avisos de segurança\naction advisories requires: repo, ecosystem, package_name, page, limit',
   inputSchema: {
     type: 'object',
     properties: {

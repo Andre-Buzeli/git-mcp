@@ -28,9 +28,7 @@ import { VcsOperations } from '../providers/index.js';
  */
 declare const GhSyncInputSchema: z.ZodObject<{
     action: z.ZodEnum<["sync-repos", "sync-issues", "sync-pulls", "sync-releases", "sync-webhooks", "sync-config"]>;
-    owner: z.ZodString;
     repo: z.ZodString;
-    provider: z.ZodEnum<["github"]>;
     projectPath: z.ZodString;
     source_repo: z.ZodOptional<z.ZodString>;
     target_repo: z.ZodOptional<z.ZodString>;
@@ -50,8 +48,6 @@ declare const GhSyncInputSchema: z.ZodObject<{
     dry_run: z.ZodOptional<z.ZodBoolean>;
     force: z.ZodOptional<z.ZodBoolean>;
 }, "strip", z.ZodTypeAny, {
-    provider: "github";
-    owner: string;
     repo: string;
     action: "sync-repos" | "sync-issues" | "sync-pulls" | "sync-releases" | "sync-webhooks" | "sync-config";
     projectPath: string;
@@ -73,8 +69,6 @@ declare const GhSyncInputSchema: z.ZodObject<{
     config_type?: "branches" | "collaborators" | "settings" | undefined;
     dry_run?: boolean | undefined;
 }, {
-    provider: "github";
-    owner: string;
     repo: string;
     action: "sync-repos" | "sync-issues" | "sync-pulls" | "sync-releases" | "sync-webhooks" | "sync-config";
     projectPath: string;
@@ -128,17 +122,8 @@ export declare const ghSyncTool: {
                 enum: string[];
                 description: string;
             };
-            owner: {
-                type: string;
-                description: string;
-            };
             repo: {
                 type: string;
-                description: string;
-            };
-            provider: {
-                type: string;
-                enum: string[];
                 description: string;
             };
             projectPath: {

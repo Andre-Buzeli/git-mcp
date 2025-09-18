@@ -160,7 +160,7 @@ export type FilesResult = z.infer<typeof FilesResultSchema>;
  */
 export const filesTool = {
   name: 'git-files',
-  description: 'Gerenciamento completo de arquivos com suporte multi-provider (GitHub e Gitea). PARÂMETROS OBRIGATÓRIOS: action, owner, repo, provider, projectPath. AÇÕES: get (obtém arquivo), create (cria arquivo), update (atualiza), delete (remove), list (lista diretório), search (busca conteúdo), upload-project (envia projeto completo). Boas práticas: use commits pequenos, mantenha README enxuto, valide conteúdo antes de enviar.',
+  description: 'tool: Gerencia arquivos Git, upload, download, busca e sincronização\n──────────────\naction get: obtém arquivo específico\naction get requires: repo, path, provider\n───────────────\naction create: cria novo arquivo\naction create requires: repo, path, content, message, provider\n───────────────\naction update: atualiza arquivo existente\naction update requires: repo, path, content, message, sha, provider\n───────────────\naction delete: remove arquivo\naction delete requires: repo, path, message, provider\n───────────────\naction list: lista arquivos do diretório\naction list requires: repo, path, provider\n───────────────\naction search: busca conteúdo em arquivos\naction search requires: repo, query, provider\n───────────────\naction upload-project: envia projeto completo\naction upload-project requires: repo, projectPath, message, provider',
   inputSchema: {
     type: 'object',
     properties: {
@@ -225,22 +225,25 @@ export const filesTool = {
       if (!provider) {
         throw new Error(`Provider '${processedInput.provider}' não encontrado`);
       }
+
+      // Obter o owner do provider
+      const owner = (await provider.getCurrentUser()).login;
       
       switch (processedInput.action) {
         case 'get':
-          return await this.getFile(processedInput, provider);
+          return await this.getFile(processedInput, provider, owner);
         case 'create':
-          return await this.createFile(processedInput, provider);
+          return await this.createFile(processedInput, provider, owner);
         case 'update':
-          return await this.updateFile(processedInput, provider);
+          return await this.updateFile(processedInput, provider, owner);
         case 'delete':
-          return await this.deleteFile(processedInput, provider);
+          return await this.deleteFile(processedInput, provider, owner);
         case 'list':
-          return await this.listFiles(processedInput, provider);
+          return await this.listFiles(processedInput, provider, owner);
         case 'search':
-          return await this.searchFiles(processedInput, provider);
+          return await this.searchFiles(processedInput, provider, owner);
         case 'upload-project':
-          return await this.uploadProject(processedInput, provider);
+          return await this.uploadProject(processedInput, provider, owner);
         default:
           throw new Error(`Ação não suportada: ${processedInput.action}`);
       }
@@ -281,13 +284,13 @@ export const filesTool = {
    * - Use referências específicas para versões
    * - Trate arquivos binários adequadamente
    */
-  async getFile(params: FilesInput, provider: VcsOperations): Promise<FilesResult> {
+  async getFile(params: FilesInput, provider: VcsOperations, owner: string): Promise<FilesResult> {
     try {
-      if (!params.owner || !params.repo || !params.path) {
+      if (!owner || !params.repo || !params.path) {
         throw new Error('repo e path são obrigatórios');
       }
 
-      const file = await provider.getFile(params.owner, params.repo, params.path, params.ref);
+      const file = await provider.getFile(owner, params.repo, params.path, params.ref);
 
       return {
         success: true,
@@ -329,14 +332,14 @@ export const filesTool = {
    * - Use branches para mudanças grandes
    * - Documente propósito do arquivo
    */
-  async createFile(params: FilesInput, provider: VcsOperations): Promise<FilesResult> {
+  async createFile(params: FilesInput, provider: VcsOperations, owner: string): Promise<FilesResult> {
     try {
-      if (!params.owner || !params.repo || !params.path || !params.content || !params.message) {
+      if (!owner || !params.repo || !params.path || !params.content || !params.message) {
         throw new Error('repo, path, content e message são obrigatórios');
       }
 
       const result = await provider.createFile(
-        params.owner, 
+        owner, 
         params.repo, 
         params.path, 
         params.content, 
@@ -385,9 +388,9 @@ export const filesTool = {
    * - Verifique se arquivo não foi modificado por outro usuário
    * - Teste mudanças antes de commitar
    */
-  async updateFile(params: FilesInput, provider: VcsOperations): Promise<FilesResult> {
+  async updateFile(params: FilesInput, provider: VcsOperations, owner: string): Promise<FilesResult> {
     try {
-      if (!params.owner || !params.repo || !params.path || !params.content || !params.message) {
+      if (!owner || !params.repo || !params.path || !params.content || !params.message) {
         throw new Error('repo, path, content e message são obrigatórios');
       }
 
@@ -395,7 +398,7 @@ export const filesTool = {
       let fileSha = params.sha;
       if (!fileSha) {
         try {
-          const existingFile = await provider.getFile(params.owner, params.repo, params.path, params.branch);
+          const existingFile = await provider.getFile(owner, params.repo, params.path, params.branch);
           fileSha = existingFile.sha;
         } catch (error) {
           throw new Error('Não foi possível obter SHA do arquivo. Forneça sha ou verifique se o arquivo existe.');
@@ -403,7 +406,7 @@ export const filesTool = {
       }
 
       const result = await provider.updateFile(
-        params.owner,
+        owner,
         params.repo,
         params.path,
         params.content,
@@ -452,9 +455,9 @@ export const filesTool = {
    * - Verifique dependências do arquivo
    * - Mantenha backup se necessário
    */
-  async deleteFile(params: FilesInput, provider: VcsOperations): Promise<FilesResult> {
+  async deleteFile(params: FilesInput, provider: VcsOperations, owner: string): Promise<FilesResult> {
     try {
-      if (!params.owner || !params.repo || !params.path || !params.message) {
+      if (!owner || !params.repo || !params.path || !params.message) {
         throw new Error('repo, path e message são obrigatórios');
       }
 
@@ -462,7 +465,7 @@ export const filesTool = {
       let fileSha = params.sha;
       if (!fileSha) {
         try {
-          const existingFile = await provider.getFile(params.owner, params.repo, params.path, params.branch);
+          const existingFile = await provider.getFile(owner, params.repo, params.path, params.branch);
           fileSha = existingFile.sha;
         } catch (error) {
           throw new Error('Não foi possível obter SHA do arquivo. Forneça sha ou verifique se o arquivo existe.');
@@ -470,7 +473,7 @@ export const filesTool = {
       }
 
       const result = await provider.deleteFile(
-        params.owner,
+        owner,
         params.repo,
         params.path,
         params.message,
@@ -519,9 +522,9 @@ export const filesTool = {
    * - Use referências específicas para versões
    * - Organize estrutura de diretórios
    */
-  async listFiles(params: FilesInput, provider: VcsOperations): Promise<FilesResult> {
+  async listFiles(params: FilesInput, provider: VcsOperations, owner: string): Promise<FilesResult> {
     try {
-      if (!params.owner || !params.repo) {
+      if (!owner || !params.repo) {
         throw new Error('e repo são obrigatórios');
       }
 
@@ -529,7 +532,7 @@ export const filesTool = {
       const page = params.page || 1;
       const limit = params.limit || 30;
       
-      const files = await provider.listFiles(params.owner, params.repo, path, params.ref);
+      const files = await provider.listFiles(owner, params.repo, path, params.ref);
 
       return {
         success: true,
@@ -575,9 +578,9 @@ export const filesTool = {
    * - Use referências para versões específicas
    * - Analise resultados para relevância
    */
-  async searchFiles(params: FilesInput, provider: VcsOperations): Promise<FilesResult> {
+  async searchFiles(params: FilesInput, provider: VcsOperations, owner: string): Promise<FilesResult> {
     try {
-      if (!params.owner || !params.repo || !params.query) {
+      if (!owner || !params.repo || !params.query) {
         throw new Error('repo e query são obrigatórios');
       }
 
@@ -631,14 +634,14 @@ export const filesTool = {
    * - Use branches para mudanças grandes
    * - Monitore erros de upload
    */
-  async uploadProject(params: FilesInput, provider: VcsOperations): Promise<FilesResult> {
+  async uploadProject(params: FilesInput, provider: VcsOperations, owner: string): Promise<FilesResult> {
     try {
-      if (!params.owner || !params.repo || !params.projectPath || !params.message) {
+      if (!owner || !params.repo || !params.projectPath || !params.message) {
         throw new Error('repo, projectPath e message são obrigatórios');
       }
 
       const result = await provider.uploadProject(
-        params.owner,
+        owner,
         params.repo,
         params.projectPath,
         params.message,

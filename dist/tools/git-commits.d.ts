@@ -41,7 +41,6 @@ import { VcsOperations } from '../providers/index.js';
  */
 declare const CommitsInputSchema: z.ZodObject<{
     action: z.ZodEnum<["list", "get", "create", "compare", "search", "push", "pull"]>;
-    owner: z.ZodString;
     repo: z.ZodString;
     projectPath: z.ZodString;
     provider: z.ZodEnum<["gitea", "github"]>;
@@ -61,7 +60,6 @@ declare const CommitsInputSchema: z.ZodObject<{
     author: z.ZodOptional<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
     provider: "gitea" | "github";
-    owner: string;
     repo: string;
     action: "push" | "get" | "search" | "pull" | "list" | "create" | "compare";
     projectPath: string;
@@ -81,7 +79,6 @@ declare const CommitsInputSchema: z.ZodObject<{
     author?: string | undefined;
 }, {
     provider: "gitea" | "github";
-    owner: string;
     repo: string;
     action: "push" | "get" | "search" | "pull" | "list" | "create" | "compare";
     projectPath: string;
@@ -316,7 +313,7 @@ export declare const commitsTool: {
      * - limit: Itens por página (padrão: 30, máximo: 100)
      *
      * VALIDAÇÕES:
-     * - Owner e repo obrigatórios
+     * - e repo obrigatórios
      * - SHA deve ser válido se fornecido
      * - Page deve ser >= 1
      * - Limit deve ser entre 1 e 100
@@ -327,7 +324,7 @@ export declare const commitsTool: {
      * - Use SHA específico para análise
      * - Mantenha histórico organizado
      */
-    listCommits(params: CommitsInput, provider: VcsOperations): Promise<CommitsResult>;
+    listCommits(params: CommitsInput, provider: VcsOperations, owner: string): Promise<CommitsResult>;
     /**
      * Obtém detalhes de um commit específico
      *
@@ -353,7 +350,7 @@ export declare const commitsTool: {
      * - Analise mensagem e autor
      * - Documente mudanças importantes
      */
-    getCommit(params: CommitsInput, provider: VcsOperations): Promise<CommitsResult>;
+    getCommit(params: CommitsInput, provider: VcsOperations, owner: string): Promise<CommitsResult>;
     /**
      * Cria um novo commit
      *
@@ -387,7 +384,7 @@ export declare const commitsTool: {
      * - Documente mudanças importantes
      * - Use branches apropriadas
      */
-    createCommit(params: CommitsInput, provider: VcsOperations): Promise<CommitsResult>;
+    createCommit(params: CommitsInput, provider: VcsOperations, owner: string): Promise<CommitsResult>;
     /**
      * Compara dois commits ou branches
      *
@@ -413,7 +410,7 @@ export declare const commitsTool: {
      * - Analise arquivos modificados
      * - Documente diferenças importantes
      */
-    compareCommits(params: CommitsInput, provider: VcsOperations): Promise<CommitsResult>;
+    compareCommits(params: CommitsInput, provider: VcsOperations, owner: string): Promise<CommitsResult>;
     /**
      * Busca commits por critérios específicos
      *
@@ -443,7 +440,7 @@ export declare const commitsTool: {
      * - Use paginação para resultados grandes
      * - Analise relevância dos resultados
      */
-    searchCommits(params: CommitsInput, provider: VcsOperations): Promise<CommitsResult>;
+    searchCommits(params: CommitsInput, provider: VcsOperations, owner: string): Promise<CommitsResult>;
     /**
      * Faz push dos commits locais para o repositório remoto
      *

@@ -48,7 +48,6 @@ const WorkflowsInputSchema = z.object({
   
   // Parâmetros comuns
   repo: CommonSchemas.repo,
-  provider: CommonSchemas.provider,
   
   // Parâmetros para listagem
   page: CommonSchemas.page,
@@ -127,7 +126,7 @@ export type WorkflowsResult = z.infer<typeof WorkflowsResultSchema>;
  */
 export const workflowsTool = {
   name: 'gh-workflows',
-  description: 'Gerenciamento completo de GitHub Actions workflows CI/CD (EXCLUSIVO GITHUB).\n\nACTIONS DISPONÍVEIS:\n• list: Lista workflows do repositório\n  - OBRIGATÓRIOS: repo\n  - OPCIONAIS: page, limit\n\n• create: Cria novo workflow\n  - OBRIGATÓRIOS: repo, name, workflow_content\n  - OPCIONAIS: description, branch\n\n• trigger: Dispara workflow manualmente\n  - OBRIGATÓRIOS: repo, workflow_id\n  - OPCIONAIS: ref, inputs\n\n• status: Verifica status de execução\n  - OBRIGATÓRIOS: repo, run_id\n\n• logs: Obtém logs de execução\n  - OBRIGATÓRIOS: repo, run_id\n  - OPCIONAIS: job_id, step_number\n\n• disable: Desabilita workflow\n  - OBRIGATÓRIOS: repo, workflow_id\n\n• enable: Habilita workflow\n  - OBRIGATÓRIOS: repo, workflow_id\n\nPARÂMETROS COMUNS:\n• repo: Nome do repositório\n• provider: Fixo como "github"\n• owner: Fixo como usuário do GitHub\n\nBoas práticas: automatize CI/CD, monitore execuções, configure triggers apropriados.',
+  description: 'tool: Gerencia GitHub Actions workflows para CI/CD\n──────────────\naction list: lista workflows do repositório\naction list requires: repo, page, limit\n───────────────\naction create: cria novo workflow\naction create requires: repo, name, workflow_content, description, branch\n───────────────\naction trigger: dispara workflow manualmente\naction trigger requires: repo, workflow_id, ref, inputs\n───────────────\naction status: verifica status de execução\naction status requires: repo, run_id\n───────────────\naction logs: obtém logs de execução\naction logs requires: repo, run_id, job_id, step_number\n───────────────\naction disable: desabilita workflow\naction disable requires: repo, workflow_id\n───────────────\naction enable: habilita workflow\naction enable requires: repo, workflow_id',
   inputSchema: {
     type: 'object',
     properties: {

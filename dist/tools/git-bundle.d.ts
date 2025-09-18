@@ -26,7 +26,6 @@ import { z } from 'zod';
  */
 declare const GitBundleInputSchema: z.ZodObject<{
     action: z.ZodEnum<["create", "verify", "list-heads", "unbundle"]>;
-    owner: z.ZodString;
     repo: z.ZodString;
     provider: z.ZodEnum<["gitea", "github"]>;
     projectPath: z.ZodString;
@@ -42,7 +41,6 @@ declare const GitBundleInputSchema: z.ZodObject<{
     all_remotes: z.ZodOptional<z.ZodBoolean>;
 }, "strip", z.ZodTypeAny, {
     provider: "gitea" | "github";
-    owner: string;
     repo: string;
     action: "create" | "verify" | "list-heads" | "unbundle";
     projectPath: string;
@@ -58,7 +56,6 @@ declare const GitBundleInputSchema: z.ZodObject<{
     all_remotes?: boolean | undefined;
 }, {
     provider: "gitea" | "github";
-    owner: string;
     repo: string;
     action: "create" | "verify" | "list-heads" | "unbundle";
     projectPath: string;

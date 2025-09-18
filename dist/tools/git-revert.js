@@ -29,7 +29,7 @@ const terminal_controller_js_1 = require("../utils/terminal-controller.js");
  */
 const GitRevertInputSchema = zod_1.z.object({
     action: zod_1.z.enum(['revert-commit', 'revert-merge', 'revert-range']),
-    owner: zod_1.z.string(),
+    // owner: obtido automaticamente do provider,
     repo: zod_1.z.string(),
     provider: zod_1.z.enum(['gitea', 'github']).describe('Provider to use (gitea or github)'),
     projectPath: zod_1.z.string().describe('Local project path for git operations'),
@@ -53,7 +53,7 @@ const GitRevertResultSchema = zod_1.z.object({
 });
 exports.gitRevertTool = {
     name: 'git-revert',
-    description: 'Manage Git revert operations (GitHub + Gitea) with multiple actions: revert-commit, revert-merge, revert-range. Suporte completo a GitHub e Gitea simultaneamente. Boas práticas (solo): use para desfazer commits de forma segura, reverter mudanças em branches compartilhadas, criar commits de reversão; use revert em vez de reset para branches compartilhadas.',
+    description: 'tool: Gerencia operações Git revert para desfazer mudanças de forma segura\n──────────────\naction revert-commit: reverte commit específico\naction revert-commit requires: repo, commit_hash, message, no_commit, provider, projectPath\n───────────────\naction revert-merge: reverte merge commit\naction revert-merge requires: repo, merge_commit_hash, mainline, message, provider, projectPath\n───────────────\naction revert-range: reverte range de commits\naction revert-range requires: repo, commit_range, strategy, message, provider, projectPath',
     inputSchema: {
         type: 'object',
         properties: {
@@ -74,7 +74,7 @@ exports.gitRevertTool = {
             commit_range: { type: 'string', description: 'Commit range to revert' },
             strategy: { type: 'string', enum: ['ours', 'theirs'], description: 'Revert strategy' }
         },
-        required: ['action', 'owner', 'repo', 'provider', 'projectPath']
+        required: ['action', 'repo', 'provider', 'projectPath']
     },
     async handler(input) {
         try {

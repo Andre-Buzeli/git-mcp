@@ -33,7 +33,6 @@ const GhProjectsInputSchema = z.object({
   action: z.enum(['list', 'create', 'get', 'update', 'delete', 'items', 'fields']),
   // owner: obtido automaticamente do provider,
   repo: z.string(),
-  provider: z.enum(['github']).describe('Provider to use (github only)'),
   projectPath: z.string().describe('Local project path for git operations'),
   
   // Para create/update
@@ -74,7 +73,7 @@ export type GhProjectsResult = z.infer<typeof GhProjectsResultSchema>;
 
 export const ghProjectsTool = {
   name: 'gh-projects',
-  description: 'Gerenciamento de GitHub Projects (EXCLUSIVO GITHUB).\n\nACTIONS DISPONÍVEIS:\n• list: Lista projetos\n  - OPCIONAIS: page, limit\n\n• create: Cria novo projeto\n  - OBRIGATÓRIOS: title\n  - OPCIONAIS: body, state, public\n\n• get: Obtém detalhes de um projeto específico\n  - OBRIGATÓRIOS: project_id\n\n• update: Atualiza projeto existente\n  - OBRIGATÓRIOS: project_id\n  - OPCIONAIS: title, body, state, public\n\n• delete: Remove projeto\n  - OBRIGATÓRIOS: project_id\n\n• items: Gerencia itens do projeto\n  - OBRIGATÓRIOS: project_id\n  - OPCIONAIS: item_id, content_id, content_type, field_id, field_value\n\n• fields: Gerencia campos do projeto\n  - OBRIGATÓRIOS: project_id\n  - OPCIONAIS: field_id, field_name, field_type, field_options\n\nPARÂMETROS COMUNS:\n• provider: Fixo como "github"\n• owner: Fixo como usuário do GitHub\n\nBoas práticas: use para gerenciamento de projetos, organização de tarefas, planejamento de sprints; use para projetos de médio a longo prazo, configure campos personalizados adequadamente.',
+  description: 'tool: Gerencia GitHub Projects para organização de tarefas e projetos\n──────────────\naction list: lista projetos\naction list requires: page, limit\n───────────────\naction create: cria novo projeto\naction create requires: title, body, state, public\n───────────────\naction get: obtém detalhes de projeto específico\naction get requires: project_id\n───────────────\naction update: atualiza projeto existente\naction update requires: project_id, title, body, state, public\n───────────────\naction delete: remove projeto\naction delete requires: project_id\n───────────────\naction items: gerencia itens do projeto\naction items requires: project_id, item_id, content_id, content_type, field_id, field_value\n───────────────\naction fields: gerencia campos do projeto\naction fields requires: project_id, field_id, field_name, field_type, field_options',
   inputSchema: {
     type: 'object',
     properties: {

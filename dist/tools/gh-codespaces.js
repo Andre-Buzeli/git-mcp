@@ -32,9 +32,8 @@ const index_js_1 = require("../providers/index.js");
  */
 const GhCodespacesInputSchema = zod_1.z.object({
     action: zod_1.z.enum(['list', 'create', 'delete', 'start', 'stop', 'rebuild', 'logs']),
-    owner: zod_1.z.string(),
+    // owner: obtido automaticamente do provider,
     repo: zod_1.z.string(),
-    provider: zod_1.z.enum(['github']).describe('Provider to use (github only)'),
     projectPath: zod_1.z.string().describe('Local project path for git operations'),
     // Para create
     codespace_name: zod_1.z.string().optional(),
@@ -55,7 +54,7 @@ const GhCodespacesResultSchema = zod_1.z.object({
 });
 exports.ghCodespacesTool = {
     name: 'gh-codespaces',
-    description: 'Manage GitHub Codespaces (GitHub only) with multiple actions: list, create, delete, start, stop, rebuild, logs. Exclusivo para GitHub. Boas práticas (solo): use para desenvolvimento em nuvem, ambientes de desenvolvimento consistentes, colaboração remota; use para projetos que precisam de ambientes específicos, configure devcontainers adequadamente.',
+    description: 'tool: Gerencia GitHub Codespaces para desenvolvimento em nuvem\n──────────────\naction list: lista codespaces\naction list requires: repo\n───────────────\naction create: cria novo codespace\naction create requires: repo, codespace_name, branch, machine_type, display_name\n───────────────\naction delete: remove codespace\naction delete requires: codespace_id\n───────────────\naction start: inicia codespace\naction start requires: codespace_id\n───────────────\naction stop: para codespace\naction stop requires: codespace_id\n───────────────\naction rebuild: reconstrói codespace\naction rebuild requires: codespace_id\n───────────────\naction logs: obtém logs do codespace\naction logs requires: codespace_id, log_type',
     inputSchema: {
         type: 'object',
         properties: {
@@ -64,9 +63,7 @@ exports.ghCodespacesTool = {
                 enum: ['list', 'create', 'delete', 'start', 'stop', 'rebuild', 'logs'],
                 description: 'Action to perform on codespaces'
             },
-            owner: { type: 'string', description: 'Repository owner' },
             repo: { type: 'string', description: 'Repository name' },
-            provider: { type: 'string', enum: ['github'], description: 'Provider to use (github only)' },
             projectPath: { type: 'string', description: 'Local project path for git operations' },
             codespace_name: { type: 'string', description: 'Codespace name' },
             branch: { type: 'string', description: 'Branch for codespace' },
@@ -75,14 +72,12 @@ exports.ghCodespacesTool = {
             codespace_id: { type: 'string', description: 'Codespace ID' },
             log_type: { type: 'string', enum: ['build', 'start', 'stop'], description: 'Log type' }
         },
-        required: ['action', 'owner', 'repo', 'provider', 'projectPath']
+        required: ['action', 'projectPath']
     },
     async handler(input) {
         try {
             const validatedInput = GhCodespacesInputSchema.parse(input);
-            if (validatedInput.provider !== 'github') {
-                throw new Error('gh-codespaces é exclusivo para GitHub');
-            }
+            // Fixar provider como github para tools exclusivas do GitHub
             const provider = index_js_1.globalProviderFactory.getProvider('github');
             if (!provider) {
                 throw new Error('Provider GitHub não encontrado');
@@ -117,13 +112,14 @@ exports.ghCodespacesTool = {
     },
     async list(params, provider) {
         try {
+            const owner = (await provider.getCurrentUser()).login;
             // Simular listagem de codespaces
             const codespaces = [
                 {
                     id: 'codespace-1',
                     name: 'my-codespace',
                     display_name: 'My Development Environment',
-                    repository: `${(await provider.getCurrentUser()).login}/${params.repo}`,
+                    repository: `${owner}/${params.repo}`,
                     branch: 'main',
                     state: 'Available',
                     created_at: new Date().toISOString(),
@@ -133,7 +129,7 @@ exports.ghCodespacesTool = {
                     id: 'codespace-2',
                     name: 'feature-branch',
                     display_name: 'Feature Development',
-                    repository: `${(await provider.getCurrentUser()).login}/${params.repo}`,
+                    repository: `${owner}/${params.repo}`,
                     branch: 'feature/new-feature',
                     state: 'Running',
                     created_at: new Date().toISOString(),
@@ -156,11 +152,12 @@ exports.ghCodespacesTool = {
     },
     async create(params, provider) {
         try {
+            const owner = (await provider.getCurrentUser()).login;
             const codespace = {
                 id: `codespace-${Date.now()}`,
                 name: params.codespace_name || 'new-codespace',
                 display_name: params.display_name || 'New Codespace',
-                repository: `${(await provider.getCurrentUser()).login}/${params.repo}`,
+                repository: `${owner}/${params.repo}`,
                 branch: params.branch || 'main',
                 machine_type: params.machine_type || 'basicLinux32gb',
                 state: 'Creating',

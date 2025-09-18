@@ -162,7 +162,7 @@ const WebhooksResultSchema = zod_1.z.object({
  */
 exports.webhooksTool = {
     name: 'git-webhooks',
-    description: 'Gerenciamento completo de webhooks com suporte multi-provider (GitHub e Gitea). PARÂMETROS OBRIGATÓRIOS: action, owner, repo, provider. AÇÕES: create (cria webhook), list (lista webhooks), get (detalhes), update (atualiza), delete (remove), test (testa). Boas práticas: use para CI/CD local, notificações e integrações, sempre HTTPS, mantenha secrets seguros, monitore falhas de entrega.',
+    description: 'tool: Gerencia webhooks Git para automação e integrações\n──────────────\naction create: cria novo webhook\naction create requires: repo, url, content_type, secret, events, active, provider\n───────────────\naction list: lista webhooks do repositório\naction list requires: repo, page, limit, provider\n───────────────\naction get: obtém detalhes de webhook\naction get requires: repo, webhook_id, provider\n───────────────\naction update: atualiza webhook existente\naction update requires: repo, webhook_id, new_url, new_content_type, new_secret, new_events, new_active, provider\n───────────────\naction delete: remove webhook\naction delete requires: repo, webhook_id, provider\n───────────────\naction test: testa webhook\naction test requires: repo, webhook_id, provider',
     inputSchema: {
         type: 'object',
         properties: {
@@ -187,7 +187,7 @@ exports.webhooksTool = {
             new_events: { type: 'array', items: { type: 'string' }, description: 'New webhook events' },
             new_active: { type: 'boolean', description: 'New webhook active status' }
         },
-        required: ['action', 'owner', 'repo', 'provider']
+        required: ['action', 'repo', 'provider']
     },
     /**
      * Handler principal da tool webhooks
@@ -229,19 +229,21 @@ exports.webhooksTool = {
             if (!provider) {
                 throw new Error('Provider não encontrado ou não configurado');
             }
+            // Obter o owner do provider
+            const owner = (await provider.getCurrentUser()).login;
             switch (processedInput.action) {
                 case 'create':
-                    return await this.createWebhook(processedInput, provider);
+                    return await this.createWebhook(processedInput, provider, owner);
                 case 'list':
-                    return await this.listWebhooks(processedInput, provider);
+                    return await this.listWebhooks(processedInput, provider, owner);
                 case 'get':
-                    return await this.getWebhook(processedInput, provider);
+                    return await this.getWebhook(processedInput, provider, owner);
                 case 'update':
-                    return await this.updateWebhook(processedInput, provider);
+                    return await this.updateWebhook(processedInput, provider, owner);
                 case 'delete':
-                    return await this.deleteWebhook(processedInput, provider);
+                    return await this.deleteWebhook(processedInput, provider, owner);
                 case 'test':
-                    return await this.testWebhook(processedInput, provider);
+                    return await this.testWebhook(processedInput, provider, owner);
                 default:
                     throw new Error(`Ação não suportada: ${processedInput.action}`);
             }
@@ -285,10 +287,10 @@ exports.webhooksTool = {
      * - Mantenha secrets seguros
      * - Teste webhook antes de ativar
      */
-    async createWebhook(params, provider) {
+    async createWebhook(params, provider, owner) {
         try {
-            if (!owner || !params.repo || !params.url) {
-                throw new Error('Owner, repo e url são obrigatórios');
+            if (!!params.repo || !params.url) {
+                throw new Error('repo e url são obrigatórios');
             }
             const webhookData = {
                 url: params.url,
@@ -326,7 +328,7 @@ exports.webhooksTool = {
      * - limit: Itens por página (padrão: 30, máximo: 100)
      *
      * VALIDAÇÕES:
-     * - Owner e repo obrigatórios
+     * - e repo obrigatórios
      * - Page deve ser >= 1
      * - Limit deve ser entre 1 e 100
      *
@@ -336,14 +338,14 @@ exports.webhooksTool = {
      * - Verifique status ativo de cada webhook
      * - Mantenha webhooks organizados
      */
-    async listWebhooks(params, provider) {
+    async listWebhooks(params, provider, owner) {
         try {
             if (!params.repo) {
-                throw new Error('Owner e repo são obrigatórios');
+                throw new Error('e repo são obrigatórios');
             }
             const page = params.page || 1;
             const limit = params.limit || 30;
-            const webhooks = await provider.listWebhooks(owner, params.repo, page, limit);
+            const webhooks = await provider.listWebhooks((await provider.getCurrentUser()).login, params.repo, page, limit);
             return {
                 success: true,
                 action: 'list',
@@ -384,12 +386,12 @@ exports.webhooksTool = {
      * - Analise eventos configurados
      * - Monitore status ativo
      */
-    async getWebhook(params, provider) {
+    async getWebhook(params, provider, owner) {
         try {
-            if (!owner || !params.repo || !params.webhook_id) {
-                throw new Error('Owner, repo e webhook_id são obrigatórios');
+            if (!!params.repo || !params.webhook_id) {
+                throw new Error('repo e webhook_id são obrigatórios');
             }
-            const webhook = await provider.getWebhook(owner, params.repo, params.webhook_id);
+            const webhook = await provider.getWebhook((await provider.getCurrentUser()).login, params.repo, params.webhook_id);
             return {
                 success: true,
                 action: 'get',
@@ -432,10 +434,10 @@ exports.webhooksTool = {
      * - Documente mudanças importantes
      * - Teste webhook após atualização
      */
-    async updateWebhook(params, provider) {
+    async updateWebhook(params, provider, owner) {
         try {
-            if (!owner || !params.repo || !params.webhook_id) {
-                throw new Error('Owner, repo e webhook_id são obrigatórios');
+            if (!!params.repo || !params.webhook_id) {
+                throw new Error('repo e webhook_id são obrigatórios');
             }
             const updateData = {};
             if (params.new_url)
@@ -451,7 +453,7 @@ exports.webhooksTool = {
             if (Object.keys(updateData).length === 0) {
                 throw new Error('Nenhum campo para atualizar foi fornecido');
             }
-            const webhook = await provider.updateWebhook(owner, params.repo, params.webhook_id, updateData);
+            const webhook = await provider.updateWebhook((await provider.getCurrentUser()).login, params.repo, params.webhook_id, updateData);
             return {
                 success: true,
                 action: 'update',
@@ -487,12 +489,12 @@ exports.webhooksTool = {
      * - Mantenha backup se necessário
      * - Documente motivo da exclusão
      */
-    async deleteWebhook(params, provider) {
+    async deleteWebhook(params, provider, owner) {
         try {
-            if (!owner || !params.repo || !params.webhook_id) {
-                throw new Error('Owner, repo e webhook_id são obrigatórios');
+            if (!!params.repo || !params.webhook_id) {
+                throw new Error('repo e webhook_id são obrigatórios');
             }
-            await provider.deleteWebhook(owner, params.repo, params.webhook_id);
+            await provider.deleteWebhook((await provider.getCurrentUser()).login, params.repo, params.webhook_id);
             return {
                 success: true,
                 action: 'delete',
@@ -528,10 +530,10 @@ exports.webhooksTool = {
      * - Verifique logs de entrega
      * - Configure retry adequado
      */
-    async testWebhook(params, provider) {
+    async testWebhook(params, provider, owner) {
         try {
-            if (!owner || !params.repo || !params.webhook_id) {
-                throw new Error('Owner, repo e webhook_id são obrigatórios');
+            if (!!params.repo || !params.webhook_id) {
+                throw new Error('repo e webhook_id são obrigatórios');
             }
             // Implementar testWebhook
             const result = {

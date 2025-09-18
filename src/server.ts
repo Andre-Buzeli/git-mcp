@@ -5,14 +5,16 @@ import { config } from './config.js';
 import { globalProviderFactory, initializeFactoryFromEnv } from './providers/index.js';
 
 /**
- * Importação de todas as ferramentas MCP disponíveis (30 tools)
+ * Importação de todas as ferramentas MCP disponíveis (31 tools)
  * 
- * GIT CORE (15 tools) - Funcionam com GitHub + Gitea:
+ * GIT CORE (16 tools) - Funcionam com GitHub + Gitea:
  * - git-repositories: Gerenciamento de repositórios
  * - git-commits: Operações com commits
  * - git-branches: Operações com branches
  * - git-tags: Gerenciamento de tags
  * - git-files: Gerenciamento de arquivos
+ * - git-upload-project: Upload completo de projeto
+ * - git-initialize: Inicialização completa de repositório
  * - git-issues: Gerenciamento de issues
  * - git-pulls: Pull requests e merges
  * - git-releases: Gerenciamento de releases
@@ -51,6 +53,7 @@ import { branchesTool } from './tools/git-branches.js';
 import { tagsTool } from './tools/git-tags.js';
 import { filesTool } from './tools/git-files.js';
 import { uploadProjectTool } from './tools/git-upload-project.js';
+import { initializeTool } from './tools/git-initialize.js';
 import { issuesTool } from './tools/git-issues.js';
 import { pullsTool } from './tools/git-pulls.js';
 import { releasesTool } from './tools/git-releases.js';
@@ -82,7 +85,7 @@ import { ghProjectsTool } from './tools/gh-projects.js';
 import { ghSyncTool } from './tools/gh-sync.js';
 
 /**
- * Array de todas as ferramentas disponíveis (30 tools)
+ * Array de todas as ferramentas disponíveis (31 tools)
  * 
  * ESTRUTURA:
  * - Cada tool deve implementar a interface Tool
@@ -90,7 +93,7 @@ import { ghSyncTool } from './tools/gh-sync.js';
  * - Handler deve ser assíncrono e retornar resultado
  * 
  * ORGANIZAÇÃO:
- * - Git Core (15): Funcionam com GitHub + Gitea
+ * - Git Core (16): Funcionam com GitHub + Gitea
  * - Git Avançado (5): Funcionam com GitHub + Gitea
  * - GitHub Exclusivo (10): Apenas GitHub
  * 
@@ -100,13 +103,14 @@ import { ghSyncTool } from './tools/gh-sync.js';
  * - Para validação de parâmetros
  */
 const tools = [
-  // Git Core Tools (15) - GitHub + Gitea
+  // Git Core Tools (16) - GitHub + Gitea
   gitRepositoriesTool,
   commitsTool,
   branchesTool,
   tagsTool,
   filesTool,
   uploadProjectTool,
+  initializeTool,
   issuesTool,
   pullsTool,
   releasesTool,

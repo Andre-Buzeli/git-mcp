@@ -30,7 +30,7 @@ const terminal_controller_js_1 = require("../utils/terminal-controller.js");
  */
 const GitArchiveInputSchema = zod_1.z.object({
     action: zod_1.z.enum(['create', 'extract', 'list', 'verify']),
-    owner: zod_1.z.string(),
+    // owner: obtido automaticamente do provider,
     repo: zod_1.z.string(),
     provider: zod_1.z.enum(['gitea', 'github']).describe('Provider to use (gitea or github)'),
     projectPath: zod_1.z.string().describe('Local project path for git operations'),
@@ -58,7 +58,7 @@ const GitArchiveResultSchema = zod_1.z.object({
 });
 exports.gitArchiveTool = {
     name: 'git-archive',
-    description: 'Manage Git archives (GitHub + Gitea) with multiple actions: create, extract, list, verify. Suporte completo a GitHub e Gitea simultaneamente. Boas práticas (solo): use para criar releases, backup de código, distribuição de código, deploy de versões específicas; use para releases oficiais, inclua apenas arquivos necessários.',
+    description: 'tool: Gerencia arquivos Git para distribuição e backup\n──────────────\naction create: cria arquivo compactado\naction create requires: repo, provider, projectPath, archive_path, commit_or_tree, format, prefix, output\n───────────────\naction extract: extrai arquivo compactado\naction extract requires: repo, provider, projectPath, archive_file, extract_path\n───────────────\naction list: lista conteúdo do arquivo\naction list requires: repo, provider, projectPath, list_archive\n───────────────\naction verify: verifica integridade do arquivo\naction verify requires: repo, provider, projectPath, verify_archive',
     inputSchema: {
         type: 'object',
         properties: {
@@ -81,7 +81,7 @@ exports.gitArchiveTool = {
             prefix: { type: 'string', description: 'Prefix for archive entries' },
             output: { type: 'string', description: 'Output file path' }
         },
-        required: ['action', 'owner', 'repo', 'provider', 'projectPath']
+        required: ['action', 'repo', 'provider', 'projectPath']
     },
     async handler(input) {
         try {

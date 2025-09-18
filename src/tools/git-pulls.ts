@@ -211,7 +211,7 @@ export type PullsResult = z.infer<typeof PullsResultSchema>;
  */
 export const pullsTool = {
   name: 'git-pulls',
-  description: 'Gerenciamento completo de pull requests com suporte multi-provider (GitHub e Gitea). PARÂMETROS OBRIGATÓRIOS: action, owner, repo, provider. AÇÕES: create (cria PR), list (lista PRs), get (detalhes), update (atualiza), merge (faz merge), close (fecha), review (revisa), search (busca). Boas práticas: use PRs como barreira de revisão, mantenha PRs pequenos e focados, escolha método de merge apropriado.',
+  description: 'tool: Gerencia pull requests Git para revisão e merge de código\n──────────────\naction create: cria novo pull request\naction create requires: repo, title, body, head, base, draft, labels, assignees, reviewers, milestone, provider\n───────────────\naction list: lista pull requests do repositório\naction list requires: repo, state, page, limit, provider\n───────────────\naction get: obtém detalhes de PR\naction get requires: repo, pull_number, provider\n───────────────\naction update: atualiza pull request\naction update requires: repo, pull_number, new_title, new_body, new_base, new_labels, new_assignees, new_milestone, provider\n───────────────\naction merge: faz merge do PR\naction merge requires: repo, pull_number, merge_method, merge_commit_title, merge_commit_message, provider\n───────────────\naction close: fecha pull request\naction close requires: repo, pull_number, provider\n───────────────\naction review: adiciona review\naction review requires: repo, pull_number, review_event, review_body, provider\n───────────────\naction search: busca PRs por critérios\naction search requires: repo, query, author, assignee, reviewer, label, provider',
   inputSchema: {
     type: 'object',
     properties: {
@@ -252,7 +252,7 @@ export const pullsTool = {
       reviewer: { type: 'string', description: 'PR reviewer filter' },
       label: { type: 'string', description: 'PR label filter' }
     },
-    required: ['action', 'owner', 'repo', 'provider']
+    required: ['action', 'repo', 'provider']
   },
 
   /**
@@ -298,24 +298,27 @@ export const pullsTool = {
       if (!provider) {
         throw new Error(`Provider '${processedInput.provider}' não encontrado`);
       }
+
+      // Obter o owner do provider
+      const owner = (await provider.getCurrentUser()).login;
       
       switch (processedInput.action) {
         case 'create':
-          return await this.createPullRequest(validatedInput, provider);
+          return await this.createPullRequest(validatedInput, provider, owner);
         case 'list':
-          return await this.listPullRequests(validatedInput, provider);
+          return await this.listPullRequests(validatedInput, provider, owner);
         case 'get':
-          return await this.getPullRequest(validatedInput, provider);
+          return await this.getPullRequest(validatedInput, provider, owner);
         case 'update':
-          return await this.updatePullRequest(validatedInput, provider);
+          return await this.updatePullRequest(validatedInput, provider, owner);
         case 'merge':
-          return await this.mergePullRequest(validatedInput, provider);
+          return await this.mergePullRequest(validatedInput, provider, owner);
         case 'close':
-          return await this.closePullRequest(validatedInput, provider);
+          return await this.closePullRequest(validatedInput, provider, owner);
         case 'review':
-          return await this.addReview(validatedInput, provider);
+          return await this.addReview(validatedInput, provider, owner);
         case 'search':
-          return await this.searchPullRequests(validatedInput, provider);
+          return await this.searchPullRequests(validatedInput, provider, owner);
         default:
           throw new Error(`Ação não suportada: ${validatedInput.action}`);
       }
@@ -364,7 +367,7 @@ export const pullsTool = {
    * - Solicite reviews adequados
    * - Mantenha PRs pequenos e focados
    */
-  async createPullRequest(params: PullsInput, provider: VcsOperations): Promise<PullsResult> {
+  async createPullRequest(params: PullsInput, provider: VcsOperations, owner: string): Promise<PullsResult> {
     try {
       if (!!params.repo || !params.title || !params.head || !params.base) {
         throw new Error('repo, title, head e base são obrigatórios');
@@ -419,7 +422,7 @@ export const pullsTool = {
    * - Filtre por estado para organização
    * - Mantenha PRs organizados
    */
-  async listPullRequests(params: PullsInput, provider: VcsOperations): Promise<PullsResult> {
+  async listPullRequests(params: PullsInput, provider: VcsOperations, owner: string): Promise<PullsResult> {
     try {
       if (!params.repo) {
         throw new Error('e repo são obrigatórios');
@@ -472,7 +475,7 @@ export const pullsTool = {
    * - Analise conflitos se houver
    * - Monitore mudanças importantes
    */
-  async getPullRequest(params: PullsInput, provider: VcsOperations): Promise<PullsResult> {
+  async getPullRequest(params: PullsInput, provider: VcsOperations, owner: string): Promise<PullsResult> {
     try {
       if (!!params.repo || !params.pull_number) {
         throw new Error('repo e pull_number são obrigatórios');
@@ -523,7 +526,7 @@ export const pullsTool = {
    * - Documente mudanças importantes
    * - Notifique responsáveis sobre mudanças
    */
-  async updatePullRequest(params: PullsInput, provider: VcsOperations): Promise<PullsResult> {
+  async updatePullRequest(params: PullsInput, provider: VcsOperations, owner: string): Promise<PullsResult> {
     try {
       if (!!params.repo || !params.pull_number) {
         throw new Error('repo e pull_number são obrigatórios');
@@ -584,7 +587,7 @@ export const pullsTool = {
    * - Use títulos e mensagens descritivas
    * - Teste após o merge
    */
-  async mergePullRequest(params: PullsInput, provider: VcsOperations): Promise<PullsResult> {
+  async mergePullRequest(params: PullsInput, provider: VcsOperations, owner: string): Promise<PullsResult> {
     try {
       if (!!params.repo || !params.pull_number) {
         throw new Error('repo e pull_number são obrigatórios');
@@ -634,7 +637,7 @@ export const pullsTool = {
    * - Use comentário explicativo
    * - Verifique se não há dependências
    */
-  async closePullRequest(params: PullsInput, provider: VcsOperations): Promise<PullsResult> {
+  async closePullRequest(params: PullsInput, provider: VcsOperations, owner: string): Promise<PullsResult> {
     try {
       if (!!params.repo || !params.pull_number) {
         throw new Error('repo e pull_number são obrigatórios');
@@ -681,7 +684,7 @@ export const pullsTool = {
    * - Use tipos de review apropriados
    * - Mantenha reviews construtivos
    */
-  async addReview(params: PullsInput, provider: VcsOperations): Promise<PullsResult> {
+  async addReview(params: PullsInput, provider: VcsOperations, owner: string): Promise<PullsResult> {
     try {
       if (!!params.repo || !params.pull_number || !params.review_event) {
         throw new Error('repo, pull_number e review_event são obrigatórios');
@@ -735,7 +738,7 @@ export const pullsTool = {
    * - Analise relevância dos resultados
    * - Use para encontrar PRs relacionados
    */
-  async searchPullRequests(params: PullsInput, provider: VcsOperations): Promise<PullsResult> {
+  async searchPullRequests(params: PullsInput, provider: VcsOperations, owner: string): Promise<PullsResult> {
     try {
       if (!params.repo || !params.query) {
         throw new Error('repo e query são obrigatórios');

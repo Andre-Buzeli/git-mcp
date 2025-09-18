@@ -62,7 +62,7 @@ export type GitRemoteResult = z.infer<typeof GitRemoteResultSchema>;
 
 export const gitRemoteTool = {
   name: 'git-remote',
-  description: 'Manage Git remotes (GitHub + Gitea) with multiple actions: add, remove, rename, show, set-url, prune. Suporte completo a GitHub e Gitea simultaneamente. Boas práticas (solo): use para configurar repositórios remotos, gerenciar múltiplos remotes, sincronizar com diferentes servidores; use origin como remote principal, configure upstream para branches.',
+  description: 'tool: Gerencia repositórios remotos Git para sincronização\n──────────────\naction add: adiciona novo remote\naction add requires: repo, remote_name, remote_url, provider\n───────────────\naction remove: remove remote\naction remove requires: repo, remote, provider\n───────────────\naction rename: renomeia remote\naction rename requires: repo, remote, new_name, provider\n───────────────\naction show: mostra informações do remote\naction show requires: repo, remote, provider\n───────────────\naction set-url: atualiza URL do remote\naction set-url requires: repo, remote, remote_url, provider\n───────────────\naction prune: remove referências obsoletas\naction prune requires: repo, remote_to_prune, provider',
   inputSchema: {
     type: 'object',
     properties: {
@@ -81,7 +81,7 @@ export const gitRemoteTool = {
       new_name: { type: 'string', description: 'New remote name' },
       remote_to_prune: { type: 'string', description: 'Remote to prune' }
     },
-    required: ['action', 'owner', 'repo', 'provider', 'projectPath']
+    required: ['action', 'repo', 'provider', 'projectPath']
   },
 
   async handler(input: GitRemoteInput): Promise<GitRemoteResult> {

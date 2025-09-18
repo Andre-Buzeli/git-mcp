@@ -32,7 +32,6 @@ import { VcsOperations } from '../providers/index.js';
 declare const SecurityInputSchema: z.ZodObject<{
     action: z.ZodEnum<["scan", "vulnerabilities", "alerts", "policies", "compliance", "dependencies", "advisories"]>;
     repo: z.ZodString;
-    provider: z.ZodEnum<["gitea", "github", "both"]>;
     page: z.ZodOptional<z.ZodNumber>;
     limit: z.ZodOptional<z.ZodNumber>;
     scan_type: z.ZodOptional<z.ZodEnum<["code", "dependencies", "secrets", "infrastructure"]>>;
@@ -55,7 +54,6 @@ declare const SecurityInputSchema: z.ZodObject<{
     updated_after: z.ZodOptional<z.ZodString>;
     updated_before: z.ZodOptional<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
-    provider: "gitea" | "github" | "both";
     repo: string;
     action: "scan" | "vulnerabilities" | "alerts" | "policies" | "compliance" | "dependencies" | "advisories";
     state?: "open" | "fixed" | "dismissed" | undefined;
@@ -80,7 +78,6 @@ declare const SecurityInputSchema: z.ZodObject<{
     updated_after?: string | undefined;
     updated_before?: string | undefined;
 }, {
-    provider: "gitea" | "github" | "both";
     repo: string;
     action: "scan" | "vulnerabilities" | "alerts" | "policies" | "compliance" | "dependencies" | "advisories";
     state?: "open" | "fixed" | "dismissed" | undefined;
@@ -144,10 +141,6 @@ export declare const securityTool: {
                 description: string;
             };
             repo: {
-                type: string;
-                description: string;
-            };
-            provider: {
                 type: string;
                 description: string;
             };

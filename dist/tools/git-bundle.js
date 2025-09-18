@@ -30,7 +30,7 @@ const terminal_controller_js_1 = require("../utils/terminal-controller.js");
  */
 const GitBundleInputSchema = zod_1.z.object({
     action: zod_1.z.enum(['create', 'verify', 'list-heads', 'unbundle']),
-    owner: zod_1.z.string(),
+    // owner: obtido automaticamente do provider,
     repo: zod_1.z.string(),
     provider: zod_1.z.enum(['gitea', 'github']).describe('Provider to use (gitea or github)'),
     projectPath: zod_1.z.string().describe('Local project path for git operations'),
@@ -59,7 +59,7 @@ const GitBundleResultSchema = zod_1.z.object({
 });
 exports.gitBundleTool = {
     name: 'git-bundle',
-    description: 'Manage Git bundles (GitHub + Gitea) with multiple actions: create, verify, list-heads, unbundle. Suporte completo a GitHub e Gitea simultaneamente. Boas práticas (solo): use para transferir repositórios offline, backup completo de repositórios, sincronização sem rede; use para transferências offline, inclua tags quando necessário.',
+    description: 'tool: Gerencia bundles Git para transferência offline de repositórios\n──────────────\naction create: cria bundle do repositório\naction create requires: repo, provider, projectPath, bundle_file, commit_range, branch_name, all_branches, all_tags, all_remotes\n───────────────\naction verify: verifica integridade do bundle\naction verify requires: repo, provider, projectPath, verify_bundle\n───────────────\naction list-heads: lista heads do bundle\naction list-heads requires: repo, provider, projectPath, list_bundle\n───────────────\naction unbundle: extrai bundle para repositório\naction unbundle requires: repo, provider, projectPath, unbundle_file, unbundle_path',
     inputSchema: {
         type: 'object',
         properties: {
@@ -83,7 +83,7 @@ exports.gitBundleTool = {
             all_tags: { type: 'boolean', description: 'Include all tags' },
             all_remotes: { type: 'boolean', description: 'Include all remotes' }
         },
-        required: ['action', 'owner', 'repo', 'provider', 'projectPath']
+        required: ['action', 'repo', 'provider', 'projectPath']
     },
     async handler(input) {
         try {

@@ -26,7 +26,6 @@ import { z } from 'zod';
  */
 declare const GitSubmoduleInputSchema: z.ZodObject<{
     action: z.ZodEnum<["add", "update", "init", "deinit", "status", "sync"]>;
-    owner: z.ZodString;
     repo: z.ZodString;
     provider: z.ZodEnum<["gitea", "github"]>;
     projectPath: z.ZodString;
@@ -39,7 +38,6 @@ declare const GitSubmoduleInputSchema: z.ZodObject<{
     recursive_sync: z.ZodOptional<z.ZodBoolean>;
 }, "strip", z.ZodTypeAny, {
     provider: "gitea" | "github";
-    owner: string;
     repo: string;
     action: "status" | "init" | "add" | "update" | "deinit" | "sync";
     projectPath: string;
@@ -52,7 +50,6 @@ declare const GitSubmoduleInputSchema: z.ZodObject<{
     recursive_sync?: boolean | undefined;
 }, {
     provider: "gitea" | "github";
-    owner: string;
     repo: string;
     action: "status" | "init" | "add" | "update" | "deinit" | "sync";
     projectPath: string;

@@ -137,7 +137,7 @@ const TagsResultSchema = zod_1.z.object({
  */
 exports.tagsTool = {
     name: 'git-tags',
-    description: 'Gerenciamento completo de tags com suporte multi-provider (GitHub e Gitea). PARÂMETROS OBRIGATÓRIOS: action, owner, repo, provider. AÇÕES: create (cria tag), list (lista tags), get (detalhes), delete (remove), search (busca). Boas práticas: use tags como "fotografias" imutáveis, facilite rollback e builds reproduzíveis.',
+    description: 'tool: Gerencia tags Git para versionamento e releases\n──────────────\naction create: cria nova tag\naction create requires: repo, tag_name, message, target, type, tagger_name, tagger_email, provider\n───────────────\naction list: lista tags do repositório\naction list requires: repo, page, limit, provider\n───────────────\naction get: obtém detalhes de tag\naction get requires: repo, tag, provider\n───────────────\naction delete: remove tag\naction delete requires: repo, tag, provider\n───────────────\naction search: busca tags por critérios\naction search requires: repo, query, pattern, provider',
     inputSchema: {
         type: 'object',
         properties: {
@@ -275,7 +275,7 @@ exports.tagsTool = {
                 if (params.tagger_email)
                     tagData.tagger_email = params.tagger_email;
             }
-            const tag = await provider.createTag(owner, params.repo, tagData);
+            const tag = await provider.createTag((await provider.getCurrentUser()).login, params.repo, tagData);
             return {
                 success: true,
                 action: 'create',
@@ -304,7 +304,7 @@ exports.tagsTool = {
      * - limit: Itens por página (padrão: 30, máximo: 100)
      *
      * VALIDAÇÕES:
-     * - Owner e repo obrigatórios
+     * - e repo obrigatórios
      * - Page deve ser >= 1
      * - Limit deve ser entre 1 e 100
      *
@@ -323,7 +323,7 @@ exports.tagsTool = {
             const owner = currentUser.login;
             const page = params.page || 1;
             const limit = params.limit || 30;
-            const tags = await provider.listTags(owner, params.repo, page, limit);
+            const tags = await provider.listTags((await provider.getCurrentUser()).login, params.repo, page, limit);
             return {
                 success: true,
                 action: 'list',
@@ -418,7 +418,7 @@ exports.tagsTool = {
             }
             const currentUser = await provider.getCurrentUser();
             const owner = currentUser.login;
-            await provider.deleteTag(owner, params.repo, params.tag);
+            await provider.deleteTag((await provider.getCurrentUser()).login, params.repo, params.tag);
             return {
                 success: true,
                 action: 'delete',
@@ -447,7 +447,7 @@ exports.tagsTool = {
      * - pattern: Padrão de busca (ex: v*.*.*)
      *
      * VALIDAÇÕES:
-     * - Owner e repo obrigatórios
+     * - e repo obrigatórios
      * - Query ou pattern deve ser fornecido
      * - Repositório deve existir
      *

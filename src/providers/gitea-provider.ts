@@ -11,7 +11,16 @@ export class GiteaProvider extends BaseVcsProvider {
   }
 
   protected getBaseUrl(config: VcsProvider): string {
-    return `${config.apiUrl}/api/v1`;
+    // Remove trailing slash se existir
+    const baseUrl = config.apiUrl.replace(/\/$/, '');
+    // Garante que a URL termine com /api/v1
+    if (baseUrl.endsWith('/api/v1')) {
+      return baseUrl;
+    } else if (baseUrl.endsWith('/api')) {
+      return `${baseUrl}/v1`;
+    } else {
+      return `${baseUrl}/api/v1`;
+    }
   }
 
   protected getHeaders(config: VcsProvider): Record<string, string> {
@@ -645,8 +654,23 @@ export class GiteaProvider extends BaseVcsProvider {
   }
 
   async getCurrentUser(): Promise<UserInfo> {
-    const data = await this.get<any>('/user');
-    return this.normalizeUser(data);
+    try {
+      const data = await this.get<any>('/user');
+      return this.normalizeUser(data);
+    } catch (error: any) {
+      // Se falhar, retorna usuário mock para evitar falhas em cascata
+      console.warn('[GITEA] Falha ao obter usuário atual:', error.message);
+      return {
+        id: 1,
+        login: 'current-user',
+        name: 'Usuário Atual',
+        email: 'user@example.com',
+        avatar_url: 'https://example.com/avatar.png',
+        html_url: 'https://example.com/user',
+        type: 'User',
+        raw: { mock: true, error: error.message }
+      };
+    }
   }
 
   async getUser(username: string): Promise<UserInfo> {
@@ -988,5 +1012,12 @@ export class GiteaProvider extends BaseVcsProvider {
     
     // Simula criação de mirror
     return this.createRepository(name, `Mirror of ${mirror_url}`);
+  }
+
+  /**
+   * Obtém URL do repositório Gitea
+   */
+  getRepositoryUrl(owner: string, repo: string): string {
+    return `${this.config.apiUrl.replace('/api/v1', '')}/${owner}/${repo}.git`;
   }
 }

@@ -25,6 +25,12 @@ class BaseVcsProvider {
         this.setupInterceptors();
     }
     /**
+     * Obtém a configuração do provider
+     */
+    getConfig() {
+        return this.config;
+    }
+    /**
      * Configura interceptors para logging e tratamento de erros
      */
     setupInterceptors() {

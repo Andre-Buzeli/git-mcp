@@ -30,9 +30,7 @@ import { VcsOperations } from '../providers/index.js';
  */
 declare const GhGistsInputSchema: z.ZodObject<{
     action: z.ZodEnum<["create", "list", "get", "update", "delete", "fork", "star", "comment"]>;
-    owner: z.ZodString;
     repo: z.ZodString;
-    provider: z.ZodEnum<["github"]>;
     projectPath: z.ZodString;
     gist_id: z.ZodOptional<z.ZodString>;
     description: z.ZodOptional<z.ZodString>;
@@ -53,8 +51,6 @@ declare const GhGistsInputSchema: z.ZodObject<{
     star: z.ZodOptional<z.ZodBoolean>;
     comment_body: z.ZodOptional<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
-    provider: "github";
-    owner: string;
     repo: string;
     action: "delete" | "get" | "list" | "create" | "update" | "fork" | "comment" | "star";
     projectPath: string;
@@ -71,8 +67,6 @@ declare const GhGistsInputSchema: z.ZodObject<{
     }> | undefined;
     public?: boolean | undefined;
 }, {
-    provider: "github";
-    owner: string;
     repo: string;
     action: "delete" | "get" | "list" | "create" | "update" | "fork" | "comment" | "star";
     projectPath: string;
@@ -117,19 +111,6 @@ export declare const ghGistsTool: {
         type: string;
         properties: {
             action: {
-                type: string;
-                enum: string[];
-                description: string;
-            };
-            owner: {
-                type: string;
-                description: string;
-            };
-            repo: {
-                type: string;
-                description: string;
-            };
-            provider: {
                 type: string;
                 enum: string[];
                 description: string;

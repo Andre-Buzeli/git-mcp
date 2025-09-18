@@ -32,7 +32,6 @@ const GhSyncInputSchema = z.object({
   action: z.enum(['sync-repos', 'sync-issues', 'sync-pulls', 'sync-releases', 'sync-webhooks', 'sync-config']),
   // owner: obtido automaticamente do provider,
   repo: z.string(),
-  provider: z.enum(['github']).describe('Provider to use (github only)'),
   projectPath: z.string().describe('Local project path for git operations'),
   
   // Para sync-repos
@@ -81,7 +80,7 @@ export type GhSyncResult = z.infer<typeof GhSyncResultSchema>;
 
 export const ghSyncTool = {
   name: 'gh-sync',
-  description: 'Sincronização GitHub (EXCLUSIVO GITHUB).\n\nACTIONS DISPONÍVEIS:\n• sync-repos: Sincroniza repositórios\n  - OBRIGATÓRIOS: source_repo, target_repo\n  - OPCIONAIS: sync_branches, sync_tags\n\n• sync-issues: Sincroniza issues\n  - OBRIGATÓRIOS: repo, issue_number\n  - OPCIONAIS: sync_comments, sync_labels\n\n• sync-pulls: Sincroniza pull requests\n  - OBRIGATÓRIOS: repo, pull_number\n  - OPCIONAIS: sync_reviews, sync_commits\n\n• sync-releases: Sincroniza releases\n  - OBRIGATÓRIOS: repo, release_tag\n  - OPCIONAIS: sync_assets\n\n• sync-webhooks: Sincroniza webhooks\n  - OBRIGATÓRIOS: repo, webhook_id\n  - OPCIONAIS: sync_events\n\n• sync-config: Sincroniza configurações\n  - OBRIGATÓRIOS: repo\n  - OPCIONAIS: config_type\n\nPARÂMETROS COMUNS:\n• provider: Fixo como "github"\n• owner: Fixo como usuário do GitHub\n\nBoas práticas: use para manter repositórios em sincronia, backup de configurações, migração de dados; use para repositórios críticos, configure sincronização automática.',
+  description: 'tool: Sincronização GitHub para manter repositórios em sincronia\n──────────────\naction sync-repos: sincroniza repositórios\naction sync-repos requires: source_repo, target_repo, sync_branches, sync_tags\n───────────────\naction sync-issues: sincroniza issues\naction sync-issues requires: repo, issue_number, sync_comments, sync_labels\n───────────────\naction sync-pulls: sincroniza pull requests\naction sync-pulls requires: repo, pull_number, sync_reviews, sync_commits\n───────────────\naction sync-releases: sincroniza releases\naction sync-releases requires: repo, release_tag, sync_assets\n───────────────\naction sync-webhooks: sincroniza webhooks\naction sync-webhooks requires: repo, webhook_id, sync_events\n───────────────\naction sync-config: sincroniza configurações\naction sync-config requires: repo, config_type',
   inputSchema: {
     type: 'object',
     properties: {

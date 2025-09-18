@@ -29,9 +29,7 @@ import { VcsOperations } from '../providers/index.js';
  */
 declare const GhCodespacesInputSchema: z.ZodObject<{
     action: z.ZodEnum<["list", "create", "delete", "start", "stop", "rebuild", "logs"]>;
-    owner: z.ZodString;
     repo: z.ZodString;
-    provider: z.ZodEnum<["github"]>;
     projectPath: z.ZodString;
     codespace_name: z.ZodOptional<z.ZodString>;
     branch: z.ZodOptional<z.ZodString>;
@@ -40,8 +38,6 @@ declare const GhCodespacesInputSchema: z.ZodObject<{
     codespace_id: z.ZodOptional<z.ZodString>;
     log_type: z.ZodOptional<z.ZodEnum<["build", "start", "stop"]>>;
 }, "strip", z.ZodTypeAny, {
-    provider: "github";
-    owner: string;
     repo: string;
     action: "delete" | "list" | "create" | "logs" | "start" | "stop" | "rebuild";
     projectPath: string;
@@ -50,10 +46,8 @@ declare const GhCodespacesInputSchema: z.ZodObject<{
     machine_type?: string | undefined;
     display_name?: string | undefined;
     codespace_id?: string | undefined;
-    log_type?: "start" | "stop" | "build" | undefined;
+    log_type?: "build" | "start" | "stop" | undefined;
 }, {
-    provider: "github";
-    owner: string;
     repo: string;
     action: "delete" | "list" | "create" | "logs" | "start" | "stop" | "rebuild";
     projectPath: string;
@@ -62,7 +56,7 @@ declare const GhCodespacesInputSchema: z.ZodObject<{
     machine_type?: string | undefined;
     display_name?: string | undefined;
     codespace_id?: string | undefined;
-    log_type?: "start" | "stop" | "build" | undefined;
+    log_type?: "build" | "start" | "stop" | undefined;
 }>;
 export type GhCodespacesInput = z.infer<typeof GhCodespacesInputSchema>;
 declare const GhCodespacesResultSchema: z.ZodObject<{
@@ -96,17 +90,8 @@ export declare const ghCodespacesTool: {
                 enum: string[];
                 description: string;
             };
-            owner: {
-                type: string;
-                description: string;
-            };
             repo: {
                 type: string;
-                description: string;
-            };
-            provider: {
-                type: string;
-                enum: string[];
                 description: string;
             };
             projectPath: {

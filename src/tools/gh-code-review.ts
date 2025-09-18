@@ -39,7 +39,6 @@ const CodeReviewInputSchema = z.object({
 
   // Parâmetros comuns
   repo: z.string(),
-  provider: CommonSchemas.provider,
 
   // Para analyze
   code: z.string().optional(),
@@ -107,7 +106,7 @@ export type CodeReviewResult = z.infer<typeof CodeReviewResultSchema>;
  */
 export const codeReviewTool = {
   name: 'gh-code-review',
-  description: 'Análise completa de código GitHub com detecção de problemas (EXCLUSIVO GITHUB).\n\nACTIONS DISPONÍVEIS:\n• analyze: Análise geral de código\n  - OBRIGATÓRIOS: code, language\n  - OPCIONAIS: context, problem, rules, exclude_patterns\n\n• review-file: Revisão de arquivo específico\n  - OBRIGATÓRIOS: repo, file_path\n  - OPCIONAIS: branch, rules, exclude_patterns\n\n• review-commit: Revisão de commit específico\n  - OBRIGATÓRIOS: repo, sha\n  - OPCIONAIS: branch, rules, exclude_patterns\n\n• review-pr: Revisão de Pull Request\n  - OBRIGATÓRIOS: repo, pull_number\n  - OPCIONAIS: rules, exclude_patterns\n\n• generate-report: Geração de relatório\n  - OBRIGATÓRIOS: repo\n  - OPCIONAIS: report_type, include_suggestions, branch\n\n• apply-suggestions: Aplicar sugestões de correção\n  - OBRIGATÓRIOS: repo, suggestions\n  - OPCIONAIS: branch\n\nPARÂMETROS COMUNS:\n• repo: Nome do repositório\n• provider: Fixo como "github"\n• owner: Fixo como usuário do GitHub\n\nBoas práticas: revisão automatizada de qualidade, detecção de bugs, sugestões de otimização.',
+  description: 'tool: Análise de código GitHub para qualidade e detecção de problemas\n──────────────\naction analyze: análise geral de código\naction analyze requires: code, language, context, problem, rules, exclude_patterns\n───────────────\naction review-file: revisão de arquivo específico\naction review-file requires: repo, file_path, branch, rules, exclude_patterns\n───────────────\naction review-commit: revisão de commit específico\naction review-commit requires: repo, sha, branch, rules, exclude_patterns\n───────────────\naction review-pr: revisão de Pull Request\naction review-pr requires: repo, pull_number, rules, exclude_patterns\n───────────────\naction generate-report: geração de relatório\naction generate-report requires: repo, report_type, include_suggestions, branch\n───────────────\naction apply-suggestions: aplicar sugestões de correção\naction apply-suggestions requires: repo, suggestions, branch',
 
   inputSchema: {
     type: 'object',
@@ -192,28 +191,14 @@ export const codeReviewTool = {
    */
   async analyzeCode(params: CodeReviewInput): Promise<CodeReviewResult> {
     try {
-      // Verificar se é Gitea - code review automatizado não é suportado
-      if (params.provider === 'gitea' || (!params.provider && (globalProviderFactory.getDefaultProvider() as any)?.config?.type === 'gitea')) {
-        return {
-          success: true,
-          action: 'analyze',
-          message: 'Code review automatizado não está disponível para o Gitea',
-          data: {
-            note: 'Esta funcionalidade é específica do GitHub',
-            supported_providers: ['github'],
-            current_provider: params.provider || 'gitea'
-          }
-        };
-      }
+      // Esta tool é específica do GitHub
+      const provider = globalProviderFactory.getProvider('github');
 
       let codeToAnalyze = params.code;
       let fileName = 'code.txt';
 
       // Se não foi fornecido código direto, buscar do repositório
       if (!codeToAnalyze && params.repo && params.file_path) {
-        const provider = params.provider
-          ? globalProviderFactory.getProvider(params.provider)
-          : globalProviderFactory.getDefaultProvider();
 
         if (provider) {
           const currentUser = await provider.getCurrentUser();

@@ -48,7 +48,6 @@ const WorkflowsInputSchema = zod_1.z.object({
     action: zod_1.z.enum(['list', 'create', 'trigger', 'status', 'logs', 'disable', 'enable']),
     // Parâmetros comuns
     repo: validator_js_1.CommonSchemas.repo,
-    provider: validator_js_1.CommonSchemas.provider,
     // Parâmetros para listagem
     page: validator_js_1.CommonSchemas.page,
     limit: validator_js_1.CommonSchemas.limit,
@@ -116,7 +115,7 @@ const WorkflowsResultSchema = zod_1.z.object({
  */
 exports.workflowsTool = {
     name: 'gh-workflows',
-    description: 'Gerenciamento completo de GitHub Actions workflows CI/CD (EXCLUSIVO GITHUB). PARÂMETROS OBRIGATÓRIOS: action, owner, repo, provider (deve ser github). AÇÕES: list (lista workflows), create (cria YAML), trigger (dispara), status (verifica), logs (obtém), disable/enable (controle). Boas práticas: automatize CI/CD, monitore execuções, configure triggers apropriados.',
+    description: 'tool: Gerencia GitHub Actions workflows para CI/CD\n──────────────\naction list: lista workflows do repositório\naction list requires: repo, page, limit\n───────────────\naction create: cria novo workflow\naction create requires: repo, name, workflow_content, description, branch\n───────────────\naction trigger: dispara workflow manualmente\naction trigger requires: repo, workflow_id, ref, inputs\n───────────────\naction status: verifica status de execução\naction status requires: repo, run_id\n───────────────\naction logs: obtém logs de execução\naction logs requires: repo, run_id, job_id, step_number\n───────────────\naction disable: desabilita workflow\naction disable requires: repo, workflow_id\n───────────────\naction enable: habilita workflow\naction enable requires: repo, workflow_id',
     inputSchema: {
         type: 'object',
         properties: {
@@ -126,7 +125,6 @@ exports.workflowsTool = {
                 description: 'Action to perform on workflows'
             },
             repo: { type: 'string', description: 'Repository name' },
-            provider: { type: 'string', description: 'Specific provider (github, gitea) or use default' },
             name: { type: 'string', description: 'Workflow name for creation' },
             description: { type: 'string', description: 'Workflow description' },
             workflow_content: { type: 'string', description: 'Workflow YAML content' },
@@ -140,7 +138,7 @@ exports.workflowsTool = {
             page: { type: 'number', description: 'Page number', minimum: 1 },
             limit: { type: 'number', description: 'Items per page', minimum: 1, maximum: 100 }
         },
-        required: ['action', 'repo', 'provider']
+        required: ['action', 'repo']
     },
     /**
      * Handler principal da tool workflows
@@ -165,14 +163,11 @@ exports.workflowsTool = {
         try {
             // Validação da entrada
             const validatedInput = WorkflowsInputSchema.parse(input);
-            // Aplicar auto-detecção de usuário
-            const updatedParams = await (0, user_detection_js_1.applyAutoUserDetection)(validatedInput, validatedInput.provider);
-            // Seleção do provider
-            const provider = updatedParams.provider
-                ? index_js_1.globalProviderFactory.getProvider(updatedParams.provider)
-                : index_js_1.globalProviderFactory.getDefaultProvider();
+            // Fixar provider como github para tools exclusivas do GitHub
+            const updatedParams = await (0, user_detection_js_1.applyAutoUserDetection)(validatedInput, 'github');
+            const provider = index_js_1.globalProviderFactory.getProvider('github');
             if (!provider) {
-                throw new Error(`Provider '${updatedParams.provider}' não encontrado`);
+                throw new Error('Provider GitHub não encontrado');
             }
             // Execução da ação específica
             switch (updatedParams.action) {

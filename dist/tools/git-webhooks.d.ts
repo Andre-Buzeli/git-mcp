@@ -342,7 +342,7 @@ export declare const webhooksTool: {
      * - Mantenha secrets seguros
      * - Teste webhook antes de ativar
      */
-    createWebhook(params: WebhooksInput, provider: VcsOperations): Promise<WebhooksResult>;
+    createWebhook(params: WebhooksInput, provider: VcsOperations, owner: string): Promise<WebhooksResult>;
     /**
      * Lista webhooks do repositório
      *
@@ -360,7 +360,7 @@ export declare const webhooksTool: {
      * - limit: Itens por página (padrão: 30, máximo: 100)
      *
      * VALIDAÇÕES:
-     * - Owner e repo obrigatórios
+     * - e repo obrigatórios
      * - Page deve ser >= 1
      * - Limit deve ser entre 1 e 100
      *
@@ -370,7 +370,7 @@ export declare const webhooksTool: {
      * - Verifique status ativo de cada webhook
      * - Mantenha webhooks organizados
      */
-    listWebhooks(params: WebhooksInput, provider: VcsOperations): Promise<WebhooksResult>;
+    listWebhooks(params: WebhooksInput, provider: VcsOperations, owner: string): Promise<WebhooksResult>;
     /**
      * Obtém detalhes de um webhook específico
      *
@@ -395,7 +395,7 @@ export declare const webhooksTool: {
      * - Analise eventos configurados
      * - Monitore status ativo
      */
-    getWebhook(params: WebhooksInput, provider: VcsOperations): Promise<WebhooksResult>;
+    getWebhook(params: WebhooksInput, provider: VcsOperations, owner: string): Promise<WebhooksResult>;
     /**
      * Atualiza um webhook existente
      *
@@ -427,7 +427,7 @@ export declare const webhooksTool: {
      * - Documente mudanças importantes
      * - Teste webhook após atualização
      */
-    updateWebhook(params: WebhooksInput, provider: VcsOperations): Promise<WebhooksResult>;
+    updateWebhook(params: WebhooksInput, provider: VcsOperations, owner: string): Promise<WebhooksResult>;
     /**
      * Deleta um webhook do repositório
      *
@@ -452,7 +452,7 @@ export declare const webhooksTool: {
      * - Mantenha backup se necessário
      * - Documente motivo da exclusão
      */
-    deleteWebhook(params: WebhooksInput, provider: VcsOperations): Promise<WebhooksResult>;
+    deleteWebhook(params: WebhooksInput, provider: VcsOperations, owner: string): Promise<WebhooksResult>;
     /**
      * Testa um webhook existente
      *
@@ -477,7 +477,7 @@ export declare const webhooksTool: {
      * - Verifique logs de entrega
      * - Configure retry adequado
      */
-    testWebhook(params: WebhooksInput, provider: VcsOperations): Promise<WebhooksResult>;
+    testWebhook(params: WebhooksInput, provider: VcsOperations, owner: string): Promise<WebhooksResult>;
 };
 export {};
 //# sourceMappingURL=git-webhooks.d.ts.map

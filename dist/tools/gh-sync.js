@@ -31,9 +31,8 @@ const index_js_1 = require("../providers/index.js");
  */
 const GhSyncInputSchema = zod_1.z.object({
     action: zod_1.z.enum(['sync-repos', 'sync-issues', 'sync-pulls', 'sync-releases', 'sync-webhooks', 'sync-config']),
-    owner: zod_1.z.string(),
+    // owner: obtido automaticamente do provider,
     repo: zod_1.z.string(),
-    provider: zod_1.z.enum(['github']).describe('Provider to use (github only)'),
     projectPath: zod_1.z.string().describe('Local project path for git operations'),
     // Para sync-repos
     source_repo: zod_1.z.string().optional(),
@@ -69,7 +68,7 @@ const GhSyncResultSchema = zod_1.z.object({
 });
 exports.ghSyncTool = {
     name: 'gh-sync',
-    description: 'GitHub synchronization (GitHub only) with multiple actions: sync-repos, sync-issues, sync-pulls, sync-releases, sync-webhooks, sync-config. Exclusivo para GitHub. Boas práticas (solo): use para manter repositórios em sincronia, backup de configurações, migração de dados; use para repositórios críticos, configure sincronização automática.',
+    description: 'tool: Sincronização GitHub para manter repositórios em sincronia\n──────────────\naction sync-repos: sincroniza repositórios\naction sync-repos requires: source_repo, target_repo, sync_branches, sync_tags\n───────────────\naction sync-issues: sincroniza issues\naction sync-issues requires: repo, issue_number, sync_comments, sync_labels\n───────────────\naction sync-pulls: sincroniza pull requests\naction sync-pulls requires: repo, pull_number, sync_reviews, sync_commits\n───────────────\naction sync-releases: sincroniza releases\naction sync-releases requires: repo, release_tag, sync_assets\n───────────────\naction sync-webhooks: sincroniza webhooks\naction sync-webhooks requires: repo, webhook_id, sync_events\n───────────────\naction sync-config: sincroniza configurações\naction sync-config requires: repo, config_type',
     inputSchema: {
         type: 'object',
         properties: {
@@ -78,9 +77,7 @@ exports.ghSyncTool = {
                 enum: ['sync-repos', 'sync-issues', 'sync-pulls', 'sync-releases', 'sync-webhooks', 'sync-config'],
                 description: 'Action to perform on sync'
             },
-            owner: { type: 'string', description: 'Repository owner' },
             repo: { type: 'string', description: 'Repository name' },
-            provider: { type: 'string', enum: ['github'], description: 'Provider to use (github only)' },
             projectPath: { type: 'string', description: 'Local project path for git operations' },
             source_repo: { type: 'string', description: 'Source repository' },
             target_repo: { type: 'string', description: 'Target repository' },
@@ -100,14 +97,12 @@ exports.ghSyncTool = {
             dry_run: { type: 'boolean', description: 'Dry run mode' },
             force: { type: 'boolean', description: 'Force sync' }
         },
-        required: ['action', 'owner', 'repo', 'provider', 'projectPath']
+        required: ['action', 'projectPath']
     },
     async handler(input) {
         try {
             const validatedInput = GhSyncInputSchema.parse(input);
-            if (validatedInput.provider !== 'github') {
-                throw new Error('gh-sync é exclusivo para GitHub');
-            }
+            // Fixar provider como github para tools exclusivas do GitHub
             const provider = index_js_1.globalProviderFactory.getProvider('github');
             if (!provider) {
                 throw new Error('Provider GitHub não encontrado');

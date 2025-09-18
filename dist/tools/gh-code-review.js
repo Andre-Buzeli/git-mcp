@@ -4,7 +4,6 @@ exports.codeReviewTool = void 0;
 const zod_1 = require("zod");
 const index_js_1 = require("../providers/index.js");
 const user_detection_js_1 = require("../utils/user-detection.js");
-const validator_js_1 = require("./validator.js");
 /**
  * Tool: code-review
  *
@@ -39,7 +38,6 @@ const CodeReviewInputSchema = zod_1.z.object({
     action: zod_1.z.enum(['analyze', 'review-file', 'review-commit', 'review-pr', 'generate-report', 'apply-suggestions']),
     // Parâmetros comuns
     repo: zod_1.z.string(),
-    provider: validator_js_1.CommonSchemas.provider,
     // Para analyze
     code: zod_1.z.string().optional(),
     language: zod_1.z.string().optional(),
@@ -95,7 +93,7 @@ const CodeReviewResultSchema = zod_1.z.object({
  */
 exports.codeReviewTool = {
     name: 'gh-code-review',
-    description: 'Análise completa de código GitHub com detecção de problemas (EXCLUSIVO GITHUB). PARÂMETROS OBRIGATÓRIOS: action, owner, repo, provider (deve ser github). AÇÕES: analyze (análise), review-file (revisar arquivo), review-commit (revisar commit), review-pr (revisar PR), generate-report (relatório), apply-suggestions (aplicar correções). Boas práticas: revisão automatizada de qualidade, detecção de bugs, sugestões de otimização.',
+    description: 'tool: Análise de código GitHub para qualidade e detecção de problemas\n──────────────\naction analyze: análise geral de código\naction analyze requires: code, language, context, problem, rules, exclude_patterns\n───────────────\naction review-file: revisão de arquivo específico\naction review-file requires: repo, file_path, branch, rules, exclude_patterns\n───────────────\naction review-commit: revisão de commit específico\naction review-commit requires: repo, sha, branch, rules, exclude_patterns\n───────────────\naction review-pr: revisão de Pull Request\naction review-pr requires: repo, pull_number, rules, exclude_patterns\n───────────────\naction generate-report: geração de relatório\naction generate-report requires: repo, report_type, include_suggestions, branch\n───────────────\naction apply-suggestions: aplicar sugestões de correção\naction apply-suggestions requires: repo, suggestions, branch',
     inputSchema: {
         type: 'object',
         properties: {
@@ -107,10 +105,6 @@ exports.codeReviewTool = {
             repo: {
                 type: 'string',
                 description: 'Nome do repositório (OBRIGATÓRIO para ações que acessam repositório)'
-            },
-            provider: {
-                type: 'string',
-                description: 'Provider específico (github, gitea) ou usa padrão'
             },
             code: { type: 'string', description: 'Código para análise direta' },
             language: { type: 'string', description: 'Linguagem de programação' },
@@ -137,28 +131,16 @@ exports.codeReviewTool = {
             rules: { type: 'array', items: { type: 'string' }, description: 'Regras específicas para análise' },
             exclude_patterns: { type: 'array', items: { type: 'string' }, description: 'Padrões para excluir da análise' }
         },
-        required: ['action', 'repo', 'provider']
+        required: ['action', 'repo']
     },
     async handler(input) {
         try {
             const validatedInput = CodeReviewInputSchema.parse(input);
-            // Aplicar auto-detecção de usuário
-            const updatedParams = await (0, user_detection_js_1.applyAutoUserDetection)(validatedInput, validatedInput.provider);
-            // Verificação específica para Gitea
-            console.log('[CODE-REVIEW] Provider recebido:', validatedInput.provider);
-            if (validatedInput.provider === 'gitea') {
-                return {
-                    success: false,
-                    action: validatedInput.action,
-                    message: 'Code review automatizado não está disponível para o Gitea',
-                    error: 'GITEA: Code review automatizado não está disponível para o Gitea. Esta funcionalidade é específica do GitHub.'
-                };
-            }
-            const provider = updatedParams.provider
-                ? index_js_1.globalProviderFactory.getProvider(updatedParams.provider)
-                : index_js_1.globalProviderFactory.getDefaultProvider();
+            // Fixar provider como github para tools exclusivas do GitHub
+            const updatedParams = await (0, user_detection_js_1.applyAutoUserDetection)(validatedInput, 'github');
+            const provider = index_js_1.globalProviderFactory.getProvider('github');
             if (!provider) {
-                throw new Error(`Provider '${updatedParams.provider}' não encontrado`);
+                throw new Error('Provider GitHub não encontrado');
             }
             switch (updatedParams.action) {
                 case 'analyze':
@@ -191,30 +173,16 @@ exports.codeReviewTool = {
      */
     async analyzeCode(params) {
         try {
-            // Verificar se é Gitea - code review automatizado não é suportado
-            if (params.provider === 'gitea' || (!params.provider && index_js_1.globalProviderFactory.getDefaultProvider()?.config?.type === 'gitea')) {
-                return {
-                    success: true,
-                    action: 'analyze',
-                    message: 'Code review automatizado não está disponível para o Gitea',
-                    data: {
-                        note: 'Esta funcionalidade é específica do GitHub',
-                        supported_providers: ['github'],
-                        current_provider: params.provider || 'gitea'
-                    }
-                };
-            }
+            // Esta tool é específica do GitHub
+            const provider = index_js_1.globalProviderFactory.getProvider('github');
             let codeToAnalyze = params.code;
             let fileName = 'code.txt';
             // Se não foi fornecido código direto, buscar do repositório
             if (!codeToAnalyze && params.repo && params.file_path) {
-                const provider = params.provider
-                    ? index_js_1.globalProviderFactory.getProvider(params.provider)
-                    : index_js_1.globalProviderFactory.getDefaultProvider();
                 if (provider) {
                     const currentUser = await provider.getCurrentUser();
                     const owner = currentUser.login;
-                    const file = await provider.getFile(owner, params.repo, params.file_path);
+                    const file = await provider.getFile((await provider.getCurrentUser()).login, params.repo, params.file_path);
                     codeToAnalyze = file.content || '';
                     fileName = params.file_path;
                 }
@@ -245,7 +213,7 @@ exports.codeReviewTool = {
             }
             const currentUser = await provider.getCurrentUser();
             const owner = currentUser.login;
-            const file = await provider.getFile(owner, params.repo, params.path, params.branch);
+            const file = await provider.getFile((await provider.getCurrentUser()).login, params.repo, params.path, params.branch);
             if (!file.content) {
                 throw new Error('Arquivo não possui conteúdo para análise');
             }
@@ -275,7 +243,7 @@ exports.codeReviewTool = {
             }
             const currentUser = await provider.getCurrentUser();
             const owner = currentUser.login;
-            const commit = await provider.getCommit(owner, params.repo, params.sha);
+            const commit = await provider.getCommit((await provider.getCurrentUser()).login, params.repo, params.sha);
             // Análise básica da mensagem do commit
             const messageAnalysis = this.analyzeCommitMessage(commit.message);
             return {
@@ -305,7 +273,7 @@ exports.codeReviewTool = {
             // Buscar informações do PR
             const currentUser = await provider.getCurrentUser();
             const owner = currentUser.login;
-            const pr = await provider.getPullRequest(owner, params.repo, (params.pull_number || 0));
+            const pr = await provider.getPullRequest((await provider.getCurrentUser()).login, params.repo, (params.pull_number || 0));
             const review = {
                 pr_number: (params.pull_number || 0),
                 title: pr.title,
@@ -384,7 +352,7 @@ exports.codeReviewTool = {
                     // Para cada sugestão, buscar o arquivo atual
                     const currentUser = await provider.getCurrentUser();
                     const owner = currentUser.login;
-                    const file = await provider.getFile(owner, params.repo, suggestion.file_path);
+                    const file = await provider.getFile((await provider.getCurrentUser()).login, params.repo, suggestion.file_path);
                     if (file.content) {
                         // Aplicar sugestão (simplificado - apenas marcar como aplicada)
                         applied.push({
