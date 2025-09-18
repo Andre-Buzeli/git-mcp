@@ -199,7 +199,7 @@ class BaseVcsProvider {
     async getRelease(owner, repo, releaseId) {
         throw new Error('getRelease not implemented');
     }
-    async createRelease(tagName, name, body, draft = false, prerelease = false) {
+    async createRelease(owner, repo, releaseData) {
         throw new Error('createRelease not implemented');
     }
     async updateRelease(releaseId, updates) {

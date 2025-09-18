@@ -250,7 +250,7 @@ export interface VcsOperations {
   // Releases
   listReleases(owner: string, repo: string, page?: number, limit?: number): Promise<ReleaseInfo[]>;
   getRelease(owner: string, repo: string, releaseId: number): Promise<ReleaseInfo>;
-  createRelease(tagName: string, name: string, body?: string, draft?: boolean, prerelease?: boolean): Promise<ReleaseInfo>;
+  createRelease(owner: string, repo: string, releaseData: any): Promise<ReleaseInfo>;
   updateRelease(releaseId: number, updates: Partial<ReleaseInfo>): Promise<ReleaseInfo>;
   deleteRelease(releaseId: number): Promise<boolean>;
   

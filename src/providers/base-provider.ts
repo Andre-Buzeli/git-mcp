@@ -317,7 +317,7 @@ export abstract class BaseVcsProvider implements VcsOperations {
     throw new Error('getRelease not implemented');
   }
 
-  async createRelease(tagName: string, name: string, body?: string, draft: boolean = false, prerelease: boolean = false): Promise<any> {
+  async createRelease(owner: string, repo: string, releaseData: any): Promise<any> {
     throw new Error('createRelease not implemented');
   }
 

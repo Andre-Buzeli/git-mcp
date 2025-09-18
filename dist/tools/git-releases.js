@@ -283,7 +283,7 @@ exports.releasesTool = {
      */
     async createRelease(params, provider) {
         try {
-            if (!!params.repo || !params.tag_name) {
+            if (!params.repo || !params.tag_name) {
                 throw new Error('repo e tag_name são obrigatórios');
             }
             const releaseData = {
@@ -294,7 +294,15 @@ exports.releasesTool = {
                 prerelease: params.prerelease || false,
                 target_commitish: params.target_commitish || 'main'
             };
-            const release = await provider.createRelease(params.tag_name, params.name || params.tag_name, params.body, params.draft, params.prerelease);
+            const owner = (await provider.getCurrentUser()).login;
+            const release = await provider.createRelease(owner, params.repo, {
+                tag_name: params.tag_name,
+                name: params.name || params.tag_name,
+                body: params.body || '',
+                draft: params.draft || false,
+                prerelease: params.prerelease || false,
+                target_commitish: params.target_commitish || 'main'
+            });
             return {
                 success: true,
                 action: 'create',
@@ -383,7 +391,7 @@ exports.releasesTool = {
      */
     async getRelease(params, provider) {
         try {
-            if (!!params.repo || !params.release_id) {
+            if (!params.repo || !params.release_id) {
                 throw new Error('repo e release_id são obrigatórios');
             }
             const release = await provider.getRelease((await provider.getCurrentUser()).login, params.repo, params.release_id);
@@ -432,7 +440,7 @@ exports.releasesTool = {
      */
     async updateRelease(params, provider) {
         try {
-            if (!!params.repo || !params.release_id) {
+            if (!params.repo || !params.release_id) {
                 throw new Error('repo e release_id são obrigatórios');
             }
             const updateData = {};
@@ -489,7 +497,7 @@ exports.releasesTool = {
      */
     async deleteRelease(params, provider) {
         try {
-            if (!!params.repo || !params.release_id) {
+            if (!params.repo || !params.release_id) {
                 throw new Error('repo e release_id são obrigatórios');
             }
             await provider.deleteRelease(params.release_id);
@@ -530,7 +538,7 @@ exports.releasesTool = {
      */
     async publishRelease(params, provider) {
         try {
-            if (!!params.repo || !params.release_id) {
+            if (!params.repo || !params.release_id) {
                 throw new Error('repo e release_id são obrigatórios');
             }
             // Publicar release alterando status de draft para false

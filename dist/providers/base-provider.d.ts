@@ -134,7 +134,7 @@ export declare abstract class BaseVcsProvider implements VcsOperations {
     mergePullRequest(owner: string, repo: string, pullNumber: number, mergeMethod?: 'merge' | 'rebase' | 'squash'): Promise<boolean>;
     listReleases(owner: string, repo: string, page?: number, limit?: number): Promise<any[]>;
     getRelease(owner: string, repo: string, releaseId: number): Promise<any>;
-    createRelease(tagName: string, name: string, body?: string, draft?: boolean, prerelease?: boolean): Promise<any>;
+    createRelease(owner: string, repo: string, releaseData: any): Promise<any>;
     updateRelease(releaseId: number, updates: any): Promise<any>;
     deleteRelease(releaseId: number): Promise<boolean>;
     listTags(owner: string, repo: string, page?: number, limit?: number): Promise<any[]>;

@@ -300,7 +300,7 @@ export const releasesTool = {
    */
   async createRelease(params: ReleasesInput, provider: VcsOperations): Promise<ReleasesResult> {
     try {
-      if (!!params.repo || !params.tag_name) {
+      if (!params.repo || !params.tag_name) {
         throw new Error('repo e tag_name são obrigatórios');
       }
 
@@ -313,12 +313,18 @@ export const releasesTool = {
         target_commitish: params.target_commitish || 'main'
       };
 
+      const owner = (await provider.getCurrentUser()).login;
       const release = await provider.createRelease(
-        params.tag_name, 
-        params.name || params.tag_name, 
-        params.body, 
-        params.draft, 
-        params.prerelease
+        owner,
+        params.repo,
+        {
+          tag_name: params.tag_name,
+          name: params.name || params.tag_name,
+          body: params.body || '',
+          draft: params.draft || false,
+          prerelease: params.prerelease || false,
+          target_commitish: params.target_commitish || 'main'
+        }
       );
 
       return {
@@ -412,7 +418,7 @@ export const releasesTool = {
    */
   async getRelease(params: ReleasesInput, provider: VcsOperations): Promise<ReleasesResult> {
     try {
-      if (!!params.repo || !params.release_id) {
+      if (!params.repo || !params.release_id) {
         throw new Error('repo e release_id são obrigatórios');
       }
 
@@ -463,7 +469,7 @@ export const releasesTool = {
    */
   async updateRelease(params: ReleasesInput, provider: VcsOperations): Promise<ReleasesResult> {
     try {
-      if (!!params.repo || !params.release_id) {
+      if (!params.repo || !params.release_id) {
         throw new Error('repo e release_id são obrigatórios');
       }
 
@@ -518,7 +524,7 @@ export const releasesTool = {
    */
   async deleteRelease(params: ReleasesInput, provider: VcsOperations): Promise<ReleasesResult> {
     try {
-      if (!!params.repo || !params.release_id) {
+      if (!params.repo || !params.release_id) {
         throw new Error('repo e release_id são obrigatórios');
       }
 
@@ -561,7 +567,7 @@ export const releasesTool = {
    */
   async publishRelease(params: ReleasesInput, provider: VcsOperations): Promise<ReleasesResult> {
     try {
-      if (!!params.repo || !params.release_id) {
+      if (!params.repo || !params.release_id) {
         throw new Error('repo e release_id são obrigatórios');
       }
 
