@@ -56,9 +56,9 @@ declare const GitSyncInputSchema: z.ZodObject<{
         repo: string;
     };
     strategy?: "timestamp" | "source-wins" | "skip-conflicts" | undefined;
-    dry_run?: boolean | undefined;
     direction?: "one-way" | "two-way" | undefined;
-    include?: ("issues" | "labels" | "git" | "pulls" | "releases" | "milestones")[] | undefined;
+    include?: ("issues" | "labels" | "git" | "milestones" | "releases" | "pulls")[] | undefined;
+    dry_run?: boolean | undefined;
 }, {
     action: "status" | "configure" | "one-shot";
     target: {
@@ -70,9 +70,9 @@ declare const GitSyncInputSchema: z.ZodObject<{
         repo: string;
     };
     strategy?: "timestamp" | "source-wins" | "skip-conflicts" | undefined;
-    dry_run?: boolean | undefined;
     direction?: "one-way" | "two-way" | undefined;
-    include?: ("issues" | "labels" | "git" | "pulls" | "releases" | "milestones")[] | undefined;
+    include?: ("issues" | "labels" | "git" | "milestones" | "releases" | "pulls")[] | undefined;
+    dry_run?: boolean | undefined;
 }>;
 export type GitSyncInput = z.infer<typeof GitSyncInputSchema>;
 declare const GitSyncResultSchema: z.ZodObject<{

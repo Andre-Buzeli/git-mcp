@@ -41,11 +41,11 @@ declare const GitRevertInputSchema: z.ZodObject<{
     action: "revert-commit" | "revert-merge" | "revert-range";
     projectPath: string;
     message?: string | undefined;
-    commit_range?: string | undefined;
     commit_hash?: string | undefined;
     no_commit?: boolean | undefined;
     merge_commit_hash?: string | undefined;
     mainline?: number | undefined;
+    commit_range?: string | undefined;
     strategy?: "ours" | "theirs" | undefined;
 }, {
     provider: "gitea" | "github";
@@ -53,11 +53,11 @@ declare const GitRevertInputSchema: z.ZodObject<{
     action: "revert-commit" | "revert-merge" | "revert-range";
     projectPath: string;
     message?: string | undefined;
-    commit_range?: string | undefined;
     commit_hash?: string | undefined;
     no_commit?: boolean | undefined;
     merge_commit_hash?: string | undefined;
     mainline?: number | undefined;
+    commit_range?: string | undefined;
     strategy?: "ours" | "theirs" | undefined;
 }>;
 export type GitRevertInput = z.infer<typeof GitRevertInputSchema>;
