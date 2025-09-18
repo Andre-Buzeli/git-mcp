@@ -1,5 +1,5 @@
 import { spawn } from 'child_process';
-import { GitOperations } from './git-operations.js';
+import { GitOperations } from './git-operations.ts';
 
 /**
  * Controller para execução de comandos no terminal

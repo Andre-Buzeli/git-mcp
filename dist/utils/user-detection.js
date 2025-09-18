@@ -7,7 +7,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getCurrentUser = getCurrentUser;
 exports.getCurrentUsername = getCurrentUsername;
 exports.applyAutoUserDetection = applyAutoUserDetection;
-const index_js_1 = require("../providers/index.js");
+const index_ts_1 = require("../providers/index.ts");
 /**
  * Obtém o usuário atual do provider ativo
  * @param provider Nome do provider (opcional)
@@ -16,8 +16,8 @@ const index_js_1 = require("../providers/index.js");
 async function getCurrentUser(provider) {
     try {
         const providerInstance = provider
-            ? index_js_1.globalProviderFactory.getProvider(provider)
-            : index_js_1.globalProviderFactory.getDefaultProvider();
+            ? index_ts_1.globalProviderFactory.getProvider(provider)
+            : index_ts_1.globalProviderFactory.getDefaultProvider();
         if (!providerInstance) {
             throw new Error(`Provider '${provider}' not found`);
         }

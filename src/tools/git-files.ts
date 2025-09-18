@@ -1,6 +1,6 @@
 import { z } from 'zod';
-import { globalProviderFactory, VcsOperations } from '../providers/index.js';
-import { applyAutoUserDetection } from '../utils/user-detection.js';
+import { globalProviderFactory, VcsOperations } from '../providers/index.ts';
+import { applyAutoUserDetection } from '../utils/user-detection.ts';
 
 /**
  * Tool: files
@@ -182,7 +182,7 @@ export const filesTool = {
       page: { type: 'number', description: 'Page number', minimum: 1 },
       limit: { type: 'number', description: 'Items per page', minimum: 1, maximum: 100 }
     },
-    required: ['action', 'repo', 'provider', 'projectPath']
+    required: ['action', 'repo', 'provider']
   },
 
   /**
@@ -663,4 +663,3 @@ export const filesTool = {
     }
   }
 };
-

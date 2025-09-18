@@ -1,6 +1,6 @@
 import { z } from 'zod';
-import { globalProviderFactory, VcsOperations } from '../providers/index.js';
-import { applyAutoUserDetection } from '../utils/user-detection.js';
+import { globalProviderFactory, VcsOperations } from '../providers/index.ts';
+import { applyAutoUserDetection } from '../utils/user-detection.ts';
 
 /**
  * Tool: webhooks
@@ -51,7 +51,6 @@ const WebhooksInputSchema = z.object({
   
   // Para multi-provider
   provider: z.enum(['gitea', 'github']).describe('Provider to use (gitea or github)'), // Provider específico: gitea, github ou both
-  projectPath: z.string().describe('Local project path for git operations'),
   
   // Para create
   url: z.string().optional(),
@@ -187,7 +186,7 @@ export const webhooksTool = {
       new_events: { type: 'array', items: { type: 'string' }, description: 'New webhook events' },
       new_active: { type: 'boolean', description: 'New webhook active status' }
     },
-    required: ['action', 'repo', 'provider', 'projectPath']
+    required: ['action', 'repo', 'provider']
   },
 
   /**
@@ -575,5 +574,4 @@ export const webhooksTool = {
     }
   }
 };
-
 

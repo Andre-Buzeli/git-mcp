@@ -1,6 +1,6 @@
 import { z } from 'zod';
-import { globalProviderFactory, VcsOperations } from '../providers/index.js';
-import { applyAutoUserDetection } from '../utils/user-detection.js';
+import { globalProviderFactory, VcsOperations } from '../providers/index.ts';
+import { applyAutoUserDetection } from '../utils/user-detection.ts';
 
 /**
  * Tool: git-sync
@@ -343,6 +343,5 @@ export const gitSyncTool = {
     }
   }
 };
-
 
 

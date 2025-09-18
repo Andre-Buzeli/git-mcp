@@ -1,0 +1,402 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.analyticsTool = void 0;
+const zod_1 = require("zod");
+const index_js_1 = require("../providers/index.js");
+const user_detection_js_1 = require("../utils/user-detection.js");
+const validator_js_1 = require("./validator.js");
+/**
+ * Tool: analytics
+ *
+ * DESCRIÇÃO:
+ * Gerenciamento completo de analytics e insights com múltiplas ações
+ *
+ * FUNCIONALIDADES:
+ * - Estatísticas de tráfego
+ * - Análise de contribuidores
+ * - Atividade do repositório
+ * - Métricas de performance
+ * - Geração de relatórios customizados
+ * - Análise de tendências
+ *
+ * USO:
+ * - Para monitorar performance do repositório
+ * - Para análise de contribuições
+ * - Para relatórios de atividade
+ * - Para insights de desenvolvimento
+ *
+ * RECOMENDAÇÕES:
+ * - Monitore métricas regularmente
+ * - Use insights para melhorar workflow
+ * - Gere relatórios periódicos
+ * - Analise tendências de contribuição
+ */
+/**
+ * Schema de validação para entrada da tool analytics
+ */
+const AnalyticsInputSchema = zod_1.z.object({
+    action: zod_1.z.enum(['traffic', 'contributors', 'activity', 'performance', 'reports', 'trends', 'insights']),
+    // Parâmetros comuns
+    repo: validator_js_1.CommonSchemas.repo,
+    // Parâmetros para listagem
+    page: validator_js_1.CommonSchemas.page,
+    limit: validator_js_1.CommonSchemas.limit,
+    // Parâmetros de período
+    period: zod_1.z.enum(['day', 'week', 'month', 'quarter', 'year']).optional(),
+    start_date: zod_1.z.string().optional(),
+    end_date: zod_1.z.string().optional(),
+    // Parâmetros para tráfego
+    metric_type: zod_1.z.enum(['views', 'clones', 'visitors', 'unique_visitors']).optional(),
+    // Parâmetros para contribuidores
+    contributor_type: zod_1.z.enum(['all', 'internal', 'external', 'bots']).optional(),
+    sort_by: zod_1.z.enum(['commits', 'additions', 'deletions', 'contributions']).optional(),
+    // Parâmetros para atividade
+    activity_type: zod_1.z.enum(['commits', 'issues', 'pulls', 'releases', 'all']).optional(),
+    branch: validator_js_1.CommonSchemas.branch,
+    // Parâmetros para performance
+    performance_metric: zod_1.z.enum(['build_time', 'test_coverage', 'code_quality', 'deployment_frequency']).optional(),
+    // Parâmetros para relatórios
+    report_type: zod_1.z.enum(['summary', 'detailed', 'trends', 'comparison']).optional(),
+    report_format: zod_1.z.enum(['json', 'csv', 'pdf', 'html']).optional(),
+    include_charts: validator_js_1.CommonSchemas.boolean,
+    // Parâmetros para trends
+    trend_metric: zod_1.z.enum(['commits', 'contributors', 'issues', 'stars', 'forks']).optional(),
+    trend_period: zod_1.z.enum(['daily', 'weekly', 'monthly']).optional(),
+    // Filtros
+    author: validator_js_1.CommonSchemas.shortString,
+    path: validator_js_1.CommonSchemas.mediumString,
+    file_type: validator_js_1.CommonSchemas.shortString
+});
+/**
+ * Schema de validação para resultado da tool analytics
+ */
+const AnalyticsResultSchema = zod_1.z.object({
+    success: zod_1.z.boolean(),
+    action: zod_1.z.string(),
+    message: zod_1.z.string(),
+    data: zod_1.z.any().optional(),
+    error: zod_1.z.string().optional()
+});
+/**
+ * Implementação da tool analytics
+ */
+exports.analyticsTool = {
+    name: 'gh-analytics',
+    description: 'tool: Gera insights e métricas de repositório GitHub para análise\n──────────────\naction traffic: estatísticas de tráfego do repositório\naction traffic requires: repo, metric_type, period, start_date, end_date\n───────────────\naction contributors: análise de contribuidores\naction contributors requires: repo, contributor_type, sort_by, period, start_date, end_date, page, limit\n───────────────\naction activity: atividade do repositório\naction activity requires: repo, activity_type, branch, author, period, start_date, end_date\n───────────────\naction performance: métricas de performance\naction performance requires: repo, performance_metric, period, start_date, end_date\n───────────────\naction reports: relatórios customizados\naction reports requires: repo, report_type, report_format, include_charts, period, start_date, end_date\n───────────────\naction trends: análise de tendências\naction trends requires: repo, trend_metric, trend_period, period, start_date, end_date\n───────────────\naction insights: insights gerais do repositório\naction insights requires: repo, period, start_date, end_date, include_charts',
+    inputSchema: {
+        type: 'object',
+        properties: {
+            action: {
+                type: 'string',
+                enum: ['traffic', 'contributors', 'activity', 'performance', 'reports', 'trends', 'insights'],
+                description: 'Ação a executar: traffic (tráfego), contributors (contribuidores), activity (atividade), performance (performance), reports (relatórios), trends (tendências), insights (insights gerais)'
+            },
+            repo: {
+                type: 'string',
+                description: 'Nome do repositório (OBRIGATÓRIO para todas as ações)'
+            },
+            period: { type: 'string', enum: ['day', 'week', 'month', 'quarter', 'year'], description: 'Período de análise' },
+            start_date: { type: 'string', description: 'Data inicial para análise' },
+            end_date: { type: 'string', description: 'Data final para análise' },
+            metric_type: { type: 'string', enum: ['views', 'clones', 'visitors', 'unique_visitors'], description: 'Tipo de métrica de tráfego' },
+            contributor_type: { type: 'string', enum: ['all', 'internal', 'external', 'bots'], description: 'Tipo de contribuidores' },
+            sort_by: { type: 'string', enum: ['commits', 'additions', 'deletions', 'contributions'], description: 'Ordenação de contribuidores' },
+            activity_type: { type: 'string', enum: ['commits', 'issues', 'pulls', 'releases', 'all'], description: 'Tipo de atividade' },
+            branch: { type: 'string', description: 'Branch específico para análise' },
+            performance_metric: { type: 'string', enum: ['build_time', 'test_coverage', 'code_quality', 'deployment_frequency'], description: 'Métrica de performance' },
+            report_type: { type: 'string', enum: ['summary', 'detailed', 'trends', 'comparison'], description: 'Tipo de relatório' },
+            report_format: { type: 'string', enum: ['json', 'csv', 'pdf', 'html'], description: 'Formato do relatório' },
+            include_charts: { type: 'boolean', description: 'Incluir gráficos no relatório' },
+            trend_metric: { type: 'string', enum: ['commits', 'contributors', 'issues', 'stars', 'forks'], description: 'Métrica de tendências' },
+            trend_period: { type: 'string', enum: ['daily', 'weekly', 'monthly'], description: 'Período de tendências' },
+            author: { type: 'string', description: 'Filtrar por autor' },
+            path: { type: 'string', description: 'Filtrar por caminho' },
+            file_type: { type: 'string', description: 'Filtrar por tipo de arquivo' },
+            page: { type: 'number', description: 'Página', minimum: 1 },
+            limit: { type: 'number', description: 'Itens por página', minimum: 1, maximum: 100 }
+        },
+        required: ['action', 'repo']
+    },
+    async handler(input) {
+        try {
+            const validatedInput = AnalyticsInputSchema.parse(input);
+            // Fixar provider como github para tools exclusivas do GitHub
+            const updatedParams = await (0, user_detection_js_1.applyAutoUserDetection)(validatedInput, 'github');
+            const provider = index_js_1.globalProviderFactory.getProvider('github');
+            if (!provider) {
+                throw new Error('Provider GitHub não encontrado');
+            }
+            switch (updatedParams.action) {
+                case 'traffic':
+                    return await this.getTrafficStats(updatedParams, provider);
+                case 'contributors':
+                    return await this.analyzeContributors(updatedParams, provider);
+                case 'activity':
+                    return await this.getActivityStats(updatedParams, provider);
+                case 'performance':
+                    return await this.getPerformanceMetrics(updatedParams, provider);
+                case 'reports':
+                    return await this.generateReports(updatedParams, provider);
+                case 'trends':
+                    return await this.analyzeTrends(updatedParams, provider);
+                case 'insights':
+                    return await this.getRepositoryInsights(updatedParams, provider);
+                default:
+                    throw new Error(`Ação não suportada: ${updatedParams.action}`);
+            }
+        }
+        catch (error) {
+            return {
+                success: false,
+                action: input.action || 'unknown',
+                message: 'Erro na operação de analytics',
+                error: error instanceof Error ? error.message : String(error)
+            };
+        }
+    },
+    /**
+     * Obtém estatísticas de tráfego
+     */
+    async getTrafficStats(params, provider) {
+        try {
+            const currentUser = await provider.getCurrentUser();
+            const owner = currentUser.login;
+            if (!provider.getTrafficStats) {
+                return {
+                    success: false,
+                    action: 'get-traffic-stats',
+                    message: 'Funcionalidade não suportada por este provider',
+                    error: 'Provider não implementa getTrafficStats'
+                };
+            }
+            const result = await provider.getTrafficStats({
+                owner,
+                repo: params.repo,
+                metric_type: params.metric_type || 'views',
+                period: params.period || 'week',
+                start_date: params.start_date,
+                end_date: params.end_date
+            });
+            return {
+                success: true,
+                action: 'traffic',
+                message: `Estatísticas de tráfego obtidas com sucesso`,
+                data: result
+            };
+        }
+        catch (error) {
+            throw new Error(`Falha ao obter estatísticas de tráfego: ${error}`);
+        }
+    },
+    /**
+     * Analisa contribuidores
+     */
+    async analyzeContributors(params, provider) {
+        try {
+            if (!provider.analyzeContributors) {
+                return {
+                    success: false,
+                    action: 'analyze-contributors',
+                    message: 'Funcionalidade não suportada por este provider',
+                    error: 'Provider não implementa analyzeContributors'
+                };
+            }
+            const owner = (await provider.getCurrentUser()).login;
+            const result = await provider.analyzeContributors({
+                owner,
+                repo: params.repo,
+                contributor_type: params.contributor_type || 'all',
+                sort_by: params.sort_by || 'commits',
+                period: params.period,
+                start_date: params.start_date,
+                end_date: params.end_date,
+                page: params.page,
+                limit: params.limit
+            });
+            return {
+                success: true,
+                action: 'contributors',
+                message: `Análise de contribuidores executada com sucesso`,
+                data: result
+            };
+        }
+        catch (error) {
+            throw new Error(`Falha ao analisar contribuidores: ${error}`);
+        }
+    },
+    /**
+     * Obtém estatísticas de atividade
+     */
+    async getActivityStats(params, provider) {
+        try {
+            const owner = (await provider.getCurrentUser()).login;
+            if (!provider.getActivityStats) {
+                return {
+                    success: false,
+                    action: 'get-activity-stats',
+                    message: 'Funcionalidade não suportada por este provider',
+                    error: 'Provider não implementa getActivityStats'
+                };
+            }
+            const result = await provider.getActivityStats({
+                owner,
+                repo: params.repo,
+                activity_type: params.activity_type || 'all',
+                branch: params.branch,
+                author: params.author,
+                period: params.period || 'month',
+                start_date: params.start_date,
+                end_date: params.end_date
+            });
+            return {
+                success: true,
+                action: 'activity',
+                message: `Estatísticas de atividade obtidas com sucesso`,
+                data: result
+            };
+        }
+        catch (error) {
+            throw new Error(`Falha ao obter estatísticas de atividade: ${error}`);
+        }
+    },
+    /**
+     * Obtém métricas de performance
+     */
+    async getPerformanceMetrics(params, provider) {
+        try {
+            const owner = (await provider.getCurrentUser()).login;
+            if (!provider.getPerformanceMetrics) {
+                return {
+                    success: false,
+                    action: 'get-performance-metrics',
+                    message: 'Funcionalidade não suportada por este provider',
+                    error: 'Provider não implementa getPerformanceMetrics'
+                };
+            }
+            const result = await provider.getPerformanceMetrics({
+                owner,
+                repo: params.repo,
+                performance_metric: params.performance_metric,
+                period: params.period || 'month',
+                start_date: params.start_date,
+                end_date: params.end_date
+            });
+            return {
+                success: true,
+                action: 'performance',
+                message: `Métricas de performance obtidas com sucesso`,
+                data: result
+            };
+        }
+        catch (error) {
+            throw new Error(`Falha ao obter métricas de performance: ${error}`);
+        }
+    },
+    /**
+     * Gera relatórios customizados
+     */
+    async generateReports(params, provider) {
+        try {
+            if (!provider.generateReports) {
+                return {
+                    success: false,
+                    action: 'generate-reports',
+                    message: 'Funcionalidade não suportada por este provider',
+                    error: 'Provider não implementa generateReports'
+                };
+            }
+            const owner = (await provider.getCurrentUser()).login;
+            const result = await provider.generateReports({
+                owner,
+                repo: params.repo,
+                report_type: params.report_type || 'summary',
+                report_format: params.report_format || 'json',
+                include_charts: params.include_charts || false,
+                period: params.period || 'month',
+                start_date: params.start_date,
+                end_date: params.end_date
+            });
+            return {
+                success: true,
+                action: 'reports',
+                message: `Relatório gerado com sucesso`,
+                data: result
+            };
+        }
+        catch (error) {
+            throw new Error(`Falha ao gerar relatório: ${error}`);
+        }
+    },
+    /**
+     * Analisa tendências
+     */
+    async analyzeTrends(params, provider) {
+        try {
+            if (!provider.analyzeTrends) {
+                return {
+                    success: false,
+                    action: 'analyze-trends',
+                    message: 'Funcionalidade não suportada por este provider',
+                    error: 'Provider não implementa analyzeTrends'
+                };
+            }
+            const owner = (await provider.getCurrentUser()).login;
+            const result = await provider.analyzeTrends({
+                owner,
+                repo: params.repo,
+                trend_metric: params.trend_metric || 'commits',
+                trend_period: params.trend_period || 'weekly',
+                period: params.period || 'quarter',
+                start_date: params.start_date,
+                end_date: params.end_date
+            });
+            return {
+                success: true,
+                action: 'trends',
+                message: `Análise de tendências executada com sucesso`,
+                data: result
+            };
+        }
+        catch (error) {
+            throw new Error(`Falha ao analisar tendências: ${error}`);
+        }
+    },
+    /**
+     * Obtém insights gerais do repositório
+     */
+    async getRepositoryInsights(params, provider) {
+        try {
+            const owner = (await provider.getCurrentUser()).login;
+            if (!provider.getRepositoryInsights) {
+                return {
+                    success: true,
+                    action: 'insights',
+                    message: 'Funcionalidade de analytics/insights não suportada por este provider',
+                    data: {
+                        period: params.period || 'month',
+                        metrics: {},
+                        note: 'Insights não disponíveis neste provider'
+                    }
+                };
+            }
+            const result = await provider.getRepositoryInsights({
+                owner,
+                repo: params.repo,
+                period: params.period || 'month',
+                start_date: params.start_date,
+                end_date: params.end_date,
+                include_charts: params.include_charts || true
+            });
+            return {
+                success: true,
+                action: 'insights',
+                message: `Insights do repositório obtidos com sucesso`,
+                data: result
+            };
+        }
+        catch (error) {
+            throw new Error(`Falha ao obter insights do repositório: ${error}`);
+        }
+    }
+};
+//# sourceMappingURL=gh-analytics.js.map

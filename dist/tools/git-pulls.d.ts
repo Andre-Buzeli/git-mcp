@@ -45,7 +45,6 @@ declare const PullsInputSchema: z.ZodObject<{
     action: z.ZodEnum<["create", "list", "get", "update", "merge", "close", "review", "search"]>;
     repo: z.ZodString;
     provider: z.ZodEnum<["gitea", "github"]>;
-    projectPath: z.ZodString;
     title: z.ZodOptional<z.ZodString>;
     body: z.ZodOptional<z.ZodString>;
     head: z.ZodOptional<z.ZodString>;
@@ -79,7 +78,6 @@ declare const PullsInputSchema: z.ZodObject<{
     provider: "gitea" | "github";
     repo: string;
     action: "merge" | "get" | "search" | "list" | "create" | "close" | "update" | "review";
-    projectPath: string;
     title?: string | undefined;
     body?: string | undefined;
     state?: "open" | "closed" | "merged" | "all" | undefined;
@@ -88,10 +86,10 @@ declare const PullsInputSchema: z.ZodObject<{
     head?: string | undefined;
     base?: string | undefined;
     draft?: boolean | undefined;
+    author?: string | undefined;
     page?: number | undefined;
     limit?: number | undefined;
     query?: string | undefined;
-    author?: string | undefined;
     merge_method?: "merge" | "rebase" | "squash" | undefined;
     milestone?: number | undefined;
     new_title?: string | undefined;
@@ -113,7 +111,6 @@ declare const PullsInputSchema: z.ZodObject<{
     provider: "gitea" | "github";
     repo: string;
     action: "merge" | "get" | "search" | "list" | "create" | "close" | "update" | "review";
-    projectPath: string;
     title?: string | undefined;
     body?: string | undefined;
     state?: "open" | "closed" | "merged" | "all" | undefined;
@@ -122,10 +119,10 @@ declare const PullsInputSchema: z.ZodObject<{
     head?: string | undefined;
     base?: string | undefined;
     draft?: boolean | undefined;
+    author?: string | undefined;
     page?: number | undefined;
     limit?: number | undefined;
     query?: string | undefined;
-    author?: string | undefined;
     merge_method?: "merge" | "rebase" | "squash" | undefined;
     milestone?: number | undefined;
     new_title?: string | undefined;

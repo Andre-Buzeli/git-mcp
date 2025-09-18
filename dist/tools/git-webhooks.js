@@ -2,8 +2,8 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.webhooksTool = void 0;
 const zod_1 = require("zod");
-const index_js_1 = require("../providers/index.js");
-const user_detection_js_1 = require("../utils/user-detection.js");
+const index_ts_1 = require("../providers/index.ts");
+const user_detection_ts_1 = require("../utils/user-detection.ts");
 /**
  * Tool: webhooks
  *
@@ -50,7 +50,6 @@ const WebhooksInputSchema = zod_1.z.object({
     repo: zod_1.z.string(),
     // Para multi-provider
     provider: zod_1.z.enum(['gitea', 'github']).describe('Provider to use (gitea or github)'), // Provider específico: gitea, github ou both
-    projectPath: zod_1.z.string().describe('Local project path for git operations'),
     // Para create
     url: zod_1.z.string().optional(),
     content_type: zod_1.z.enum(['json', 'form']).optional(),
@@ -176,7 +175,7 @@ exports.webhooksTool = {
             new_events: { type: 'array', items: { type: 'string' }, description: 'New webhook events' },
             new_active: { type: 'boolean', description: 'New webhook active status' }
         },
-        required: ['action', 'repo', 'provider', 'projectPath']
+        required: ['action', 'repo', 'provider']
     },
     /**
      * Handler principal da tool webhooks
@@ -210,11 +209,11 @@ exports.webhooksTool = {
         try {
             const validatedInput = WebhooksInputSchema.parse(input);
             // Apply automatic user/owner detection from configured tokens
-            const processedInput = await (0, user_detection_js_1.applyAutoUserDetection)(validatedInput, validatedInput.provider || 'default');
+            const processedInput = await (0, user_detection_ts_1.applyAutoUserDetection)(validatedInput, validatedInput.provider || 'default');
             // Seleciona o provider baseado na entrada ou usa o padrão
             const provider = processedInput.provider
-                ? index_js_1.globalProviderFactory.getProvider(processedInput.provider)
-                : index_js_1.globalProviderFactory.getDefaultProvider();
+                ? index_ts_1.globalProviderFactory.getProvider(processedInput.provider)
+                : index_ts_1.globalProviderFactory.getDefaultProvider();
             if (!provider) {
                 throw new Error('Provider não encontrado ou não configurado');
             }

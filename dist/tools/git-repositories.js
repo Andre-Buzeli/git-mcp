@@ -120,7 +120,7 @@ const GitRepositoriesInputSchema = zod_1.z.object({
     // Parâmetros comuns
     repo: zod_1.z.string().optional(),
     provider: zod_1.z.enum(['gitea', 'github']).describe('Provider to use (gitea or github)'),
-    projectPath: zod_1.z.string().describe('Local project path for git operations'),
+    projectPath: zod_1.z.string().describe('Local project path for git operations').optional(),
     name: zod_1.z.string().optional(),
     description: zod_1.z.string().optional(),
     private: zod_1.z.boolean().optional(),
@@ -258,7 +258,7 @@ exports.gitRepositoriesTool = {
             organization: { type: 'string', description: 'Organization for fork' },
             query: { type: 'string', description: 'Search query' }
         },
-        required: ['action', 'provider', 'projectPath']
+        required: ['action', 'provider']
     },
     /**
      * Handler principal da tool git-repositories

@@ -1,7 +1,7 @@
 import { z } from 'zod';
-import { globalProviderFactory, VcsOperations } from '../providers/index.js';
-import { applyAutoUserDetection } from '../utils/user-detection.js';
-import { runTerminalCmd } from '../utils/terminal-controller.js';
+import { globalProviderFactory, VcsOperations } from '../providers/index.ts';
+import { applyAutoUserDetection } from '../utils/user-detection.ts';
+import { runTerminalCmd } from '../utils/terminal-controller.ts';
 
 /**
  * Tool: git-repositories
@@ -120,7 +120,7 @@ const GitRepositoriesInputSchema = z.object({
   // Parâmetros comuns
   repo: z.string().optional(),
   provider: z.enum(['gitea', 'github']).describe('Provider to use (gitea or github)'),
-  projectPath: z.string().describe('Local project path for git operations'),
+  projectPath: z.string().describe('Local project path for git operations').optional(),
   name: z.string().optional(),
   description: z.string().optional(),
   private: z.boolean().optional(),
@@ -268,7 +268,7 @@ export const gitRepositoriesTool = {
       organization: { type: 'string', description: 'Organization for fork' },
       query: { type: 'string', description: 'Search query' }
     },
-    required: ['action', 'provider', 'projectPath']
+    required: ['action', 'provider']
   },
 
   /**
@@ -683,4 +683,3 @@ export const gitRepositoriesTool = {
     }
   }
 };
-

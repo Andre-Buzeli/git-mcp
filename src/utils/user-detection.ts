@@ -3,8 +3,8 @@
  * Isolado para evitar dependências circulares
  */
 
-import { globalProviderFactory } from '../providers/index.js';
-import { UserInfo } from '../providers/types.js';
+import { globalProviderFactory } from '../providers/index.ts';
+import { UserInfo } from '../providers/types.ts';
 
 /**
  * Obtém o usuário atual do provider ativo

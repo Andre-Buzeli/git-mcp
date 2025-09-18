@@ -20,22 +20,22 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ErrorHandler = exports.initializeFactoryFromEnv = exports.createProviderFromEnv = exports.globalProviderFactory = exports.ProviderFactory = exports.GitHubProvider = exports.GiteaProvider = exports.BaseVcsProvider = void 0;
 // Interfaces e tipos
-__exportStar(require("./types.js"), exports);
+__exportStar(require("./types.ts"), exports);
 // Classe base
-var base_provider_js_1 = require("./base-provider.js");
-Object.defineProperty(exports, "BaseVcsProvider", { enumerable: true, get: function () { return base_provider_js_1.BaseVcsProvider; } });
+var base_provider_ts_1 = require("./base-provider.ts");
+Object.defineProperty(exports, "BaseVcsProvider", { enumerable: true, get: function () { return base_provider_ts_1.BaseVcsProvider; } });
 // Providers específicos
-var gitea_provider_js_1 = require("./gitea-provider.js");
-Object.defineProperty(exports, "GiteaProvider", { enumerable: true, get: function () { return gitea_provider_js_1.GiteaProvider; } });
-var github_provider_js_1 = require("./github-provider.js");
-Object.defineProperty(exports, "GitHubProvider", { enumerable: true, get: function () { return github_provider_js_1.GitHubProvider; } });
+var gitea_provider_ts_1 = require("./gitea-provider.ts");
+Object.defineProperty(exports, "GiteaProvider", { enumerable: true, get: function () { return gitea_provider_ts_1.GiteaProvider; } });
+var github_provider_ts_1 = require("./github-provider.ts");
+Object.defineProperty(exports, "GitHubProvider", { enumerable: true, get: function () { return github_provider_ts_1.GitHubProvider; } });
 // Factory e helpers
-var provider_factory_js_1 = require("./provider-factory.js");
-Object.defineProperty(exports, "ProviderFactory", { enumerable: true, get: function () { return provider_factory_js_1.ProviderFactory; } });
-Object.defineProperty(exports, "globalProviderFactory", { enumerable: true, get: function () { return provider_factory_js_1.globalProviderFactory; } });
-Object.defineProperty(exports, "createProviderFromEnv", { enumerable: true, get: function () { return provider_factory_js_1.createProviderFromEnv; } });
-Object.defineProperty(exports, "initializeFactoryFromEnv", { enumerable: true, get: function () { return provider_factory_js_1.initializeFactoryFromEnv; } });
+var provider_factory_ts_1 = require("./provider-factory.ts");
+Object.defineProperty(exports, "ProviderFactory", { enumerable: true, get: function () { return provider_factory_ts_1.ProviderFactory; } });
+Object.defineProperty(exports, "globalProviderFactory", { enumerable: true, get: function () { return provider_factory_ts_1.globalProviderFactory; } });
+Object.defineProperty(exports, "createProviderFromEnv", { enumerable: true, get: function () { return provider_factory_ts_1.createProviderFromEnv; } });
+Object.defineProperty(exports, "initializeFactoryFromEnv", { enumerable: true, get: function () { return provider_factory_ts_1.initializeFactoryFromEnv; } });
 // Error handling
-var error_handler_js_1 = require("./error-handler.js");
-Object.defineProperty(exports, "ErrorHandler", { enumerable: true, get: function () { return error_handler_js_1.ErrorHandler; } });
+var error_handler_ts_1 = require("./error-handler.ts");
+Object.defineProperty(exports, "ErrorHandler", { enumerable: true, get: function () { return error_handler_ts_1.ErrorHandler; } });
 //# sourceMappingURL=index.js.map

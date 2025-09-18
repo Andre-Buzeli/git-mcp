@@ -43,7 +43,6 @@ declare const TagsInputSchema: z.ZodObject<{
     action: z.ZodEnum<["create", "list", "get", "delete", "search"]>;
     repo: z.ZodString;
     provider: z.ZodEnum<["gitea", "github"]>;
-    projectPath: z.ZodString;
     tag_name: z.ZodOptional<z.ZodString>;
     message: z.ZodOptional<z.ZodString>;
     target: z.ZodOptional<z.ZodString>;
@@ -59,7 +58,6 @@ declare const TagsInputSchema: z.ZodObject<{
     provider: "gitea" | "github";
     repo: string;
     action: "delete" | "get" | "search" | "list" | "create";
-    projectPath: string;
     message?: string | undefined;
     type?: "lightweight" | "annotated" | undefined;
     tag_name?: string | undefined;
@@ -75,7 +73,6 @@ declare const TagsInputSchema: z.ZodObject<{
     provider: "gitea" | "github";
     repo: string;
     action: "delete" | "get" | "search" | "list" | "create";
-    projectPath: string;
     message?: string | undefined;
     type?: "lightweight" | "annotated" | undefined;
     tag_name?: string | undefined;

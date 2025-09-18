@@ -192,7 +192,6 @@ function createProviderFromEnv(providerName, providerType) {
         name: providerName,
         type: providerType,
         apiUrl,
-        baseUrl: providerType === 'github' ? 'https://github.com' : apiUrl.replace('/api/v1', ''),
         token,
         username
     };
@@ -231,7 +230,6 @@ function initializeFactoryFromEnv() {
                 name: 'gitea',
                 type: 'gitea',
                 apiUrl: process.env.GITEA_URL,
-                baseUrl: process.env.GITEA_URL?.replace('/api/v1', '') || process.env.GITEA_URL,
                 token: process.env.GITEA_TOKEN,
                 username: process.env.GITEA_USERNAME
             });
@@ -239,7 +237,6 @@ function initializeFactoryFromEnv() {
                 name: 'github',
                 type: 'github',
                 apiUrl: process.env.GITHUB_URL || 'https://api.github.com',
-                baseUrl: 'https://github.com',
                 token: process.env.GITHUB_TOKEN,
                 username: process.env.GITHUB_USERNAME
             });
@@ -252,7 +249,6 @@ function initializeFactoryFromEnv() {
                     name: 'github',
                     type: 'github',
                     apiUrl: process.env.GITHUB_URL || 'https://api.github.com',
-                    baseUrl: 'https://github.com',
                     token: process.env.GITHUB_TOKEN,
                     username: process.env.GITHUB_USERNAME
                 });
@@ -271,7 +267,6 @@ function initializeFactoryFromEnv() {
                         name: 'gitea',
                         type: 'gitea',
                         apiUrl: giteaUrl,
-                        baseUrl: giteaUrl.replace('/api/v1', ''),
                         token: process.env.GITEA_TOKEN,
                         username: process.env.GITEA_USERNAME
                     });
@@ -290,7 +285,6 @@ function initializeFactoryFromEnv() {
                 name: providerType,
                 type: providerType,
                 apiUrl: process.env.API_URL,
-                baseUrl: providerType === 'github' ? 'https://github.com' : process.env.API_URL?.replace('/api/v1', '') || process.env.API_URL,
                 token: process.env.API_TOKEN,
                 username: process.env.USERNAME
             });
@@ -304,7 +298,6 @@ function initializeFactoryFromEnv() {
             name: 'demo',
             type: 'gitea',
             apiUrl: 'https://demo.gitea.io/api/v1',
-            baseUrl: 'https://demo.gitea.io',
             token: 'demo-token',
             username: 'demo-user'
         });

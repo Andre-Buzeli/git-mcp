@@ -44,7 +44,6 @@ declare const ReleasesInputSchema: z.ZodObject<{
     action: z.ZodEnum<["create", "list", "get", "update", "delete", "publish"]>;
     repo: z.ZodString;
     provider: z.ZodEnum<["gitea", "github"]>;
-    projectPath: z.ZodString;
     tag_name: z.ZodOptional<z.ZodString>;
     name: z.ZodOptional<z.ZodString>;
     body: z.ZodOptional<z.ZodString>;
@@ -65,7 +64,6 @@ declare const ReleasesInputSchema: z.ZodObject<{
     provider: "gitea" | "github";
     repo: string;
     action: "delete" | "get" | "list" | "create" | "update" | "publish";
-    projectPath: string;
     name?: string | undefined;
     body?: string | undefined;
     tag_name?: string | undefined;
@@ -86,7 +84,6 @@ declare const ReleasesInputSchema: z.ZodObject<{
     provider: "gitea" | "github";
     repo: string;
     action: "delete" | "get" | "list" | "create" | "update" | "publish";
-    projectPath: string;
     name?: string | undefined;
     body?: string | undefined;
     tag_name?: string | undefined;

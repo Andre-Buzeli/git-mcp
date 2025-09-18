@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { runGitCommand } from '../utils/terminal-controller.js';
+import { runGitCommand } from '../utils/terminal-controller.ts';
 
 /**
  * Tool: git-remote
@@ -335,5 +335,4 @@ export const gitRemoteTool = {
     }
   }
 };
-
 

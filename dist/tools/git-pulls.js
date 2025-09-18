@@ -51,7 +51,6 @@ const PullsInputSchema = zod_1.z.object({
     repo: zod_1.z.string(),
     // Para multi-provider
     provider: zod_1.z.enum(['gitea', 'github']).describe('Provider to use (gitea or github)'),
-    projectPath: zod_1.z.string().describe('Local project path for git operations'),
     // Para create
     title: zod_1.z.string().optional(),
     body: zod_1.z.string().optional(),
@@ -239,7 +238,7 @@ exports.pullsTool = {
             reviewer: { type: 'string', description: 'PR reviewer filter' },
             label: { type: 'string', description: 'PR label filter' }
         },
-        required: ['action', 'repo', 'provider', 'projectPath']
+        required: ['action', 'repo', 'provider']
     },
     /**
      * Handler principal da tool pulls

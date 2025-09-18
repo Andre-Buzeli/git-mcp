@@ -1,7 +1,7 @@
 import { z } from 'zod';
-import { globalProviderFactory, VcsOperations } from '../providers/index.js';
-import { applyAutoUserDetection } from '../utils/user-detection.js';
-import { GitOperations } from '../utils/git-operations.js';
+import { globalProviderFactory, VcsOperations } from '../providers/index.ts';
+import { applyAutoUserDetection } from '../utils/user-detection.ts';
+import { GitOperations } from '../utils/git-operations.ts';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 
@@ -444,5 +444,4 @@ temp/
     return filesCreated;
   }
 };
-
 
