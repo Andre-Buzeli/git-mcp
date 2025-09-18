@@ -3,41 +3,41 @@ import { VcsOperations } from '../providers/index.js';
 /**
  * Tool: branches
  *
- * DESCRIÇÃO:
- * Gerenciamento completo de branches Gitea com múltiplas ações
+ * DESCRIÃ‡ÃƒO:
+ * Gerenciamento completo de branches Gitea com mÃºltiplas aÃ§Ãµes
  *
  * FUNCIONALIDADES:
- * - Criação de novas branches
+ * - CriaÃ§Ã£o de novas branches
  * - Listagem e busca de branches
- * - Obtenção de detalhes específicos
- * - Exclusão de branches
+ * - ObtenÃ§Ã£o de detalhes especÃ­ficos
+ * - ExclusÃ£o de branches
  * - Merge de branches
- * - Comparação entre branches
+ * - ComparaÃ§Ã£o entre branches
  *
  * USO:
  * - Para gerenciar fluxo de trabalho Git
  * - Para criar branches de feature
  * - Para organizar desenvolvimento
- * - Para controle de versão
+ * - Para controle de versÃ£o
  *
- * RECOMENDAÇÕES:
- * - Use convenções de nomenclatura consistentes
+ * RECOMENDAÃ‡Ã•ES:
+ * - Use convenÃ§Ãµes de nomenclatura consistentes
  * - Proteja branches importantes
  * - Mantenha branches limpas
- * - Documente propósito das branches
+ * - Documente propÃ³sito das branches
  */
 /**
- * Schema de validação para entrada da tool branches
+ * Schema de validaÃ§Ã£o para entrada da tool branches
  *
- * VALIDAÇÕES:
- * - action: Ação obrigatória (create, list, get, delete, merge, compare)
- * - Parâmetros específicos por ação
- * - Validação de tipos e formatos
+ * VALIDAÃ‡Ã•ES:
+ * - action: AÃ§Ã£o obrigatÃ³ria (create, list, get, delete, merge, compare)
+ * - ParÃ¢metros especÃ­ficos por aÃ§Ã£o
+ * - ValidaÃ§Ã£o de tipos e formatos
  *
- * RECOMENDAÇÕES:
+ * RECOMENDAÃ‡Ã•ES:
  * - Sempre valide entrada antes de usar
- * - Use parâmetros opcionais adequadamente
- * - Documente parâmetros obrigatórios
+ * - Use parÃ¢metros opcionais adequadamente
+ * - Documente parÃ¢metros obrigatÃ³rios
  */
 declare const BranchesInputSchema: z.ZodObject<{
     action: z.ZodEnum<["create", "list", "get", "delete", "merge", "compare"]>;
@@ -59,11 +59,11 @@ declare const BranchesInputSchema: z.ZodObject<{
     repo: string;
     action: "merge" | "delete" | "get" | "list" | "create" | "compare";
     projectPath: string;
+    branch?: string | undefined;
     head?: string | undefined;
     base?: string | undefined;
     page?: number | undefined;
     limit?: number | undefined;
-    branch?: string | undefined;
     branch_name?: string | undefined;
     from_branch?: string | undefined;
     merge_method?: "merge" | "rebase" | "squash" | undefined;
@@ -74,11 +74,11 @@ declare const BranchesInputSchema: z.ZodObject<{
     repo: string;
     action: "merge" | "delete" | "get" | "list" | "create" | "compare";
     projectPath: string;
+    branch?: string | undefined;
     head?: string | undefined;
     base?: string | undefined;
     page?: number | undefined;
     limit?: number | undefined;
-    branch?: string | undefined;
     branch_name?: string | undefined;
     from_branch?: string | undefined;
     merge_method?: "merge" | "rebase" | "squash" | undefined;
@@ -87,11 +87,11 @@ declare const BranchesInputSchema: z.ZodObject<{
 }>;
 export type BranchesInput = z.infer<typeof BranchesInputSchema>;
 /**
- * Schema de saída padronizado
+ * Schema de saÃ­da padronizado
  *
  * ESTRUTURA:
- * - success: Status da operação
- * - action: Ação executada
+ * - success: Status da operaÃ§Ã£o
+ * - action: AÃ§Ã£o executada
  * - message: Mensagem descritiva
  * - data: Dados retornados (opcional)
  * - error: Detalhes do erro (opcional)
@@ -119,58 +119,58 @@ export type BranchesResult = z.infer<typeof BranchesResultSchema>;
 /**
  * Tool: branches
  *
- * DESCRIÇÃO:
- * Gerenciamento completo de branches Gitea com múltiplas ações
+ * DESCRIÃ‡ÃƒO:
+ * Gerenciamento completo de branches Gitea com mÃºltiplas aÃ§Ãµes
  *
- * ACTIONS DISPONÍVEIS:
+ * ACTIONS DISPONÃVEIS:
  *
  * 1. create - Criar nova branch
- *    Parâmetros:
- *    - owner (obrigatório): Proprietário do repositório
- *    - repo (obrigatório): Nome do repositório
- *    - branch_name (obrigatório): Nome da nova branch
- *    - from_branch (obrigatório): Branch de origem
+ *    ParÃ¢metros:
+ *    - owner (obrigatÃ³rio): ProprietÃ¡rio do repositÃ³rio
+ *    - repo (obrigatÃ³rio): Nome do repositÃ³rio
+ *    - branch_name (obrigatÃ³rio): Nome da nova branch
+ *    - from_branch (obrigatÃ³rio): Branch de origem
  *
  * 2. list - Listar branches
- *    Parâmetros:
- *    - owner (obrigatório): Proprietário do repositório
- *    - repo (obrigatório): Nome do repositório
- *    - page (opcional): Página da listagem (padrão: 1)
- *    - limit (opcional): Itens por página (padrão: 30)
+ *    ParÃ¢metros:
+ *    - owner (obrigatÃ³rio): ProprietÃ¡rio do repositÃ³rio
+ *    - repo (obrigatÃ³rio): Nome do repositÃ³rio
+ *    - page (opcional): PÃ¡gina da listagem (padrÃ£o: 1)
+ *    - limit (opcional): Itens por pÃ¡gina (padrÃ£o: 30)
  *
  * 3. get - Obter detalhes da branch
- *    Parâmetros:
- *    - owner (obrigatório): Proprietário do repositório
- *    - repo (obrigatório): Nome do repositório
- *    - branch (obrigatório): Nome da branch
+ *    ParÃ¢metros:
+ *    - owner (obrigatÃ³rio): ProprietÃ¡rio do repositÃ³rio
+ *    - repo (obrigatÃ³rio): Nome do repositÃ³rio
+ *    - branch (obrigatÃ³rio): Nome da branch
  *
  * 4. delete - Deletar branch
- *    Parâmetros:
- *    - owner (obrigatório): Proprietário do repositório
- *    - repo (obrigatório): Nome do repositório
- *    - branch (obrigatório): Nome da branch
+ *    ParÃ¢metros:
+ *    - owner (obrigatÃ³rio): ProprietÃ¡rio do repositÃ³rio
+ *    - repo (obrigatÃ³rio): Nome do repositÃ³rio
+ *    - branch (obrigatÃ³rio): Nome da branch
  *
  * 5. merge - Fazer merge de branches
- *    Parâmetros:
- *    - owner (obrigatório): Proprietário do repositório
- *    - repo (obrigatório): Nome do repositório
- *    - head (obrigatório): Branch de origem
- *    - base (obrigatório): Branch de destino
- *    - merge_method (opcional): Método de merge (padrão: merge)
+ *    ParÃ¢metros:
+ *    - owner (obrigatÃ³rio): ProprietÃ¡rio do repositÃ³rio
+ *    - repo (obrigatÃ³rio): Nome do repositÃ³rio
+ *    - head (obrigatÃ³rio): Branch de origem
+ *    - base (obrigatÃ³rio): Branch de destino
+ *    - merge_method (opcional): MÃ©todo de merge (padrÃ£o: merge)
  *
  * 6. compare - Comparar branches
- *    Parâmetros:
- *    - owner (obrigatório): Proprietário do repositório
- *    - repo (obrigatório): Nome do repositório
- *    - base_branch (obrigatório): Branch base
- *    - head_branch (obrigatório): Branch de comparação
+ *    ParÃ¢metros:
+ *    - owner (obrigatÃ³rio): ProprietÃ¡rio do repositÃ³rio
+ *    - repo (obrigatÃ³rio): Nome do repositÃ³rio
+ *    - base_branch (obrigatÃ³rio): Branch base
+ *    - head_branch (obrigatÃ³rio): Branch de comparaÃ§Ã£o
  *
- * RECOMENDAÇÕES DE USO:
+ * RECOMENDAÃ‡Ã•ES DE USO:
  * - Use nomes descritivos para branches
  * - Mantenha branches principais protegidas
- * - Faça merge regularmente
- * - Documente propósito das branches
- * - Use convenções de nomenclatura
+ * - FaÃ§a merge regularmente
+ * - Documente propÃ³sito das branches
+ * - Use convenÃ§Ãµes de nomenclatura
  * - Limpe branches antigas
  */
 export declare const branchesTool: {
@@ -248,128 +248,128 @@ export declare const branchesTool: {
      *
      * FUNCIONALIDADE:
      * - Valida entrada usando Zod schema
-     * - Roteia para método específico baseado na ação
+     * - Roteia para mÃ©todo especÃ­fico baseado na aÃ§Ã£o
      * - Trata erros de forma uniforme
      * - Retorna resultado padronizado
      *
      * FLUXO:
-     * 1. Validação de entrada
-     * 2. Roteamento por ação
-     * 3. Execução do método específico
+     * 1. ValidaÃ§Ã£o de entrada
+     * 2. Roteamento por aÃ§Ã£o
+     * 3. ExecuÃ§Ã£o do mÃ©todo especÃ­fico
      * 4. Tratamento de erros
      * 5. Retorno de resultado
      *
      * TRATAMENTO DE ERROS:
-     * - Validação: erro de schema
-     * - Execução: erro da operação
-     * - Roteamento: ação não suportada
+     * - ValidaÃ§Ã£o: erro de schema
+     * - ExecuÃ§Ã£o: erro da operaÃ§Ã£o
+     * - Roteamento: aÃ§Ã£o nÃ£o suportada
      *
-     * RECOMENDAÇÕES:
+     * RECOMENDAÃ‡Ã•ES:
      * - Sempre valide entrada antes de processar
-     * - Trate erros específicos adequadamente
+     * - Trate erros especÃ­ficos adequadamente
      * - Log detalhes de erro para debug
-     * - Retorne mensagens de erro úteis
+     * - Retorne mensagens de erro Ãºteis
      */
     handler(input: BranchesInput): Promise<BranchesResult>;
     /**
-     * Cria uma nova branch no repositório
+     * Cria uma nova branch no repositÃ³rio
      *
      * FUNCIONALIDADE:
-     * - Valida parâmetros obrigatórios
+     * - Valida parÃ¢metros obrigatÃ³rios
      * - Cria branch a partir de branch existente
      * - Retorna detalhes da nova branch
      *
-     * PARÂMETROS OBRIGATÓRIOS:
-     * - owner: Proprietário do repositório
-     * - repo: Nome do repositório
+     * PARÃ‚METROS OBRIGATÃ“RIOS:
+     * - owner: ProprietÃ¡rio do repositÃ³rio
+     * - repo: Nome do repositÃ³rio
      * - branch_name: Nome da nova branch
      * - from_branch: Branch de origem
      *
-     * VALIDAÇÕES:
-     * - Todos os parâmetros obrigatórios
+     * VALIDAÃ‡Ã•ES:
+     * - Todos os parÃ¢metros obrigatÃ³rios
      * - Branch de origem deve existir
-     * - Nome da nova branch deve ser único
+     * - Nome da nova branch deve ser Ãºnico
      *
-     * RECOMENDAÇÕES:
+     * RECOMENDAÃ‡Ã•ES:
      * - Use nomes descritivos para branches
-     * - Crie a partir de branches estáveis
-     * - Documente propósito da branch
-     * - Use convenções de nomenclatura
+     * - Crie a partir de branches estÃ¡veis
+     * - Documente propÃ³sito da branch
+     * - Use convenÃ§Ãµes de nomenclatura
      */
     createBranch(params: BranchesInput, provider: VcsOperations): Promise<BranchesResult>;
     /**
-     * Lista todas as branches do repositório
+     * Lista todas as branches do repositÃ³rio
      *
      * FUNCIONALIDADE:
-     * - Lista branches com paginação
-     * - Retorna informações básicas de cada branch
-     * - Suporta filtros de paginação
+     * - Lista branches com paginaÃ§Ã£o
+     * - Retorna informaÃ§Ãµes bÃ¡sicas de cada branch
+     * - Suporta filtros de paginaÃ§Ã£o
      *
-     * PARÂMETROS OBRIGATÓRIOS:
-     * - owner: Proprietário do repositório
-     * - repo: Nome do repositório
+     * PARÃ‚METROS OBRIGATÃ“RIOS:
+     * - owner: ProprietÃ¡rio do repositÃ³rio
+     * - repo: Nome do repositÃ³rio
      *
-     * PARÂMETROS OPCIONAIS:
-     * - page: Página da listagem (padrão: 1)
-     * - limit: Itens por página (padrão: 30, máximo: 100)
+     * PARÃ‚METROS OPCIONAIS:
+     * - page: PÃ¡gina da listagem (padrÃ£o: 1)
+     * - limit: Itens por pÃ¡gina (padrÃ£o: 30, mÃ¡ximo: 100)
      *
-     * VALIDAÇÕES:
-     * - e repo obrigatórios
+     * VALIDAÃ‡Ã•ES:
+     * - e repo obrigatÃ³rios
      * - Page deve ser >= 1
      * - Limit deve ser entre 1 e 100
      *
-     * RECOMENDAÇÕES:
-     * - Use paginação para repositórios grandes
-     * - Monitore número total de branches
+     * RECOMENDAÃ‡Ã•ES:
+     * - Use paginaÃ§Ã£o para repositÃ³rios grandes
+     * - Monitore nÃºmero total de branches
      * - Mantenha branches organizadas
      */
     listBranches(params: BranchesInput, provider: VcsOperations): Promise<BranchesResult>;
     /**
-     * Obtém detalhes de uma branch específica
+     * ObtÃ©m detalhes de uma branch especÃ­fica
      *
      * FUNCIONALIDADE:
-     * - Retorna informações completas da branch
+     * - Retorna informaÃ§Ãµes completas da branch
      * - Inclui commit mais recente
-     * - Informações de proteção e permissões
+     * - InformaÃ§Ãµes de proteÃ§Ã£o e permissÃµes
      *
-     * PARÂMETROS OBRIGATÓRIOS:
-     * - owner: Proprietário do repositório
-     * - repo: Nome do repositório
+     * PARÃ‚METROS OBRIGATÃ“RIOS:
+     * - owner: ProprietÃ¡rio do repositÃ³rio
+     * - repo: Nome do repositÃ³rio
      * - branch: Nome da branch
      *
-     * VALIDAÇÕES:
-     * - Todos os parâmetros obrigatórios
-     * - Branch deve existir no repositório
+     * VALIDAÃ‡Ã•ES:
+     * - Todos os parÃ¢metros obrigatÃ³rios
+     * - Branch deve existir no repositÃ³rio
      *
-     * RECOMENDAÇÕES:
-     * - Use para obter informações detalhadas
-     * - Verifique status de proteção
+     * RECOMENDAÃ‡Ã•ES:
+     * - Use para obter informaÃ§Ãµes detalhadas
+     * - Verifique status de proteÃ§Ã£o
      * - Monitore commits recentes
      */
     getBranch(params: BranchesInput, provider: VcsOperations): Promise<BranchesResult>;
     /**
-     * Deleta uma branch do repositório
+     * Deleta uma branch do repositÃ³rio
      *
      * FUNCIONALIDADE:
      * - Remove branch especificada
-     * - Valida permissões de exclusão
-     * - Confirma exclusão bem-sucedida
+     * - Valida permissÃµes de exclusÃ£o
+     * - Confirma exclusÃ£o bem-sucedida
      *
-     * PARÂMETROS OBRIGATÓRIOS:
-     * - owner: Proprietário do repositório
-     * - repo: Nome do repositório
+     * PARÃ‚METROS OBRIGATÃ“RIOS:
+     * - owner: ProprietÃ¡rio do repositÃ³rio
+     * - repo: Nome do repositÃ³rio
      * - branch: Nome da branch a ser deletada
      *
-     * VALIDAÇÕES:
-     * - Todos os parâmetros obrigatórios
+     * VALIDAÃ‡Ã•ES:
+     * - Todos os parÃ¢metros obrigatÃ³rios
      * - Branch deve existir
-     * - Usuário deve ter permissão de exclusão
+     * - UsuÃ¡rio deve ter permissÃ£o de exclusÃ£o
      *
-     * RECOMENDAÇÕES:
+     * RECOMENDAÃ‡Ã•ES:
      * - Confirme antes de deletar
      * - Verifique se branch foi mergeada
-     * - Mantenha backup se necessário
-     * - Documente motivo da exclusão
+     * - Mantenha backup se necessÃ¡rio
+     * - Documente motivo da exclusÃ£o
      */
     deleteBranch(params: BranchesInput, provider: VcsOperations): Promise<BranchesResult>;
     /**
@@ -377,55 +377,59 @@ export declare const branchesTool: {
      *
      * FUNCIONALIDADE:
      * - Merge de branch de origem em branch de destino
-     * - Suporta diferentes métodos de merge
+     * - Suporta diferentes mÃ©todos de merge
      * - Retorna resultado do merge
      *
-     * PARÂMETROS OBRIGATÓRIOS:
-     * - owner: Proprietário do repositório
-     * - repo: Nome do repositório
-     * - head: Branch de origem (será mergeada)
-     * - base: Branch de destino (receberá o merge)
+     * PARÃ‚METROS OBRIGATÃ“RIOS:
+     * - owner: ProprietÃ¡rio do repositÃ³rio
+     * - repo: Nome do repositÃ³rio
+     * - head: Branch de origem (serÃ¡ mergeada)
+     * - base: Branch de destino (receberÃ¡ o merge)
      *
-     * PARÂMETROS OPCIONAIS:
-     * - merge_method: Método de merge (merge, rebase, squash)
+     * PARÃ‚METROS OPCIONAIS:
+     * - merge_method: MÃ©todo de merge (merge, rebase, squash)
      *
-     * VALIDAÇÕES:
-     * - Todos os parâmetros obrigatórios
+     * VALIDAÃ‡Ã•ES:
+     * - Todos os parÃ¢metros obrigatÃ³rios
      * - Branches devem existir
-     * - Não deve haver conflitos
+     * - NÃ£o deve haver conflitos
      *
-     * RECOMENDAÇÕES:
+     * RECOMENDAÃ‡Ã•ES:
      * - Resolva conflitos antes do merge
-     * - Escolha método de merge adequado
-     * - Teste após o merge
-     * - Documente mudanças
+     * - Escolha mÃ©todo de merge adequado
+     * - Teste apÃ³s o merge
+     * - Documente mudanÃ§as
      */
     mergeBranches(params: BranchesInput, provider: VcsOperations): Promise<BranchesResult>;
     /**
      * Compara duas branches
      *
      * FUNCIONALIDADE:
-     * - Compara diferenças entre branches
+     * - Compara diferenÃ§as entre branches
      * - Retorna commits diferentes
-     * - Mostra divergências
+     * - Mostra divergÃªncias
      *
-     * PARÂMETROS OBRIGATÓRIOS:
-     * - owner: Proprietário do repositório
-     * - repo: Nome do repositório
-     * - base_branch: Branch base para comparação
+     * PARÃ‚METROS OBRIGATÃ“RIOS:
+     * - owner: ProprietÃ¡rio do repositÃ³rio
+     * - repo: Nome do repositÃ³rio
+     * - base_branch: Branch base para comparaÃ§Ã£o
      * - head_branch: Branch a ser comparada
      *
-     * VALIDAÇÕES:
-     * - Todos os parâmetros obrigatórios
+     * VALIDAÃ‡Ã•ES:
+     * - Todos os parÃ¢metros obrigatÃ³rios
      * - Ambas as branches devem existir
      *
-     * RECOMENDAÇÕES:
-     * - Use para verificar divergências
+     * RECOMENDAÃ‡Ã•ES:
+     * - Use para verificar divergÃªncias
      * - Compare antes de fazer merge
      * - Analise commits diferentes
-     * - Documente diferenças importantes
+     * - Documente diferenÃ§as importantes
      */
     compareBranches(params: BranchesInput, provider: VcsOperations): Promise<BranchesResult>;
+    /**
+     * Verifica se erro Ã© relacionado a Git
+     */
+    isGitRelatedError(errorMessage: string): boolean;
 };
 export {};
 //# sourceMappingURL=git-branches.d.ts.map

@@ -8,116 +8,116 @@ const terminal_controller_js_1 = require("../utils/terminal-controller.js");
 /**
  * Tool: git-repositories
  *
- * DESCRIÇÃO COMPLETA:
- * Gerenciamento completo de repositórios Git com suporte multi-provider (GitHub e Gitea).
- * Esta tool é 100% auto-suficiente e implementa TODAS as operações de repositório sem depender
+ * DESCRIÃ‡ÃƒO COMPLETA:
+ * Gerenciamento completo de repositÃ³rios Git com suporte multi-provider (GitHub e Gitea).
+ * Esta tool Ã© 100% auto-suficiente e implementa TODAS as operaÃ§Ãµes de repositÃ³rio sem depender
  * de outras tools ou comandos externos.
  *
  * FUNCIONALIDADES IMPLEMENTADAS:
  *
- * 1. CRIAÇÃO E CONFIGURAÇÃO:
- *    - create: Cria novos repositórios com configurações completas
- *    - init: Inicializa repositórios Git locais
- *    - clone: Clona repositórios remotos localmente
- *    - update: Atualiza configurações de repositórios existentes
+ * 1. CRIAÃ‡ÃƒO E CONFIGURAÃ‡ÃƒO:
+ *    - create: Cria novos repositÃ³rios com configuraÃ§Ãµes completas
+ *    - init: Inicializa repositÃ³rios Git locais
+ *    - clone: Clona repositÃ³rios remotos localmente
+ *    - update: Atualiza configuraÃ§Ãµes de repositÃ³rios existentes
  *
  * 2. LISTAGEM E BUSCA:
- *    - list: Lista repositórios do usuário ou organização
- *    - get: Obtém detalhes específicos de um repositório
- *    - search: Busca repositórios por critérios específicos
+ *    - list: Lista repositÃ³rios do usuÃ¡rio ou organizaÃ§Ã£o
+ *    - get: ObtÃ©m detalhes especÃ­ficos de um repositÃ³rio
+ *    - search: Busca repositÃ³rios por critÃ©rios especÃ­ficos
  *
- * 3. OPERAÇÕES AVANÇADAS:
- *    - fork: Cria fork de repositórios existentes
- *    - delete: Remove repositórios permanentemente
- *    - archive: Arquivamento de repositórios
- *    - transfer: Transferência de propriedade
+ * 3. OPERAÃ‡Ã•ES AVANÃ‡ADAS:
+ *    - fork: Cria fork de repositÃ³rios existentes
+ *    - delete: Remove repositÃ³rios permanentemente
+ *    - archive: Arquivamento de repositÃ³rios
+ *    - transfer: TransferÃªncia de propriedade
  *
- * 4. CONFIGURAÇÕES E METADADOS:
- *    - Visibilidade (público/privado)
- *    - Descrições e documentação
- *    - Configurações de branch padrão
- *    - Templates e inicialização automática
- *    - Licenças e arquivos de configuração
+ * 4. CONFIGURAÃ‡Ã•ES E METADADOS:
+ *    - Visibilidade (pÃºblico/privado)
+ *    - DescriÃ§Ãµes e documentaÃ§Ã£o
+ *    - ConfiguraÃ§Ãµes de branch padrÃ£o
+ *    - Templates e inicializaÃ§Ã£o automÃ¡tica
+ *    - LicenÃ§as e arquivos de configuraÃ§Ã£o
  *
- * PARÂMETROS OBRIGATÓRIOS:
- * - action: Ação a executar (create, list, get, update, delete, fork, search, init, clone)
+ * PARÃ‚METROS OBRIGATÃ“RIOS:
+ * - action: AÃ§Ã£o a executar (create, list, get, update, delete, fork, search, init, clone)
  * - provider: Provedor a usar (gitea ou github)
- * - owner: Proprietário do repositório (obrigatório para operações remotas)
- * - repo: Nome do repositório (obrigatório para operações remotas)
- * - projectPath: Caminho do projeto local (obrigatório para operações locais)
+ * - owner: ProprietÃ¡rio do repositÃ³rio (obrigatÃ³rio para operaÃ§Ãµes remotas)
+ * - repo: Nome do repositÃ³rio (obrigatÃ³rio para operaÃ§Ãµes remotas)
+ * - projectPath: Caminho do projeto local (obrigatÃ³rio para operaÃ§Ãµes locais)
  *
- * PARÂMETROS OPCIONAIS:
- * - name: Nome do repositório para criação
- * - description: Descrição do repositório
- * - private: Visibilidade do repositório
- * - auto_init: Inicialização automática com README
+ * PARÃ‚METROS OPCIONAIS:
+ * - name: Nome do repositÃ³rio para criaÃ§Ã£o
+ * - description: DescriÃ§Ã£o do repositÃ³rio
+ * - private: Visibilidade do repositÃ³rio
+ * - auto_init: InicializaÃ§Ã£o automÃ¡tica com README
  * - gitignores: Template de .gitignore
- * - license: Template de licença
- * - readme: Conteúdo do README
- * - default_branch: Branch padrão
- * - username: Usuário para listagem
- * - page: Página para paginação
+ * - license: Template de licenÃ§a
+ * - readme: ConteÃºdo do README
+ * - default_branch: Branch padrÃ£o
+ * - username: UsuÃ¡rio para listagem
+ * - page: PÃ¡gina para paginaÃ§Ã£o
  * - limit: Limite de resultados
- * - new_name: Novo nome para atualização
- * - new_description: Nova descrição
+ * - new_name: Novo nome para atualizaÃ§Ã£o
+ * - new_description: Nova descriÃ§Ã£o
  * - new_private: Nova visibilidade
  * - archived: Status de arquivamento
- * - organization: Organização para fork
+ * - organization: OrganizaÃ§Ã£o para fork
  * - query: Termo de busca
  *
  * CASOS DE USO:
- * 1. Criação de repositórios para novos projetos
- * 2. Backup e migração de código
- * 3. Organização de projetos em equipe
- * 4. Automação de workflows de desenvolvimento
- * 5. Gerenciamento de repositórios em massa
- * 6. Configuração de templates de projeto
- * 7. Sincronização entre diferentes provedores
+ * 1. CriaÃ§Ã£o de repositÃ³rios para novos projetos
+ * 2. Backup e migraÃ§Ã£o de cÃ³digo
+ * 3. OrganizaÃ§Ã£o de projetos em equipe
+ * 4. AutomaÃ§Ã£o de workflows de desenvolvimento
+ * 5. Gerenciamento de repositÃ³rios em massa
+ * 6. ConfiguraÃ§Ã£o de templates de projeto
+ * 7. SincronizaÃ§Ã£o entre diferentes provedores
  *
  * EXEMPLOS DE USO:
- * - Criar repositório: action=create, name=meu-projeto, description=Projeto incrível
- * - Listar repositórios: action=list, username=usuario
- * - Buscar repositórios: action=search, query=react typescript
- * - Clonar repositório: action=clone, url=https://github.com/user/repo.git
+ * - Criar repositÃ³rio: action=create, name=meu-projeto, description=Projeto incrÃ­vel
+ * - Listar repositÃ³rios: action=list, username=usuario
+ * - Buscar repositÃ³rios: action=search, query=react typescript
+ * - Clonar repositÃ³rio: action=clone, url=https://github.com/user/repo.git
  * - Inicializar local: action=init, projectPath=/path/to/project
  *
- * RECOMENDAÇÕES:
+ * RECOMENDAÃ‡Ã•ES:
  * - Use nomes descritivos e consistentes
  * - Configure visibilidade adequada para cada projeto
- * - Mantenha descrições atualizadas e informativas
- * - Use templates para padronização
- * - Configure branches padrão apropriadas
- * - Documente configurações importantes
- * - Use licenças adequadas para cada projeto
+ * - Mantenha descriÃ§Ãµes atualizadas e informativas
+ * - Use templates para padronizaÃ§Ã£o
+ * - Configure branches padrÃ£o apropriadas
+ * - Documente configuraÃ§Ãµes importantes
+ * - Use licenÃ§as adequadas para cada projeto
  *
- * LIMITAÇÕES:
- * - Operações de arquivamento dependem do provedor
- * - Transferência de propriedade requer permissões especiais
- * - Alguns provedores podem ter limitações de API
+ * LIMITAÃ‡Ã•ES:
+ * - OperaÃ§Ãµes de arquivamento dependem do provedor
+ * - TransferÃªncia de propriedade requer permissÃµes especiais
+ * - Alguns provedores podem ter limitaÃ§Ãµes de API
  *
- * SEGURANÇA:
- * - Tokens de acesso são obrigatórios para operações remotas
- * - Validação de permissões antes de operações destrutivas
- * - Logs detalhados de todas as operações
- * - Tratamento seguro de informações sensíveis
+ * SEGURANÃ‡A:
+ * - Tokens de acesso sÃ£o obrigatÃ³rios para operaÃ§Ãµes remotas
+ * - ValidaÃ§Ã£o de permissÃµes antes de operaÃ§Ãµes destrutivas
+ * - Logs detalhados de todas as operaÃ§Ãµes
+ * - Tratamento seguro de informaÃ§Ãµes sensÃ­veis
  */
 /**
- * Schema de validação para entrada da tool git-repositories
+ * Schema de validaÃ§Ã£o para entrada da tool git-repositories
  *
- * VALIDAÇÕES:
- * - action: Ação obrigatória (create, list, get, update, delete, fork, search, init, clone)
- * - provider: Obrigatório (gitea ou github)
- * - Parâmetros específicos por ação
- * - Validação de tipos e formatos
+ * VALIDAÃ‡Ã•ES:
+ * - action: AÃ§Ã£o obrigatÃ³ria (create, list, get, update, delete, fork, search, init, clone)
+ * - provider: ObrigatÃ³rio (gitea ou github)
+ * - ParÃ¢metros especÃ­ficos por aÃ§Ã£o
+ * - ValidaÃ§Ã£o de tipos e formatos
  *
- * RECOMENDAÇÕES:
+ * RECOMENDAÃ‡Ã•ES:
  * - Sempre valide entrada antes de usar
- * - Use parâmetros opcionais adequadamente
- * - Documente parâmetros obrigatórios
+ * - Use parÃ¢metros opcionais adequadamente
+ * - Documente parÃ¢metros obrigatÃ³rios
  */
 const GitRepositoriesInputSchema = zod_1.z.object({
     action: zod_1.z.enum(['create', 'list', 'get', 'update', 'delete', 'fork', 'search', 'init', 'clone']),
-    // Parâmetros comuns
+    // ParÃ¢metros comuns
     repo: zod_1.z.string().optional(),
     provider: zod_1.z.enum(['gitea', 'github']).describe('Provider to use (gitea or github)'),
     projectPath: zod_1.z.string().describe('Local project path for git operations'),
@@ -143,7 +143,7 @@ const GitRepositoriesInputSchema = zod_1.z.object({
     // Para search
     query: zod_1.z.string().optional(),
 });
-// Schema de saída
+// Schema de saÃ­da
 const GitRepositoriesResultSchema = zod_1.z.object({
     success: zod_1.z.boolean(),
     action: zod_1.z.string(),
@@ -154,81 +154,81 @@ const GitRepositoriesResultSchema = zod_1.z.object({
 /**
  * Tool: git-repositories
  *
- * DESCRIÇÃO:
- * Gerenciamento completo de repositórios Git (GitHub + Gitea) com múltiplas ações
+ * DESCRIÃ‡ÃƒO:
+ * Gerenciamento completo de repositÃ³rios Git (GitHub + Gitea) com mÃºltiplas aÃ§Ãµes
  *
- * ACTIONS DISPONÍVEIS:
+ * ACTIONS DISPONÃVEIS:
  *
- * 1. create - Criar novo repositório
- *    Parâmetros:
- *    - name (obrigatório): Nome do repositório
- *    - description (opcional): Descrição do repositório
- *    - private (opcional): Repositório privado (padrão: false)
- *    - auto_init (opcional): Inicializar com README (padrão: false)
+ * 1. create - Criar novo repositÃ³rio
+ *    ParÃ¢metros:
+ *    - name (obrigatÃ³rio): Nome do repositÃ³rio
+ *    - description (opcional): DescriÃ§Ã£o do repositÃ³rio
+ *    - private (opcional): RepositÃ³rio privado (padrÃ£o: false)
+ *    - auto_init (opcional): Inicializar com README (padrÃ£o: false)
  *    - gitignores (opcional): Template de .gitignore
- *    - license (opcional): Template de licença
- *    - readme (opcional): Conteúdo do README
- *    - default_branch (opcional): Branch padrão
+ *    - license (opcional): Template de licenÃ§a
+ *    - readme (opcional): ConteÃºdo do README
+ *    - default_branch (opcional): Branch padrÃ£o
  *
- * 2. list - Listar repositórios
- *    Parâmetros:
- *    - username (opcional): Usuário específico (padrão: usuário atual)
- *    - page (opcional): Página da listagem (padrão: 1)
- *    - limit (opcional): Itens por página (padrão: 30)
+ * 2. list - Listar repositÃ³rios
+ *    ParÃ¢metros:
+ *    - username (opcional): UsuÃ¡rio especÃ­fico (padrÃ£o: usuÃ¡rio atual)
+ *    - page (opcional): PÃ¡gina da listagem (padrÃ£o: 1)
+ *    - limit (opcional): Itens por pÃ¡gina (padrÃ£o: 30)
  *
- * 3. get - Obter detalhes do repositório
- *    Parâmetros:
- *    - owner (obrigatório): Proprietário do repositório
- *    - repo (obrigatório): Nome do repositório
+ * 3. get - Obter detalhes do repositÃ³rio
+ *    ParÃ¢metros:
+ *    - owner (obrigatÃ³rio): ProprietÃ¡rio do repositÃ³rio
+ *    - repo (obrigatÃ³rio): Nome do repositÃ³rio
  *
- * 4. update - Atualizar repositório
- *    Parâmetros:
- *    - owner (obrigatório): Proprietário do repositório
- *    - repo (obrigatório): Nome do repositório
+ * 4. update - Atualizar repositÃ³rio
+ *    ParÃ¢metros:
+ *    - owner (obrigatÃ³rio): ProprietÃ¡rio do repositÃ³rio
+ *    - repo (obrigatÃ³rio): Nome do repositÃ³rio
  *    - new_name (opcional): Novo nome
- *    - new_description (opcional): Nova descrição
+ *    - new_description (opcional): Nova descriÃ§Ã£o
  *    - new_private (opcional): Nova visibilidade
  *    - archived (opcional): Status de arquivamento
  *
- * 5. delete - Deletar repositório
- *    Parâmetros:
- *    - owner (obrigatório): Proprietário do repositório
- *    - repo (obrigatório): Nome do repositório
+ * 5. delete - Deletar repositÃ³rio
+ *    ParÃ¢metros:
+ *    - owner (obrigatÃ³rio): ProprietÃ¡rio do repositÃ³rio
+ *    - repo (obrigatÃ³rio): Nome do repositÃ³rio
  *
- * 6. fork - Fazer fork do repositório
- *    Parâmetros:
- *    - owner (obrigatório): Proprietário do repositório original
- *    - repo (obrigatório): Nome do repositório original
- *    - organization (opcional): Organização de destino
+ * 6. fork - Fazer fork do repositÃ³rio
+ *    ParÃ¢metros:
+ *    - owner (obrigatÃ³rio): ProprietÃ¡rio do repositÃ³rio original
+ *    - repo (obrigatÃ³rio): Nome do repositÃ³rio original
+ *    - organization (opcional): OrganizaÃ§Ã£o de destino
  *
- * 7. search - Buscar repositórios
- *    Parâmetros:
- *    - query (obrigatório): Termo de busca
- *    - page (opcional): Página da busca (padrão: 1)
- *    - limit (opcional): Itens por página (padrão: 30)
+ * 7. search - Buscar repositÃ³rios
+ *    ParÃ¢metros:
+ *    - query (obrigatÃ³rio): Termo de busca
+ *    - page (opcional): PÃ¡gina da busca (padrÃ£o: 1)
+ *    - limit (opcional): Itens por pÃ¡gina (padrÃ£o: 30)
  *
- * 8. init - Inicializar repositório Git local
- *    Parâmetros:
- *    - projectPath (obrigatório): Caminho do projeto local
+ * 8. init - Inicializar repositÃ³rio Git local
+ *    ParÃ¢metros:
+ *    - projectPath (obrigatÃ³rio): Caminho do projeto local
  *    - owner/repo (opcional): Para configurar remote
  *
- * 9. clone - Clonar repositório para local
- *    Parâmetros:
- *    - owner (obrigatório): Proprietário do repositório
- *    - repo (obrigatório): Nome do repositório
- *    - projectPath (obrigatório): Caminho local de destino
+ * 9. clone - Clonar repositÃ³rio para local
+ *    ParÃ¢metros:
+ *    - owner (obrigatÃ³rio): ProprietÃ¡rio do repositÃ³rio
+ *    - repo (obrigatÃ³rio): Nome do repositÃ³rio
+ *    - projectPath (obrigatÃ³rio): Caminho local de destino
  *
- * RECOMENDAÇÕES DE USO:
- * - Use nomes descritivos para repositórios
+ * RECOMENDAÃ‡Ã•ES DE USO:
+ * - Use nomes descritivos para repositÃ³rios
  * - Configure visibilidade adequada para o projeto
- * - Mantenha descrições atualizadas
+ * - Mantenha descriÃ§Ãµes atualizadas
  * - Use templates para projetos similares
- * - Configure branch padrão adequada
- * - Use paginação para listas grandes
+ * - Configure branch padrÃ£o adequada
+ * - Use paginaÃ§Ã£o para listas grandes
  */
 exports.gitRepositoriesTool = {
     name: 'git-repositories',
-    description: 'tool: Gerencia repositórios Git completos, criação, configuração, busca e operações avançadas\n──────────────\naction create: cria repositório novo\naction create requires: name, description, private, auto_init, gitignores, license, readme, default_branch, provider\n───────────────\naction list: lista repositórios do usuário\naction list requires: page, limit, username, provider\n───────────────\naction get: obtém detalhes específicos\naction get requires: repo, provider\n───────────────\naction update: atualiza configurações\naction update requires: repo, new_name, new_description, new_private, archived, provider\n───────────────\naction delete: remove repositório\naction delete requires: repo, provider\n───────────────\naction fork: cria fork\naction fork requires: repo, organization, provider\n───────────────\naction search: busca repositórios\naction search requires: query, provider\n───────────────\naction init: inicializa repositório local\naction init requires: projectPath, provider\n───────────────\naction clone: clona repositório\naction clone requires: repo, projectPath, provider',
+    description: 'tool: Gerencia repositÃ³rios Git completos, criaÃ§Ã£o, configuraÃ§Ã£o, busca e operaÃ§Ãµes avanÃ§adas\nâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\naction create: cria repositÃ³rio novo\naction create requires: name, description, private, auto_init, gitignores, license, readme, default_branch, provider\nâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\naction list: lista repositÃ³rios do usuÃ¡rio\naction list requires: page, limit, username, provider\nâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\naction get: obtÃ©m detalhes especÃ­ficos\naction get requires: repo, provider\nâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\naction update: atualiza configuraÃ§Ãµes\naction update requires: repo, new_name, new_description, new_private, archived, provider\nâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\naction delete: remove repositÃ³rio\naction delete requires: repo, provider\nâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\naction fork: cria fork\naction fork requires: repo, organization, provider\nâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\naction search: busca repositÃ³rios\naction search requires: query, provider\nâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\naction init: inicializa repositÃ³rio local\naction init requires: projectPath, provider\nâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\naction clone: clona repositÃ³rio\naction clone requires: repo, projectPath, provider',
     inputSchema: {
         type: 'object',
         properties: {
@@ -265,37 +265,37 @@ exports.gitRepositoriesTool = {
      *
      * FUNCIONALIDADE:
      * - Valida entrada usando Zod schema
-     * - Roteia para método específico baseado na ação
+     * - Roteia para mÃ©todo especÃ­fico baseado na aÃ§Ã£o
      * - Trata erros de forma uniforme
      * - Retorna resultado padronizado
      *
      * FLUXO:
-     * 1. Validação de entrada
-     * 2. Roteamento por ação
-     * 3. Execução do método específico
+     * 1. ValidaÃ§Ã£o de entrada
+     * 2. Roteamento por aÃ§Ã£o
+     * 3. ExecuÃ§Ã£o do mÃ©todo especÃ­fico
      * 4. Tratamento de erros
      * 5. Retorno de resultado
      *
      * TRATAMENTO DE ERROS:
-     * - Validação: erro de schema
-     * - Execução: erro da operação
-     * - Roteamento: ação não suportada
+     * - ValidaÃ§Ã£o: erro de schema
+     * - ExecuÃ§Ã£o: erro da operaÃ§Ã£o
+     * - Roteamento: aÃ§Ã£o nÃ£o suportada
      *
-     * RECOMENDAÇÕES:
+     * RECOMENDAÃ‡Ã•ES:
      * - Sempre valide entrada antes de processar
-     * - Trate erros específicos adequadamente
+     * - Trate erros especÃ­ficos adequadamente
      * - Log detalhes de erro para debug
-     * - Retorne mensagens de erro úteis
+     * - Retorne mensagens de erro Ãºteis
      */
     async handler(input) {
         try {
             const validatedInput = GitRepositoriesInputSchema.parse(input);
-            // Aplicar auto-detecção apenas para owner/username dentro do provider especificado
+            // Aplicar auto-detecÃ§Ã£o apenas para owner/username dentro do provider especificado
             const processedInput = await (0, user_detection_js_1.applyAutoUserDetection)(validatedInput, validatedInput.provider);
-            // Usar o provider especificado pelo usuário
+            // Usar o provider especificado pelo usuÃ¡rio
             const provider = index_js_1.globalProviderFactory.getProvider(processedInput.provider);
             if (!provider) {
-                throw new Error(`Provider '${processedInput.provider}' não encontrado`);
+                throw new Error(`Provider '${processedInput.provider}' nÃ£o encontrado`);
             }
             switch (processedInput.action) {
                 case 'create':
@@ -317,65 +317,65 @@ exports.gitRepositoriesTool = {
                 case 'clone':
                     return await this.cloneRepository(processedInput, provider);
                 default:
-                    throw new Error(`Ação não suportada: ${processedInput.action}`);
+                    throw new Error(`AÃ§Ã£o nÃ£o suportada: ${processedInput.action}`);
             }
         }
         catch (error) {
             return {
                 success: false,
                 action: input.action,
-                message: 'Erro na operação de repositórios',
+                message: 'Erro na operaÃ§Ã£o de repositÃ³rios',
                 error: error instanceof Error ? error.message : String(error)
             };
         }
     },
     /**
-     * Cria um novo repositório
+     * Cria um novo repositÃ³rio
      *
      * FUNCIONALIDADE:
-     * - Valida parâmetros obrigatórios
-     * - Configura dados padrão
-     * - Chama API do provider para criação
+     * - Valida parÃ¢metros obrigatÃ³rios
+     * - Configura dados padrÃ£o
+     * - Chama API do provider para criaÃ§Ã£o
      * - Retorna resultado formatado
      *
-     * PARÂMETROS OBRIGATÓRIOS:
-     * - name: Nome do repositório
+     * PARÃ‚METROS OBRIGATÃ“RIOS:
+     * - name: Nome do repositÃ³rio
      *
-     * PARÂMETROS OPCIONAIS:
-     * - description: Descrição do repositório
-     * - private: Visibilidade (padrão: false)
-     * - auto_init: Inicializar com README (padrão: false)
+     * PARÃ‚METROS OPCIONAIS:
+     * - description: DescriÃ§Ã£o do repositÃ³rio
+     * - private: Visibilidade (padrÃ£o: false)
+     * - auto_init: Inicializar com README (padrÃ£o: false)
      * - gitignores: Template de .gitignore
-     * - license: Template de licença
-     * - readme: Conteúdo do README
-     * - default_branch: Branch padrão (padrão: main)
+     * - license: Template de licenÃ§a
+     * - readme: ConteÃºdo do README
+     * - default_branch: Branch padrÃ£o (padrÃ£o: main)
      *
-     * VALIDAÇÕES:
-     * - Nome obrigatório
-     * - Nome único no usuário/organização
-     * - Permissões adequadas
+     * VALIDAÃ‡Ã•ES:
+     * - Nome obrigatÃ³rio
+     * - Nome Ãºnico no usuÃ¡rio/organizaÃ§Ã£o
+     * - PermissÃµes adequadas
      *
-     * RECOMENDAÇÕES:
-     * - Use nomes descritivos e únicos
+     * RECOMENDAÃ‡Ã•ES:
+     * - Use nomes descritivos e Ãºnicos
      * - Configure visibilidade adequada
      * - Inicialize com README para projetos novos
-     * - Use templates para consistência
+     * - Use templates para consistÃªncia
      */
     async createRepository(params, provider) {
         try {
             if (!params.name) {
-                throw new Error('Nome do repositório é obrigatório');
+                throw new Error('Nome do repositÃ³rio Ã© obrigatÃ³rio');
             }
             const repository = await provider.createRepository(params.name, params.description, params.private || false);
             return {
                 success: true,
                 action: 'create',
-                message: `Repositório '${params.name}' criado com sucesso`,
+                message: `RepositÃ³rio '${params.name}' criado com sucesso`,
                 data: repository
             };
         }
         catch (error) {
-            throw new Error(`Falha ao criar repositório: ${error instanceof Error ? error.message : String(error)}`);
+            throw new Error(`Falha ao criar repositÃ³rio: ${error instanceof Error ? error.message : String(error)}`);
         }
     },
     async listRepositories(params, provider) {
@@ -386,7 +386,7 @@ exports.gitRepositoriesTool = {
             return {
                 success: true,
                 action: 'list',
-                message: `${repositories.length} repositórios encontrados`,
+                message: `${repositories.length} repositÃ³rios encontrados`,
                 data: {
                     repositories,
                     page,
@@ -396,13 +396,13 @@ exports.gitRepositoriesTool = {
             };
         }
         catch (error) {
-            throw new Error(`Falha ao listar repositórios: ${error instanceof Error ? error.message : String(error)}`);
+            throw new Error(`Falha ao listar repositÃ³rios: ${error instanceof Error ? error.message : String(error)}`);
         }
     },
     async getRepository(params, provider) {
         try {
             if (!params.repo) {
-                throw new Error('Nome do repositório é obrigatório');
+                throw new Error('Nome do repositÃ³rio Ã© obrigatÃ³rio');
             }
             const currentUser = await provider.getCurrentUser();
             const owner = currentUser.login;
@@ -410,18 +410,18 @@ exports.gitRepositoriesTool = {
             return {
                 success: true,
                 action: 'get',
-                message: `Repositório '${owner}/${params.repo}' obtido com sucesso`,
+                message: `RepositÃ³rio '${owner}/${params.repo}' obtido com sucesso`,
                 data: repository
             };
         }
         catch (error) {
-            throw new Error(`Falha ao obter repositório: ${error instanceof Error ? error.message : String(error)}`);
+            throw new Error(`Falha ao obter repositÃ³rio: ${error instanceof Error ? error.message : String(error)}`);
         }
     },
     async updateRepository(params, provider) {
         try {
             if (!params.repo) {
-                throw new Error('Nome do repositório é obrigatório');
+                throw new Error('Nome do repositÃ³rio Ã© obrigatÃ³rio');
             }
             const currentUser = await provider.getCurrentUser();
             const owner = currentUser.login;
@@ -441,18 +441,18 @@ exports.gitRepositoriesTool = {
             return {
                 success: true,
                 action: 'update',
-                message: `Repositório '${owner}/${params.repo}' atualizado com sucesso`,
+                message: `RepositÃ³rio '${owner}/${params.repo}' atualizado com sucesso`,
                 data: repository
             };
         }
         catch (error) {
-            throw new Error(`Falha ao atualizar repositório: ${error instanceof Error ? error.message : String(error)}`);
+            throw new Error(`Falha ao atualizar repositÃ³rio: ${error instanceof Error ? error.message : String(error)}`);
         }
     },
     async deleteRepository(params, provider) {
         try {
             if (!params.repo) {
-                throw new Error('Nome do repositório é obrigatório');
+                throw new Error('Nome do repositÃ³rio Ã© obrigatÃ³rio');
             }
             const currentUser = await provider.getCurrentUser();
             const owner = currentUser.login;
@@ -460,18 +460,18 @@ exports.gitRepositoriesTool = {
             return {
                 success: true,
                 action: 'delete',
-                message: `Repositório '${owner}/${params.repo}' deletado com sucesso`,
+                message: `RepositÃ³rio '${owner}/${params.repo}' deletado com sucesso`,
                 data: { deleted: true }
             };
         }
         catch (error) {
-            throw new Error(`Falha ao deletar repositório: ${error instanceof Error ? error.message : String(error)}`);
+            throw new Error(`Falha ao deletar repositÃ³rio: ${error instanceof Error ? error.message : String(error)}`);
         }
     },
     async forkRepository(params, provider) {
         try {
             if (!params.repo) {
-                throw new Error('Nome do repositório é obrigatório');
+                throw new Error('Nome do repositÃ³rio Ã© obrigatÃ³rio');
             }
             const currentUser = await provider.getCurrentUser();
             const owner = currentUser.login;
@@ -479,18 +479,18 @@ exports.gitRepositoriesTool = {
             return {
                 success: true,
                 action: 'fork',
-                message: `Fork do repositório '${owner}/${params.repo}' criado com sucesso`,
+                message: `Fork do repositÃ³rio '${owner}/${params.repo}' criado com sucesso`,
                 data: repository
             };
         }
         catch (error) {
-            throw new Error(`Falha ao fazer fork do repositório: ${error instanceof Error ? error.message : String(error)}`);
+            throw new Error(`Falha ao fazer fork do repositÃ³rio: ${error instanceof Error ? error.message : String(error)}`);
         }
     },
     async searchRepositories(params, provider) {
         try {
             if (!params.query) {
-                throw new Error('Query de busca é obrigatória');
+                throw new Error('Query de busca Ã© obrigatÃ³ria');
             }
             const page = params.page || 1;
             const limit = params.limit || 30;
@@ -498,7 +498,7 @@ exports.gitRepositoriesTool = {
             return {
                 success: true,
                 action: 'search',
-                message: `${repositories.length} repositórios encontrados para '${params.query}'`,
+                message: `${repositories.length} repositÃ³rios encontrados para '${params.query}'`,
                 data: {
                     repositories,
                     query: params.query,
@@ -509,48 +509,48 @@ exports.gitRepositoriesTool = {
             };
         }
         catch (error) {
-            throw new Error(`Falha ao buscar repositórios: ${error instanceof Error ? error.message : String(error)}`);
+            throw new Error(`Falha ao buscar repositÃ³rios: ${error instanceof Error ? error.message : String(error)}`);
         }
     },
     /**
-     * Inicializa um repositório Git local
+     * Inicializa um repositÃ³rio Git local
      *
      * FUNCIONALIDADE:
-     * - Executa 'git init' no diretório especificado
-     * - Cria estrutura básica do Git
+     * - Executa 'git init' no diretÃ³rio especificado
+     * - Cria estrutura bÃ¡sica do Git
      * - Adiciona remote se especificado
      *
-     * PARÂMETROS OBRIGATÓRIOS:
+     * PARÃ‚METROS OBRIGATÃ“RIOS:
      * - projectPath: Caminho do projeto local
      *
-     * PARÂMETROS OPCIONAIS:
+     * PARÃ‚METROS OPCIONAIS:
      * - owner/repo: Para configurar remote
      * - provider: Para determinar URL do remote
      *
-     * RECOMENDAÇÕES:
-     * - Verifique se diretório existe
+     * RECOMENDAÃ‡Ã•ES:
+     * - Verifique se diretÃ³rio existe
      * - Use caminhos absolutos
-     * - Configure remote após inicialização
+     * - Configure remote apÃ³s inicializaÃ§Ã£o
      */
     async initRepository(params, provider) {
         try {
             if (!params.projectPath) {
-                throw new Error('projectPath é obrigatório para inicialização do repositório');
+                throw new Error('projectPath Ã© obrigatÃ³rio para inicializaÃ§Ã£o do repositÃ³rio');
             }
-            // Executa git init no diretório especificado
+            // Executa git init no diretÃ³rio especificado
             const initResult = await (0, terminal_controller_js_1.runTerminalCmd)({
                 command: `git init "${params.projectPath}"`,
                 is_background: false,
-                explanation: 'Inicializando repositório Git local'
+                explanation: 'Inicializando repositÃ³rio Git local'
             });
             if (initResult.exitCode !== 0) {
-                throw new Error(`Falha ao inicializar repositório: ${initResult.output}`);
+                throw new Error(`Falha ao inicializar repositÃ³rio: ${initResult.output}`);
             }
             // Se owner/repo foram especificados, configura remote
             if (params.repo && provider) {
                 const currentUser = await provider.getCurrentUser();
                 const owner = currentUser.login;
-                // Obtém URL base do provider
+                // ObtÃ©m URL base do provider
                 const providerConfig = provider.getConfig ? provider.getConfig() : null;
                 const baseUrl = providerConfig?.apiUrl || (params.provider === 'gitea' ? 'http://nas-ubuntu:3000' : 'https://github.com');
                 const remoteUrl = params.provider === 'gitea'
@@ -562,13 +562,13 @@ exports.gitRepositoriesTool = {
                     explanation: 'Configurando remote origin'
                 });
                 if (remoteResult.exitCode !== 0) {
-                    console.warn(`Aviso: Não foi possível configurar remote: ${remoteResult.output}`);
+                    console.warn(`Aviso: NÃ£o foi possÃ­vel configurar remote: ${remoteResult.output}`);
                 }
             }
             return {
                 success: true,
                 action: 'init',
-                message: `Repositório Git inicializado com sucesso em '${params.projectPath}'`,
+                message: `RepositÃ³rio Git inicializado com sucesso em '${params.projectPath}'`,
                 data: {
                     path: params.projectPath,
                     initialized: true,
@@ -577,36 +577,36 @@ exports.gitRepositoriesTool = {
             };
         }
         catch (error) {
-            throw new Error(`Falha ao inicializar repositório: ${error instanceof Error ? error.message : String(error)}`);
+            throw new Error(`Falha ao inicializar repositÃ³rio: ${error instanceof Error ? error.message : String(error)}`);
         }
     },
     /**
-     * Clona um repositório para o diretório local
+     * Clona um repositÃ³rio para o diretÃ³rio local
      *
      * FUNCIONALIDADE:
-     * - Clona repositório remoto para diretório local
+     * - Clona repositÃ³rio remoto para diretÃ³rio local
      * - Suporta diferentes protocolos (HTTPS, SSH)
-     * - Mantém estrutura de diretórios
+     * - MantÃ©m estrutura de diretÃ³rios
      *
-     * PARÂMETROS OBRIGATÓRIOS:
-     * - owner: Proprietário do repositório
-     * - repo: Nome do repositório
+     * PARÃ‚METROS OBRIGATÃ“RIOS:
+     * - owner: ProprietÃ¡rio do repositÃ³rio
+     * - repo: Nome do repositÃ³rio
      * - projectPath: Caminho local de destino
      * - provider: Provider a ser usado
      *
-     * RECOMENDAÇÕES:
-     * - Verifique espaço em disco disponível
+     * RECOMENDAÃ‡Ã•ES:
+     * - Verifique espaÃ§o em disco disponÃ­vel
      * - Use caminhos absolutos
-     * - Considere profundidade de clone para repositórios grandes
+     * - Considere profundidade de clone para repositÃ³rios grandes
      */
     async cloneRepository(params, provider) {
         try {
             if (!params.repo || !params.projectPath) {
-                throw new Error('repo e projectPath são obrigatórios para clonagem');
+                throw new Error('repo e projectPath sÃ£o obrigatÃ³rios para clonagem');
             }
             const currentUser = await provider.getCurrentUser();
             const owner = currentUser.login;
-            // Obtém URL do repositório
+            // ObtÃ©m URL do repositÃ³rio
             const providerConfig = provider.getConfig ? provider.getConfig() : null;
             const baseUrl = providerConfig?.apiUrl || (params.provider === 'gitea' ? 'http://nas-ubuntu:3000' : 'https://github.com');
             const repoUrl = params.provider === 'gitea'
@@ -616,15 +616,15 @@ exports.gitRepositoriesTool = {
             const cloneResult = await (0, terminal_controller_js_1.runTerminalCmd)({
                 command: `git clone "${repoUrl}" "${params.projectPath}"`,
                 is_background: false,
-                explanation: 'Clonando repositório remoto'
+                explanation: 'Clonando repositÃ³rio remoto'
             });
             if (cloneResult.exitCode !== 0) {
-                throw new Error(`Falha ao clonar repositório: ${cloneResult.output}`);
+                throw new Error(`Falha ao clonar repositÃ³rio: ${cloneResult.output}`);
             }
             return {
                 success: true,
                 action: 'clone',
-                message: `Repositório '${owner}/${params.repo}' clonado com sucesso para '${params.projectPath}'`,
+                message: `RepositÃ³rio '${owner}/${params.repo}' clonado com sucesso para '${params.projectPath}'`,
                 data: {
                     source: `${owner}/${params.repo}`,
                     destination: params.projectPath,
@@ -634,8 +634,25 @@ exports.gitRepositoriesTool = {
             };
         }
         catch (error) {
-            throw new Error(`Falha ao clonar repositório: ${error instanceof Error ? error.message : String(error)}`);
+            throw new Error(`Falha ao clonar repositÃ³rio: ${error instanceof Error ? error.message : String(error)}`);
         }
+    }
+    /**
+     * Verifica se erro Ã© relacionado a Git
+     */
+    ,
+    /**
+     * Verifica se erro Ã© relacionado a Git
+     */
+    isGitRelatedError(errorMessage) {
+        const gitKeywords = [
+            'git', 'commit', 'push', 'pull', 'merge', 'conflict', 'branch',
+            'remote', 'repository', 'authentication', 'permission', 'unauthorized',
+            'divergent', 'non-fast-forward', 'fetch first', 'working tree',
+            'uncommitted', 'stash', 'rebase', 'reset', 'checkout'
+        ];
+        const errorLower = errorMessage.toLowerCase();
+        return gitKeywords.some(keyword => errorLower.includes(keyword));
     }
 };
 //# sourceMappingURL=git-repositories.js.map

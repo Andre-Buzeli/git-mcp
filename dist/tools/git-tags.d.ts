@@ -3,41 +3,41 @@ import { VcsOperations } from '../providers/index.js';
 /**
  * Tool: tags
  *
- * DESCRIÇÃO:
+ * DESCRIÃ‡ÃƒO:
  * Gerenciamento completo de tags com suporte multi-provider (GitHub e Gitea)
  *
  * FUNCIONALIDADES:
- * - Criação de novas tags
+ * - CriaÃ§Ã£o de novas tags
  * - Listagem e busca de tags
- * - Obtenção de detalhes específicos
- * - Exclusão de tags
- * - Controle de versão
- * - Busca por padrões
+ * - ObtenÃ§Ã£o de detalhes especÃ­ficos
+ * - ExclusÃ£o de tags
+ * - Controle de versÃ£o
+ * - Busca por padrÃµes
  *
  * USO:
- * - Para marcar versões específicas
+ * - Para marcar versÃµes especÃ­ficas
  * - Para controle de release
- * - Para rollback de código
- * - Para identificação de commits
+ * - Para rollback de cÃ³digo
+ * - Para identificaÃ§Ã£o de commits
  *
- * RECOMENDAÇÕES:
- * - Use versionamento semântico
+ * RECOMENDAÃ‡Ã•ES:
+ * - Use versionamento semÃ¢ntico
  * - Mantenha tags organizadas
- * - Documente propósito das tags
- * - Use para pontos de referência
+ * - Documente propÃ³sito das tags
+ * - Use para pontos de referÃªncia
  */
 /**
- * Schema de validação para entrada da tool tags
+ * Schema de validaÃ§Ã£o para entrada da tool tags
  *
- * VALIDAÇÕES:
- * - action: Ação obrigatória (create, list, get, delete, search)
- * - Parâmetros específicos por ação
- * - Validação de tipos e formatos
+ * VALIDAÃ‡Ã•ES:
+ * - action: AÃ§Ã£o obrigatÃ³ria (create, list, get, delete, search)
+ * - ParÃ¢metros especÃ­ficos por aÃ§Ã£o
+ * - ValidaÃ§Ã£o de tipos e formatos
  *
- * RECOMENDAÇÕES:
+ * RECOMENDAÃ‡Ã•ES:
  * - Sempre valide entrada antes de usar
- * - Use parâmetros opcionais adequadamente
- * - Documente parâmetros obrigatórios
+ * - Use parÃ¢metros opcionais adequadamente
+ * - Documente parÃ¢metros obrigatÃ³rios
  */
 declare const TagsInputSchema: z.ZodObject<{
     action: z.ZodEnum<["create", "list", "get", "delete", "search"]>;
@@ -90,11 +90,11 @@ declare const TagsInputSchema: z.ZodObject<{
 }>;
 export type TagsInput = z.infer<typeof TagsInputSchema>;
 /**
- * Schema de saída padronizado
+ * Schema de saÃ­da padronizado
  *
  * ESTRUTURA:
- * - success: Status da operação
- * - action: Ação executada
+ * - success: Status da operaÃ§Ã£o
+ * - action: AÃ§Ã£o executada
  * - message: Mensagem descritiva
  * - data: Dados retornados (opcional)
  * - error: Detalhes do erro (opcional)
@@ -122,53 +122,53 @@ export type TagsResult = z.infer<typeof TagsResultSchema>;
 /**
  * Tool: tags
  *
- * DESCRIÇÃO:
- * Gerenciamento completo de tags Gitea com múltiplas ações
+ * DESCRIÃ‡ÃƒO:
+ * Gerenciamento completo de tags Gitea com mÃºltiplas aÃ§Ãµes
  *
- * ACTIONS DISPONÍVEIS:
+ * ACTIONS DISPONÃVEIS:
  *
  * 1. create - Criar nova tag
- *    Parâmetros:
- *    - owner (obrigatório): Proprietário do repositório
- *    - repo (obrigatório): Nome do repositório
- *    - tag_name (obrigatório): Nome da tag
+ *    ParÃ¢metros:
+ *    - owner (obrigatÃ³rio): ProprietÃ¡rio do repositÃ³rio
+ *    - repo (obrigatÃ³rio): Nome do repositÃ³rio
+ *    - tag_name (obrigatÃ³rio): Nome da tag
  *    - message (opcional): Mensagem da tag (para tags anotadas)
- *    - target (obrigatório): Commit, branch ou tag alvo
- *    - type (opcional): Tipo de tag (lightweight, annotated) - padrão: lightweight
+ *    - target (obrigatÃ³rio): Commit, branch ou tag alvo
+ *    - type (opcional): Tipo de tag (lightweight, annotated) - padrÃ£o: lightweight
  *    - tagger_name (opcional): Nome do tagger (para tags anotadas)
  *    - tagger_email (opcional): Email do tagger (para tags anotadas)
  *
  * 2. list - Listar tags
- *    Parâmetros:
- *    - owner (obrigatório): Proprietário do repositório
- *    - repo (obrigatório): Nome do repositório
- *    - page (opcional): Página da listagem (padrão: 1)
- *    - limit (opcional): Itens por página (padrão: 30, máximo: 100)
+ *    ParÃ¢metros:
+ *    - owner (obrigatÃ³rio): ProprietÃ¡rio do repositÃ³rio
+ *    - repo (obrigatÃ³rio): Nome do repositÃ³rio
+ *    - page (opcional): PÃ¡gina da listagem (padrÃ£o: 1)
+ *    - limit (opcional): Itens por pÃ¡gina (padrÃ£o: 30, mÃ¡ximo: 100)
  *
  * 3. get - Obter detalhes da tag
- *    Parâmetros:
- *    - owner (obrigatório): Proprietário do repositório
- *    - repo (obrigatório): Nome do repositório
- *    - tag (obrigatório): Nome da tag
+ *    ParÃ¢metros:
+ *    - owner (obrigatÃ³rio): ProprietÃ¡rio do repositÃ³rio
+ *    - repo (obrigatÃ³rio): Nome do repositÃ³rio
+ *    - tag (obrigatÃ³rio): Nome da tag
  *
  * 4. delete - Deletar tag
- *    Parâmetros:
- *    - owner (obrigatório): Proprietário do repositório
- *    - repo (obrigatório): Nome do repositório
- *    - tag (obrigatório): Nome da tag
+ *    ParÃ¢metros:
+ *    - owner (obrigatÃ³rio): ProprietÃ¡rio do repositÃ³rio
+ *    - repo (obrigatÃ³rio): Nome do repositÃ³rio
+ *    - tag (obrigatÃ³rio): Nome da tag
  *
  * 5. search - Buscar tags
- *    Parâmetros:
- *    - owner (obrigatório): Proprietário do repositório
- *    - repo (obrigatório): Nome do repositório
+ *    ParÃ¢metros:
+ *    - owner (obrigatÃ³rio): ProprietÃ¡rio do repositÃ³rio
+ *    - repo (obrigatÃ³rio): Nome do repositÃ³rio
  *    - query (opcional): Termo de busca
- *    - pattern (opcional): Padrão de busca (ex: v*.*.*)
+ *    - pattern (opcional): PadrÃ£o de busca (ex: v*.*.*)
  *
- * RECOMENDAÇÕES DE USO:
- * - Use convenções de nomenclatura consistentes
- * - Documente propósito das tags
+ * RECOMENDAÃ‡Ã•ES DE USO:
+ * - Use convenÃ§Ãµes de nomenclatura consistentes
+ * - Documente propÃ³sito das tags
  * - Mantenha tags organizadas
- * - Use versionamento semântico
+ * - Use versionamento semÃ¢ntico
  * - Use tags anotadas para releases importantes
  * - Limpe tags antigas regularmente
  */
@@ -247,169 +247,173 @@ export declare const tagsTool: {
      *
      * FUNCIONALIDADE:
      * - Valida entrada usando Zod schema
-     * - Roteia para método específico baseado na ação
+     * - Roteia para mÃ©todo especÃ­fico baseado na aÃ§Ã£o
      * - Trata erros de forma uniforme
      * - Retorna resultado padronizado
      *
      * FLUXO:
-     * 1. Validação de entrada
-     * 2. Seleção do provider
-     * 3. Roteamento por ação
-     * 4. Execução do método específico
+     * 1. ValidaÃ§Ã£o de entrada
+     * 2. SeleÃ§Ã£o do provider
+     * 3. Roteamento por aÃ§Ã£o
+     * 4. ExecuÃ§Ã£o do mÃ©todo especÃ­fico
      * 5. Tratamento de erros
      * 6. Retorno de resultado
      *
      * TRATAMENTO DE ERROS:
-     * - Validação: erro de schema
-     * - Execução: erro da operação
-     * - Roteamento: ação não suportada
+     * - ValidaÃ§Ã£o: erro de schema
+     * - ExecuÃ§Ã£o: erro da operaÃ§Ã£o
+     * - Roteamento: aÃ§Ã£o nÃ£o suportada
      *
-     * RECOMENDAÇÕES:
+     * RECOMENDAÃ‡Ã•ES:
      * - Sempre valide entrada antes de processar
-     * - Trate erros específicos adequadamente
+     * - Trate erros especÃ­ficos adequadamente
      * - Log detalhes de erro para debug
-     * - Retorne mensagens de erro úteis
+     * - Retorne mensagens de erro Ãºteis
      */
     handler(input: TagsInput): Promise<TagsResult>;
     /**
-     * Cria uma nova tag no repositório
+     * Cria uma nova tag no repositÃ³rio
      *
      * FUNCIONALIDADE:
      * - Cria tag com nome e target especificados
      * - Suporta tags lightweight e anotadas
-     * - Permite configuração de tagger
+     * - Permite configuraÃ§Ã£o de tagger
      *
-     * PARÂMETROS OBRIGATÓRIOS:
-     * - owner: Proprietário do repositório
-     * - repo: Nome do repositório
+     * PARÃ‚METROS OBRIGATÃ“RIOS:
+     * - owner: ProprietÃ¡rio do repositÃ³rio
+     * - repo: Nome do repositÃ³rio
      * - tag_name: Nome da tag
      * - target: Commit, branch ou tag alvo
      *
-     * PARÂMETROS OPCIONAIS:
+     * PARÃ‚METROS OPCIONAIS:
      * - message: Mensagem da tag (para tags anotadas)
-     * - type: Tipo de tag (lightweight, annotated) - padrão: lightweight
+     * - type: Tipo de tag (lightweight, annotated) - padrÃ£o: lightweight
      * - tagger_name: Nome do tagger (para tags anotadas)
      * - tagger_email: Email do tagger (para tags anotadas)
      *
-     * VALIDAÇÕES:
-     * - Todos os parâmetros obrigatórios
-     * - Nome da tag deve ser único no repositório
+     * VALIDAÃ‡Ã•ES:
+     * - Todos os parÃ¢metros obrigatÃ³rios
+     * - Nome da tag deve ser Ãºnico no repositÃ³rio
      * - Target deve existir
-     * - Usuário deve ter permissão de escrita
+     * - UsuÃ¡rio deve ter permissÃ£o de escrita
      *
-     * RECOMENDAÇÕES:
-     * - Use convenções de nomenclatura consistentes
+     * RECOMENDAÃ‡Ã•ES:
+     * - Use convenÃ§Ãµes de nomenclatura consistentes
      * - Use tags anotadas para releases importantes
-     * - Documente propósito da tag
-     * - Use versionamento semântico
+     * - Documente propÃ³sito da tag
+     * - Use versionamento semÃ¢ntico
      */
     createTag(params: TagsInput, provider: VcsOperations): Promise<TagsResult>;
     /**
-     * Lista tags do repositório
+     * Lista tags do repositÃ³rio
      *
      * FUNCIONALIDADE:
-     * - Lista tags com paginação
-     * - Retorna informações básicas de cada tag
+     * - Lista tags com paginaÃ§Ã£o
+     * - Retorna informaÃ§Ãµes bÃ¡sicas de cada tag
      * - Inclui commit alvo e URLs de download
      *
-     * PARÂMETROS OBRIGATÓRIOS:
-     * - owner: Proprietário do repositório
-     * - repo: Nome do repositório
+     * PARÃ‚METROS OBRIGATÃ“RIOS:
+     * - owner: ProprietÃ¡rio do repositÃ³rio
+     * - repo: Nome do repositÃ³rio
      *
-     * PARÂMETROS OPCIONAIS:
-     * - page: Página da listagem (padrão: 1)
-     * - limit: Itens por página (padrão: 30, máximo: 100)
+     * PARÃ‚METROS OPCIONAIS:
+     * - page: PÃ¡gina da listagem (padrÃ£o: 1)
+     * - limit: Itens por pÃ¡gina (padrÃ£o: 30, mÃ¡ximo: 100)
      *
-     * VALIDAÇÕES:
-     * - e repo obrigatórios
+     * VALIDAÃ‡Ã•ES:
+     * - e repo obrigatÃ³rios
      * - Page deve ser >= 1
      * - Limit deve ser entre 1 e 100
      *
-     * RECOMENDAÇÕES:
-     * - Use paginação para repositórios com muitas tags
-     * - Monitore número total de tags
+     * RECOMENDAÃ‡Ã•ES:
+     * - Use paginaÃ§Ã£o para repositÃ³rios com muitas tags
+     * - Monitore nÃºmero total de tags
      * - Verifique commit alvo de cada tag
      * - Mantenha tags organizadas
      */
     listTags(params: TagsInput, provider: VcsOperations): Promise<TagsResult>;
     /**
-     * Obtém detalhes de uma tag específica
+     * ObtÃ©m detalhes de uma tag especÃ­fica
      *
      * FUNCIONALIDADE:
-     * - Retorna informações completas da tag
+     * - Retorna informaÃ§Ãµes completas da tag
      * - Inclui nome, commit alvo e URLs
      * - Mostra tipo da tag (lightweight/anotada)
      *
-     * PARÂMETROS OBRIGATÓRIOS:
-     * - owner: Proprietário do repositório
-     * - repo: Nome do repositório
+     * PARÃ‚METROS OBRIGATÃ“RIOS:
+     * - owner: ProprietÃ¡rio do repositÃ³rio
+     * - repo: Nome do repositÃ³rio
      * - tag: Nome da tag
      *
-     * VALIDAÇÕES:
-     * - Todos os parâmetros obrigatórios
-     * - Tag deve existir no repositório
-     * - Nome deve ser válido
+     * VALIDAÃ‡Ã•ES:
+     * - Todos os parÃ¢metros obrigatÃ³rios
+     * - Tag deve existir no repositÃ³rio
+     * - Nome deve ser vÃ¡lido
      *
-     * RECOMENDAÇÕES:
+     * RECOMENDAÃ‡Ã•ES:
      * - Use para obter detalhes completos
      * - Verifique commit alvo da tag
      * - Analise URLs de download
-     * - Monitore mudanças importantes
+     * - Monitore mudanÃ§as importantes
      */
     getTag(params: TagsInput, provider: VcsOperations): Promise<TagsResult>;
     /**
-     * Deleta uma tag do repositório
+     * Deleta uma tag do repositÃ³rio
      *
      * FUNCIONALIDADE:
      * - Remove tag especificada
-     * - Mantém commit alvo intacto
-     * - Confirma exclusão bem-sucedida
+     * - MantÃ©m commit alvo intacto
+     * - Confirma exclusÃ£o bem-sucedida
      *
-     * PARÂMETROS OBRIGATÓRIOS:
-     * - owner: Proprietário do repositório
-     * - repo: Nome do repositório
+     * PARÃ‚METROS OBRIGATÃ“RIOS:
+     * - owner: ProprietÃ¡rio do repositÃ³rio
+     * - repo: Nome do repositÃ³rio
      * - tag: Nome da tag
      *
-     * VALIDAÇÕES:
-     * - Todos os parâmetros obrigatórios
+     * VALIDAÃ‡Ã•ES:
+     * - Todos os parÃ¢metros obrigatÃ³rios
      * - Tag deve existir
-     * - Usuário deve ter permissão de exclusão
+     * - UsuÃ¡rio deve ter permissÃ£o de exclusÃ£o
      *
-     * RECOMENDAÇÕES:
-     * - Confirme exclusão antes de executar
-     * - Verifique se tag não está sendo usada
-     * - Mantenha backup se necessário
-     * - Documente motivo da exclusão
+     * RECOMENDAÃ‡Ã•ES:
+     * - Confirme exclusÃ£o antes de executar
+     * - Verifique se tag nÃ£o estÃ¡ sendo usada
+     * - Mantenha backup se necessÃ¡rio
+     * - Documente motivo da exclusÃ£o
      */
     deleteTag(params: TagsInput, provider: VcsOperations): Promise<TagsResult>;
     /**
-     * Busca tags por critérios específicos
+     * Busca tags por critÃ©rios especÃ­ficos
      *
      * FUNCIONALIDADE:
-     * - Busca tags por nome ou padrão
-     * - Suporta padrões glob (ex: v*.*.*)
+     * - Busca tags por nome ou padrÃ£o
+     * - Suporta padrÃµes glob (ex: v*.*.*)
      * - Retorna resultados relevantes
      *
-     * PARÂMETROS OBRIGATÓRIOS:
-     * - owner: Proprietário do repositório
-     * - repo: Nome do repositório
+     * PARÃ‚METROS OBRIGATÃ“RIOS:
+     * - owner: ProprietÃ¡rio do repositÃ³rio
+     * - repo: Nome do repositÃ³rio
      *
-     * PARÂMETROS OPCIONAIS:
+     * PARÃ‚METROS OPCIONAIS:
      * - query: Termo de busca
-     * - pattern: Padrão de busca (ex: v*.*.*)
+     * - pattern: PadrÃ£o de busca (ex: v*.*.*)
      *
-     * VALIDAÇÕES:
-     * - e repo obrigatórios
+     * VALIDAÃ‡Ã•ES:
+     * - e repo obrigatÃ³rios
      * - Query ou pattern deve ser fornecido
-     * - Repositório deve existir
+     * - RepositÃ³rio deve existir
      *
-     * RECOMENDAÇÕES:
-     * - Use padrões glob para busca eficiente
+     * RECOMENDAÃ‡Ã•ES:
+     * - Use padrÃµes glob para busca eficiente
      * - Combine com filtros de nome
-     * - Analise resultados para relevância
+     * - Analise resultados para relevÃ¢ncia
      * - Use para encontrar tags relacionadas
      */
     searchTags(params: TagsInput, provider: VcsOperations): Promise<TagsResult>;
+    /**
+     * Verifica se erro Ã© relacionado a Git
+     */
+    isGitRelatedError(errorMessage: string): boolean;
 };
 export {};
 //# sourceMappingURL=git-tags.d.ts.map

@@ -1,11 +1,12 @@
-import { z } from 'zod';
+﻿import { z } from 'zod';
 import { runGitCommand } from '../utils/terminal-controller.js';
+import { ErrorHandler } from '../providers/error-handler.js';
 
 /**
  * Tool: git-remote
  * 
- * DESCRIÇÃO:
- * Gerenciamento de remotes Git (GitHub + Gitea) com múltiplas ações
+ * DESCRIÃ‡ÃƒO:
+ * Gerenciamento de remotes Git (GitHub + Gitea) com mÃºltiplas aÃ§Ãµes
  * 
  * FUNCIONALIDADES:
  * - Adicionar remote
@@ -16,12 +17,12 @@ import { runGitCommand } from '../utils/terminal-controller.js';
  * - Prune remotes
  * 
  * USO:
- * - Para configurar repositórios remotos
- * - Para gerenciar múltiplos remotes
+ * - Para configurar repositÃ³rios remotos
+ * - Para gerenciar mÃºltiplos remotes
  * - Para sincronizar com diferentes servidores
  * - Para configurar upstream
  * 
- * RECOMENDAÇÕES:
+ * RECOMENDAÃ‡Ã•ES:
  * - Use 'origin' como remote principal
  * - Configure upstream para branches
  * - Mantenha URLs atualizadas
@@ -62,7 +63,7 @@ export type GitRemoteResult = z.infer<typeof GitRemoteResultSchema>;
 
 export const gitRemoteTool = {
   name: 'git-remote',
-  description: 'tool: Gerencia repositórios remotos Git para sincronização\n──────────────\naction add: adiciona novo remote\naction add requires: repo, remote_name, remote_url, provider\n───────────────\naction remove: remove remote\naction remove requires: repo, remote, provider\n───────────────\naction rename: renomeia remote\naction rename requires: repo, remote, new_name, provider\n───────────────\naction show: mostra informações do remote\naction show requires: repo, remote, provider\n───────────────\naction set-url: atualiza URL do remote\naction set-url requires: repo, remote, remote_url, provider\n───────────────\naction prune: remove referências obsoletas\naction prune requires: repo, remote_to_prune, provider',
+  description: 'tool: Gerencia repositÃ³rios remotos Git para sincronizaÃ§Ã£o\nâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\naction add: adiciona novo remote\naction add requires: repo, remote_name, remote_url, provider\nâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\naction remove: remove remote\naction remove requires: repo, remote, provider\nâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\naction rename: renomeia remote\naction rename requires: repo, remote, new_name, provider\nâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\naction show: mostra informaÃ§Ãµes do remote\naction show requires: repo, remote, provider\nâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\naction set-url: atualiza URL do remote\naction set-url requires: repo, remote, remote_url, provider\nâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\naction prune: remove referÃªncias obsoletas\naction prune requires: repo, remote_to_prune, provider',
   inputSchema: {
     type: 'object',
     properties: {
@@ -102,13 +103,13 @@ export const gitRemoteTool = {
         case 'prune':
           return await this.prune(validatedInput);
         default:
-          throw new Error(`Ação não suportada: ${validatedInput.action}`);
+          throw new Error(`AÃ§Ã£o nÃ£o suportada: ${validatedInput.action}`);
       }
     } catch (error) {
       return {
         success: false,
         action: input.action,
-        message: 'Erro na operação de remote',
+        message: 'Erro na operaÃ§Ã£o de remote',
         error: error instanceof Error ? error.message : String(error)
       };
     }
@@ -117,7 +118,7 @@ export const gitRemoteTool = {
   async add(params: GitRemoteInput): Promise<GitRemoteResult> {
     try {
       if (!params.remote_name || !params.remote_url) {
-        throw new Error('remote_name e remote_url são obrigatórios para add');
+        throw new Error('remote_name e remote_url sÃ£o obrigatÃ³rios para add');
       }
 
       const gitCommand = `remote add ${params.remote_name} ${params.remote_url}`;
@@ -150,7 +151,7 @@ export const gitRemoteTool = {
   async remove(params: GitRemoteInput): Promise<GitRemoteResult> {
     try {
       if (!params.remote) {
-        throw new Error('remote é obrigatório para remove');
+        throw new Error('remote Ã© obrigatÃ³rio para remove');
       }
 
       const gitCommand = `remote remove ${params.remote}`;
@@ -182,7 +183,7 @@ export const gitRemoteTool = {
   async rename(params: GitRemoteInput): Promise<GitRemoteResult> {
     try {
       if (!params.remote || !params.new_name) {
-        throw new Error('remote e new_name são obrigatórios para rename');
+        throw new Error('remote e new_name sÃ£o obrigatÃ³rios para rename');
       }
 
       const gitCommand = `remote rename ${params.remote} ${params.new_name}`;
@@ -245,7 +246,7 @@ export const gitRemoteTool = {
           }
         };
       } else {
-        // Mostrar remote específico
+        // Mostrar remote especÃ­fico
         const gitCommand = `remote show ${params.remote}`;
         
         const result = await runGitCommand(
@@ -276,7 +277,7 @@ export const gitRemoteTool = {
   async setUrl(params: GitRemoteInput): Promise<GitRemoteResult> {
     try {
       if (!params.remote || !params.remote_url) {
-        throw new Error('remote e remote_url são obrigatórios para set-url');
+        throw new Error('remote e remote_url sÃ£o obrigatÃ³rios para set-url');
       }
 
       const gitCommand = `remote set-url ${params.remote} ${params.remote_url}`;
@@ -334,6 +335,19 @@ export const gitRemoteTool = {
       throw new Error(`Falha ao prunar remotes: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
+  /**
+   * Verifica se erro Ã© relacionado a Git
+   */
+  isGitRelatedError(errorMessage: string): boolean {
+    const gitKeywords = [
+      'git', 'commit', 'push', 'pull', 'merge', 'conflict', 'branch',
+      'remote', 'repository', 'authentication', 'permission', 'unauthorized',
+      'divergent', 'non-fast-forward', 'fetch first', 'working tree',
+      'uncommitted', 'stash', 'rebase', 'reset', 'checkout'
+    ];
+    
+    const errorLower = errorMessage.toLowerCase();
+    return gitKeywords.some(keyword => errorLower.includes(keyword));
+  }
 };
-
 

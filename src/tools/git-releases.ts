@@ -1,56 +1,57 @@
-import { z } from 'zod';
+﻿import { z } from 'zod';
 import { globalProviderFactory, VcsOperations } from '../providers/index.js';
 import { applyAutoUserDetection } from '../utils/user-detection.js';
+import { ErrorHandler } from '../providers/error-handler.js';
 
 /**
  * Tool: releases
  * 
- * DESCRIÇÃO:
+ * DESCRIÃ‡ÃƒO:
  * Gerenciamento completo de releases com suporte multi-provider (GitHub e Gitea)
  * 
  * FUNCIONALIDADES:
- * - Criação de novos releases
+ * - CriaÃ§Ã£o de novos releases
  * - Listagem e busca de releases
- * - Obtenção de detalhes específicos
- * - Atualização de releases existentes
- * - Publicação de releases
- * - Exclusão de releases
- * - Controle de versão
+ * - ObtenÃ§Ã£o de detalhes especÃ­ficos
+ * - AtualizaÃ§Ã£o de releases existentes
+ * - PublicaÃ§Ã£o de releases
+ * - ExclusÃ£o de releases
+ * - Controle de versÃ£o
  * 
  * USO:
- * - Para gerenciar versões do software
+ * - Para gerenciar versÃµes do software
  * - Para controle de deploy
- * - Para documentação de mudanças
- * - Para distribuição de releases
+ * - Para documentaÃ§Ã£o de mudanÃ§as
+ * - Para distribuiÃ§Ã£o de releases
  * 
- * RECOMENDAÇÕES:
- * - Use versionamento semântico
- * - Documente mudanças detalhadamente
+ * RECOMENDAÃ‡Ã•ES:
+ * - Use versionamento semÃ¢ntico
+ * - Documente mudanÃ§as detalhadamente
  * - Teste antes de publicar
- * - Mantenha histórico de versões
+ * - Mantenha histÃ³rico de versÃµes
  */
 
 /**
- * Schema de validação para entrada da tool releases
+ * Schema de validaÃ§Ã£o para entrada da tool releases
  * 
- * VALIDAÇÕES:
- * - action: Ação obrigatória (create, list, get, update, delete, publish)
- * - Parâmetros específicos por ação
- * - Validação de tipos e formatos
+ * VALIDAÃ‡Ã•ES:
+ * - action: AÃ§Ã£o obrigatÃ³ria (create, list, get, update, delete, publish)
+ * - ParÃ¢metros especÃ­ficos por aÃ§Ã£o
+ * - ValidaÃ§Ã£o de tipos e formatos
  * 
- * RECOMENDAÇÕES:
+ * RECOMENDAÃ‡Ã•ES:
  * - Sempre valide entrada antes de usar
- * - Use parâmetros opcionais adequadamente
- * - Documente parâmetros obrigatórios
+ * - Use parÃ¢metros opcionais adequadamente
+ * - Documente parÃ¢metros obrigatÃ³rios
  */
 const ReleasesInputSchema = z.object({
   action: z.enum(['create', 'list', 'get', 'update', 'delete', 'publish']),
   
-  // Parâmetros comuns
+  // ParÃ¢metros comuns
   repo: z.string(),
   
   // Para multi-provider
-  provider: z.enum(['gitea', 'github']).describe('Provider to use (gitea or github)'), // Provider específico: gitea, github ou both
+  provider: z.enum(['gitea', 'github']).describe('Provider to use (gitea or github)'), // Provider especÃ­fico: gitea, github ou both
   projectPath: z.string().describe('Local project path for git operations'),
   
   // Para create
@@ -83,11 +84,11 @@ const ReleasesInputSchema = z.object({
 export type ReleasesInput = z.infer<typeof ReleasesInputSchema>;
 
 /**
- * Schema de saída padronizado
+ * Schema de saÃ­da padronizado
  * 
  * ESTRUTURA:
- * - success: Status da operação
- * - action: Ação executada
+ * - success: Status da operaÃ§Ã£o
+ * - action: AÃ§Ã£o executada
  * - message: Mensagem descritiva
  * - data: Dados retornados (opcional)
  * - error: Detalhes do erro (opcional)
@@ -105,70 +106,70 @@ export type ReleasesResult = z.infer<typeof ReleasesResultSchema>;
 /**
  * Tool: releases
  * 
- * DESCRIÇÃO:
- * Gerenciamento completo de releases Gitea com múltiplas ações
+ * DESCRIÃ‡ÃƒO:
+ * Gerenciamento completo de releases Gitea com mÃºltiplas aÃ§Ãµes
  * 
- * ACTIONS DISPONÍVEIS:
+ * ACTIONS DISPONÃVEIS:
  * 
  * 1. create - Criar novo release
- *    Parâmetros:
- *    - owner (obrigatório): Proprietário do repositório
- *    - repo (obrigatório): Nome do repositório
- *    - tag_name (obrigatório): Nome da tag do release
+ *    ParÃ¢metros:
+ *    - owner (obrigatÃ³rio): ProprietÃ¡rio do repositÃ³rio
+ *    - repo (obrigatÃ³rio): Nome do repositÃ³rio
+ *    - tag_name (obrigatÃ³rio): Nome da tag do release
  *    - name (opcional): Nome do release
- *    - body (opcional): Descrição detalhada (changelog)
- *    - draft (opcional): Se é um draft release (padrão: false)
- *    - prerelease (opcional): Se é um prerelease (padrão: false)
- *    - target_commitish (opcional): Branch ou commit alvo (padrão: branch padrão)
+ *    - body (opcional): DescriÃ§Ã£o detalhada (changelog)
+ *    - draft (opcional): Se Ã© um draft release (padrÃ£o: false)
+ *    - prerelease (opcional): Se Ã© um prerelease (padrÃ£o: false)
+ *    - target_commitish (opcional): Branch ou commit alvo (padrÃ£o: branch padrÃ£o)
  * 
  * 2. list - Listar releases
- *    Parâmetros:
- *    - owner (obrigatório): Proprietário do repositório
- *    - repo (obrigatório): Nome do repositório
- *    - page (opcional): Página da listagem (padrão: 1)
- *    - limit (opcional): Itens por página (padrão: 30, máximo: 100)
+ *    ParÃ¢metros:
+ *    - owner (obrigatÃ³rio): ProprietÃ¡rio do repositÃ³rio
+ *    - repo (obrigatÃ³rio): Nome do repositÃ³rio
+ *    - page (opcional): PÃ¡gina da listagem (padrÃ£o: 1)
+ *    - limit (opcional): Itens por pÃ¡gina (padrÃ£o: 30, mÃ¡ximo: 100)
  * 
  * 3. get - Obter detalhes do release
- *    Parâmetros:
- *    - owner (obrigatório): Proprietário do repositório
- *    - repo (obrigatório): Nome do repositório
- *    - release_id (obrigatório): ID do release
+ *    ParÃ¢metros:
+ *    - owner (obrigatÃ³rio): ProprietÃ¡rio do repositÃ³rio
+ *    - repo (obrigatÃ³rio): Nome do repositÃ³rio
+ *    - release_id (obrigatÃ³rio): ID do release
  * 
  * 4. update - Atualizar release existente
- *    Parâmetros:
- *    - owner (obrigatório): Proprietário do repositório
- *    - repo (obrigatório): Nome do repositório
- *    - release_id (obrigatório): ID do release
+ *    ParÃ¢metros:
+ *    - owner (obrigatÃ³rio): ProprietÃ¡rio do repositÃ³rio
+ *    - repo (obrigatÃ³rio): Nome do repositÃ³rio
+ *    - release_id (obrigatÃ³rio): ID do release
  *    - new_tag_name (opcional): Nova tag
  *    - new_name (opcional): Novo nome
- *    - new_body (opcional): Nova descrição
+ *    - new_body (opcional): Nova descriÃ§Ã£o
  *    - new_draft (opcional): Novo status de draft
  *    - new_prerelease (opcional): Novo status de prerelease
  *    - new_target_commitish (opcional): Nova branch/commit alvo
  * 
  * 5. delete - Deletar release
- *    Parâmetros:
- *    - owner (obrigatório): Proprietário do repositório
- *    - repo (obrigatório): Nome do repositório
- *    - release_id (obrigatório): ID do release
+ *    ParÃ¢metros:
+ *    - owner (obrigatÃ³rio): ProprietÃ¡rio do repositÃ³rio
+ *    - repo (obrigatÃ³rio): Nome do repositÃ³rio
+ *    - release_id (obrigatÃ³rio): ID do release
  * 
  * 6. publish - Publicar release
- *    Parâmetros:
- *    - owner (obrigatório): Proprietário do repositório
- *    - repo (obrigatório): Nome do repositório
- *    - release_id (obrigatório): ID do release
+ *    ParÃ¢metros:
+ *    - owner (obrigatÃ³rio): ProprietÃ¡rio do repositÃ³rio
+ *    - repo (obrigatÃ³rio): Nome do repositÃ³rio
+ *    - release_id (obrigatÃ³rio): ID do release
  * 
- * RECOMENDAÇÕES DE USO:
- * - Use versionamento semântico (ex: v1.0.0, v2.1.3)
- * - Documente mudanças detalhadamente no body
- * - Use drafts para releases em preparação
+ * RECOMENDAÃ‡Ã•ES DE USO:
+ * - Use versionamento semÃ¢ntico (ex: v1.0.0, v2.1.3)
+ * - Documente mudanÃ§as detalhadamente no body
+ * - Use drafts para releases em preparaÃ§Ã£o
  * - Marque prereleases adequadamente
  * - Teste releases antes de publicar
  * - Mantenha changelog organizado
  */
 export const releasesTool = {
   name: 'git-releases',
-  description: 'tool: Gerencia releases Git para distribuição de versões\n──────────────\naction create: cria nova release\naction create requires: repo, tag_name, name, body, draft, prerelease, target_commitish, provider\n───────────────\naction list: lista releases do repositório\naction list requires: repo, page, limit, provider\n───────────────\naction get: obtém detalhes de release\naction get requires: repo, release_id, provider\n───────────────\naction update: atualiza release existente\naction update requires: repo, release_id, new_tag_name, new_name, new_body, new_draft, new_prerelease, new_target_commitish, provider\n───────────────\naction delete: remove release\naction delete requires: repo, release_id, provider\n───────────────\naction publish: publica release\naction publish requires: repo, release_id, latest, provider',
+  description: 'tool: Gerencia releases Git para distribuiÃ§Ã£o de versÃµes\nâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\naction create: cria nova release\naction create requires: repo, tag_name, name, body, draft, prerelease, target_commitish, provider\nâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\naction list: lista releases do repositÃ³rio\naction list requires: repo, page, limit, provider\nâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\naction get: obtÃ©m detalhes de release\naction get requires: repo, release_id, provider\nâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\naction update: atualiza release existente\naction update requires: repo, release_id, new_tag_name, new_name, new_body, new_draft, new_prerelease, new_target_commitish, provider\nâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\naction delete: remove release\naction delete requires: repo, release_id, provider\nâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\naction publish: publica release\naction publish requires: repo, release_id, latest, provider',
   inputSchema: {
     type: 'object',
     properties: {
@@ -204,41 +205,41 @@ export const releasesTool = {
    * 
    * FUNCIONALIDADE:
    * - Valida entrada usando Zod schema
-   * - Roteia para método específico baseado na ação
+   * - Roteia para mÃ©todo especÃ­fico baseado na aÃ§Ã£o
    * - Trata erros de forma uniforme
    * - Retorna resultado padronizado
    * 
    * FLUXO:
-   * 1. Validação de entrada
-   * 2. Seleção do provider
-   * 3. Roteamento por ação
-   * 4. Execução do método específico
+   * 1. ValidaÃ§Ã£o de entrada
+   * 2. SeleÃ§Ã£o do provider
+   * 3. Roteamento por aÃ§Ã£o
+   * 4. ExecuÃ§Ã£o do mÃ©todo especÃ­fico
    * 5. Tratamento de erros
    * 6. Retorno de resultado
    * 
    * TRATAMENTO DE ERROS:
-   * - Validação: erro de schema
-   * - Execução: erro da operação
-   * - Roteamento: ação não suportada
+   * - ValidaÃ§Ã£o: erro de schema
+   * - ExecuÃ§Ã£o: erro da operaÃ§Ã£o
+   * - Roteamento: aÃ§Ã£o nÃ£o suportada
    * 
-   * RECOMENDAÇÕES:
+   * RECOMENDAÃ‡Ã•ES:
    * - Sempre valide entrada antes de processar
-   * - Trate erros específicos adequadamente
+   * - Trate erros especÃ­ficos adequadamente
    * - Log detalhes de erro para debug
-   * - Retorne mensagens de erro úteis
+   * - Retorne mensagens de erro Ãºteis
    */
   async handler(input: ReleasesInput): Promise<ReleasesResult> {
     try {
       const validatedInput = ReleasesInputSchema.parse(input);
       
-      // Aplicar auto-detecção apenas para owner dentro do provider especificado
+      // Aplicar auto-detecÃ§Ã£o apenas para owner dentro do provider especificado
       const processedInput = await applyAutoUserDetection(validatedInput, validatedInput.provider);
       
-      // Usar o provider especificado pelo usuário
+      // Usar o provider especificado pelo usuÃ¡rio
       const provider = globalProviderFactory.getProvider(processedInput.provider);
       
       if (!provider) {
-        throw new Error(`Provider '${processedInput.provider}' não encontrado`);
+        throw new Error(`Provider '${processedInput.provider}' nÃ£o encontrado`);
       }
       
       switch (processedInput.action) {
@@ -255,54 +256,54 @@ export const releasesTool = {
         case 'publish':
           return await this.publishRelease(processedInput, provider);
         default:
-          throw new Error(`Ação não suportada: ${processedInput.action}`);
+          throw new Error(`AÃ§Ã£o nÃ£o suportada: ${processedInput.action}`);
       }
     } catch (error) {
       return {
         success: false,
         action: input.action,
-        message: 'Erro na operação de releases',
+        message: 'Erro na operaÃ§Ã£o de releases',
         error: error instanceof Error ? error.message : String(error)
       };
     }
   },
 
   /**
-   * Cria um novo release no repositório
+   * Cria um novo release no repositÃ³rio
    * 
    * FUNCIONALIDADE:
-   * - Cria release com tag e descrição
-   * - Suporta configuração de draft e prerelease
+   * - Cria release com tag e descriÃ§Ã£o
+   * - Suporta configuraÃ§Ã£o de draft e prerelease
    * - Permite especificar branch/commit alvo
    * 
-   * PARÂMETROS OBRIGATÓRIOS:
-   * - owner: Proprietário do repositório
-   * - repo: Nome do repositório
+   * PARÃ‚METROS OBRIGATÃ“RIOS:
+   * - owner: ProprietÃ¡rio do repositÃ³rio
+   * - repo: Nome do repositÃ³rio
    * - tag_name: Nome da tag do release
    * 
-   * PARÂMETROS OPCIONAIS:
+   * PARÃ‚METROS OPCIONAIS:
    * - name: Nome do release
-   * - body: Descrição detalhada (changelog)
-   * - draft: Se é um draft release (padrão: false)
-   * - prerelease: Se é um prerelease (padrão: false)
-   * - target_commitish: Branch ou commit alvo (padrão: branch padrão)
+   * - body: DescriÃ§Ã£o detalhada (changelog)
+   * - draft: Se Ã© um draft release (padrÃ£o: false)
+   * - prerelease: Se Ã© um prerelease (padrÃ£o: false)
+   * - target_commitish: Branch ou commit alvo (padrÃ£o: branch padrÃ£o)
    * 
-   * VALIDAÇÕES:
-   * - Todos os parâmetros obrigatórios
-   * - Tag deve ser única no repositório
+   * VALIDAÃ‡Ã•ES:
+   * - Todos os parÃ¢metros obrigatÃ³rios
+   * - Tag deve ser Ãºnica no repositÃ³rio
    * - Target commitish deve existir
-   * - Usuário deve ter permissão de escrita
+   * - UsuÃ¡rio deve ter permissÃ£o de escrita
    * 
-   * RECOMENDAÇÕES:
-   * - Use versionamento semântico (ex: v1.0.0)
-   * - Documente mudanças detalhadamente
-   * - Use drafts para releases em preparação
+   * RECOMENDAÃ‡Ã•ES:
+   * - Use versionamento semÃ¢ntico (ex: v1.0.0)
+   * - Documente mudanÃ§as detalhadamente
+   * - Use drafts para releases em preparaÃ§Ã£o
    * - Marque prereleases adequadamente
    */
   async createRelease(params: ReleasesInput, provider: VcsOperations): Promise<ReleasesResult> {
     try {
       if (!params.repo || !params.tag_name) {
-        throw new Error('repo e tag_name são obrigatórios');
+        throw new Error('repo e tag_name sÃ£o obrigatÃ³rios');
       }
 
       const releaseData = {
@@ -340,36 +341,36 @@ export const releasesTool = {
   },
 
   /**
-   * Lista releases do repositório
+   * Lista releases do repositÃ³rio
    * 
    * FUNCIONALIDADE:
-   * - Lista releases com paginação
-   * - Retorna informações básicas de cada release
+   * - Lista releases com paginaÃ§Ã£o
+   * - Retorna informaÃ§Ãµes bÃ¡sicas de cada release
    * - Inclui status de draft e prerelease
    * 
-   * PARÂMETROS OBRIGATÓRIOS:
-   * - owner: Proprietário do repositório
-   * - repo: Nome do repositório
+   * PARÃ‚METROS OBRIGATÃ“RIOS:
+   * - owner: ProprietÃ¡rio do repositÃ³rio
+   * - repo: Nome do repositÃ³rio
    * 
-   * PARÂMETROS OPCIONAIS:
-   * - page: Página da listagem (padrão: 1)
-   * - limit: Itens por página (padrão: 30, máximo: 100)
+   * PARÃ‚METROS OPCIONAIS:
+   * - page: PÃ¡gina da listagem (padrÃ£o: 1)
+   * - limit: Itens por pÃ¡gina (padrÃ£o: 30, mÃ¡ximo: 100)
    * 
-   * VALIDAÇÕES:
-   * - e repo obrigatórios
+   * VALIDAÃ‡Ã•ES:
+   * - e repo obrigatÃ³rios
    * - Page deve ser >= 1
    * - Limit deve ser entre 1 e 100
    * 
-   * RECOMENDAÇÕES:
-   * - Use paginação para repositórios com muitos releases
-   * - Monitore número total de releases
+   * RECOMENDAÃ‡Ã•ES:
+   * - Use paginaÃ§Ã£o para repositÃ³rios com muitos releases
+   * - Monitore nÃºmero total de releases
    * - Verifique status de draft e prerelease
    * - Mantenha releases organizados
    */
   async listReleases(params: ReleasesInput, provider: VcsOperations): Promise<ReleasesResult> {
     try {
       if (!params.repo) {
-        throw new Error('e repo são obrigatórios');
+        throw new Error('e repo sÃ£o obrigatÃ³rios');
       }
 
       const page = params.page || 1;
@@ -394,33 +395,33 @@ export const releasesTool = {
   },
 
   /**
-   * Obtém detalhes de um release específico
+   * ObtÃ©m detalhes de um release especÃ­fico
    * 
    * FUNCIONALIDADE:
-   * - Retorna informações completas do release
-   * - Inclui tag, nome, descrição e status
+   * - Retorna informaÃ§Ãµes completas do release
+   * - Inclui tag, nome, descriÃ§Ã£o e status
    * - Mostra URLs de download
    * 
-   * PARÂMETROS OBRIGATÓRIOS:
-   * - owner: Proprietário do repositório
-   * - repo: Nome do repositório
+   * PARÃ‚METROS OBRIGATÃ“RIOS:
+   * - owner: ProprietÃ¡rio do repositÃ³rio
+   * - repo: Nome do repositÃ³rio
    * - release_id: ID do release
    * 
-   * VALIDAÇÕES:
-   * - Todos os parâmetros obrigatórios
-   * - Release deve existir no repositório
-   * - ID deve ser válido
+   * VALIDAÃ‡Ã•ES:
+   * - Todos os parÃ¢metros obrigatÃ³rios
+   * - Release deve existir no repositÃ³rio
+   * - ID deve ser vÃ¡lido
    * 
-   * RECOMENDAÇÕES:
+   * RECOMENDAÃ‡Ã•ES:
    * - Use para obter detalhes completos
    * - Verifique status de draft e prerelease
-   * - Analise changelog e descrição
+   * - Analise changelog e descriÃ§Ã£o
    * - Monitore URLs de download
    */
   async getRelease(params: ReleasesInput, provider: VcsOperations): Promise<ReleasesResult> {
     try {
       if (!params.repo || !params.release_id) {
-        throw new Error('repo e release_id são obrigatórios');
+        throw new Error('repo e release_id sÃ£o obrigatÃ³rios');
       }
 
       const release = await provider.getRelease((await provider.getCurrentUser()).login, params.repo, params.release_id);
@@ -441,37 +442,37 @@ export const releasesTool = {
    * 
    * FUNCIONALIDADE:
    * - Atualiza campos do release
-   * - Suporta mudança de tag e descrição
-   * - Permite alteração de status
+   * - Suporta mudanÃ§a de tag e descriÃ§Ã£o
+   * - Permite alteraÃ§Ã£o de status
    * 
-   * PARÂMETROS OBRIGATÓRIOS:
-   * - owner: Proprietário do repositório
-   * - repo: Nome do repositório
+   * PARÃ‚METROS OBRIGATÃ“RIOS:
+   * - owner: ProprietÃ¡rio do repositÃ³rio
+   * - repo: Nome do repositÃ³rio
    * - release_id: ID do release
    * 
-   * PARÂMETROS OPCIONAIS:
+   * PARÃ‚METROS OPCIONAIS:
    * - new_tag_name: Nova tag
    * - new_name: Novo nome
-   * - new_body: Nova descrição
+   * - new_body: Nova descriÃ§Ã£o
    * - new_draft: Novo status de draft
    * - new_prerelease: Novo status de prerelease
    * - new_target_commitish: Nova branch/commit alvo
    * 
-   * VALIDAÇÕES:
-   * - Todos os parâmetros obrigatórios
+   * VALIDAÃ‡Ã•ES:
+   * - Todos os parÃ¢metros obrigatÃ³rios
    * - Release deve existir
    * - Pelo menos um campo deve ser atualizado
    * 
-   * RECOMENDAÇÕES:
-   * - Atualize apenas campos necessários
+   * RECOMENDAÃ‡Ã•ES:
+   * - Atualize apenas campos necessÃ¡rios
    * - Use mensagens de commit descritivas
-   * - Documente mudanças importantes
-   * - Notifique usuários sobre mudanças
+   * - Documente mudanÃ§as importantes
+   * - Notifique usuÃ¡rios sobre mudanÃ§as
    */
   async updateRelease(params: ReleasesInput, provider: VcsOperations): Promise<ReleasesResult> {
     try {
       if (!params.repo || !params.release_id) {
-        throw new Error('repo e release_id são obrigatórios');
+        throw new Error('repo e release_id sÃ£o obrigatÃ³rios');
       }
 
       const updateData: any = {};
@@ -500,33 +501,33 @@ export const releasesTool = {
   },
 
   /**
-   * Deleta um release do repositório
+   * Deleta um release do repositÃ³rio
    * 
    * FUNCIONALIDADE:
    * - Remove release especificado
-   * - Mantém tag associada (se existir)
-   * - Confirma exclusão bem-sucedida
+   * - MantÃ©m tag associada (se existir)
+   * - Confirma exclusÃ£o bem-sucedida
    * 
-   * PARÂMETROS OBRIGATÓRIOS:
-   * - owner: Proprietário do repositório
-   * - repo: Nome do repositório
+   * PARÃ‚METROS OBRIGATÃ“RIOS:
+   * - owner: ProprietÃ¡rio do repositÃ³rio
+   * - repo: Nome do repositÃ³rio
    * - release_id: ID do release
    * 
-   * VALIDAÇÕES:
-   * - Todos os parâmetros obrigatórios
+   * VALIDAÃ‡Ã•ES:
+   * - Todos os parÃ¢metros obrigatÃ³rios
    * - Release deve existir
-   * - Usuário deve ter permissão de exclusão
+   * - UsuÃ¡rio deve ter permissÃ£o de exclusÃ£o
    * 
-   * RECOMENDAÇÕES:
-   * - Confirme exclusão antes de executar
-   * - Verifique se release não está sendo usado
-   * - Mantenha backup se necessário
-   * - Documente motivo da exclusão
+   * RECOMENDAÃ‡Ã•ES:
+   * - Confirme exclusÃ£o antes de executar
+   * - Verifique se release nÃ£o estÃ¡ sendo usado
+   * - Mantenha backup se necessÃ¡rio
+   * - Documente motivo da exclusÃ£o
    */
   async deleteRelease(params: ReleasesInput, provider: VcsOperations): Promise<ReleasesResult> {
     try {
       if (!params.repo || !params.release_id) {
-        throw new Error('repo e release_id são obrigatórios');
+        throw new Error('repo e release_id sÃ£o obrigatÃ³rios');
       }
 
       await provider.deleteRelease(params.release_id);
@@ -547,29 +548,29 @@ export const releasesTool = {
    * 
    * FUNCIONALIDADE:
    * - Altera status do release de draft para publicado
-   * - Mantém todas as outras configurações
-   * - Permite download público
+   * - MantÃ©m todas as outras configuraÃ§Ãµes
+   * - Permite download pÃºblico
    * 
-   * PARÂMETROS OBRIGATÓRIOS:
-   * - owner: Proprietário do repositório
-   * - repo: Nome do repositório
+   * PARÃ‚METROS OBRIGATÃ“RIOS:
+   * - owner: ProprietÃ¡rio do repositÃ³rio
+   * - repo: Nome do repositÃ³rio
    * - release_id: ID do release
    * 
-   * VALIDAÇÕES:
-   * - Todos os parâmetros obrigatórios
+   * VALIDAÃ‡Ã•ES:
+   * - Todos os parÃ¢metros obrigatÃ³rios
    * - Release deve existir
    * - Release deve estar como draft
    * 
-   * RECOMENDAÇÕES:
-   * - Confirme que release está pronto
+   * RECOMENDAÃ‡Ã•ES:
+   * - Confirme que release estÃ¡ pronto
    * - Teste antes de publicar
-   * - Verifique se não há bugs conhecidos
-   * - Notifique usuários sobre nova versão
+   * - Verifique se nÃ£o hÃ¡ bugs conhecidos
+   * - Notifique usuÃ¡rios sobre nova versÃ£o
    */
   async publishRelease(params: ReleasesInput, provider: VcsOperations): Promise<ReleasesResult> {
     try {
       if (!params.repo || !params.release_id) {
-        throw new Error('repo e release_id são obrigatórios');
+        throw new Error('repo e release_id sÃ£o obrigatÃ³rios');
       }
 
       // Publicar release alterando status de draft para false
@@ -585,7 +586,19 @@ export const releasesTool = {
       throw new Error(`Falha ao publicar release: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
+  /**
+   * Verifica se erro Ã© relacionado a Git
+   */
+  isGitRelatedError(errorMessage: string): boolean {
+    const gitKeywords = [
+      'git', 'commit', 'push', 'pull', 'merge', 'conflict', 'branch',
+      'remote', 'repository', 'authentication', 'permission', 'unauthorized',
+      'divergent', 'non-fast-forward', 'fetch first', 'working tree',
+      'uncommitted', 'stash', 'rebase', 'reset', 'checkout'
+    ];
+    
+    const errorLower = errorMessage.toLowerCase();
+    return gitKeywords.some(keyword => errorLower.includes(keyword));
+  }
 };
-
-
 

@@ -3,42 +3,42 @@ import { VcsOperations } from '../providers/index.js';
 /**
  * Tool: issues
  *
- * DESCRIÇÃO:
+ * DESCRIÃ‡ÃƒO:
  * Gerenciamento completo de issues com suporte multi-provider (GitHub e Gitea)
  *
  * FUNCIONALIDADES:
- * - Criação de novas issues
+ * - CriaÃ§Ã£o de novas issues
  * - Listagem e busca de issues
- * - Obtenção de detalhes específicos
- * - Atualização de issues existentes
+ * - ObtenÃ§Ã£o de detalhes especÃ­ficos
+ * - AtualizaÃ§Ã£o de issues existentes
  * - Fechamento de issues
- * - Adição de comentários
- * - Busca por conteúdo e status
+ * - AdiÃ§Ã£o de comentÃ¡rios
+ * - Busca por conteÃºdo e status
  *
  * USO:
  * - Para gerenciar bugs e features
  * - Para acompanhar progresso de desenvolvimento
- * - Para comunicação entre equipe
+ * - Para comunicaÃ§Ã£o entre equipe
  * - Para controle de qualidade
  *
- * RECOMENDAÇÕES:
- * - Use títulos descritivos
+ * RECOMENDAÃ‡Ã•ES:
+ * - Use tÃ­tulos descritivos
  * - Documente detalhes completos
  * - Atualize status regularmente
  * - Use labels adequadamente
  */
 /**
- * Schema de validação para entrada da tool issues
+ * Schema de validaÃ§Ã£o para entrada da tool issues
  *
- * VALIDAÇÕES:
- * - action: Ação obrigatória (create, list, get, update, close, comment, search)
- * - Parâmetros específicos por ação
- * - Validação de tipos e formatos
+ * VALIDAÃ‡Ã•ES:
+ * - action: AÃ§Ã£o obrigatÃ³ria (create, list, get, update, close, comment, search)
+ * - ParÃ¢metros especÃ­ficos por aÃ§Ã£o
+ * - ValidaÃ§Ã£o de tipos e formatos
  *
- * RECOMENDAÇÕES:
+ * RECOMENDAÃ‡Ã•ES:
  * - Sempre valide entrada antes de usar
- * - Use parâmetros opcionais adequadamente
- * - Documente parâmetros obrigatórios
+ * - Use parÃ¢metros opcionais adequadamente
+ * - Documente parÃ¢metros obrigatÃ³rios
  */
 declare const IssuesInputSchema: z.ZodObject<{
     action: z.ZodEnum<["create", "list", "get", "update", "close", "comment", "search"]>;
@@ -118,11 +118,11 @@ declare const IssuesInputSchema: z.ZodObject<{
 }>;
 export type IssuesInput = z.infer<typeof IssuesInputSchema>;
 /**
- * Schema de saída padronizado
+ * Schema de saÃ­da padronizado
  *
  * ESTRUTURA:
- * - success: Status da operação
- * - action: Ação executada
+ * - success: Status da operaÃ§Ã£o
+ * - action: AÃ§Ã£o executada
  * - message: Mensagem descritiva
  * - data: Dados retornados (opcional)
  * - error: Detalhes do erro (opcional)
@@ -150,75 +150,75 @@ export type IssuesResult = z.infer<typeof IssuesResultSchema>;
 /**
  * Tool: issues
  *
- * DESCRIÇÃO:
- * Gerenciamento completo de issues Gitea com múltiplas ações
+ * DESCRIÃ‡ÃƒO:
+ * Gerenciamento completo de issues Gitea com mÃºltiplas aÃ§Ãµes
  *
- * ACTIONS DISPONÍVEIS:
+ * ACTIONS DISPONÃVEIS:
  *
  * 1. create - Criar nova issue
- *    Parâmetros:
- *    - owner (obrigatório): Proprietário do repositório
- *    - repo (obrigatório): Nome do repositório
- *    - title (obrigatório): Título da issue
- *    - body (opcional): Descrição detalhada
+ *    ParÃ¢metros:
+ *    - owner (obrigatÃ³rio): ProprietÃ¡rio do repositÃ³rio
+ *    - repo (obrigatÃ³rio): Nome do repositÃ³rio
+ *    - title (obrigatÃ³rio): TÃ­tulo da issue
+ *    - body (opcional): DescriÃ§Ã£o detalhada
  *    - labels (opcional): Array de labels
- *    - assignees (opcional): Array de usuários responsáveis
+ *    - assignees (opcional): Array de usuÃ¡rios responsÃ¡veis
  *    - milestone (opcional): ID do milestone
  *
  * 2. list - Listar issues
- *    Parâmetros:
- *    - owner (obrigatório): Proprietário do repositório
- *    - repo (obrigatório): Nome do repositório
- *    - state (opcional): Estado das issues (open, closed, all) - padrão: open
- *    - page (opcional): Página da listagem (padrão: 1)
- *    - limit (opcional): Itens por página (padrão: 30, máximo: 100)
+ *    ParÃ¢metros:
+ *    - owner (obrigatÃ³rio): ProprietÃ¡rio do repositÃ³rio
+ *    - repo (obrigatÃ³rio): Nome do repositÃ³rio
+ *    - state (opcional): Estado das issues (open, closed, all) - padrÃ£o: open
+ *    - page (opcional): PÃ¡gina da listagem (padrÃ£o: 1)
+ *    - limit (opcional): Itens por pÃ¡gina (padrÃ£o: 30, mÃ¡ximo: 100)
  *
  * 3. get - Obter detalhes da issue
- *    Parâmetros:
- *    - owner (obrigatório): Proprietário do repositório
- *    - repo (obrigatório): Nome do repositório
- *    - issue_number (obrigatório): Número da issue
+ *    ParÃ¢metros:
+ *    - owner (obrigatÃ³rio): ProprietÃ¡rio do repositÃ³rio
+ *    - repo (obrigatÃ³rio): Nome do repositÃ³rio
+ *    - issue_number (obrigatÃ³rio): NÃºmero da issue
  *
  * 4. update - Atualizar issue existente
- *    Parâmetros:
- *    - owner (obrigatório): Proprietário do repositório
- *    - repo (obrigatório): Nome do repositório
- *    - issue_number (obrigatório): Número da issue
- *    - new_title (opcional): Novo título
- *    - new_body (opcional): Nova descrição
+ *    ParÃ¢metros:
+ *    - owner (obrigatÃ³rio): ProprietÃ¡rio do repositÃ³rio
+ *    - repo (obrigatÃ³rio): Nome do repositÃ³rio
+ *    - issue_number (obrigatÃ³rio): NÃºmero da issue
+ *    - new_title (opcional): Novo tÃ­tulo
+ *    - new_body (opcional): Nova descriÃ§Ã£o
  *    - new_state (opcional): Novo estado
  *    - new_labels (opcional): Novos labels
- *    - new_assignees (opcional): Novos responsáveis
+ *    - new_assignees (opcional): Novos responsÃ¡veis
  *    - new_milestone (opcional): Novo milestone
  *
  * 5. close - Fechar issue
- *    Parâmetros:
- *    - owner (obrigatório): Proprietário do repositório
- *    - repo (obrigatório): Nome do repositório
- *    - issue_number (obrigatório): Número da issue
+ *    ParÃ¢metros:
+ *    - owner (obrigatÃ³rio): ProprietÃ¡rio do repositÃ³rio
+ *    - repo (obrigatÃ³rio): Nome do repositÃ³rio
+ *    - issue_number (obrigatÃ³rio): NÃºmero da issue
  *
- * 6. comment - Adicionar comentário
- *    Parâmetros:
- *    - owner (obrigatório): Proprietário do repositório
- *    - repo (obrigatório): Nome do repositório
- *    - issue_number (obrigatório): Número da issue
- *    - comment_body (obrigatório): Conteúdo do comentário
+ * 6. comment - Adicionar comentÃ¡rio
+ *    ParÃ¢metros:
+ *    - owner (obrigatÃ³rio): ProprietÃ¡rio do repositÃ³rio
+ *    - repo (obrigatÃ³rio): Nome do repositÃ³rio
+ *    - issue_number (obrigatÃ³rio): NÃºmero da issue
+ *    - comment_body (obrigatÃ³rio): ConteÃºdo do comentÃ¡rio
  *
  * 7. search - Buscar issues
- *    Parâmetros:
- *    - owner (obrigatório): Proprietário do repositório
- *    - repo (obrigatório): Nome do repositório
- *    - query (obrigatório): Termo de busca
+ *    ParÃ¢metros:
+ *    - owner (obrigatÃ³rio): ProprietÃ¡rio do repositÃ³rio
+ *    - repo (obrigatÃ³rio): Nome do repositÃ³rio
+ *    - query (obrigatÃ³rio): Termo de busca
  *    - author (opcional): Autor das issues
- *    - assignee (opcional): Responsável pelas issues
- *    - label (opcional): Label específico
+ *    - assignee (opcional): ResponsÃ¡vel pelas issues
+ *    - label (opcional): Label especÃ­fico
  *
- * RECOMENDAÇÕES DE USO:
- * - Use títulos descritivos e claros
- * - Documente detalhes completos na descrição
+ * RECOMENDAÃ‡Ã•ES DE USO:
+ * - Use tÃ­tulos descritivos e claros
+ * - Documente detalhes completos na descriÃ§Ã£o
  * - Atualize status regularmente
- * - Use labels para categorização
- * - Atribua responsáveis adequadamente
+ * - Use labels para categorizaÃ§Ã£o
+ * - Atribua responsÃ¡veis adequadamente
  * - Mantenha issues organizadas
  */
 export declare const issuesTool: {
@@ -345,115 +345,115 @@ export declare const issuesTool: {
      *
      * FUNCIONALIDADE:
      * - Valida entrada usando Zod schema
-     * - Roteia para método específico baseado na ação
+     * - Roteia para mÃ©todo especÃ­fico baseado na aÃ§Ã£o
      * - Trata erros de forma uniforme
      * - Retorna resultado padronizado
      *
      * FLUXO:
-     * 1. Validação de entrada
-     * 2. Seleção do provider
-     * 3. Roteamento por ação
-     * 4. Execução do método específico
+     * 1. ValidaÃ§Ã£o de entrada
+     * 2. SeleÃ§Ã£o do provider
+     * 3. Roteamento por aÃ§Ã£o
+     * 4. ExecuÃ§Ã£o do mÃ©todo especÃ­fico
      * 5. Tratamento de erros
      * 6. Retorno de resultado
      *
      * TRATAMENTO DE ERROS:
-     * - Validação: erro de schema
-     * - Execução: erro da operação
-     * - Roteamento: ação não suportada
+     * - ValidaÃ§Ã£o: erro de schema
+     * - ExecuÃ§Ã£o: erro da operaÃ§Ã£o
+     * - Roteamento: aÃ§Ã£o nÃ£o suportada
      *
-     * RECOMENDAÇÕES:
+     * RECOMENDAÃ‡Ã•ES:
      * - Sempre valide entrada antes de processar
-     * - Trate erros específicos adequadamente
+     * - Trate erros especÃ­ficos adequadamente
      * - Log detalhes de erro para debug
-     * - Retorne mensagens de erro úteis
+     * - Retorne mensagens de erro Ãºteis
      */
     handler(input: IssuesInput): Promise<IssuesResult>;
     /**
-     * Cria uma nova issue no repositório
+     * Cria uma nova issue no repositÃ³rio
      *
      * FUNCIONALIDADE:
-     * - Cria issue com título e descrição
+     * - Cria issue com tÃ­tulo e descriÃ§Ã£o
      * - Suporta labels, assignees e milestone
      * - Retorna detalhes da issue criada
      *
-     * PARÂMETROS OBRIGATÓRIOS:
-     * - owner: Proprietário do repositório
-     * - repo: Nome do repositório
-     * - title: Título da issue
+     * PARÃ‚METROS OBRIGATÃ“RIOS:
+     * - owner: ProprietÃ¡rio do repositÃ³rio
+     * - repo: Nome do repositÃ³rio
+     * - title: TÃ­tulo da issue
      *
-     * PARÂMETROS OPCIONAIS:
-     * - body: Descrição detalhada
-     * - labels: Array de labels para categorização
-     * - assignees: Array de usuários responsáveis
+     * PARÃ‚METROS OPCIONAIS:
+     * - body: DescriÃ§Ã£o detalhada
+     * - labels: Array de labels para categorizaÃ§Ã£o
+     * - assignees: Array de usuÃ¡rios responsÃ¡veis
      * - milestone: ID do milestone associado
      *
-     * VALIDAÇÕES:
-     * - Todos os parâmetros obrigatórios
-     * - Título deve ser único no repositório
-     * - Labels devem existir no repositório
-     * - Assignees devem ser usuários válidos
+     * VALIDAÃ‡Ã•ES:
+     * - Todos os parÃ¢metros obrigatÃ³rios
+     * - TÃ­tulo deve ser Ãºnico no repositÃ³rio
+     * - Labels devem existir no repositÃ³rio
+     * - Assignees devem ser usuÃ¡rios vÃ¡lidos
      *
-     * RECOMENDAÇÕES:
-     * - Use títulos descritivos e claros
+     * RECOMENDAÃ‡Ã•ES:
+     * - Use tÃ­tulos descritivos e claros
      * - Documente detalhes completos
-     * - Use labels para categorização
-     * - Atribua responsáveis adequadamente
+     * - Use labels para categorizaÃ§Ã£o
+     * - Atribua responsÃ¡veis adequadamente
      */
     createIssue(params: IssuesInput, provider: VcsOperations, owner: string): Promise<IssuesResult>;
     /**
-     * Lista issues do repositório
+     * Lista issues do repositÃ³rio
      *
      * FUNCIONALIDADE:
      * - Lista issues com filtros de estado
-     * - Suporta paginação
-     * - Retorna informações básicas de cada issue
+     * - Suporta paginaÃ§Ã£o
+     * - Retorna informaÃ§Ãµes bÃ¡sicas de cada issue
      *
-     * PARÂMETROS OBRIGATÓRIOS:
-     * - owner: Proprietário do repositório
-     * - repo: Nome do repositório
+     * PARÃ‚METROS OBRIGATÃ“RIOS:
+     * - owner: ProprietÃ¡rio do repositÃ³rio
+     * - repo: Nome do repositÃ³rio
      *
-     * PARÂMETROS OPCIONAIS:
-     * - state: Estado das issues (open, closed, all) - padrão: open
-     * - page: Página da listagem (padrão: 1)
-     * - limit: Itens por página (padrão: 30, máximo: 100)
+     * PARÃ‚METROS OPCIONAIS:
+     * - state: Estado das issues (open, closed, all) - padrÃ£o: open
+     * - page: PÃ¡gina da listagem (padrÃ£o: 1)
+     * - limit: Itens por pÃ¡gina (padrÃ£o: 30, mÃ¡ximo: 100)
      *
-     * VALIDAÇÕES:
-     * - e repo obrigatórios
-     * - State deve ser um dos valores válidos
+     * VALIDAÃ‡Ã•ES:
+     * - e repo obrigatÃ³rios
+     * - State deve ser um dos valores vÃ¡lidos
      * - Page deve ser >= 1
      * - Limit deve ser entre 1 e 100
      *
-     * RECOMENDAÇÕES:
-     * - Use paginação para repositórios com muitas issues
-     * - Monitore número total de issues
-     * - Filtre por estado para organização
+     * RECOMENDAÃ‡Ã•ES:
+     * - Use paginaÃ§Ã£o para repositÃ³rios com muitas issues
+     * - Monitore nÃºmero total de issues
+     * - Filtre por estado para organizaÃ§Ã£o
      * - Mantenha issues organizadas
      */
     listIssues(params: IssuesInput, provider: VcsOperations, owner: string): Promise<IssuesResult>;
     /**
-     * Obtém detalhes de uma issue específica
+     * ObtÃ©m detalhes de uma issue especÃ­fica
      *
      * FUNCIONALIDADE:
-     * - Retorna informações completas da issue
-     * - Inclui título, descrição, labels, assignees
-     * - Mostra histórico de comentários
+     * - Retorna informaÃ§Ãµes completas da issue
+     * - Inclui tÃ­tulo, descriÃ§Ã£o, labels, assignees
+     * - Mostra histÃ³rico de comentÃ¡rios
      *
-     * PARÂMETROS OBRIGATÓRIOS:
-     * - owner: Proprietário do repositório
-     * - repo: Nome do repositório
-     * - issue_number: Número da issue
+     * PARÃ‚METROS OBRIGATÃ“RIOS:
+     * - owner: ProprietÃ¡rio do repositÃ³rio
+     * - repo: Nome do repositÃ³rio
+     * - issue_number: NÃºmero da issue
      *
-     * VALIDAÇÕES:
-     * - Todos os parâmetros obrigatórios
-     * - Issue deve existir no repositório
-     * - Número deve ser válido
+     * VALIDAÃ‡Ã•ES:
+     * - Todos os parÃ¢metros obrigatÃ³rios
+     * - Issue deve existir no repositÃ³rio
+     * - NÃºmero deve ser vÃ¡lido
      *
-     * RECOMENDAÇÕES:
+     * RECOMENDAÃ‡Ã•ES:
      * - Use para obter detalhes completos
      * - Verifique status e labels
-     * - Analise comentários e histórico
-     * - Monitore mudanças importantes
+     * - Analise comentÃ¡rios e histÃ³rico
+     * - Monitore mudanÃ§as importantes
      */
     getIssue(params: IssuesInput, provider: VcsOperations, owner: string): Promise<IssuesResult>;
     /**
@@ -461,32 +461,32 @@ export declare const issuesTool: {
      *
      * FUNCIONALIDADE:
      * - Atualiza campos da issue
-     * - Suporta mudança de estado
-     * - Permite alteração de labels e assignees
+     * - Suporta mudanÃ§a de estado
+     * - Permite alteraÃ§Ã£o de labels e assignees
      *
-     * PARÂMETROS OBRIGATÓRIOS:
-     * - owner: Proprietário do repositório
-     * - repo: Nome do repositório
-     * - issue_number: Número da issue
+     * PARÃ‚METROS OBRIGATÃ“RIOS:
+     * - owner: ProprietÃ¡rio do repositÃ³rio
+     * - repo: Nome do repositÃ³rio
+     * - issue_number: NÃºmero da issue
      *
-     * PARÂMETROS OPCIONAIS:
-     * - new_title: Novo título
-     * - new_body: Nova descrição
+     * PARÃ‚METROS OPCIONAIS:
+     * - new_title: Novo tÃ­tulo
+     * - new_body: Nova descriÃ§Ã£o
      * - new_state: Novo estado
      * - new_labels: Novos labels
-     * - new_assignees: Novos responsáveis
+     * - new_assignees: Novos responsÃ¡veis
      * - new_milestone: Novo milestone
      *
-     * VALIDAÇÕES:
-     * - Todos os parâmetros obrigatórios
+     * VALIDAÃ‡Ã•ES:
+     * - Todos os parÃ¢metros obrigatÃ³rios
      * - Issue deve existir
      * - Pelo menos um campo deve ser atualizado
      *
-     * RECOMENDAÇÕES:
-     * - Atualize apenas campos necessários
+     * RECOMENDAÃ‡Ã•ES:
+     * - Atualize apenas campos necessÃ¡rios
      * - Use mensagens de commit descritivas
-     * - Documente mudanças importantes
-     * - Notifique responsáveis sobre mudanças
+     * - Documente mudanÃ§as importantes
+     * - Notifique responsÃ¡veis sobre mudanÃ§as
      */
     updateIssue(params: IssuesInput, provider: VcsOperations, owner: string): Promise<IssuesResult>;
     /**
@@ -494,82 +494,86 @@ export declare const issuesTool: {
      *
      * FUNCIONALIDADE:
      * - Altera estado da issue para closed
-     * - Mantém histórico e comentários
+     * - MantÃ©m histÃ³rico e comentÃ¡rios
      * - Permite reabertura posterior
      *
-     * PARÂMETROS OBRIGATÓRIOS:
-     * - owner: Proprietário do repositório
-     * - repo: Nome do repositório
-     * - issue_number: Número da issue
+     * PARÃ‚METROS OBRIGATÃ“RIOS:
+     * - owner: ProprietÃ¡rio do repositÃ³rio
+     * - repo: Nome do repositÃ³rio
+     * - issue_number: NÃºmero da issue
      *
-     * VALIDAÇÕES:
-     * - Todos os parâmetros obrigatórios
+     * VALIDAÃ‡Ã•ES:
+     * - Todos os parÃ¢metros obrigatÃ³rios
      * - Issue deve existir
      * - Issue deve estar aberta
      *
-     * RECOMENDAÇÕES:
+     * RECOMENDAÃ‡Ã•ES:
      * - Confirme que issue foi resolvida
-     * - Documente solução aplicada
-     * - Use comentário explicativo
-     * - Verifique se não há dependências
+     * - Documente soluÃ§Ã£o aplicada
+     * - Use comentÃ¡rio explicativo
+     * - Verifique se nÃ£o hÃ¡ dependÃªncias
      */
     closeIssue(params: IssuesInput, provider: VcsOperations, owner: string): Promise<IssuesResult>;
     /**
-     * Adiciona comentário a uma issue
+     * Adiciona comentÃ¡rio a uma issue
      *
      * FUNCIONALIDADE:
-     * - Cria novo comentário na issue
-     * - Mantém histórico de discussão
-     * - Suporta formatação Markdown
+     * - Cria novo comentÃ¡rio na issue
+     * - MantÃ©m histÃ³rico de discussÃ£o
+     * - Suporta formataÃ§Ã£o Markdown
      *
-     * PARÂMETROS OBRIGATÓRIOS:
-     * - owner: Proprietário do repositório
-     * - repo: Nome do repositório
-     * - issue_number: Número da issue
-     * - comment_body: Conteúdo do comentário
+     * PARÃ‚METROS OBRIGATÃ“RIOS:
+     * - owner: ProprietÃ¡rio do repositÃ³rio
+     * - repo: Nome do repositÃ³rio
+     * - issue_number: NÃºmero da issue
+     * - comment_body: ConteÃºdo do comentÃ¡rio
      *
-     * VALIDAÇÕES:
-     * - Todos os parâmetros obrigatórios
+     * VALIDAÃ‡Ã•ES:
+     * - Todos os parÃ¢metros obrigatÃ³rios
      * - Issue deve existir
-     * - Comentário não pode estar vazio
+     * - ComentÃ¡rio nÃ£o pode estar vazio
      *
-     * RECOMENDAÇÕES:
-     * - Use comentários para atualizações
-     * - Documente progresso e decisões
-     * - Use formatação Markdown adequadamente
-     * - Mantenha comentários relevantes
+     * RECOMENDAÃ‡Ã•ES:
+     * - Use comentÃ¡rios para atualizaÃ§Ãµes
+     * - Documente progresso e decisÃµes
+     * - Use formataÃ§Ã£o Markdown adequadamente
+     * - Mantenha comentÃ¡rios relevantes
      */
     addComment(params: IssuesInput, provider: VcsOperations, owner: string): Promise<IssuesResult>;
     /**
-     * Busca issues por critérios específicos
+     * Busca issues por critÃ©rios especÃ­ficos
      *
      * FUNCIONALIDADE:
-     * - Busca issues por conteúdo
+     * - Busca issues por conteÃºdo
      * - Filtra por autor, assignee e label
      * - Retorna resultados relevantes
      *
-     * PARÂMETROS OBRIGATÓRIOS:
-     * - owner: Proprietário do repositório
-     * - repo: Nome do repositório
+     * PARÃ‚METROS OBRIGATÃ“RIOS:
+     * - owner: ProprietÃ¡rio do repositÃ³rio
+     * - repo: Nome do repositÃ³rio
      * - query: Termo de busca
      *
-     * PARÂMETROS OPCIONAIS:
+     * PARÃ‚METROS OPCIONAIS:
      * - author: Autor das issues
-     * - assignee: Responsável pelas issues
-     * - label: Label específico
+     * - assignee: ResponsÃ¡vel pelas issues
+     * - label: Label especÃ­fico
      *
-     * VALIDAÇÕES:
-     * - Todos os parâmetros obrigatórios
+     * VALIDAÃ‡Ã•ES:
+     * - Todos os parÃ¢metros obrigatÃ³rios
      * - Query deve ter pelo menos 3 caracteres
-     * - Repositório deve existir
+     * - RepositÃ³rio deve existir
      *
-     * RECOMENDAÇÕES:
-     * - Use termos de busca específicos
+     * RECOMENDAÃ‡Ã•ES:
+     * - Use termos de busca especÃ­ficos
      * - Combine filtros para resultados precisos
-     * - Analise relevância dos resultados
+     * - Analise relevÃ¢ncia dos resultados
      * - Use para encontrar issues relacionadas
      */
     searchIssues(params: IssuesInput, provider: VcsOperations, owner: string): Promise<IssuesResult>;
+    /**
+     * Verifica se erro Ã© relacionado a Git
+     */
+    isGitRelatedError(errorMessage: string): boolean;
 };
 export {};
 //# sourceMappingURL=git-issues.d.ts.map

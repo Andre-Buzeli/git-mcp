@@ -3,41 +3,41 @@ import { VcsOperations } from '../providers/index.js';
 /**
  * Tool: commits
  *
- * DESCRIÇÃO:
+ * DESCRIÃ‡ÃƒO:
  * Gerenciamento completo de commits com suporte multi-provider (GitHub e Gitea)
  *
  * FUNCIONALIDADES:
- * - Listagem de histórico de commits
- * - Obtenção de detalhes específicos
- * - Criação de novos commits
- * - Comparação entre commits
- * - Busca por mensagens e conteúdo
- * - Análise de mudanças
+ * - Listagem de histÃ³rico de commits
+ * - ObtenÃ§Ã£o de detalhes especÃ­ficos
+ * - CriaÃ§Ã£o de novos commits
+ * - ComparaÃ§Ã£o entre commits
+ * - Busca por mensagens e conteÃºdo
+ * - AnÃ¡lise de mudanÃ§as
  *
  * USO:
- * - Para acompanhar histórico de mudanças
- * - Para analisar evolução do código
+ * - Para acompanhar histÃ³rico de mudanÃ§as
+ * - Para analisar evoluÃ§Ã£o do cÃ³digo
  * - Para criar commits programaticamente
- * - Para auditoria de mudanças
+ * - Para auditoria de mudanÃ§as
  *
- * RECOMENDAÇÕES:
+ * RECOMENDAÃ‡Ã•ES:
  * - Use mensagens de commit descritivas
- * - Mantenha commits atômicos
- * - Documente mudanças importantes
- * - Revise histórico regularmente
+ * - Mantenha commits atÃ´micos
+ * - Documente mudanÃ§as importantes
+ * - Revise histÃ³rico regularmente
  */
 /**
- * Schema de validação para entrada da tool commits
+ * Schema de validaÃ§Ã£o para entrada da tool commits
  *
- * VALIDAÇÕES:
- * - action: Ação obrigatória (list, get, create, compare, search)
- * - Parâmetros específicos por ação
- * - Validação de tipos e formatos
+ * VALIDAÃ‡Ã•ES:
+ * - action: AÃ§Ã£o obrigatÃ³ria (list, get, create, compare, search)
+ * - ParÃ¢metros especÃ­ficos por aÃ§Ã£o
+ * - ValidaÃ§Ã£o de tipos e formatos
  *
- * RECOMENDAÇÕES:
+ * RECOMENDAÃ‡Ã•ES:
  * - Sempre valide entrada antes de usar
- * - Use parâmetros opcionais adequadamente
- * - Documente parâmetros obrigatórios
+ * - Use parÃ¢metros opcionais adequadamente
+ * - Documente parÃ¢metros obrigatÃ³rios
  */
 declare const CommitsInputSchema: z.ZodObject<{
     action: z.ZodEnum<["list", "get", "create", "compare", "search", "push", "pull"]>;
@@ -64,12 +64,12 @@ declare const CommitsInputSchema: z.ZodObject<{
     action: "push" | "get" | "search" | "pull" | "list" | "create" | "compare";
     projectPath: string;
     message?: string | undefined;
+    branch?: string | undefined;
     head?: string | undefined;
     base?: string | undefined;
     page?: number | undefined;
     limit?: number | undefined;
     sha?: string | undefined;
-    branch?: string | undefined;
     query?: string | undefined;
     commit_sha?: string | undefined;
     author_name?: string | undefined;
@@ -83,12 +83,12 @@ declare const CommitsInputSchema: z.ZodObject<{
     action: "push" | "get" | "search" | "pull" | "list" | "create" | "compare";
     projectPath: string;
     message?: string | undefined;
+    branch?: string | undefined;
     head?: string | undefined;
     base?: string | undefined;
     page?: number | undefined;
     limit?: number | undefined;
     sha?: string | undefined;
-    branch?: string | undefined;
     query?: string | undefined;
     commit_sha?: string | undefined;
     author_name?: string | undefined;
@@ -99,11 +99,11 @@ declare const CommitsInputSchema: z.ZodObject<{
 }>;
 export type CommitsInput = z.infer<typeof CommitsInputSchema>;
 /**
- * Schema de saída padronizado
+ * Schema de saÃ­da padronizado
  *
  * ESTRUTURA:
- * - success: Status da operação
- * - action: Ação executada
+ * - success: Status da operaÃ§Ã£o
+ * - action: AÃ§Ã£o executada
  * - message: Mensagem descritiva
  * - data: Dados retornados (opcional)
  * - error: Detalhes do erro (opcional)
@@ -131,59 +131,59 @@ export type CommitsResult = z.infer<typeof CommitsResultSchema>;
 /**
  * Tool: commits
  *
- * DESCRIÇÃO:
- * Gerenciamento completo de commits Gitea com múltiplas ações
+ * DESCRIÃ‡ÃƒO:
+ * Gerenciamento completo de commits Gitea com mÃºltiplas aÃ§Ãµes
  *
- * ACTIONS DISPONÍVEIS:
+ * ACTIONS DISPONÃVEIS:
  *
  * 1. list - Listar commits
- *    Parâmetros:
- *    - owner (obrigatório): Proprietário do repositório
- *    - repo (obrigatório): Nome do repositório
- *    - sha (opcional): Branch ou commit específico (padrão: branch padrão)
- *    - page (opcional): Página da listagem (padrão: 1)
- *    - limit (opcional): Itens por página (padrão: 30, máximo: 100)
+ *    ParÃ¢metros:
+ *    - owner (obrigatÃ³rio): ProprietÃ¡rio do repositÃ³rio
+ *    - repo (obrigatÃ³rio): Nome do repositÃ³rio
+ *    - sha (opcional): Branch ou commit especÃ­fico (padrÃ£o: branch padrÃ£o)
+ *    - page (opcional): PÃ¡gina da listagem (padrÃ£o: 1)
+ *    - limit (opcional): Itens por pÃ¡gina (padrÃ£o: 30, mÃ¡ximo: 100)
  *
  * 2. get - Obter detalhes do commit
- *    Parâmetros:
- *    - owner (obrigatório): Proprietário do repositório
- *    - repo (obrigatório): Nome do repositório
- *    - commit_sha (obrigatório): SHA do commit
+ *    ParÃ¢metros:
+ *    - owner (obrigatÃ³rio): ProprietÃ¡rio do repositÃ³rio
+ *    - repo (obrigatÃ³rio): Nome do repositÃ³rio
+ *    - commit_sha (obrigatÃ³rio): SHA do commit
  *
  * 3. create - Criar novo commit
- *    Parâmetros:
- *    - owner (obrigatório): Proprietário do repositório
- *    - repo (obrigatório): Nome do repositório
- *    - message (obrigatório): Mensagem do commit
- *    - branch (obrigatório): Branch de destino
+ *    ParÃ¢metros:
+ *    - owner (obrigatÃ³rio): ProprietÃ¡rio do repositÃ³rio
+ *    - repo (obrigatÃ³rio): Nome do repositÃ³rio
+ *    - message (obrigatÃ³rio): Mensagem do commit
+ *    - branch (obrigatÃ³rio): Branch de destino
  *    - author_name (opcional): Nome do autor
  *    - author_email (opcional): Email do autor
  *    - committer_name (opcional): Nome do committer
  *    - committer_email (opcional): Email do committer
  *
  * 4. compare - Comparar commits
- *    Parâmetros:
- *    - owner (obrigatório): Proprietário do repositório
- *    - repo (obrigatório): Nome do repositório
- *    - base (obrigatório): Commit base para comparação
- *    - head (obrigatório): Commit para comparar
+ *    ParÃ¢metros:
+ *    - owner (obrigatÃ³rio): ProprietÃ¡rio do repositÃ³rio
+ *    - repo (obrigatÃ³rio): Nome do repositÃ³rio
+ *    - base (obrigatÃ³rio): Commit base para comparaÃ§Ã£o
+ *    - head (obrigatÃ³rio): Commit para comparar
  *
  * 5. search - Buscar commits
- *    Parâmetros:
- *    - owner (obrigatório): Proprietário do repositório
- *    - repo (obrigatório): Nome do repositório
- *    - query (obrigatório): Termo de busca
+ *    ParÃ¢metros:
+ *    - owner (obrigatÃ³rio): ProprietÃ¡rio do repositÃ³rio
+ *    - repo (obrigatÃ³rio): Nome do repositÃ³rio
+ *    - query (obrigatÃ³rio): Termo de busca
  *    - author (opcional): Autor dos commits
- *    - page (opcional): Página da busca (padrão: 1)
- *    - limit (opcional): Itens por página (padrão: 30, máximo: 100)
+ *    - page (opcional): PÃ¡gina da busca (padrÃ£o: 1)
+ *    - limit (opcional): Itens por pÃ¡gina (padrÃ£o: 30, mÃ¡ximo: 100)
  *
- * RECOMENDAÇÕES DE USO:
+ * RECOMENDAÃ‡Ã•ES DE USO:
  * - Use mensagens de commit descritivas
- * - Mantenha commits atômicos
- * - Documente mudanças importantes
- * - Revise histórico regularmente
+ * - Mantenha commits atÃ´micos
+ * - Documente mudanÃ§as importantes
+ * - Revise histÃ³rico regularmente
  * - Use branches para features
- * - Mantenha histórico limpo
+ * - Mantenha histÃ³rico limpo
  */
 export declare const commitsTool: {
     name: string;
@@ -271,84 +271,84 @@ export declare const commitsTool: {
      *
      * FUNCIONALIDADE:
      * - Valida entrada usando Zod schema
-     * - Roteia para método específico baseado na ação
+     * - Roteia para mÃ©todo especÃ­fico baseado na aÃ§Ã£o
      * - Trata erros de forma uniforme
      * - Retorna resultado padronizado
      *
      * FLUXO:
-     * 1. Validação de entrada
-     * 2. Seleção do provider
-     * 3. Roteamento por ação
-     * 4. Execução do método específico
+     * 1. ValidaÃ§Ã£o de entrada
+     * 2. SeleÃ§Ã£o do provider
+     * 3. Roteamento por aÃ§Ã£o
+     * 4. ExecuÃ§Ã£o do mÃ©todo especÃ­fico
      * 5. Tratamento de erros
      * 6. Retorno de resultado
      *
      * TRATAMENTO DE ERROS:
-     * - Validação: erro de schema
-     * - Execução: erro da operação
-     * - Roteamento: ação não suportada
+     * - ValidaÃ§Ã£o: erro de schema
+     * - ExecuÃ§Ã£o: erro da operaÃ§Ã£o
+     * - Roteamento: aÃ§Ã£o nÃ£o suportada
      *
-     * RECOMENDAÇÕES:
+     * RECOMENDAÃ‡Ã•ES:
      * - Sempre valide entrada antes de processar
-     * - Trate erros específicos adequadamente
+     * - Trate erros especÃ­ficos adequadamente
      * - Log detalhes de erro para debug
-     * - Retorne mensagens de erro úteis
+     * - Retorne mensagens de erro Ãºteis
      */
     handler(input: CommitsInput): Promise<CommitsResult>;
     /**
-     * Lista commits do repositório
+     * Lista commits do repositÃ³rio
      *
      * FUNCIONALIDADE:
-     * - Lista commits com paginação
+     * - Lista commits com paginaÃ§Ã£o
      * - Suporta filtro por branch ou commit
-     * - Retorna informações básicas de cada commit
+     * - Retorna informaÃ§Ãµes bÃ¡sicas de cada commit
      *
-     * PARÂMETROS OBRIGATÓRIOS:
-     * - owner: Proprietário do repositório
-     * - repo: Nome do repositório
+     * PARÃ‚METROS OBRIGATÃ“RIOS:
+     * - owner: ProprietÃ¡rio do repositÃ³rio
+     * - repo: Nome do repositÃ³rio
      *
-     * PARÂMETROS OPCIONAIS:
-     * - sha: Branch, tag ou commit específico (padrão: branch padrão)
-     * - page: Página da listagem (padrão: 1)
-     * - limit: Itens por página (padrão: 30, máximo: 100)
+     * PARÃ‚METROS OPCIONAIS:
+     * - sha: Branch, tag ou commit especÃ­fico (padrÃ£o: branch padrÃ£o)
+     * - page: PÃ¡gina da listagem (padrÃ£o: 1)
+     * - limit: Itens por pÃ¡gina (padrÃ£o: 30, mÃ¡ximo: 100)
      *
-     * VALIDAÇÕES:
-     * - e repo obrigatórios
-     * - SHA deve ser válido se fornecido
+     * VALIDAÃ‡Ã•ES:
+     * - e repo obrigatÃ³rios
+     * - SHA deve ser vÃ¡lido se fornecido
      * - Page deve ser >= 1
      * - Limit deve ser entre 1 e 100
      *
-     * RECOMENDAÇÕES:
-     * - Use paginação para repositórios grandes
-     * - Monitore número total de commits
-     * - Use SHA específico para análise
-     * - Mantenha histórico organizado
+     * RECOMENDAÃ‡Ã•ES:
+     * - Use paginaÃ§Ã£o para repositÃ³rios grandes
+     * - Monitore nÃºmero total de commits
+     * - Use SHA especÃ­fico para anÃ¡lise
+     * - Mantenha histÃ³rico organizado
      */
     listCommits(params: CommitsInput, provider: VcsOperations, owner: string): Promise<CommitsResult>;
     /**
-     * Obtém detalhes de um commit específico
+     * ObtÃ©m detalhes de um commit especÃ­fico
      *
      * FUNCIONALIDADE:
-     * - Obtém informações completas do commit
+     * - ObtÃ©m informaÃ§Ãµes completas do commit
      * - Inclui detalhes de autor e committer
      * - Mostra arquivos modificados
      * - Retorna hash e mensagem
      *
-     * PARÂMETROS OBRIGATÓRIOS:
-     * - owner: Proprietário do repositório
-     * - repo: Nome do repositório
+     * PARÃ‚METROS OBRIGATÃ“RIOS:
+     * - owner: ProprietÃ¡rio do repositÃ³rio
+     * - repo: Nome do repositÃ³rio
      * - commit_sha: SHA do commit
      *
-     * VALIDAÇÕES:
-     * - Todos os parâmetros obrigatórios
-     * - SHA deve ser válido
+     * VALIDAÃ‡Ã•ES:
+     * - Todos os parÃ¢metros obrigatÃ³rios
+     * - SHA deve ser vÃ¡lido
      * - Commit deve existir
      *
-     * RECOMENDAÇÕES:
-     * - Use para análise detalhada
+     * RECOMENDAÃ‡Ã•ES:
+     * - Use para anÃ¡lise detalhada
      * - Verifique arquivos modificados
      * - Analise mensagem e autor
-     * - Documente mudanças importantes
+     * - Documente mudanÃ§as importantes
      */
     getCommit(params: CommitsInput, provider: VcsOperations, owner: string): Promise<CommitsResult>;
     /**
@@ -358,30 +358,30 @@ export declare const commitsTool: {
      * - Cria commit com mensagem personalizada
      * - Suporta autor e committer diferentes
      * - Permite especificar branch de destino
-     * - Valida dados obrigatórios
+     * - Valida dados obrigatÃ³rios
      *
-     * PARÂMETROS OBRIGATÓRIOS:
-     * - owner: Proprietário do repositório
-     * - repo: Nome do repositório
+     * PARÃ‚METROS OBRIGATÃ“RIOS:
+     * - owner: ProprietÃ¡rio do repositÃ³rio
+     * - repo: Nome do repositÃ³rio
      * - message: Mensagem do commit
      * - branch: Branch de destino
      *
-     * PARÂMETROS OPCIONAIS:
+     * PARÃ‚METROS OPCIONAIS:
      * - author_name: Nome do autor
      * - author_email: Email do autor
      * - committer_name: Nome do committer
      * - committer_email: Email do committer
      *
-     * VALIDAÇÕES:
-     * - Todos os parâmetros obrigatórios
-     * - Mensagem não pode estar vazia
+     * VALIDAÃ‡Ã•ES:
+     * - Todos os parÃ¢metros obrigatÃ³rios
+     * - Mensagem nÃ£o pode estar vazia
      * - Branch deve existir
-     * - Emails devem ser válidos
+     * - Emails devem ser vÃ¡lidos
      *
-     * RECOMENDAÇÕES:
+     * RECOMENDAÃ‡Ã•ES:
      * - Use mensagens descritivas
-     * - Mantenha commits atômicos
-     * - Documente mudanças importantes
+     * - Mantenha commits atÃ´micos
+     * - Documente mudanÃ§as importantes
      * - Use branches apropriadas
      */
     createCommit(params: CommitsInput, provider: VcsOperations, owner: string): Promise<CommitsResult>;
@@ -389,98 +389,102 @@ export declare const commitsTool: {
      * Compara dois commits ou branches
      *
      * FUNCIONALIDADE:
-     * - Compara diferenças entre commits
+     * - Compara diferenÃ§as entre commits
      * - Mostra arquivos modificados
-     * - Retorna estatísticas de mudanças
+     * - Retorna estatÃ­sticas de mudanÃ§as
      *
-     * PARÂMETROS OBRIGATÓRIOS:
-     * - owner: Proprietário do repositório
-     * - repo: Nome do repositório
+     * PARÃ‚METROS OBRIGATÃ“RIOS:
+     * - owner: ProprietÃ¡rio do repositÃ³rio
+     * - repo: Nome do repositÃ³rio
      * - base: Commit ou branch base
      * - head: Commit ou branch para comparar
      *
-     * VALIDAÇÕES:
-     * - Todos os parâmetros obrigatórios
+     * VALIDAÃ‡Ã•ES:
+     * - Todos os parÃ¢metros obrigatÃ³rios
      * - Base e head devem existir
-     * - Deve ser possível comparar
+     * - Deve ser possÃ­vel comparar
      *
-     * RECOMENDAÇÕES:
-     * - Use para análise de mudanças
+     * RECOMENDAÃ‡Ã•ES:
+     * - Use para anÃ¡lise de mudanÃ§as
      * - Compare antes de fazer merge
      * - Analise arquivos modificados
-     * - Documente diferenças importantes
+     * - Documente diferenÃ§as importantes
      */
     compareCommits(params: CommitsInput, provider: VcsOperations, owner: string): Promise<CommitsResult>;
     /**
-     * Busca commits por critérios específicos
+     * Busca commits por critÃ©rios especÃ­ficos
      *
      * FUNCIONALIDADE:
      * - Busca commits por mensagem
      * - Filtra por autor
-     * - Suporta paginação
+     * - Suporta paginaÃ§Ã£o
      *
-     * PARÂMETROS OBRIGATÓRIOS:
-     * - owner: Proprietário do repositório
-     * - repo: Nome do repositório
+     * PARÃ‚METROS OBRIGATÃ“RIOS:
+     * - owner: ProprietÃ¡rio do repositÃ³rio
+     * - repo: Nome do repositÃ³rio
      * - query: Termo de busca
      *
-     * PARÂMETROS OPCIONAIS:
+     * PARÃ‚METROS OPCIONAIS:
      * - author: Autor dos commits
-     * - page: Página da busca (padrão: 1)
-     * - limit: Itens por página (padrão: 30, máximo: 100)
+     * - page: PÃ¡gina da busca (padrÃ£o: 1)
+     * - limit: Itens por pÃ¡gina (padrÃ£o: 30, mÃ¡ximo: 100)
      *
-     * VALIDAÇÕES:
-     * - Todos os parâmetros obrigatórios
+     * VALIDAÃ‡Ã•ES:
+     * - Todos os parÃ¢metros obrigatÃ³rios
      * - Query deve ter pelo menos 3 caracteres
-     * - Repositório deve existir
+     * - RepositÃ³rio deve existir
      *
-     * RECOMENDAÇÕES:
-     * - Use termos de busca específicos
+     * RECOMENDAÃ‡Ã•ES:
+     * - Use termos de busca especÃ­ficos
      * - Combine com filtros de autor
-     * - Use paginação para resultados grandes
-     * - Analise relevância dos resultados
+     * - Use paginaÃ§Ã£o para resultados grandes
+     * - Analise relevÃ¢ncia dos resultados
      */
     searchCommits(params: CommitsInput, provider: VcsOperations, owner: string): Promise<CommitsResult>;
     /**
-     * Faz push dos commits locais para o repositório remoto
+     * Faz push dos commits locais para o repositÃ³rio remoto
      *
      * FUNCIONALIDADE:
      * - Faz push da branch atual para o remote
-     * - Suporta especificar branch específica
-     * - Verifica se há commits para fazer push
+     * - Suporta especificar branch especÃ­fica
+     * - Verifica se hÃ¡ commits para fazer push
      *
-     * PARÂMETROS OBRIGATÓRIOS:
+     * PARÃ‚METROS OBRIGATÃ“RIOS:
      * - projectPath: Caminho do projeto local
      *
-     * PARÂMETROS OPCIONAIS:
-     * - branch: Branch para fazer push (padrão: branch atual)
+     * PARÃ‚METROS OPCIONAIS:
+     * - branch: Branch para fazer push (padrÃ£o: branch atual)
      *
-     * RECOMENDAÇÕES:
-     * - Verifique se há commits locais antes do push
-     * - Use branch específica se necessário
+     * RECOMENDAÃ‡Ã•ES:
+     * - Verifique se hÃ¡ commits locais antes do push
+     * - Use branch especÃ­fica se necessÃ¡rio
      * - Monitore conflitos durante o push
      */
     pushCommits(params: CommitsInput, provider?: VcsOperations): Promise<CommitsResult>;
     /**
-     * Faz pull dos commits do repositório remoto
+     * Faz pull dos commits do repositÃ³rio remoto
      *
      * FUNCIONALIDADE:
      * - Faz pull da branch atual do remote
-     * - Suporta especificar branch específica
-     * - Faz merge automático se possível
+     * - Suporta especificar branch especÃ­fica
+     * - Faz merge automÃ¡tico se possÃ­vel
      *
-     * PARÂMETROS OBRIGATÓRIOS:
+     * PARÃ‚METROS OBRIGATÃ“RIOS:
      * - projectPath: Caminho do projeto local
      *
-     * PARÂMETROS OPCIONAIS:
-     * - branch: Branch para fazer pull (padrão: branch atual)
+     * PARÃ‚METROS OPCIONAIS:
+     * - branch: Branch para fazer pull (padrÃ£o: branch atual)
      *
-     * RECOMENDAÇÕES:
-     * - Faça backup antes do pull
+     * RECOMENDAÃ‡Ã•ES:
+     * - FaÃ§a backup antes do pull
      * - Resolva conflitos manualmente se houver
-     * - Use branch específica se necessário
+     * - Use branch especÃ­fica se necessÃ¡rio
      */
     pullCommits(params: CommitsInput, provider?: VcsOperations): Promise<CommitsResult>;
+    /**
+     * Verifica se erro Ã© relacionado a Git
+     */
+    isGitRelatedError(errorMessage: string): boolean;
 };
 export {};
 //# sourceMappingURL=git-commits.d.ts.map

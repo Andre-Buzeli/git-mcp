@@ -2,27 +2,27 @@ import { z } from 'zod';
 /**
  * Tool: git-archive
  *
- * DESCRIÇÃO:
- * Gerenciamento de arquivos Git (GitHub + Gitea) com múltiplas ações
+ * DESCRIÃ‡ÃƒO:
+ * Gerenciamento de arquivos Git (GitHub + Gitea) com mÃºltiplas aÃ§Ãµes
  *
  * FUNCIONALIDADES:
  * - Criar arquivo
  * - Extrair arquivo
- * - Listar conteúdo do arquivo
+ * - Listar conteÃºdo do arquivo
  * - Verificar arquivo
  * - Criar tarball
  * - Criar zip
  *
  * USO:
  * - Para criar releases
- * - Para backup de código
- * - Para distribuição de código
- * - Para deploy de versões específicas
+ * - Para backup de cÃ³digo
+ * - Para distribuiÃ§Ã£o de cÃ³digo
+ * - Para deploy de versÃµes especÃ­ficas
  *
- * RECOMENDAÇÕES:
+ * RECOMENDAÃ‡Ã•ES:
  * - Use para releases oficiais
- * - Inclua apenas arquivos necessários
- * - Teste arquivos antes da distribuição
+ * - Inclua apenas arquivos necessÃ¡rios
+ * - Teste arquivos antes da distribuiÃ§Ã£o
  */
 declare const GitArchiveInputSchema: z.ZodObject<{
     action: z.ZodEnum<["create", "extract", "list", "verify"]>;
@@ -161,6 +161,10 @@ export declare const gitArchiveTool: {
     extract(params: GitArchiveInput): Promise<GitArchiveResult>;
     list(params: GitArchiveInput): Promise<GitArchiveResult>;
     verify(params: GitArchiveInput): Promise<GitArchiveResult>;
+    /**
+     * Verifica se erro Ã© relacionado a Git
+     */
+    isGitRelatedError(errorMessage: string): boolean;
 };
 export {};
 //# sourceMappingURL=git-archive.d.ts.map

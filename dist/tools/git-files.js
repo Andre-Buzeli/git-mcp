@@ -7,45 +7,45 @@ const user_detection_js_1 = require("../utils/user-detection.js");
 /**
  * Tool: files
  *
- * DESCRIÇÃO:
- * Gerenciamento completo de arquivos e diretórios Gitea com múltiplas ações
+ * DESCRIÃ‡ÃƒO:
+ * Gerenciamento completo de arquivos e diretÃ³rios Gitea com mÃºltiplas aÃ§Ãµes
  *
  * FUNCIONALIDADES:
- * - Criação de arquivos e diretórios
- * - Leitura e listagem de conteúdo
- * - Atualização de arquivos existentes
- * - Exclusão de arquivos e diretórios
- * - Busca por conteúdo e nome
- * - Controle de versão de arquivos
+ * - CriaÃ§Ã£o de arquivos e diretÃ³rios
+ * - Leitura e listagem de conteÃºdo
+ * - AtualizaÃ§Ã£o de arquivos existentes
+ * - ExclusÃ£o de arquivos e diretÃ³rios
+ * - Busca por conteÃºdo e nome
+ * - Controle de versÃ£o de arquivos
  *
  * USO:
  * - Para gerenciar arquivos de projeto
- * - Para automatizar criação de arquivos
- * - Para backup e migração de conteúdo
- * - Para sincronização de arquivos
+ * - Para automatizar criaÃ§Ã£o de arquivos
+ * - Para backup e migraÃ§Ã£o de conteÃºdo
+ * - Para sincronizaÃ§Ã£o de arquivos
  *
- * RECOMENDAÇÕES:
+ * RECOMENDAÃ‡Ã•ES:
  * - Use mensagens de commit descritivas
- * - Mantenha estrutura de diretórios organizada
- * - Valide conteúdo antes de enviar
- * - Use branches para mudanças grandes
+ * - Mantenha estrutura de diretÃ³rios organizada
+ * - Valide conteÃºdo antes de enviar
+ * - Use branches para mudanÃ§as grandes
  */
 /**
- * Schema de validação para entrada da tool files
+ * Schema de validaÃ§Ã£o para entrada da tool files
  *
- * VALIDAÇÕES:
- * - action: Ação obrigatória (get, create, update, delete, list, search)
- * - Parâmetros específicos por ação
- * - Validação de tipos e formatos
+ * VALIDAÃ‡Ã•ES:
+ * - action: AÃ§Ã£o obrigatÃ³ria (get, create, update, delete, list, search)
+ * - ParÃ¢metros especÃ­ficos por aÃ§Ã£o
+ * - ValidaÃ§Ã£o de tipos e formatos
  *
- * RECOMENDAÇÕES:
+ * RECOMENDAÃ‡Ã•ES:
  * - Sempre valide entrada antes de usar
- * - Use parâmetros opcionais adequadamente
- * - Documente parâmetros obrigatórios
+ * - Use parÃ¢metros opcionais adequadamente
+ * - Documente parÃ¢metros obrigatÃ³rios
  */
 const FilesInputSchema = zod_1.z.object({
     action: zod_1.z.enum(['get', 'create', 'update', 'delete', 'list', 'search', 'upload-project']),
-    // Parâmetros comuns
+    // ParÃ¢metros comuns
     // owner: obtido automaticamente do provider,
     repo: zod_1.z.string(),
     path: zod_1.z.string().optional(),
@@ -60,16 +60,16 @@ const FilesInputSchema = zod_1.z.object({
     ref: zod_1.z.string().optional(),
     // Para search
     query: zod_1.z.string().optional(),
-    // Para list com paginação
+    // Para list com paginaÃ§Ã£o
     page: zod_1.z.number().min(1).optional(),
     limit: zod_1.z.number().min(1).max(100).optional(),
 });
 /**
- * Schema de saída padronizado
+ * Schema de saÃ­da padronizado
  *
  * ESTRUTURA:
- * - success: Status da operação
- * - action: Ação executada
+ * - success: Status da operaÃ§Ã£o
+ * - action: AÃ§Ã£o executada
  * - message: Mensagem descritiva
  * - data: Dados retornados (opcional)
  * - error: Detalhes do erro (opcional)
@@ -84,73 +84,73 @@ const FilesResultSchema = zod_1.z.object({
 /**
  * Tool: files
  *
- * DESCRIÇÃO:
- * Gerenciamento completo de arquivos e diretórios Gitea com múltiplas ações
+ * DESCRIÃ‡ÃƒO:
+ * Gerenciamento completo de arquivos e diretÃ³rios Gitea com mÃºltiplas aÃ§Ãµes
  *
- * ACTIONS DISPONÍVEIS:
+ * ACTIONS DISPONÃVEIS:
  *
- * 1. get - Obter conteúdo de arquivo
- *    Parâmetros:
- *    - owner (obrigatório): Proprietário do repositório
- *    - repo (obrigatório): Nome do repositório
- *    - path (obrigatório): Caminho do arquivo
- *    - ref (opcional): Branch, tag ou commit (padrão: branch padrão)
+ * 1. get - Obter conteÃºdo de arquivo
+ *    ParÃ¢metros:
+ *    - owner (obrigatÃ³rio): ProprietÃ¡rio do repositÃ³rio
+ *    - repo (obrigatÃ³rio): Nome do repositÃ³rio
+ *    - path (obrigatÃ³rio): Caminho do arquivo
+ *    - ref (opcional): Branch, tag ou commit (padrÃ£o: branch padrÃ£o)
  *
  * 2. create - Criar novo arquivo
- *    Parâmetros:
- *    - owner (obrigatório): Proprietário do repositório
- *    - repo (obrigatório): Nome do repositório
- *    - path (obrigatório): Caminho do arquivo
- *    - content (obrigatório): Conteúdo do arquivo
- *    - message (obrigatório): Mensagem de commit
- *    - branch (opcional): Branch de destino (padrão: branch padrão)
+ *    ParÃ¢metros:
+ *    - owner (obrigatÃ³rio): ProprietÃ¡rio do repositÃ³rio
+ *    - repo (obrigatÃ³rio): Nome do repositÃ³rio
+ *    - path (obrigatÃ³rio): Caminho do arquivo
+ *    - content (obrigatÃ³rio): ConteÃºdo do arquivo
+ *    - message (obrigatÃ³rio): Mensagem de commit
+ *    - branch (opcional): Branch de destino (padrÃ£o: branch padrÃ£o)
  *
  * 3. update - Atualizar arquivo existente
- *    Parâmetros:
- *    - owner (obrigatório): Proprietário do repositório
- *    - repo (obrigatório): Nome do repositório
- *    - path (obrigatório): Caminho do arquivo
- *    - content (obrigatório): Novo conteúdo
- *    - message (obrigatório): Mensagem de commit
- *    - sha (obrigatório): SHA do arquivo atual
- *    - branch (opcional): Branch de destino (padrão: branch padrão)
+ *    ParÃ¢metros:
+ *    - owner (obrigatÃ³rio): ProprietÃ¡rio do repositÃ³rio
+ *    - repo (obrigatÃ³rio): Nome do repositÃ³rio
+ *    - path (obrigatÃ³rio): Caminho do arquivo
+ *    - content (obrigatÃ³rio): Novo conteÃºdo
+ *    - message (obrigatÃ³rio): Mensagem de commit
+ *    - sha (obrigatÃ³rio): SHA do arquivo atual
+ *    - branch (opcional): Branch de destino (padrÃ£o: branch padrÃ£o)
  *
  * 4. delete - Deletar arquivo
- *    Parâmetros:
- *    - owner (obrigatório): Proprietário do repositório
- *    - repo (obrigatório): Nome do repositório
- *    - path (obrigatório): Caminho do arquivo
- *    - message (obrigatório): Mensagem de commit
- *    - sha (obrigatório): SHA do arquivo
- *    - branch (opcional): Branch de destino (padrão: branch padrão)
+ *    ParÃ¢metros:
+ *    - owner (obrigatÃ³rio): ProprietÃ¡rio do repositÃ³rio
+ *    - repo (obrigatÃ³rio): Nome do repositÃ³rio
+ *    - path (obrigatÃ³rio): Caminho do arquivo
+ *    - message (obrigatÃ³rio): Mensagem de commit
+ *    - sha (obrigatÃ³rio): SHA do arquivo
+ *    - branch (opcional): Branch de destino (padrÃ£o: branch padrÃ£o)
  *
- * 5. list - Listar conteúdo de diretório
- *    Parâmetros:
- *    - owner (obrigatório): Proprietário do repositório
- *    - repo (obrigatório): Nome do repositório
- *    - path (opcional): Caminho do diretório (padrão: raiz)
- *    - ref (opcional): Branch, tag ou commit (padrão: branch padrão)
- *    - page (opcional): Página da listagem (padrão: 1)
- *    - limit (opcional): Itens por página (padrão: 30, máximo: 100)
+ * 5. list - Listar conteÃºdo de diretÃ³rio
+ *    ParÃ¢metros:
+ *    - owner (obrigatÃ³rio): ProprietÃ¡rio do repositÃ³rio
+ *    - repo (obrigatÃ³rio): Nome do repositÃ³rio
+ *    - path (opcional): Caminho do diretÃ³rio (padrÃ£o: raiz)
+ *    - ref (opcional): Branch, tag ou commit (padrÃ£o: branch padrÃ£o)
+ *    - page (opcional): PÃ¡gina da listagem (padrÃ£o: 1)
+ *    - limit (opcional): Itens por pÃ¡gina (padrÃ£o: 30, mÃ¡ximo: 100)
  *
- * 6. search - Buscar arquivos por conteúdo
- *    Parâmetros:
- *    - owner (obrigatório): Proprietário do repositório
- *    - repo (obrigatório): Nome do repositório
- *    - query (obrigatório): Termo de busca
- *    - ref (opcional): Branch, tag ou commit (padrão: branch padrão)
+ * 6. search - Buscar arquivos por conteÃºdo
+ *    ParÃ¢metros:
+ *    - owner (obrigatÃ³rio): ProprietÃ¡rio do repositÃ³rio
+ *    - repo (obrigatÃ³rio): Nome do repositÃ³rio
+ *    - query (obrigatÃ³rio): Termo de busca
+ *    - ref (opcional): Branch, tag ou commit (padrÃ£o: branch padrÃ£o)
  *
- * RECOMENDAÇÕES DE USO:
+ * RECOMENDAÃ‡Ã•ES DE USO:
  * - Use mensagens de commit descritivas
- * - Mantenha estrutura de diretórios organizada
- * - Valide conteúdo antes de enviar
- * - Use branches para mudanças grandes
- * - Documente mudanças importantes
- * - Mantenha histórico de commits limpo
+ * - Mantenha estrutura de diretÃ³rios organizada
+ * - Valide conteÃºdo antes de enviar
+ * - Use branches para mudanÃ§as grandes
+ * - Documente mudanÃ§as importantes
+ * - Mantenha histÃ³rico de commits limpo
  */
 exports.filesTool = {
     name: 'git-files',
-    description: 'tool: Gerencia arquivos Git, upload, download, busca e sincronização\n──────────────\naction get: obtém arquivo específico\naction get requires: repo, path, provider\n───────────────\naction create: cria novo arquivo\naction create requires: repo, path, content, message, provider\n───────────────\naction update: atualiza arquivo existente\naction update requires: repo, path, content, message, sha, provider\n───────────────\naction delete: remove arquivo\naction delete requires: repo, path, message, provider\n───────────────\naction list: lista arquivos do diretório\naction list requires: repo, path, provider\n───────────────\naction search: busca conteúdo em arquivos\naction search requires: repo, query, provider\n───────────────\naction upload-project: envia projeto completo\naction upload-project requires: repo, projectPath, message, provider',
+    description: 'tool: Gerencia arquivos Git, upload, download, busca e sincronizaÃ§Ã£o\nâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\naction get: obtÃ©m arquivo especÃ­fico\naction get requires: repo, path, provider\nâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\naction create: cria novo arquivo\naction create requires: repo, path, content, message, provider\nâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\naction update: atualiza arquivo existente\naction update requires: repo, path, content, message, sha, provider\nâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\naction delete: remove arquivo\naction delete requires: repo, path, message, provider\nâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\naction list: lista arquivos do diretÃ³rio\naction list requires: repo, path, provider\nâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\naction search: busca conteÃºdo em arquivos\naction search requires: repo, query, provider\nâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\naction upload-project: envia projeto completo\naction upload-project requires: repo, projectPath, message, provider',
     inputSchema: {
         type: 'object',
         properties: {
@@ -179,37 +179,37 @@ exports.filesTool = {
      *
      * FUNCIONALIDADE:
      * - Valida entrada usando Zod schema
-     * - Roteia para método específico baseado na ação
+     * - Roteia para mÃ©todo especÃ­fico baseado na aÃ§Ã£o
      * - Trata erros de forma uniforme
      * - Retorna resultado padronizado
      *
      * FLUXO:
-     * 1. Validação de entrada
-     * 2. Roteamento por ação
-     * 3. Execução do método específico
+     * 1. ValidaÃ§Ã£o de entrada
+     * 2. Roteamento por aÃ§Ã£o
+     * 3. ExecuÃ§Ã£o do mÃ©todo especÃ­fico
      * 4. Tratamento de erros
      * 5. Retorno de resultado
      *
      * TRATAMENTO DE ERROS:
-     * - Validação: erro de schema
-     * - Execução: erro da operação
-     * - Roteamento: ação não suportada
+     * - ValidaÃ§Ã£o: erro de schema
+     * - ExecuÃ§Ã£o: erro da operaÃ§Ã£o
+     * - Roteamento: aÃ§Ã£o nÃ£o suportada
      *
-     * RECOMENDAÇÕES:
+     * RECOMENDAÃ‡Ã•ES:
      * - Sempre valide entrada antes de processar
-     * - Trate erros específicos adequadamente
+     * - Trate erros especÃ­ficos adequadamente
      * - Log detalhes de erro para debug
-     * - Retorne mensagens de erro úteis
+     * - Retorne mensagens de erro Ãºteis
      */
     async handler(input) {
         try {
             const validatedInput = FilesInputSchema.parse(input);
-            // Aplicar auto-detecção apenas para owner dentro do provider especificado
+            // Aplicar auto-detecÃ§Ã£o apenas para owner dentro do provider especificado
             const processedInput = await (0, user_detection_js_1.applyAutoUserDetection)(validatedInput, validatedInput.provider);
-            // Usar o provider especificado pelo usuário
+            // Usar o provider especificado pelo usuÃ¡rio
             const provider = index_js_1.globalProviderFactory.getProvider(processedInput.provider);
             if (!provider) {
-                throw new Error(`Provider '${processedInput.provider}' não encontrado`);
+                throw new Error(`Provider '${processedInput.provider}' nÃ£o encontrado`);
             }
             // Obter o owner do provider
             const owner = (await provider.getCurrentUser()).login;
@@ -229,49 +229,49 @@ exports.filesTool = {
                 case 'upload-project':
                     return await this.uploadProject(processedInput, provider, owner);
                 default:
-                    throw new Error(`Ação não suportada: ${processedInput.action}`);
+                    throw new Error(`AÃ§Ã£o nÃ£o suportada: ${processedInput.action}`);
             }
         }
         catch (error) {
             return {
                 success: false,
                 action: input.action,
-                message: 'Erro na operação de arquivos',
+                message: 'Erro na operaÃ§Ã£o de arquivos',
                 error: error instanceof Error ? error.message : String(error)
             };
         }
     },
     /**
-     * Obtém o conteúdo de um arquivo específico
+     * ObtÃ©m o conteÃºdo de um arquivo especÃ­fico
      *
      * FUNCIONALIDADE:
-     * - Retorna conteúdo completo do arquivo
+     * - Retorna conteÃºdo completo do arquivo
      * - Inclui metadados (SHA, tamanho, tipo)
-     * - Suporta diferentes referências (branch, tag, commit)
+     * - Suporta diferentes referÃªncias (branch, tag, commit)
      *
-     * PARÂMETROS OBRIGATÓRIOS:
-     * - owner: Proprietário do repositório
-     * - repo: Nome do repositório
+     * PARÃ‚METROS OBRIGATÃ“RIOS:
+     * - owner: ProprietÃ¡rio do repositÃ³rio
+     * - repo: Nome do repositÃ³rio
      * - path: Caminho do arquivo
      *
-     * PARÂMETROS OPCIONAIS:
-     * - ref: Branch, tag ou commit (padrão: branch padrão)
+     * PARÃ‚METROS OPCIONAIS:
+     * - ref: Branch, tag ou commit (padrÃ£o: branch padrÃ£o)
      *
-     * VALIDAÇÕES:
-     * - Todos os parâmetros obrigatórios
+     * VALIDAÃ‡Ã•ES:
+     * - Todos os parÃ¢metros obrigatÃ³rios
      * - Arquivo deve existir no caminho especificado
-     * - Referência deve ser válida
+     * - ReferÃªncia deve ser vÃ¡lida
      *
-     * RECOMENDAÇÕES:
-     * - Use para leitura de arquivos de configuração
+     * RECOMENDAÃ‡Ã•ES:
+     * - Use para leitura de arquivos de configuraÃ§Ã£o
      * - Verifique tamanho antes de ler arquivos grandes
-     * - Use referências específicas para versões
-     * - Trate arquivos binários adequadamente
+     * - Use referÃªncias especÃ­ficas para versÃµes
+     * - Trate arquivos binÃ¡rios adequadamente
      */
     async getFile(params, provider, owner) {
         try {
             if (!owner || !params.repo || !params.path) {
-                throw new Error('repo e path são obrigatórios');
+                throw new Error('repo e path sÃ£o obrigatÃ³rios');
             }
             const file = await provider.getFile(owner, params.repo, params.path, params.ref);
             return {
@@ -286,38 +286,38 @@ exports.filesTool = {
         }
     },
     /**
-     * Cria um novo arquivo no repositório
+     * Cria um novo arquivo no repositÃ³rio
      *
      * FUNCIONALIDADE:
-     * - Cria arquivo com conteúdo especificado
-     * - Faz commit automático com mensagem
-     * - Suporta criação em branches específicas
+     * - Cria arquivo com conteÃºdo especificado
+     * - Faz commit automÃ¡tico com mensagem
+     * - Suporta criaÃ§Ã£o em branches especÃ­ficas
      *
-     * PARÂMETROS OBRIGATÓRIOS:
-     * - owner: Proprietário do repositório
-     * - repo: Nome do repositório
+     * PARÃ‚METROS OBRIGATÃ“RIOS:
+     * - owner: ProprietÃ¡rio do repositÃ³rio
+     * - repo: Nome do repositÃ³rio
      * - path: Caminho do arquivo
-     * - content: Conteúdo do arquivo
+     * - content: ConteÃºdo do arquivo
      * - message: Mensagem de commit
      *
-     * PARÂMETROS OPCIONAIS:
-     * - branch: Branch de destino (padrão: branch padrão)
+     * PARÃ‚METROS OPCIONAIS:
+     * - branch: Branch de destino (padrÃ£o: branch padrÃ£o)
      *
-     * VALIDAÇÕES:
-     * - Todos os parâmetros obrigatórios
-     * - Caminho deve ser válido
-     * - Usuário deve ter permissão de escrita
+     * VALIDAÃ‡Ã•ES:
+     * - Todos os parÃ¢metros obrigatÃ³rios
+     * - Caminho deve ser vÃ¡lido
+     * - UsuÃ¡rio deve ter permissÃ£o de escrita
      *
-     * RECOMENDAÇÕES:
+     * RECOMENDAÃ‡Ã•ES:
      * - Use mensagens de commit descritivas
-     * - Valide conteúdo antes de enviar
-     * - Use branches para mudanças grandes
-     * - Documente propósito do arquivo
+     * - Valide conteÃºdo antes de enviar
+     * - Use branches para mudanÃ§as grandes
+     * - Documente propÃ³sito do arquivo
      */
     async createFile(params, provider, owner) {
         try {
             if (!owner || !params.repo || !params.path || !params.content || !params.message) {
-                throw new Error('repo, path, content e message são obrigatórios');
+                throw new Error('repo, path, content e message sÃ£o obrigatÃ³rios');
             }
             const result = await provider.createFile(owner, params.repo, params.path, params.content, params.message, params.branch);
             return {
@@ -332,41 +332,41 @@ exports.filesTool = {
         }
     },
     /**
-     * Atualiza um arquivo existente no repositório
+     * Atualiza um arquivo existente no repositÃ³rio
      *
      * FUNCIONALIDADE:
-     * - Atualiza conteúdo do arquivo
-     * - Faz commit com nova versão
+     * - Atualiza conteÃºdo do arquivo
+     * - Faz commit com nova versÃ£o
      * - Requer SHA do arquivo atual
      *
-     * PARÂMETROS OBRIGATÓRIOS:
-     * - owner: Proprietário do repositório
-     * - repo: Nome do repositório
+     * PARÃ‚METROS OBRIGATÃ“RIOS:
+     * - owner: ProprietÃ¡rio do repositÃ³rio
+     * - repo: Nome do repositÃ³rio
      * - path: Caminho do arquivo
-     * - content: Novo conteúdo
+     * - content: Novo conteÃºdo
      * - message: Mensagem de commit
      * - sha: SHA do arquivo atual
      *
-     * PARÂMETROS OPCIONAIS:
-     * - branch: Branch de destino (padrão: branch padrão)
+     * PARÃ‚METROS OPCIONAIS:
+     * - branch: Branch de destino (padrÃ£o: branch padrÃ£o)
      *
-     * VALIDAÇÕES:
-     * - Todos os parâmetros obrigatórios
+     * VALIDAÃ‡Ã•ES:
+     * - Todos os parÃ¢metros obrigatÃ³rios
      * - Arquivo deve existir
-     * - SHA deve ser válido
+     * - SHA deve ser vÃ¡lido
      *
-     * RECOMENDAÇÕES:
+     * RECOMENDAÃ‡Ã•ES:
      * - Sempre obtenha SHA atual antes de atualizar
      * - Use mensagens de commit descritivas
-     * - Verifique se arquivo não foi modificado por outro usuário
-     * - Teste mudanças antes de commitar
+     * - Verifique se arquivo nÃ£o foi modificado por outro usuÃ¡rio
+     * - Teste mudanÃ§as antes de commitar
      */
     async updateFile(params, provider, owner) {
         try {
             if (!owner || !params.repo || !params.path || !params.content || !params.message) {
-                throw new Error('repo, path, content e message são obrigatórios');
+                throw new Error('repo, path, content e message sÃ£o obrigatÃ³rios');
             }
-            // Se não foi fornecido SHA, obter automaticamente
+            // Se nÃ£o foi fornecido SHA, obter automaticamente
             let fileSha = params.sha;
             if (!fileSha) {
                 try {
@@ -374,7 +374,7 @@ exports.filesTool = {
                     fileSha = existingFile.sha;
                 }
                 catch (error) {
-                    throw new Error('Não foi possível obter SHA do arquivo. Forneça sha ou verifique se o arquivo existe.');
+                    throw new Error('NÃ£o foi possÃ­vel obter SHA do arquivo. ForneÃ§a sha ou verifique se o arquivo existe.');
                 }
             }
             const result = await provider.updateFile(owner, params.repo, params.path, params.content, params.message, fileSha, params.branch);
@@ -390,40 +390,40 @@ exports.filesTool = {
         }
     },
     /**
-     * Deleta um arquivo do repositório
+     * Deleta um arquivo do repositÃ³rio
      *
      * FUNCIONALIDADE:
      * - Remove arquivo especificado
-     * - Faz commit de exclusão
+     * - Faz commit de exclusÃ£o
      * - Requer SHA do arquivo
      *
-     * PARÂMETROS OBRIGATÓRIOS:
-     * - owner: Proprietário do repositório
-     * - repo: Nome do repositório
+     * PARÃ‚METROS OBRIGATÃ“RIOS:
+     * - owner: ProprietÃ¡rio do repositÃ³rio
+     * - repo: Nome do repositÃ³rio
      * - path: Caminho do arquivo
      * - message: Mensagem de commit
      * - sha: SHA do arquivo
      *
-     * PARÂMETROS OPCIONAIS:
-     * - branch: Branch de destino (padrão: branch padrão)
+     * PARÃ‚METROS OPCIONAIS:
+     * - branch: Branch de destino (padrÃ£o: branch padrÃ£o)
      *
-     * VALIDAÇÕES:
-     * - Todos os parâmetros obrigatórios
+     * VALIDAÃ‡Ã•ES:
+     * - Todos os parÃ¢metros obrigatÃ³rios
      * - Arquivo deve existir
-     * - SHA deve ser válido
+     * - SHA deve ser vÃ¡lido
      *
-     * RECOMENDAÇÕES:
-     * - Confirme exclusão antes de executar
+     * RECOMENDAÃ‡Ã•ES:
+     * - Confirme exclusÃ£o antes de executar
      * - Use mensagens de commit descritivas
-     * - Verifique dependências do arquivo
-     * - Mantenha backup se necessário
+     * - Verifique dependÃªncias do arquivo
+     * - Mantenha backup se necessÃ¡rio
      */
     async deleteFile(params, provider, owner) {
         try {
             if (!owner || !params.repo || !params.path || !params.message) {
-                throw new Error('repo, path e message são obrigatórios');
+                throw new Error('repo, path e message sÃ£o obrigatÃ³rios');
             }
-            // Se não foi fornecido SHA, obter automaticamente
+            // Se nÃ£o foi fornecido SHA, obter automaticamente
             let fileSha = params.sha;
             if (!fileSha) {
                 try {
@@ -431,7 +431,7 @@ exports.filesTool = {
                     fileSha = existingFile.sha;
                 }
                 catch (error) {
-                    throw new Error('Não foi possível obter SHA do arquivo. Forneça sha ou verifique se o arquivo existe.');
+                    throw new Error('NÃ£o foi possÃ­vel obter SHA do arquivo. ForneÃ§a sha ou verifique se o arquivo existe.');
                 }
             }
             const result = await provider.deleteFile(owner, params.repo, params.path, params.message, fileSha, params.branch);
@@ -447,39 +447,39 @@ exports.filesTool = {
         }
     },
     /**
-     * Lista conteúdo de um diretório
+     * Lista conteÃºdo de um diretÃ³rio
      *
      * FUNCIONALIDADE:
-     * - Lista arquivos e subdiretórios
-     * - Suporta paginação
+     * - Lista arquivos e subdiretÃ³rios
+     * - Suporta paginaÃ§Ã£o
      * - Inclui metadados de cada item
      *
-     * PARÂMETROS OBRIGATÓRIOS:
-     * - owner: Proprietário do repositório
-     * - repo: Nome do repositório
+     * PARÃ‚METROS OBRIGATÃ“RIOS:
+     * - owner: ProprietÃ¡rio do repositÃ³rio
+     * - repo: Nome do repositÃ³rio
      *
-     * PARÂMETROS OPCIONAIS:
-     * - path: Caminho do diretório (padrão: raiz)
-     * - ref: Branch, tag ou commit (padrão: branch padrão)
-     * - page: Página da listagem (padrão: 1)
-     * - limit: Itens por página (padrão: 30, máximo: 100)
+     * PARÃ‚METROS OPCIONAIS:
+     * - path: Caminho do diretÃ³rio (padrÃ£o: raiz)
+     * - ref: Branch, tag ou commit (padrÃ£o: branch padrÃ£o)
+     * - page: PÃ¡gina da listagem (padrÃ£o: 1)
+     * - limit: Itens por pÃ¡gina (padrÃ£o: 30, mÃ¡ximo: 100)
      *
-     * VALIDAÇÕES:
-     * - e repo obrigatórios
-     * - Diretório deve existir
+     * VALIDAÃ‡Ã•ES:
+     * - e repo obrigatÃ³rios
+     * - DiretÃ³rio deve existir
      * - Page deve ser >= 1
      * - Limit deve ser entre 1 e 100
      *
-     * RECOMENDAÇÕES:
-     * - Use paginação para diretórios grandes
-     * - Monitore número total de itens
-     * - Use referências específicas para versões
-     * - Organize estrutura de diretórios
+     * RECOMENDAÃ‡Ã•ES:
+     * - Use paginaÃ§Ã£o para diretÃ³rios grandes
+     * - Monitore nÃºmero total de itens
+     * - Use referÃªncias especÃ­ficas para versÃµes
+     * - Organize estrutura de diretÃ³rios
      */
     async listFiles(params, provider, owner) {
         try {
             if (!owner || !params.repo) {
-                throw new Error('e repo são obrigatórios');
+                throw new Error('e repo sÃ£o obrigatÃ³rios');
             }
             const path = params.path || '';
             const page = params.page || 1;
@@ -503,41 +503,41 @@ exports.filesTool = {
         }
     },
     /**
-     * Busca arquivos por conteúdo
+     * Busca arquivos por conteÃºdo
      *
      * FUNCIONALIDADE:
-     * - Busca arquivos que contenham texto específico
-     * - Suporta diferentes referências
+     * - Busca arquivos que contenham texto especÃ­fico
+     * - Suporta diferentes referÃªncias
      * - Retorna resultados relevantes
      *
-     * PARÂMETROS OBRIGATÓRIOS:
-     * - owner: Proprietário do repositório
-     * - repo: Nome do repositório
+     * PARÃ‚METROS OBRIGATÃ“RIOS:
+     * - owner: ProprietÃ¡rio do repositÃ³rio
+     * - repo: Nome do repositÃ³rio
      * - query: Termo de busca
      *
-     * PARÂMETROS OPCIONAIS:
-     * - ref: Branch, tag ou commit (padrão: branch padrão)
+     * PARÃ‚METROS OPCIONAIS:
+     * - ref: Branch, tag ou commit (padrÃ£o: branch padrÃ£o)
      *
-     * VALIDAÇÕES:
-     * - Todos os parâmetros obrigatórios
+     * VALIDAÃ‡Ã•ES:
+     * - Todos os parÃ¢metros obrigatÃ³rios
      * - Query deve ter pelo menos 3 caracteres
-     * - Repositório deve existir
+     * - RepositÃ³rio deve existir
      *
-     * RECOMENDAÇÕES:
-     * - Use termos de busca específicos
-     * - Combine com filtros de diretório
-     * - Use referências para versões específicas
-     * - Analise resultados para relevância
+     * RECOMENDAÃ‡Ã•ES:
+     * - Use termos de busca especÃ­ficos
+     * - Combine com filtros de diretÃ³rio
+     * - Use referÃªncias para versÃµes especÃ­ficas
+     * - Analise resultados para relevÃ¢ncia
      */
     async searchFiles(params, provider, owner) {
         try {
             if (!owner || !params.repo || !params.query) {
-                throw new Error('repo e query são obrigatórios');
+                throw new Error('repo e query sÃ£o obrigatÃ³rios');
             }
             if (params.query.length < 3) {
                 throw new Error('Query deve ter pelo menos 3 caracteres');
             }
-            // Implementar busca de arquivos por conteúdo
+            // Implementar busca de arquivos por conteÃºdo
             // Por enquanto, retorna mensagem de funcionalidade
             return {
                 success: true,
@@ -545,8 +545,8 @@ exports.filesTool = {
                 message: `Busca por '${params.query}' solicitada`,
                 data: {
                     query: params.query,
-                    ref: params.ref || 'branch padrão',
-                    results: 'Funcionalidade de busca será implementada'
+                    ref: params.ref || 'branch padrÃ£o',
+                    results: 'Funcionalidade de busca serÃ¡ implementada'
                 }
             };
         }
@@ -555,38 +555,38 @@ exports.filesTool = {
         }
     },
     /**
-     * Faz upload de todo o projeto para o repositório
+     * Faz upload de todo o projeto para o repositÃ³rio
      *
      * FUNCIONALIDADE:
      * - Envia todos os arquivos do projeto local
-     * - Ignora diretórios desnecessários (node_modules, .git, dist)
-     * - Ignora arquivos temporários e logs
+     * - Ignora diretÃ³rios desnecessÃ¡rios (node_modules, .git, dist)
+     * - Ignora arquivos temporÃ¡rios e logs
      * - Faz commit com mensagem personalizada
      *
-     * PARÂMETROS OBRIGATÓRIOS:
-     * - owner: Proprietário do repositório
-     * - repo: Nome do repositório
+     * PARÃ‚METROS OBRIGATÃ“RIOS:
+     * - owner: ProprietÃ¡rio do repositÃ³rio
+     * - repo: Nome do repositÃ³rio
      * - projectPath: Caminho do projeto local
      * - message: Mensagem de commit
      *
-     * PARÂMETROS OPCIONAIS:
-     * - branch: Branch de destino (padrão: branch padrão)
+     * PARÃ‚METROS OPCIONAIS:
+     * - branch: Branch de destino (padrÃ£o: branch padrÃ£o)
      *
-     * VALIDAÇÕES:
-     * - Todos os parâmetros obrigatórios
+     * VALIDAÃ‡Ã•ES:
+     * - Todos os parÃ¢metros obrigatÃ³rios
      * - Projeto deve existir no caminho especificado
-     * - Usuário deve ter permissão de escrita
+     * - UsuÃ¡rio deve ter permissÃ£o de escrita
      *
-     * RECOMENDAÇÕES:
+     * RECOMENDAÃ‡Ã•ES:
      * - Use mensagens de commit descritivas
-     * - Verifique se o repositório está limpo
-     * - Use branches para mudanças grandes
+     * - Verifique se o repositÃ³rio estÃ¡ limpo
+     * - Use branches para mudanÃ§as grandes
      * - Monitore erros de upload
      */
     async uploadProject(params, provider, owner) {
         try {
             if (!owner || !params.repo || !params.projectPath || !params.message) {
-                throw new Error('repo, projectPath e message são obrigatórios');
+                throw new Error('repo, projectPath e message sÃ£o obrigatÃ³rios');
             }
             const result = await provider.uploadProject(owner, params.repo, params.projectPath, params.message, params.branch);
             return {
@@ -603,6 +603,23 @@ exports.filesTool = {
         catch (error) {
             throw new Error(`Falha ao fazer upload do projeto: ${error instanceof Error ? error.message : String(error)}`);
         }
+    }
+    /**
+     * Verifica se erro Ã© relacionado a Git
+     */
+    ,
+    /**
+     * Verifica se erro Ã© relacionado a Git
+     */
+    isGitRelatedError(errorMessage) {
+        const gitKeywords = [
+            'git', 'commit', 'push', 'pull', 'merge', 'conflict', 'branch',
+            'remote', 'repository', 'authentication', 'permission', 'unauthorized',
+            'divergent', 'non-fast-forward', 'fetch first', 'working tree',
+            'uncommitted', 'stash', 'rebase', 'reset', 'checkout'
+        ];
+        const errorLower = errorMessage.toLowerCase();
+        return gitKeywords.some(keyword => errorLower.includes(keyword));
     }
 };
 //# sourceMappingURL=git-files.js.map

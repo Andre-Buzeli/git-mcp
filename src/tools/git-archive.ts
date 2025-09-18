@@ -1,30 +1,31 @@
-import { z } from 'zod';
+﻿import { z } from 'zod';
 import { runGitCommand, runTerminalCmd } from '../utils/terminal-controller.js';
+import { ErrorHandler } from '../providers/error-handler.js';
 
 /**
  * Tool: git-archive
  * 
- * DESCRIÇÃO:
- * Gerenciamento de arquivos Git (GitHub + Gitea) com múltiplas ações
+ * DESCRIÃ‡ÃƒO:
+ * Gerenciamento de arquivos Git (GitHub + Gitea) com mÃºltiplas aÃ§Ãµes
  * 
  * FUNCIONALIDADES:
  * - Criar arquivo
  * - Extrair arquivo
- * - Listar conteúdo do arquivo
+ * - Listar conteÃºdo do arquivo
  * - Verificar arquivo
  * - Criar tarball
  * - Criar zip
  * 
  * USO:
  * - Para criar releases
- * - Para backup de código
- * - Para distribuição de código
- * - Para deploy de versões específicas
+ * - Para backup de cÃ³digo
+ * - Para distribuiÃ§Ã£o de cÃ³digo
+ * - Para deploy de versÃµes especÃ­ficas
  * 
- * RECOMENDAÇÕES:
+ * RECOMENDAÃ‡Ã•ES:
  * - Use para releases oficiais
- * - Inclua apenas arquivos necessários
- * - Teste arquivos antes da distribuição
+ * - Inclua apenas arquivos necessÃ¡rios
+ * - Teste arquivos antes da distribuiÃ§Ã£o
  */
 
 const GitArchiveInputSchema = z.object({
@@ -49,7 +50,7 @@ const GitArchiveInputSchema = z.object({
   // Para verify
   verify_archive: z.string().optional(),
   
-  // Opções
+  // OpÃ§Ãµes
   prefix: z.string().optional(),
   output: z.string().optional(),
 });
@@ -68,7 +69,7 @@ export type GitArchiveResult = z.infer<typeof GitArchiveResultSchema>;
 
 export const gitArchiveTool = {
   name: 'git-archive',
-  description: 'tool: Gerencia arquivos Git para distribuição e backup\n──────────────\naction create: cria arquivo compactado\naction create requires: repo, provider, projectPath, archive_path, commit_or_tree, format, prefix, output\n───────────────\naction extract: extrai arquivo compactado\naction extract requires: repo, provider, projectPath, archive_file, extract_path\n───────────────\naction list: lista conteúdo do arquivo\naction list requires: repo, provider, projectPath, list_archive\n───────────────\naction verify: verifica integridade do arquivo\naction verify requires: repo, provider, projectPath, verify_archive',
+  description: 'tool: Gerencia arquivos Git para distribuiÃ§Ã£o e backup\nâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\naction create: cria arquivo compactado\naction create requires: repo, provider, projectPath, archive_path, commit_or_tree, format, prefix, output\nâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\naction extract: extrai arquivo compactado\naction extract requires: repo, provider, projectPath, archive_file, extract_path\nâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\naction list: lista conteÃºdo do arquivo\naction list requires: repo, provider, projectPath, list_archive\nâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\naction verify: verifica integridade do arquivo\naction verify requires: repo, provider, projectPath, verify_archive',
   inputSchema: {
     type: 'object',
     properties: {
@@ -108,13 +109,13 @@ export const gitArchiveTool = {
         case 'verify':
           return await this.verify(validatedInput);
         default:
-          throw new Error(`Ação não suportada: ${validatedInput.action}`);
+          throw new Error(`AÃ§Ã£o nÃ£o suportada: ${validatedInput.action}`);
       }
     } catch (error) {
       return {
         success: false,
         action: input.action,
-        message: 'Erro na operação de archive',
+        message: 'Erro na operaÃ§Ã£o de archive',
         error: error instanceof Error ? error.message : String(error)
       };
     }
@@ -123,7 +124,7 @@ export const gitArchiveTool = {
   async create(params: GitArchiveInput): Promise<GitArchiveResult> {
     try {
       if (!params.archive_path || !params.commit_or_tree) {
-        throw new Error('archive_path e commit_or_tree são obrigatórios para create');
+        throw new Error('archive_path e commit_or_tree sÃ£o obrigatÃ³rios para create');
       }
 
       const format = params.format || 'tar.gz';
@@ -170,7 +171,7 @@ export const gitArchiveTool = {
   async extract(params: GitArchiveInput): Promise<GitArchiveResult> {
     try {
       if (!params.archive_file || !params.extract_path) {
-        throw new Error('archive_file e extract_path são obrigatórios para extract');
+        throw new Error('archive_file e extract_path sÃ£o obrigatÃ³rios para extract');
       }
 
       const result = await runTerminalCmd({
@@ -187,7 +188,7 @@ export const gitArchiveTool = {
       return {
         success: true,
         action: 'extract',
-        message: `Arquivo extraído com sucesso para ${params.extract_path}`,
+        message: `Arquivo extraÃ­do com sucesso para ${params.extract_path}`,
         data: {
           archive_file: params.archive_file,
           extract_path: params.extract_path,
@@ -202,13 +203,13 @@ export const gitArchiveTool = {
   async list(params: GitArchiveInput): Promise<GitArchiveResult> {
     try {
       if (!params.list_archive) {
-        throw new Error('list_archive é obrigatório para list');
+        throw new Error('list_archive Ã© obrigatÃ³rio para list');
       }
 
       const result = await runTerminalCmd({
         command: `tar -tf ${params.list_archive}`,
         is_background: false,
-        explanation: 'Listando conteúdo do arquivo',
+        explanation: 'Listando conteÃºdo do arquivo',
         projectPath: params.projectPath
       });
 
@@ -221,7 +222,7 @@ export const gitArchiveTool = {
       return {
         success: true,
         action: 'list',
-        message: `Conteúdo do arquivo listado com sucesso: ${params.list_archive}`,
+        message: `ConteÃºdo do arquivo listado com sucesso: ${params.list_archive}`,
         data: {
           archive: params.list_archive,
           files,
@@ -236,7 +237,7 @@ export const gitArchiveTool = {
   async verify(params: GitArchiveInput): Promise<GitArchiveResult> {
     try {
       if (!params.verify_archive) {
-        throw new Error('verify_archive é obrigatório para verify');
+        throw new Error('verify_archive Ã© obrigatÃ³rio para verify');
       }
 
       const result = await runTerminalCmd({
@@ -251,7 +252,7 @@ export const gitArchiveTool = {
       return {
         success: true,
         action: 'verify',
-        message: `Arquivo ${isValid ? 'válido' : 'inválido'}: ${params.verify_archive}`,
+        message: `Arquivo ${isValid ? 'vÃ¡lido' : 'invÃ¡lido'}: ${params.verify_archive}`,
         data: {
           archive: params.verify_archive,
           valid: isValid,
@@ -262,6 +263,19 @@ export const gitArchiveTool = {
       throw new Error(`Falha ao verificar arquivo: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
+  /**
+   * Verifica se erro Ã© relacionado a Git
+   */
+  isGitRelatedError(errorMessage: string): boolean {
+    const gitKeywords = [
+      'git', 'commit', 'push', 'pull', 'merge', 'conflict', 'branch',
+      'remote', 'repository', 'authentication', 'permission', 'unauthorized',
+      'divergent', 'non-fast-forward', 'fetch first', 'working tree',
+      'uncommitted', 'stash', 'rebase', 'reset', 'checkout'
+    ];
+    
+    const errorLower = errorMessage.toLowerCase();
+    return gitKeywords.some(keyword => errorLower.includes(keyword));
+  }
 };
-
 

@@ -1,7 +1,14 @@
 /**
  * Classe utilitária para padronizar tratamento de erros entre providers
  * Fornece métodos consistentes para normalização e formatação de erros
+ * 
+ * NOVA FUNCIONALIDADE:
+ * - Análise inteligente de erros Git
+ * - Sugestões automáticas de solução
+ * - Integração com GitErrorAnalyzer
  */
+
+import { GitErrorAnalyzer, IntelligentErrorResponse } from '../utils/git-error-analyzer.js';
 
 export interface StandardError {
   code: string;
@@ -10,6 +17,8 @@ export interface StandardError {
   originalError?: any;
   statusCode?: number;
   retryable?: boolean;
+  analysis?: any; // Análise inteligente do erro
+  suggestedSolutions?: string[]; // Soluções sugeridas
 }
 
 export class ErrorHandler {
@@ -189,5 +198,71 @@ export class ErrorHandler {
    */
   static isRetryableError(error: any): boolean {
     return error?.retryable === true;
+  }
+
+  /**
+   * NOVO: Cria resposta inteligente de erro com análise Git
+   */
+  static createIntelligentGitError(
+    action: string,
+    error: string,
+    provider: string = 'git',
+    context: string = ''
+  ): IntelligentErrorResponse {
+    const analysis = GitErrorAnalyzer.analyzeGitError(error, context);
+    
+    return {
+      success: false,
+      action,
+      message: `[${provider.toUpperCase()}] ${analysis.cause}`,
+      error: error,
+      analysis,
+      nextSteps: this.generateIntelligentNextSteps(analysis, provider)
+    };
+  }
+
+  /**
+   * NOVO: Gera próximos passos inteligentes baseados na análise
+   */
+  private static generateIntelligentNextSteps(analysis: any, provider: string): string[] {
+    const steps: string[] = [];
+    
+    steps.push(`🔍 ANÁLISE DO ERRO:`);
+    steps.push(`   Tipo: ${analysis.errorType}`);
+    steps.push(`   Causa: ${analysis.cause}`);
+    steps.push(`   Solução: ${analysis.solution}`);
+    
+    if (analysis.autoFixable) {
+      steps.push(`✅ RESOLUÇÃO AUTOMÁTICA DISPONÍVEL:`);
+      steps.push(`   Este erro pode ser resolvido automaticamente usando outras tools.`);
+      steps.push(`   Tools recomendadas:`);
+      analysis.relatedTools.forEach((tool: string) => {
+        steps.push(`   - ${tool}`);
+      });
+    } else {
+      steps.push(`⚠️ AÇÃO MANUAL NECESSÁRIA:`);
+      steps.push(`   Comandos Git sugeridos:`);
+      analysis.suggestedCommands.forEach((cmd: string) => {
+        steps.push(`   - ${cmd}`);
+      });
+    }
+    
+    steps.push(`💡 DICA: Use as tools relacionadas para resolver automaticamente!`);
+    
+    return steps;
+  }
+
+  /**
+   * NOVO: Verifica se erro Git pode ser resolvido automaticamente
+   */
+  static isGitErrorAutoFixable(error: string): boolean {
+    return GitErrorAnalyzer.isAutoFixable(error);
+  }
+
+  /**
+   * NOVO: Retorna tools que podem resolver o erro Git
+   */
+  static getGitErrorRelatedTools(error: string): string[] {
+    return GitErrorAnalyzer.getRelatedTools(error);
   }
 }

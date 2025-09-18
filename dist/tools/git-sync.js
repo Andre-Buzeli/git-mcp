@@ -7,22 +7,22 @@ const user_detection_js_1 = require("../utils/user-detection.js");
 /**
  * Tool: git-sync
  *
- * DESCRIÇÃO:
- * Sincronização entre dois repositórios hospedados em provedores distintos (ex.: Gitea <-> GitHub).
+ * DESCRIÃ‡ÃƒO:
+ * SincronizaÃ§Ã£o entre dois repositÃ³rios hospedados em provedores distintos (ex.: Gitea <-> GitHub).
  *
  * OBJETIVOS:
  * - Configurar espelhamento (quando suportado pelo backend) e registrar estado
- * - Executar sincronização pontual (one-shot) de código e/ou metadados
- * - Consultar status/diagnóstico da sincronização
+ * - Executar sincronizaÃ§Ã£o pontual (one-shot) de cÃ³digo e/ou metadados
+ * - Consultar status/diagnÃ³stico da sincronizaÃ§Ã£o
  *
- * LIMITAÇÕES:
- * - Histórico Git completo por API REST é limitado; prioriza espelhamento nativo (push mirrors) quando disponível
- * - Metadados (issues, labels, releases, PRs) têm mapeamento best-effort com diferenças entre plataformas
+ * LIMITAÃ‡Ã•ES:
+ * - HistÃ³rico Git completo por API REST Ã© limitado; prioriza espelhamento nativo (push mirrors) quando disponÃ­vel
+ * - Metadados (issues, labels, releases, PRs) tÃªm mapeamento best-effort com diferenÃ§as entre plataformas
  *
  * DICAS (solo):
  * - Use para manter um backup/em espelho entre provedores
- * - Prefira one-shot antes de configurar contínuo; verifique status e conflitos
- * - Defina estratégia de conflito e escopos explicitamente
+ * - Prefira one-shot antes de configurar contÃ­nuo; verifique status e conflitos
+ * - Defina estratÃ©gia de conflito e escopos explicitamente
  */
 const GitSyncInputSchema = zod_1.z.object({
     action: zod_1.z.enum(['configure', 'status', 'one-shot']),
@@ -48,7 +48,7 @@ const GitSyncResultSchema = zod_1.z.object({
 });
 exports.gitSyncTool = {
     name: 'git-sync',
-    description: 'Synchronize two repositories across providers (Gitea <-> GitHub). Modos: configure (espelhamento quando suportado), one-shot (execução pontual) e status (diagnóstico). Dicas: execute dry-run primeiro, escolha escopos e estratégia de conflito.',
+    description: 'Synchronize two repositories across providers (Gitea <-> GitHub). Modos: configure (espelhamento quando suportado), one-shot (execuÃ§Ã£o pontual) e status (diagnÃ³stico). Dicas: execute dry-run primeiro, escolha escopos e estratÃ©gia de conflito.',
     inputSchema: {
         type: 'object',
         properties: {
@@ -81,7 +81,7 @@ exports.gitSyncTool = {
     async handler(input) {
         try {
             const validatedInput = GitSyncInputSchema.parse(input);
-            // Aplicar auto-detecção para ambos os providers
+            // Aplicar auto-detecÃ§Ã£o para ambos os providers
             const processedInput = await (0, user_detection_js_1.applyAutoUserDetection)(validatedInput, validatedInput.source.provider);
             switch (validatedInput.action) {
                 case 'configure':
@@ -91,47 +91,47 @@ exports.gitSyncTool = {
                 case 'one-shot':
                     return await this.executeSync(validatedInput);
                 default:
-                    throw new Error(`Ação não suportada: ${validatedInput.action}`);
+                    throw new Error(`AÃ§Ã£o nÃ£o suportada: ${validatedInput.action}`);
             }
         }
         catch (error) {
             return {
                 success: false,
                 action: input.action,
-                message: 'Erro na execução do git-sync',
+                message: 'Erro na execuÃ§Ã£o do git-sync',
                 error: error instanceof Error ? error.message : String(error)
             };
         }
     },
     /**
-     * Configura sincronização entre dois repositórios
+     * Configura sincronizaÃ§Ã£o entre dois repositÃ³rios
      */
     async configureSync(params) {
         try {
             const sourceProvider = index_js_1.globalProviderFactory.getProvider(params.source.provider);
             const targetProvider = index_js_1.globalProviderFactory.getProvider(params.target.provider);
             if (!sourceProvider || !targetProvider) {
-                throw new Error('Providers não encontrados para sincronização');
+                throw new Error('Providers nÃ£o encontrados para sincronizaÃ§Ã£o');
             }
-            // Obter informações dos repositórios
+            // Obter informaÃ§Ãµes dos repositÃ³rios
             const sourceOwner = (await sourceProvider.getCurrentUser()).login;
             const targetOwner = (await targetProvider.getCurrentUser()).login;
             const sourceRepo = await sourceProvider.getRepository(sourceOwner, params.source.repo);
             const targetRepo = await targetProvider.getRepository(targetOwner, params.target.repo);
-            // Configurar webhook para sincronização automática se suportado
+            // Configurar webhook para sincronizaÃ§Ã£o automÃ¡tica se suportado
             const targetConfig = targetProvider.getConfig?.();
             const webhookUrl = `${targetConfig?.baseUrl || 'http://localhost'}/webhook/sync`;
             const webhookEvents = ['push', 'pull_request'];
             try {
-                await sourceProvider.createWebhook(sourceOwner, params.source.repo, webhookUrl, webhookEvents, 'Sincronização automática');
+                await sourceProvider.createWebhook(sourceOwner, params.source.repo, webhookUrl, webhookEvents, 'SincronizaÃ§Ã£o automÃ¡tica');
             }
             catch (webhookError) {
-                console.warn('Aviso: Não foi possível configurar webhook automático:', webhookError);
+                console.warn('Aviso: NÃ£o foi possÃ­vel configurar webhook automÃ¡tico:', webhookError);
             }
             return {
                 success: true,
                 action: 'configure',
-                message: `Sincronização configurada entre ${params.source.provider}/${params.source.repo} e ${params.target.provider}/${params.target.repo}`,
+                message: `SincronizaÃ§Ã£o configurada entre ${params.source.provider}/${params.source.repo} e ${params.target.provider}/${params.target.repo}`,
                 data: {
                     source: {
                         provider: params.source.provider,
@@ -153,31 +153,31 @@ exports.gitSyncTool = {
             };
         }
         catch (error) {
-            throw new Error(`Falha ao configurar sincronização: ${error instanceof Error ? error.message : String(error)}`);
+            throw new Error(`Falha ao configurar sincronizaÃ§Ã£o: ${error instanceof Error ? error.message : String(error)}`);
         }
     },
     /**
-     * Obtém status da sincronização
+     * ObtÃ©m status da sincronizaÃ§Ã£o
      */
     async getSyncStatus(params) {
         try {
             const sourceProvider = index_js_1.globalProviderFactory.getProvider(params.source.provider);
             const targetProvider = index_js_1.globalProviderFactory.getProvider(params.target.provider);
             if (!sourceProvider || !targetProvider) {
-                throw new Error('Providers não encontrados');
+                throw new Error('Providers nÃ£o encontrados');
             }
             const sourceOwner = (await sourceProvider.getCurrentUser()).login;
             const targetOwner = (await targetProvider.getCurrentUser()).login;
-            // Verificar se repositórios existem
+            // Verificar se repositÃ³rios existem
             const sourceRepo = await sourceProvider.getRepository(sourceOwner, params.source.repo);
             const targetRepo = await targetProvider.getRepository(targetOwner, params.target.repo);
-            // Verificar última atividade
+            // Verificar Ãºltima atividade
             const sourceCommits = await sourceProvider.listCommits(sourceOwner, params.source.repo, undefined, 1, 1);
             const targetCommits = await targetProvider.listCommits(targetOwner, params.target.repo, undefined, 1, 1);
             // Verificar webhooks
             const webhooks = await sourceProvider.listWebhooks(sourceOwner, params.source.repo, 1, 10);
             const syncWebhooks = webhooks.filter((w) => w.url && w.url.includes('/webhook/sync'));
-            // Calcular status de saúde
+            // Calcular status de saÃºde
             const sourceLastCommit = sourceCommits[0]?.commit?.author?.date || null;
             const targetLastCommit = targetCommits[0]?.commit?.author?.date || null;
             let health = 'healthy';
@@ -198,7 +198,7 @@ exports.gitSyncTool = {
             return {
                 success: true,
                 action: 'status',
-                message: `Status da sincronização obtido com sucesso`,
+                message: `Status da sincronizaÃ§Ã£o obtido com sucesso`,
                 data: {
                     health,
                     source: {
@@ -230,7 +230,7 @@ exports.gitSyncTool = {
         }
     },
     /**
-     * Executa sincronização pontual
+     * Executa sincronizaÃ§Ã£o pontual
      */
     async executeSync(params) {
         try {
@@ -238,11 +238,11 @@ exports.gitSyncTool = {
                 return {
                     success: true,
                     action: 'one-shot',
-                    message: 'Sincronização simulada (dry-run) - nenhuma mudança aplicada',
+                    message: 'SincronizaÃ§Ã£o simulada (dry-run) - nenhuma mudanÃ§a aplicada',
                     data: {
                         dryRun: true,
                         wouldSync: {
-                            commits: 'Últimos commits seriam sincronizados',
+                            commits: 'Ãšltimos commits seriam sincronizados',
                             issues: 'Issues abertas seriam sincronizadas',
                             releases: 'Releases recentes seriam sincronizadas'
                         }
@@ -252,7 +252,7 @@ exports.gitSyncTool = {
             const sourceProvider = index_js_1.globalProviderFactory.getProvider(params.source.provider);
             const targetProvider = index_js_1.globalProviderFactory.getProvider(params.target.provider);
             if (!sourceProvider || !targetProvider) {
-                throw new Error('Providers não encontrados');
+                throw new Error('Providers nÃ£o encontrados');
             }
             const sourceOwner = (await sourceProvider.getCurrentUser()).login;
             const targetOwner = (await targetProvider.getCurrentUser()).login;
@@ -288,7 +288,7 @@ exports.gitSyncTool = {
             return {
                 success: true,
                 action: 'one-shot',
-                message: `Sincronização pontual executada com sucesso`,
+                message: `SincronizaÃ§Ã£o pontual executada com sucesso`,
                 data: {
                     source: {
                         provider: params.source.provider,
@@ -306,8 +306,25 @@ exports.gitSyncTool = {
             };
         }
         catch (error) {
-            throw new Error(`Falha na sincronização: ${error instanceof Error ? error.message : String(error)}`);
+            throw new Error(`Falha na sincronizaÃ§Ã£o: ${error instanceof Error ? error.message : String(error)}`);
         }
+    }
+    /**
+     * Verifica se erro Ã© relacionado a Git
+     */
+    ,
+    /**
+     * Verifica se erro Ã© relacionado a Git
+     */
+    isGitRelatedError(errorMessage) {
+        const gitKeywords = [
+            'git', 'commit', 'push', 'pull', 'merge', 'conflict', 'branch',
+            'remote', 'repository', 'authentication', 'permission', 'unauthorized',
+            'divergent', 'non-fast-forward', 'fetch first', 'working tree',
+            'uncommitted', 'stash', 'rebase', 'reset', 'checkout'
+        ];
+        const errorLower = errorMessage.toLowerCase();
+        return gitKeywords.some(keyword => errorLower.includes(keyword));
     }
 };
 //# sourceMappingURL=git-sync.js.map

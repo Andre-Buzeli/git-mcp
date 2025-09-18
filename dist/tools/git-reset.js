@@ -6,25 +6,25 @@ const terminal_controller_js_1 = require("../utils/terminal-controller.js");
 /**
  * Tool: git-reset
  *
- * DESCRIÇÃO:
- * Gerenciamento de reset Git (GitHub + Gitea) com múltiplas ações
+ * DESCRIÃ‡ÃƒO:
+ * Gerenciamento de reset Git (GitHub + Gitea) com mÃºltiplas aÃ§Ãµes
  *
  * FUNCIONALIDADES:
- * - Reset soft (mantém mudanças no staging)
- * - Reset mixed (padrão, remove do staging)
- * - Reset hard (remove todas as mudanças)
- * - Reset para commit específico
+ * - Reset soft (mantÃ©m mudanÃ§as no staging)
+ * - Reset mixed (padrÃ£o, remove do staging)
+ * - Reset hard (remove todas as mudanÃ§as)
+ * - Reset para commit especÃ­fico
  * - Reset de branch
  *
  * USO:
  * - Para desfazer commits
  * - Para limpar staging area
  * - Para voltar a estado anterior
- * - Para remover mudanças não commitadas
+ * - Para remover mudanÃ§as nÃ£o commitadas
  *
- * RECOMENDAÇÕES:
+ * RECOMENDAÃ‡Ã•ES:
  * - Use com cuidado, especialmente reset hard
- * - Faça backup antes de resets destrutivos
+ * - FaÃ§a backup antes de resets destrutivos
  * - Teste em branches locais primeiro
  */
 const GitResetInputSchema = zod_1.z.object({
@@ -49,7 +49,7 @@ const GitResetResultSchema = zod_1.z.object({
 });
 exports.gitResetTool = {
     name: 'git-reset',
-    description: 'tool: Gerencia operações Git reset para desfazer mudanças\n──────────────\naction soft: reset soft mantém mudanças no staging\naction soft requires: repo, commit_hash, provider, projectPath\n───────────────\naction mixed: reset mixed limpa staging area\naction mixed requires: repo, commit_hash, provider, projectPath\n───────────────\naction hard: reset hard remove todas as mudanças\naction hard requires: repo, commit_hash, provider, projectPath\n───────────────\naction reset-to-commit: reseta para commit específico\naction reset-to-commit requires: repo, commit_hash, reset_type, provider, projectPath\n───────────────\naction reset-branch: reseta branch específica\naction reset-branch requires: repo, branch_name, target_branch, provider, projectPath',
+    description: 'tool: Gerencia operaÃ§Ãµes Git reset para desfazer mudanÃ§as\nâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\naction soft: reset soft mantÃ©m mudanÃ§as no staging\naction soft requires: repo, commit_hash, provider, projectPath\nâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\naction mixed: reset mixed limpa staging area\naction mixed requires: repo, commit_hash, provider, projectPath\nâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\naction hard: reset hard remove todas as mudanÃ§as\naction hard requires: repo, commit_hash, provider, projectPath\nâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\naction reset-to-commit: reseta para commit especÃ­fico\naction reset-to-commit requires: repo, commit_hash, reset_type, provider, projectPath\nâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\naction reset-branch: reseta branch especÃ­fica\naction reset-branch requires: repo, branch_name, target_branch, provider, projectPath',
     inputSchema: {
         type: 'object',
         properties: {
@@ -84,14 +84,14 @@ exports.gitResetTool = {
                 case 'reset-branch':
                     return await this.resetBranch(validatedInput);
                 default:
-                    throw new Error(`Ação não suportada: ${validatedInput.action}`);
+                    throw new Error(`AÃ§Ã£o nÃ£o suportada: ${validatedInput.action}`);
             }
         }
         catch (error) {
             return {
                 success: false,
                 action: input.action,
-                message: 'Erro na operação de reset',
+                message: 'Erro na operaÃ§Ã£o de reset',
                 error: error instanceof Error ? error.message : String(error)
             };
         }
@@ -165,7 +165,7 @@ exports.gitResetTool = {
     async resetToCommit(params) {
         try {
             if (!params.commit_hash) {
-                throw new Error('commit_hash é obrigatório para reset-to-commit');
+                throw new Error('commit_hash Ã© obrigatÃ³rio para reset-to-commit');
             }
             const resetType = params.reset_type || 'mixed';
             const result = await (0, terminal_controller_js_1.runTerminalCmd)({
@@ -194,7 +194,7 @@ exports.gitResetTool = {
     async resetBranch(params) {
         try {
             if (!params.target_branch) {
-                throw new Error('target_branch é obrigatório para reset-branch');
+                throw new Error('target_branch Ã© obrigatÃ³rio para reset-branch');
             }
             const resetType = params.reset_type || 'mixed';
             const result = await (0, terminal_controller_js_1.runTerminalCmd)({
@@ -219,6 +219,23 @@ exports.gitResetTool = {
         catch (error) {
             throw new Error(`Falha ao executar reset para branch: ${error instanceof Error ? error.message : String(error)}`);
         }
+    }
+    /**
+     * Verifica se erro Ã© relacionado a Git
+     */
+    ,
+    /**
+     * Verifica se erro Ã© relacionado a Git
+     */
+    isGitRelatedError(errorMessage) {
+        const gitKeywords = [
+            'git', 'commit', 'push', 'pull', 'merge', 'conflict', 'branch',
+            'remote', 'repository', 'authentication', 'permission', 'unauthorized',
+            'divergent', 'non-fast-forward', 'fetch first', 'working tree',
+            'uncommitted', 'stash', 'rebase', 'reset', 'checkout'
+        ];
+        const errorLower = errorMessage.toLowerCase();
+        return gitKeywords.some(keyword => errorLower.includes(keyword));
     }
 };
 //# sourceMappingURL=git-reset.js.map
