@@ -321,6 +321,24 @@ export abstract class BaseVcsProvider implements VcsOperations {
     throw new Error('createRelease not implemented');
   }
 
+  // Métodos adicionais para commits
+  async compareCommits(owner: string, repo: string, base: string, head: string): Promise<any> {
+    throw new Error('compareCommits not implemented');
+  }
+
+  async searchCommits(owner: string, repo: string, query: string, author?: string): Promise<any> {
+    throw new Error('searchCommits not implemented');
+  }
+
+  // Métodos adicionais para issues
+  async addComment(owner: string, repo: string, issueNumber: number, commentBody: string): Promise<any> {
+    throw new Error('addComment not implemented');
+  }
+
+  async searchIssues(owner: string, repo: string, query: string, author?: string, assignee?: string, label?: string): Promise<any> {
+    throw new Error('searchIssues not implemented');
+  }
+
   async updateRelease(releaseId: number, updates: any): Promise<any> {
     throw new Error('updateRelease not implemented');
   }

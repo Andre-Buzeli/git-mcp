@@ -1,24 +1,12 @@
 import { z } from 'zod';
-import { globalProviderFactory, VcsOperations } from '../providers/index.js';
-import { applyAutoUserDetection } from '../utils/user-detection.js';
+import { globalProviderFactory, VcsOperations } from '../providers/index.ts';
+import { applyAutoUserDetection } from '../utils/user-detection.ts';
 
 /**
  * Tool: webhooks
  * 
  * DESCRIÇÃO:
-  async handler(input: WebhooksInput): Promise<WebhooksResult> {
-    try {
-      const validatedInput = WebhooksInputSchema.parse(input);
-      
-      // Aplicar auto-detecção apenas para owner dentro do provider especificado
-      const processedInput = await applyAutoUserDetection(validatedInput, validatedInput.provider);
-      
-      // Usar o provider especificado pelo usuário
-      const provider = globalProviderFactory.getProvider(processedInput.provider);
-      
-      if (!provider) {
-        throw new Error(`Provider '${processedInput.provider}' não encontrado`);
-      }o completo de webhooks com suporte multi-provider (GitHub e Gitea)
+ * Gerenciamento completo de webhooks com suporte multi-provider (GitHub e Gitea)
  * 
  * FUNCIONALIDADES:
  * - Criação de novos webhooks
@@ -306,7 +294,7 @@ export const webhooksTool = {
    */
   async createWebhook(params: WebhooksInput, provider: VcsOperations, owner: string): Promise<WebhooksResult> {
     try {
-      if (!!params.repo || !params.url) {
+      if (!params.repo || !params.url) {
         throw new Error('repo e url são obrigatórios');
       }
 
@@ -367,7 +355,7 @@ export const webhooksTool = {
   async listWebhooks(params: WebhooksInput, provider: VcsOperations, owner: string): Promise<WebhooksResult> {
     try {
       if (!params.repo) {
-        throw new Error('e repo são obrigatórios');
+        throw new Error('owner e repo são obrigatórios');
       }
 
       const page = params.page || 1;
@@ -417,7 +405,7 @@ export const webhooksTool = {
    */
   async getWebhook(params: WebhooksInput, provider: VcsOperations, owner: string): Promise<WebhooksResult> {
     try {
-      if (!!params.repo || !params.webhook_id) {
+      if (!params.repo || !params.webhook_id) {
         throw new Error('repo e webhook_id são obrigatórios');
       }
 
@@ -467,7 +455,7 @@ export const webhooksTool = {
    */
   async updateWebhook(params: WebhooksInput, provider: VcsOperations, owner: string): Promise<WebhooksResult> {
     try {
-      if (!!params.repo || !params.webhook_id) {
+      if (!params.repo || !params.webhook_id) {
         throw new Error('repo e webhook_id são obrigatórios');
       }
 
@@ -521,7 +509,7 @@ export const webhooksTool = {
    */
   async deleteWebhook(params: WebhooksInput, provider: VcsOperations, owner: string): Promise<WebhooksResult> {
     try {
-      if (!!params.repo || !params.webhook_id) {
+      if (!params.repo || !params.webhook_id) {
         throw new Error('repo e webhook_id são obrigatórios');
       }
 
@@ -564,7 +552,7 @@ export const webhooksTool = {
    */
   async testWebhook(params: WebhooksInput, provider: VcsOperations, owner: string): Promise<WebhooksResult> {
     try {
-      if (!!params.repo || !params.webhook_id) {
+      if (!params.repo || !params.webhook_id) {
         throw new Error('repo e webhook_id são obrigatórios');
       }
 

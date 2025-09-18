@@ -1,7 +1,7 @@
 import { z } from 'zod';
-import { globalProviderFactory, VcsOperations } from '../providers/index.js';
-import { applyAutoUserDetection } from '../utils/user-detection.js';
-import { runTerminalCmd } from '../utils/terminal-controller.js';
+import { globalProviderFactory, VcsOperations } from '../providers/index.ts';
+import { applyAutoUserDetection } from '../utils/user-detection.ts';
+import { runTerminalCmd } from '../utils/terminal-controller.ts';
 
 /**
  * Tool: git-repositories

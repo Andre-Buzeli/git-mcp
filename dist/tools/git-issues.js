@@ -608,20 +608,28 @@ exports.issuesTool = {
             if (!params.comment_body) {
                 throw new Error('Comment_body é obrigatório');
             }
-            // Implementar criação de comentário
-            // Por enquanto, retorna mensagem de funcionalidade
-            const comment = {
-                id: Date.now(),
-                body: params.comment_body,
-                user: { login: 'usuário atual', id: 1 },
-                created_at: new Date().toISOString(),
-                note: 'Funcionalidade de comentário será implementada'
-            };
+            // Verificar se a issue existe
+            try {
+                await provider.getIssue(owner, params.repo, params.issue_number);
+            }
+            catch (error) {
+                throw new Error(`Issue #${params.issue_number} não encontrada no repositório`);
+            }
+            // Adicionar comentário usando o provider
+            const comment = await provider.addComment(owner, params.repo, params.issue_number, params.comment_body);
             return {
                 success: true,
                 action: 'comment',
                 message: `Comentário adicionado à issue #${params.issue_number} com sucesso`,
-                data: comment
+                data: {
+                    issue_number: params.issue_number,
+                    comment: comment,
+                    body: params.comment_body,
+                    created_at: comment.created_at,
+                    updated_at: comment.updated_at,
+                    user: comment.user,
+                    html_url: comment.html_url
+                }
             };
         }
         catch (error) {
@@ -671,18 +679,57 @@ exports.issuesTool = {
             if (params.query.length < 3) {
                 throw new Error('Query deve ter pelo menos 3 caracteres');
             }
-            // Implementar busca de issues
-            // Por enquanto, retorna mensagem de funcionalidade
+            const page = params.page || 1;
+            const limit = Math.min(params.limit || 30, 100);
+            // Buscar issues usando o provider
+            let searchResults = [];
+            if (provider.searchIssues) {
+                searchResults = await provider.searchIssues(owner, params.repo, params.query, params.author || undefined, params.assignee || undefined, params.label || undefined);
+            }
+            else {
+                // Fallback: buscar todas as issues e filtrar localmente
+                const allIssues = await provider.listIssues(owner, params.repo, 'all', 1, 100);
+                searchResults = allIssues.filter((issue) => issue.title?.toLowerCase().includes(params.query.toLowerCase()) ||
+                    issue.body?.toLowerCase().includes(params.query.toLowerCase()));
+            }
+            // Filtrar resultados por página e limite
+            const startIndex = (page - 1) * limit;
+            const endIndex = startIndex + limit;
+            const paginatedResults = searchResults.slice(startIndex, endIndex);
+            // Aplicar filtros adicionais se especificados
+            let filteredResults = paginatedResults;
+            if (params.author) {
+                filteredResults = filteredResults.filter((issue) => issue.user?.login?.toLowerCase().includes(params.author.toLowerCase()));
+            }
+            if (params.assignee) {
+                filteredResults = filteredResults.filter((issue) => issue.assignees?.some((assignee) => assignee.login?.toLowerCase().includes(params.assignee.toLowerCase())));
+            }
+            if (params.label) {
+                filteredResults = filteredResults.filter((issue) => issue.labels?.some((label) => label.name?.toLowerCase().includes(params.label.toLowerCase())));
+            }
             return {
                 success: true,
                 action: 'search',
-                message: `Busca por issues com '${params.query}' solicitada`,
+                message: `${filteredResults.length} issues encontradas para '${params.query}'`,
                 data: {
                     query: params.query,
                     author: params.author || 'todos',
                     assignee: params.assignee || 'todos',
                     label: params.label || 'todos',
-                    results: 'Funcionalidade de busca será implementada'
+                    page,
+                    limit,
+                    total_found: searchResults.length,
+                    results: filteredResults,
+                    summary: {
+                        total_issues: searchResults.length,
+                        filtered_issues: filteredResults.length,
+                        states: {
+                            open: filteredResults.filter((i) => i.state === 'open').length,
+                            closed: filteredResults.filter((i) => i.state === 'closed').length
+                        },
+                        labels: [...new Set(filteredResults.flatMap((i) => i.labels?.map((l) => l.name) || []).filter(Boolean))],
+                        assignees: [...new Set(filteredResults.flatMap((i) => i.assignees?.map((a) => a.login) || []).filter(Boolean))]
+                    }
                 }
             };
         }

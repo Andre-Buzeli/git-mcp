@@ -1,6 +1,6 @@
 import { z } from 'zod';
-import { globalProviderFactory, VcsOperations } from '../providers/index.js';
-import { applyAutoUserDetection } from '../utils/user-detection.js';
+import { globalProviderFactory, VcsOperations } from '../providers/index.ts';
+import { applyAutoUserDetection } from '../utils/user-detection.ts';
 
 /**
  * Tool: branches
@@ -495,16 +495,75 @@ export const branchesTool = {
         throw new Error('Repo, head e base são obrigatórios');
       }
 
-      // Por enquanto, retorna mensagem de funcionalidade não implementada
-      // TODO: Implementar merge direto de branches via provider
+      const currentUser = await provider.getCurrentUser();
+      const owner = currentUser.login;
+      const mergeMethod = params.merge_method || 'merge';
+
+      // Verificar se as branches existem
+      try {
+        await provider.getBranch(owner, params.repo, params.head);
+        await provider.getBranch(owner, params.repo, params.base);
+      } catch (error) {
+        throw new Error(`Uma das branches não existe: ${params.head} ou ${params.base}`);
+      }
+
+      // Criar pull request para fazer o merge
+      const prTitle = `Merge ${params.head} into ${params.base}`;
+      const prBody = `Merge automático da branch '${params.head}' na branch '${params.base}'\n\nMétodo: ${mergeMethod}`;
+
+      const pullRequest = await provider.createPullRequest(
+        owner,
+        params.repo,
+        prTitle,
+        prBody,
+        params.head,
+        params.base
+      );
+
+      // Se o merge_method for merge direto, fazer merge automático
+      if (mergeMethod === 'merge') {
+        try {
+          await provider.mergePullRequest(owner, params.repo, pullRequest.number, 'merge');
+          
+          return {
+            success: true,
+            action: 'merge',
+            message: `Merge de '${params.head}' em '${params.base}' realizado com sucesso`,
+            data: {
+              head: params.head,
+              base: params.base,
+              merge_method: mergeMethod,
+              pull_request: pullRequest,
+              merged: true
+            }
+          };
+        } catch (mergeError) {
+          return {
+            success: true,
+            action: 'merge',
+            message: `Pull request criado para merge de '${params.head}' em '${params.base}' (merge automático falhou)`,
+            data: {
+              head: params.head,
+              base: params.base,
+              merge_method: mergeMethod,
+              pull_request: pullRequest,
+              merged: false,
+              merge_error: mergeError instanceof Error ? mergeError.message : String(mergeError)
+            }
+          };
+        }
+      }
+
       return {
         success: true,
         action: 'merge',
-        message: `Merge de '${params.head}' em '${params.base}' solicitado (funcionalidade será implementada)`,
+        message: `Pull request criado para merge de '${params.head}' em '${params.base}'`,
         data: {
           head: params.head,
           base: params.base,
-          merge_method: params.merge_method || 'merge'
+          merge_method: mergeMethod,
+          pull_request: pullRequest,
+          requires_manual_review: true
         }
       };
     } catch (error) {
@@ -542,16 +601,69 @@ export const branchesTool = {
         throw new Error('Repo, base_branch e head_branch são obrigatórios');
       }
 
-      // Implementar comparação de branches
-      // Por enquanto, retorna mensagem de funcionalidade
+      const currentUser = await provider.getCurrentUser();
+      const owner = currentUser.login;
+
+      // Verificar se as branches existem
+      try {
+        const baseBranch = await provider.getBranch(owner, params.repo, params.base_branch);
+        const headBranch = await provider.getBranch(owner, params.repo, params.head_branch);
+      } catch (error) {
+        throw new Error(`Uma das branches não existe: ${params.base_branch} ou ${params.head_branch}`);
+      }
+
+      // Obter commits de cada branch
+      const baseCommits = await provider.listCommits(owner, params.repo, params.base_branch, 1, 10);
+      const headCommits = await provider.listCommits(owner, params.repo, params.head_branch, 1, 10);
+
+      // Comparar commits (simplificado - apenas verificar se há commits diferentes)
+      const baseCommitShas = baseCommits.map(c => c.sha);
+      const headCommitShas = headCommits.map(c => c.sha);
+      
+      const uniqueBaseCommits = baseCommits.filter(c => !headCommitShas.includes(c.sha));
+      const uniqueHeadCommits = headCommits.filter(c => !baseCommitShas.includes(c.sha));
+
+      // Usar compareCommits se disponível no provider
+      let detailedComparison = null;
+      try {
+        if (provider.compareCommits) {
+          detailedComparison = await provider.compareCommits(owner, params.repo, params.base_branch, params.head_branch);
+        }
+      } catch (error) {
+        console.warn('Comparação detalhada não disponível:', error);
+      }
+
       return {
         success: true,
         action: 'compare',
-        message: `Comparação entre '${params.base_branch}' e '${params.head_branch}' solicitada`,
+        message: `Comparação entre '${params.base_branch}' e '${params.head_branch}' realizada com sucesso`,
         data: {
-          base: params.base_branch,
-          head: params.head_branch,
-          comparison: 'Funcionalidade de comparação será implementada'
+          base: {
+            branch: params.base_branch,
+            commits: baseCommits.length,
+            unique_commits: uniqueBaseCommits.length,
+            last_commit: baseCommits[0]?.sha
+          },
+          head: {
+            branch: params.head_branch,
+            commits: headCommits.length,
+            unique_commits: uniqueHeadCommits.length,
+            last_commit: headCommits[0]?.sha
+          },
+          comparison: {
+            base_ahead: uniqueBaseCommits.length,
+            head_ahead: uniqueHeadCommits.length,
+            divergent: uniqueBaseCommits.length > 0 && uniqueHeadCommits.length > 0,
+            mergeable: true, // Assumir mergeable por padrão
+            detailed: detailedComparison
+          },
+          summary: {
+            can_merge: uniqueBaseCommits.length === 0 || uniqueHeadCommits.length === 0,
+            requires_merge: uniqueBaseCommits.length > 0 && uniqueHeadCommits.length > 0,
+            recommendation: uniqueBaseCommits.length === 0 ? 'head está à frente' : 
+                           uniqueHeadCommits.length === 0 ? 'base está à frente' :
+                           'branches divergiram'
+          }
         }
       };
     } catch (error) {

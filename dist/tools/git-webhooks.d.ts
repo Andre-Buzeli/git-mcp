@@ -1,22 +1,10 @@
 import { z } from 'zod';
-import { VcsOperations } from '../providers/index.js';
+import { VcsOperations } from '../providers/index.ts';
 /**
  * Tool: webhooks
  *
  * DESCRIÇÃO:
-  async handler(input: WebhooksInput): Promise<WebhooksResult> {
-    try {
-      const validatedInput = WebhooksInputSchema.parse(input);
-      
-      // Aplicar auto-detecção apenas para owner dentro do provider especificado
-      const processedInput = await applyAutoUserDetection(validatedInput, validatedInput.provider);
-      
-      // Usar o provider especificado pelo usuário
-      const provider = globalProviderFactory.getProvider(processedInput.provider);
-      
-      if (!provider) {
-        throw new Error(`Provider '${processedInput.provider}' não encontrado`);
-      }o completo de webhooks com suporte multi-provider (GitHub e Gitea)
+ * Gerenciamento completo de webhooks com suporte multi-provider (GitHub e Gitea)
  *
  * FUNCIONALIDADES:
  * - Criação de novos webhooks
@@ -74,8 +62,8 @@ declare const WebhooksInputSchema: z.ZodObject<{
     repo: string;
     action: "delete" | "get" | "list" | "create" | "update" | "test";
     active?: boolean | undefined;
-    events?: string[] | undefined;
     url?: string | undefined;
+    events?: string[] | undefined;
     page?: number | undefined;
     limit?: number | undefined;
     content_type?: "json" | "form" | undefined;
@@ -91,8 +79,8 @@ declare const WebhooksInputSchema: z.ZodObject<{
     repo: string;
     action: "delete" | "get" | "list" | "create" | "update" | "test";
     active?: boolean | undefined;
-    events?: string[] | undefined;
     url?: string | undefined;
+    events?: string[] | undefined;
     page?: number | undefined;
     limit?: number | undefined;
     content_type?: "json" | "form" | undefined;

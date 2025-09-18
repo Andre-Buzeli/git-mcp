@@ -86,10 +86,10 @@ declare const PullsInputSchema: z.ZodObject<{
     head?: string | undefined;
     base?: string | undefined;
     draft?: boolean | undefined;
+    author?: string | undefined;
     page?: number | undefined;
     limit?: number | undefined;
     query?: string | undefined;
-    author?: string | undefined;
     merge_method?: "merge" | "rebase" | "squash" | undefined;
     milestone?: number | undefined;
     new_title?: string | undefined;
@@ -119,10 +119,10 @@ declare const PullsInputSchema: z.ZodObject<{
     head?: string | undefined;
     base?: string | undefined;
     draft?: boolean | undefined;
+    author?: string | undefined;
     page?: number | undefined;
     limit?: number | undefined;
     query?: string | undefined;
-    author?: string | undefined;
     merge_method?: "merge" | "rebase" | "squash" | undefined;
     milestone?: number | undefined;
     new_title?: string | undefined;

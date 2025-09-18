@@ -410,18 +410,42 @@ exports.commitsTool = {
             if (params.message.trim().length === 0) {
                 throw new Error('Mensagem do commit não pode estar vazia');
             }
-            // Implementar criação de commit
-            // Por enquanto, retorna mensagem de funcionalidade
+            // Verificar se a branch existe
+            try {
+                await provider.getBranch(owner, params.repo, params.branch);
+            }
+            catch (error) {
+                throw new Error(`Branch '${params.branch}' não existe no repositório`);
+            }
+            // Obter informações do usuário atual para usar como padrão
+            const currentUser = await provider.getCurrentUser();
+            // Preparar dados do commit
+            const commitData = {
+                message: params.message,
+                branch: params.branch,
+                author: {
+                    name: params.author_name || currentUser.login,
+                    email: params.author_email || currentUser.email || `${currentUser.login}@example.com`
+                },
+                committer: {
+                    name: params.committer_name || currentUser.login,
+                    email: params.committer_email || currentUser.email || `${currentUser.login}@example.com`
+                }
+            };
+            // Criar o commit usando o provider
+            const commit = await provider.createCommit(owner, params.repo, commitData.message, commitData.branch, commitData.author.name, commitData.author.email, commitData.committer.name, commitData.committer.email);
             return {
                 success: true,
                 action: 'create',
-                message: `Criação de commit solicitada para branch '${params.branch}'`,
+                message: `Commit criado com sucesso na branch '${params.branch}'`,
                 data: {
+                    commit: commit,
                     message: params.message,
                     branch: params.branch,
-                    author: params.author_name || 'usuário atual',
-                    committer: params.committer_name || 'usuário atual',
-                    commit: 'Funcionalidade de criação será implementada'
+                    author: commitData.author,
+                    committer: commitData.committer,
+                    sha: commit.sha,
+                    url: commit.html_url
                 }
             };
         }
@@ -459,16 +483,70 @@ exports.commitsTool = {
             if (!owner || !params.repo || !params.base || !params.head) {
                 throw new Error('repo, base e head são obrigatórios');
             }
-            // Implementar comparação de commits
-            // Por enquanto, retorna mensagem de funcionalidade
+            // Verificar se os commits/branches existem
+            try {
+                // Tentar obter como commits primeiro
+                await provider.getCommit(owner, params.repo, params.base);
+                await provider.getCommit(owner, params.repo, params.head);
+            }
+            catch (commitError) {
+                try {
+                    // Se falhar, tentar como branches
+                    await provider.getBranch(owner, params.repo, params.base);
+                    await provider.getBranch(owner, params.repo, params.head);
+                }
+                catch (branchError) {
+                    throw new Error(`Commits/branches não encontrados: ${params.base} ou ${params.head}`);
+                }
+            }
+            // Obter commits de cada referência para análise
+            const baseCommits = await provider.listCommits(owner, params.repo, params.base, 1, 10);
+            const headCommits = await provider.listCommits(owner, params.repo, params.head, 1, 10);
+            // Comparar commits únicos
+            const baseCommitShas = baseCommits.map(c => c.sha);
+            const headCommitShas = headCommits.map(c => c.sha);
+            const uniqueBaseCommits = baseCommits.filter(c => !headCommitShas.includes(c.sha));
+            const uniqueHeadCommits = headCommits.filter(c => !baseCommitShas.includes(c.sha));
+            // Usar compareCommits do provider se disponível
+            let detailedComparison = null;
+            try {
+                if (provider.compareCommits) {
+                    detailedComparison = await provider.compareCommits(owner, params.repo, params.base, params.head);
+                }
+            }
+            catch (error) {
+                console.warn('Comparação detalhada não disponível:', error);
+            }
             return {
                 success: true,
                 action: 'compare',
-                message: `Comparação entre '${params.base}' e '${params.head}' solicitada`,
+                message: `Comparação entre '${params.base}' e '${params.head}' realizada com sucesso`,
                 data: {
-                    base: params.base,
-                    head: params.head,
-                    comparison: 'Funcionalidade de comparação será implementada'
+                    base: {
+                        ref: params.base,
+                        commits: baseCommits.length,
+                        unique_commits: uniqueBaseCommits.length,
+                        last_commit: baseCommits[0]?.sha
+                    },
+                    head: {
+                        ref: params.head,
+                        commits: headCommits.length,
+                        unique_commits: uniqueHeadCommits.length,
+                        last_commit: headCommits[0]?.sha
+                    },
+                    comparison: {
+                        base_ahead: uniqueBaseCommits.length,
+                        head_ahead: uniqueHeadCommits.length,
+                        divergent: uniqueBaseCommits.length > 0 && uniqueHeadCommits.length > 0,
+                        detailed: detailedComparison
+                    },
+                    summary: {
+                        status: uniqueBaseCommits.length === 0 ? 'head está à frente' :
+                            uniqueHeadCommits.length === 0 ? 'base está à frente' :
+                                'divergiram',
+                        can_merge: uniqueBaseCommits.length === 0 || uniqueHeadCommits.length === 0,
+                        requires_merge: uniqueBaseCommits.length > 0 && uniqueHeadCommits.length > 0
+                    }
                 }
             };
         }
@@ -513,16 +591,48 @@ exports.commitsTool = {
             if (params.query.length < 3) {
                 throw new Error('Query deve ter pelo menos 3 caracteres');
             }
-            // Implementar busca de commits
-            // Por enquanto, retorna mensagem de funcionalidade
+            const page = params.page || 1;
+            const limit = Math.min(params.limit || 30, 100);
+            // Buscar commits usando o provider
+            let searchResults = [];
+            if (provider.searchCommits) {
+                searchResults = await provider.searchCommits(owner, params.repo, params.query, params.author || undefined);
+            }
+            else {
+                // Fallback: buscar todos os commits e filtrar localmente
+                const allCommits = await provider.listCommits(owner, params.repo, undefined, 1, 100);
+                searchResults = allCommits.filter((commit) => commit.message?.toLowerCase().includes(params.query.toLowerCase()) ||
+                    commit.commit?.message?.toLowerCase().includes(params.query.toLowerCase()));
+            }
+            // Filtrar resultados por página e limite
+            const startIndex = (page - 1) * limit;
+            const endIndex = startIndex + limit;
+            const paginatedResults = searchResults.slice(startIndex, endIndex);
+            // Filtrar por autor se especificado
+            const filteredResults = params.author
+                ? paginatedResults.filter((commit) => commit.commit?.author?.name?.toLowerCase().includes(params.author.toLowerCase()) ||
+                    commit.author?.login?.toLowerCase().includes(params.author.toLowerCase()))
+                : paginatedResults;
             return {
                 success: true,
                 action: 'search',
-                message: `Busca por commits com '${params.query}' solicitada`,
+                message: `${filteredResults.length} commits encontrados para '${params.query}'`,
                 data: {
                     query: params.query,
                     author: params.author || 'todos',
-                    results: 'Funcionalidade de busca será implementada'
+                    page,
+                    limit,
+                    total_found: searchResults.length,
+                    results: filteredResults,
+                    summary: {
+                        total_commits: searchResults.length,
+                        filtered_commits: filteredResults.length,
+                        authors: [...new Set(filteredResults.map((c) => c.commit?.author?.name || c.author?.login).filter(Boolean))],
+                        date_range: filteredResults.length > 0 ? {
+                            earliest: filteredResults[filteredResults.length - 1]?.commit?.author?.date,
+                            latest: filteredResults[0]?.commit?.author?.date
+                        } : null
+                    }
                 }
             };
         }

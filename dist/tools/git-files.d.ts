@@ -60,10 +60,10 @@ declare const FilesInputSchema: z.ZodObject<{
     projectPath: string;
     path?: string | undefined;
     message?: string | undefined;
+    sha?: string | undefined;
     ref?: string | undefined;
     page?: number | undefined;
     limit?: number | undefined;
-    sha?: string | undefined;
     branch?: string | undefined;
     query?: string | undefined;
     content?: string | undefined;
@@ -74,10 +74,10 @@ declare const FilesInputSchema: z.ZodObject<{
     projectPath: string;
     path?: string | undefined;
     message?: string | undefined;
+    sha?: string | undefined;
     ref?: string | undefined;
     page?: number | undefined;
     limit?: number | undefined;
-    sha?: string | undefined;
     branch?: string | undefined;
     query?: string | undefined;
     content?: string | undefined;

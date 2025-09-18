@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { runGitCommand, runTerminalCmd } from '../utils/terminal-controller.js';
+import { runGitCommand, runTerminalCmd } from '../utils/terminal-controller.ts';
 
 /**
  * Tool: git-archive
@@ -263,3 +263,4 @@ export const gitArchiveTool = {
     }
   }
 };
+

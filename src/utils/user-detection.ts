@@ -3,8 +3,8 @@
  * Isolado para evitar dependências circulares
  */
 
-import { globalProviderFactory } from '../providers/index.js';
-import { UserInfo } from '../providers/types.js';
+import { globalProviderFactory } from '../providers/index.ts';
+import { UserInfo } from '../providers/types.ts';
 
 /**
  * Obtém o usuário atual do provider ativo
@@ -51,3 +51,4 @@ export async function applyAutoUserDetection(params: any, provider?: string): Pr
   // Retornar os parâmetros originais pois o owner agora é detectado internamente nos métodos
   return params;
 }
+

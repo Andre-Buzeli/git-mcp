@@ -66,9 +66,10 @@ declare const CommitsInputSchema: z.ZodObject<{
     message?: string | undefined;
     head?: string | undefined;
     base?: string | undefined;
+    sha?: string | undefined;
+    author?: string | undefined;
     page?: number | undefined;
     limit?: number | undefined;
-    sha?: string | undefined;
     branch?: string | undefined;
     query?: string | undefined;
     commit_sha?: string | undefined;
@@ -76,7 +77,6 @@ declare const CommitsInputSchema: z.ZodObject<{
     author_email?: string | undefined;
     committer_name?: string | undefined;
     committer_email?: string | undefined;
-    author?: string | undefined;
 }, {
     provider: "gitea" | "github";
     repo: string;
@@ -85,9 +85,10 @@ declare const CommitsInputSchema: z.ZodObject<{
     message?: string | undefined;
     head?: string | undefined;
     base?: string | undefined;
+    sha?: string | undefined;
+    author?: string | undefined;
     page?: number | undefined;
     limit?: number | undefined;
-    sha?: string | undefined;
     branch?: string | undefined;
     query?: string | undefined;
     commit_sha?: string | undefined;
@@ -95,7 +96,6 @@ declare const CommitsInputSchema: z.ZodObject<{
     author_email?: string | undefined;
     committer_name?: string | undefined;
     committer_email?: string | undefined;
-    author?: string | undefined;
 }>;
 export type CommitsInput = z.infer<typeof CommitsInputSchema>;
 /**

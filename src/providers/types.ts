@@ -7,6 +7,7 @@ export interface VcsProvider {
   name: string;
   type: 'github' | 'gitea';
   apiUrl: string;
+  baseUrl: string;
   token: string;
   username?: string;
 }
@@ -63,14 +64,28 @@ export interface CommitInfo {
   sha: string;
   message: string;
   author: {
-    name: string;
-    email: string;
-    date: string;
+    login?: string;
+    name?: string;
+    email?: string;
+    date?: string;
   };
   committer: {
-    name: string;
-    email: string;
-    date: string;
+    name?: string;
+    email?: string;
+    date?: string;
+  };
+  commit: {
+    author: {
+      name: string;
+      email: string;
+      date: string;
+    };
+    committer: {
+      name: string;
+      email: string;
+      date: string;
+    };
+    message: string;
   };
   url: string;
   html_url: string;
@@ -191,6 +206,7 @@ export interface WebhookInfo {
   type: string;
   name: string;
   active: boolean;
+  url: string;
   events: string[];
   config: {
     url: string;
@@ -231,7 +247,9 @@ export interface VcsOperations {
   // Commits
   listCommits(owner: string, repo: string, branch?: string, page?: number, limit?: number): Promise<CommitInfo[]>;
   getCommit(owner: string, repo: string, sha: string): Promise<CommitInfo>;
-  createCommit(owner: string, repo: string, message: string, branch: string, changes?: any): Promise<CommitInfo>;
+  createCommit(owner: string, repo: string, message: string, branch: string, authorName?: string, authorEmail?: string, committerName?: string, committerEmail?: string): Promise<CommitInfo>;
+  compareCommits(owner: string, repo: string, base: string, head: string): Promise<any>;
+  searchCommits(owner: string, repo: string, query: string, author?: string): Promise<CommitInfo[]>;
   
   // Issues
   listIssues(owner: string, repo: string, state?: 'open' | 'closed' | 'all', page?: number, limit?: number): Promise<IssueInfo[]>;
@@ -239,6 +257,8 @@ export interface VcsOperations {
   createIssue(owner: string, repo: string, title: string, body?: string, assignees?: string[], labels?: string[]): Promise<IssueInfo>;
   updateIssue(owner: string, repo: string, issueNumber: number, updates: Partial<IssueInfo>): Promise<IssueInfo>;
   closeIssue(owner: string, repo: string, issueNumber: number): Promise<IssueInfo>;
+  addComment(owner: string, repo: string, issueNumber: number, commentBody: string): Promise<any>;
+  searchIssues(owner: string, repo: string, query: string, author?: string, assignee?: string, label?: string): Promise<IssueInfo[]>;
   
   // Pull Requests
   listPullRequests(owner: string, repo: string, state?: 'open' | 'closed' | 'merged' | 'all', page?: number, limit?: number): Promise<PullRequestInfo[]>;

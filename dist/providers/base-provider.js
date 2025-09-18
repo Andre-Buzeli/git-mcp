@@ -202,6 +202,20 @@ class BaseVcsProvider {
     async createRelease(owner, repo, releaseData) {
         throw new Error('createRelease not implemented');
     }
+    // Métodos adicionais para commits
+    async compareCommits(owner, repo, base, head) {
+        throw new Error('compareCommits not implemented');
+    }
+    async searchCommits(owner, repo, query, author) {
+        throw new Error('searchCommits not implemented');
+    }
+    // Métodos adicionais para issues
+    async addComment(owner, repo, issueNumber, commentBody) {
+        throw new Error('addComment not implemented');
+    }
+    async searchIssues(owner, repo, query, author, assignee, label) {
+        throw new Error('searchIssues not implemented');
+    }
     async updateRelease(releaseId, updates) {
         throw new Error('updateRelease not implemented');
     }

@@ -73,10 +73,10 @@ declare const IssuesInputSchema: z.ZodObject<{
     state?: "open" | "closed" | "all" | undefined;
     assignees?: string[] | undefined;
     labels?: string[] | undefined;
+    author?: string | undefined;
     page?: number | undefined;
     limit?: number | undefined;
     query?: string | undefined;
-    author?: string | undefined;
     milestone?: number | undefined;
     issue_number?: number | undefined;
     new_title?: string | undefined;
@@ -97,10 +97,10 @@ declare const IssuesInputSchema: z.ZodObject<{
     state?: "open" | "closed" | "all" | undefined;
     assignees?: string[] | undefined;
     labels?: string[] | undefined;
+    author?: string | undefined;
     page?: number | undefined;
     limit?: number | undefined;
     query?: string | undefined;
-    author?: string | undefined;
     milestone?: number | undefined;
     issue_number?: number | undefined;
     new_title?: string | undefined;

@@ -1,11 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GiteaMCPServer = void 0;
-const index_js_1 = require("@modelcontextprotocol/sdk/server/index.js");
-const stdio_js_1 = require("@modelcontextprotocol/sdk/server/stdio.js");
-const types_js_1 = require("@modelcontextprotocol/sdk/types.js");
-const config_js_1 = require("./config.js");
-const index_js_2 = require("./providers/index.js");
+const index_ts_1 = require("@modelcontextprotocol/sdk/server/index.ts");
+const stdio_ts_1 = require("@modelcontextprotocol/sdk/server/stdio.ts");
+const types_ts_1 = require("@modelcontextprotocol/sdk/types.ts");
+const config_ts_1 = require("./config.ts");
+const index_ts_2 = require("./providers/index.ts");
 /**
  * Importação de todas as ferramentas MCP disponíveis (18 tools)
  *
@@ -30,24 +30,24 @@ const index_js_2 = require("./providers/index.js");
  * - git-sync: Sincronização de repositórios
  */
 // Git Core Tools (18)
-const git_repositories_js_1 = require("./tools/git-repositories.js");
-const git_commits_js_1 = require("./tools/git-commits.js");
-const git_branches_js_1 = require("./tools/git-branches.js");
-const git_tags_js_1 = require("./tools/git-tags.js");
-const git_files_js_1 = require("./tools/git-files.js");
-const git_upload_project_js_1 = require("./tools/git-upload-project.js");
-const git_initialize_js_1 = require("./tools/git-initialize.js");
-const git_issues_js_1 = require("./tools/git-issues.js");
-const git_pulls_js_1 = require("./tools/git-pulls.js");
-const git_releases_js_1 = require("./tools/git-releases.js");
-const git_webhooks_js_1 = require("./tools/git-webhooks.js");
-const git_reset_js_1 = require("./tools/git-reset.js");
-const git_revert_js_1 = require("./tools/git-revert.js");
-const git_stash_js_1 = require("./tools/git-stash.js");
-const git_config_js_1 = require("./tools/git-config.js");
-const git_remote_js_1 = require("./tools/git-remote.js");
-const git_archive_js_1 = require("./tools/git-archive.js");
-const git_sync_js_1 = require("./tools/git-sync.js");
+const git_repositories_ts_1 = require("./tools/git-repositories.ts");
+const git_commits_ts_1 = require("./tools/git-commits.ts");
+const git_branches_ts_1 = require("./tools/git-branches.ts");
+const git_tags_ts_1 = require("./tools/git-tags.ts");
+const git_files_ts_1 = require("./tools/git-files.ts");
+const git_upload_project_ts_1 = require("./tools/git-upload-project.ts");
+const git_initialize_ts_1 = require("./tools/git-initialize.ts");
+const git_issues_ts_1 = require("./tools/git-issues.ts");
+const git_pulls_ts_1 = require("./tools/git-pulls.ts");
+const git_releases_ts_1 = require("./tools/git-releases.ts");
+const git_webhooks_ts_1 = require("./tools/git-webhooks.ts");
+const git_reset_ts_1 = require("./tools/git-reset.ts");
+const git_revert_ts_1 = require("./tools/git-revert.ts");
+const git_stash_ts_1 = require("./tools/git-stash.ts");
+const git_config_ts_1 = require("./tools/git-config.ts");
+const git_remote_ts_1 = require("./tools/git-remote.ts");
+const git_archive_ts_1 = require("./tools/git-archive.ts");
+const git_sync_ts_1 = require("./tools/git-sync.ts");
 /**
  * Array de todas as ferramentas disponíveis (18 tools)
  *
@@ -66,24 +66,24 @@ const git_sync_js_1 = require("./tools/git-sync.js");
  */
 const tools = [
     // Git Core Tools (18) - GitHub + Gitea
-    git_repositories_js_1.gitRepositoriesTool,
-    git_commits_js_1.commitsTool,
-    git_branches_js_1.branchesTool,
-    git_tags_js_1.tagsTool,
-    git_files_js_1.filesTool,
-    git_upload_project_js_1.uploadProjectTool,
-    git_initialize_js_1.initializeTool,
-    git_issues_js_1.issuesTool,
-    git_pulls_js_1.pullsTool,
-    git_releases_js_1.releasesTool,
-    git_webhooks_js_1.webhooksTool,
-    git_reset_js_1.gitResetTool,
-    git_revert_js_1.gitRevertTool,
-    git_stash_js_1.gitStashTool,
-    git_config_js_1.gitConfigTool,
-    git_remote_js_1.gitRemoteTool,
-    git_archive_js_1.gitArchiveTool,
-    git_sync_js_1.gitSyncTool
+    git_repositories_ts_1.gitRepositoriesTool,
+    git_commits_ts_1.commitsTool,
+    git_branches_ts_1.branchesTool,
+    git_tags_ts_1.tagsTool,
+    git_files_ts_1.filesTool,
+    git_upload_project_ts_1.uploadProjectTool,
+    git_initialize_ts_1.initializeTool,
+    git_issues_ts_1.issuesTool,
+    git_pulls_ts_1.pullsTool,
+    git_releases_ts_1.releasesTool,
+    git_webhooks_ts_1.webhooksTool,
+    git_reset_ts_1.gitResetTool,
+    git_revert_ts_1.gitRevertTool,
+    git_stash_ts_1.gitStashTool,
+    git_config_ts_1.gitConfigTool,
+    git_remote_ts_1.gitRemoteTool,
+    git_archive_ts_1.gitArchiveTool,
+    git_sync_ts_1.gitSyncTool
 ];
 /**
  * Servidor MCP principal para Gitea
@@ -107,7 +107,7 @@ const tools = [
 class GiteaMCPServer {
     server;
     constructor() {
-        this.server = new index_js_1.Server({
+        this.server = new index_ts_1.Server({
             name: 'git-mcp',
             version: '2.16.0',
         });
@@ -133,7 +133,7 @@ class GiteaMCPServer {
      */
     setupHandlers() {
         // Handler para listar tools disponíveis
-        this.server.setRequestHandler(types_js_1.ListToolsRequestSchema, async () => {
+        this.server.setRequestHandler(types_ts_1.ListToolsRequestSchema, async () => {
             return {
                 tools: tools.map(tool => ({
                     name: tool.name,
@@ -143,7 +143,7 @@ class GiteaMCPServer {
             };
         });
         // Handler para executar tools específicas
-        this.server.setRequestHandler(types_js_1.CallToolRequestSchema, async (request) => {
+        this.server.setRequestHandler(types_ts_1.CallToolRequestSchema, async (request) => {
             const { name, arguments: args } = request.params;
             // Busca a tool solicitada
             const tool = tools.find(t => t.name === name);
@@ -201,14 +201,14 @@ class GiteaMCPServer {
      * - Configure timeout adequado
      */
     async run() {
-        const cfg = config_js_1.config.getConfig();
+        const cfg = config_ts_1.config.getConfig();
         if (cfg.debug) {
             // Server starting - debug info removed for MCP protocol compliance
         }
         // Inicializar provider factory com configuração
         try {
             console.log('[SERVER] Inicializando provider factory...');
-            const factory = (0, index_js_2.initializeFactoryFromEnv)();
+            const factory = (0, index_ts_2.initializeFactoryFromEnv)();
             // Log detalhado dos providers configurados
             try {
                 const providersInfo = factory.getProvidersInfo();
@@ -221,7 +221,7 @@ class GiteaMCPServer {
                 console.log('[SERVER] Não foi possível obter informações detalhadas dos providers');
             }
             // Atualizar o globalProviderFactory com a configuração
-            Object.assign(index_js_2.globalProviderFactory, factory);
+            Object.assign(index_ts_2.globalProviderFactory, factory);
             console.log('[SERVER] Provider factory inicializado com sucesso');
         }
         catch (error) {
@@ -234,11 +234,12 @@ class GiteaMCPServer {
                     name: 'github-fallback',
                     type: 'github',
                     apiUrl: 'https://api.github.com',
+                    baseUrl: 'https://github.com',
                     token: process.env.GITHUB_TOKEN || 'dummy_token',
                     username: process.env.GITHUB_USERNAME
                 };
-                const fallbackProvider = index_js_2.globalProviderFactory.createProvider(fallbackConfig);
-                index_js_2.globalProviderFactory.setDefaultProvider('github-fallback');
+                const fallbackProvider = index_ts_2.globalProviderFactory.createProvider(fallbackConfig);
+                index_ts_2.globalProviderFactory.setDefaultProvider('github-fallback');
                 console.log('[SERVER] Provider fallback criado com sucesso');
             }
             catch (fallbackError) {
@@ -246,7 +247,7 @@ class GiteaMCPServer {
                 // Continua sem provider - algumas tools podem não funcionar
             }
         }
-        const transport = new stdio_js_1.StdioServerTransport();
+        const transport = new stdio_ts_1.StdioServerTransport();
         await this.server.connect(transport);
         if (cfg.debug) {
             // Server connected and ready

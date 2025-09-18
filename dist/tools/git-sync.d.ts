@@ -162,6 +162,18 @@ export declare const gitSyncTool: {
         required: string[];
     };
     handler(input: GitSyncInput): Promise<GitSyncResult>;
+    /**
+     * Configura sincronização entre dois repositórios
+     */
+    configureSync(params: GitSyncInput): Promise<GitSyncResult>;
+    /**
+     * Obtém status da sincronização
+     */
+    getSyncStatus(params: GitSyncInput): Promise<GitSyncResult>;
+    /**
+     * Executa sincronização pontual
+     */
+    executeSync(params: GitSyncInput): Promise<GitSyncResult>;
 };
 export {};
 //# sourceMappingURL=git-sync.d.ts.map

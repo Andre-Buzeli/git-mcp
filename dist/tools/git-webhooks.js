@@ -2,25 +2,13 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.webhooksTool = void 0;
 const zod_1 = require("zod");
-const index_js_1 = require("../providers/index.js");
-const user_detection_js_1 = require("../utils/user-detection.js");
+const index_ts_1 = require("../providers/index.ts");
+const user_detection_ts_1 = require("../utils/user-detection.ts");
 /**
  * Tool: webhooks
  *
  * DESCRIÇÃO:
-  async handler(input: WebhooksInput): Promise<WebhooksResult> {
-    try {
-      const validatedInput = WebhooksInputSchema.parse(input);
-      
-      // Aplicar auto-detecção apenas para owner dentro do provider especificado
-      const processedInput = await applyAutoUserDetection(validatedInput, validatedInput.provider);
-      
-      // Usar o provider especificado pelo usuário
-      const provider = globalProviderFactory.getProvider(processedInput.provider);
-      
-      if (!provider) {
-        throw new Error(`Provider '${processedInput.provider}' não encontrado`);
-      }o completo de webhooks com suporte multi-provider (GitHub e Gitea)
+ * Gerenciamento completo de webhooks com suporte multi-provider (GitHub e Gitea)
  *
  * FUNCIONALIDADES:
  * - Criação de novos webhooks
@@ -221,11 +209,11 @@ exports.webhooksTool = {
         try {
             const validatedInput = WebhooksInputSchema.parse(input);
             // Apply automatic user/owner detection from configured tokens
-            const processedInput = await (0, user_detection_js_1.applyAutoUserDetection)(validatedInput, validatedInput.provider || 'default');
+            const processedInput = await (0, user_detection_ts_1.applyAutoUserDetection)(validatedInput, validatedInput.provider || 'default');
             // Seleciona o provider baseado na entrada ou usa o padrão
             const provider = processedInput.provider
-                ? index_js_1.globalProviderFactory.getProvider(processedInput.provider)
-                : index_js_1.globalProviderFactory.getDefaultProvider();
+                ? index_ts_1.globalProviderFactory.getProvider(processedInput.provider)
+                : index_ts_1.globalProviderFactory.getDefaultProvider();
             if (!provider) {
                 throw new Error('Provider não encontrado ou não configurado');
             }
@@ -289,7 +277,7 @@ exports.webhooksTool = {
      */
     async createWebhook(params, provider, owner) {
         try {
-            if (!!params.repo || !params.url) {
+            if (!params.repo || !params.url) {
                 throw new Error('repo e url são obrigatórios');
             }
             const webhookData = {
@@ -341,7 +329,7 @@ exports.webhooksTool = {
     async listWebhooks(params, provider, owner) {
         try {
             if (!params.repo) {
-                throw new Error('e repo são obrigatórios');
+                throw new Error('owner e repo são obrigatórios');
             }
             const page = params.page || 1;
             const limit = params.limit || 30;
@@ -388,7 +376,7 @@ exports.webhooksTool = {
      */
     async getWebhook(params, provider, owner) {
         try {
-            if (!!params.repo || !params.webhook_id) {
+            if (!params.repo || !params.webhook_id) {
                 throw new Error('repo e webhook_id são obrigatórios');
             }
             const webhook = await provider.getWebhook((await provider.getCurrentUser()).login, params.repo, params.webhook_id);
@@ -436,7 +424,7 @@ exports.webhooksTool = {
      */
     async updateWebhook(params, provider, owner) {
         try {
-            if (!!params.repo || !params.webhook_id) {
+            if (!params.repo || !params.webhook_id) {
                 throw new Error('repo e webhook_id são obrigatórios');
             }
             const updateData = {};
@@ -491,7 +479,7 @@ exports.webhooksTool = {
      */
     async deleteWebhook(params, provider, owner) {
         try {
-            if (!!params.repo || !params.webhook_id) {
+            if (!params.repo || !params.webhook_id) {
                 throw new Error('repo e webhook_id são obrigatórios');
             }
             await provider.deleteWebhook((await provider.getCurrentUser()).login, params.repo, params.webhook_id);
@@ -532,7 +520,7 @@ exports.webhooksTool = {
      */
     async testWebhook(params, provider, owner) {
         try {
-            if (!!params.repo || !params.webhook_id) {
+            if (!params.repo || !params.webhook_id) {
                 throw new Error('repo e webhook_id são obrigatórios');
             }
             // Implementar testWebhook

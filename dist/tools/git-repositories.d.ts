@@ -143,12 +143,12 @@ declare const GitRepositoriesInputSchema: z.ZodObject<{
     repo?: string | undefined;
     page?: number | undefined;
     limit?: number | undefined;
+    username?: string | undefined;
     projectPath?: string | undefined;
     auto_init?: boolean | undefined;
     gitignores?: string | undefined;
     license?: string | undefined;
     readme?: string | undefined;
-    username?: string | undefined;
     new_name?: string | undefined;
     new_description?: string | undefined;
     new_private?: boolean | undefined;
@@ -165,12 +165,12 @@ declare const GitRepositoriesInputSchema: z.ZodObject<{
     repo?: string | undefined;
     page?: number | undefined;
     limit?: number | undefined;
+    username?: string | undefined;
     projectPath?: string | undefined;
     auto_init?: boolean | undefined;
     gitignores?: string | undefined;
     license?: string | undefined;
     readme?: string | undefined;
-    username?: string | undefined;
     new_name?: string | undefined;
     new_description?: string | undefined;
     new_private?: boolean | undefined;
