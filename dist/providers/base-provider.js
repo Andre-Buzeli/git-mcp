@@ -214,7 +214,7 @@ class BaseVcsProvider {
     async getTag(owner, repo, tag) {
         throw new Error('getTag not implemented');
     }
-    async createTag(tagName, message, target) {
+    async createTag(owner, repo, tagData) {
         throw new Error('createTag not implemented');
     }
     async deleteTag(owner, repo, tag) {

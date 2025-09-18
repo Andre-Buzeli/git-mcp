@@ -337,7 +337,7 @@ export abstract class BaseVcsProvider implements VcsOperations {
     throw new Error('getTag not implemented');
   }
 
-  async createTag(tagName: string, message: string, target: string): Promise<any> {
+  async createTag(owner: string, repo: string, tagData: any): Promise<any> {
     throw new Error('createTag not implemented');
   }
 

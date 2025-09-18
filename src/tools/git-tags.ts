@@ -292,7 +292,7 @@ export const tagsTool = {
         if (params.tagger_email) tagData.tagger_email = params.tagger_email;
       }
 
-      const tag = await provider.createTag((await provider.getCurrentUser()).login, params.repo, tagData);
+      const tag = await provider.createTag(owner, params.repo, tagData);
 
       return {
         success: true,

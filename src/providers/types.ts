@@ -257,7 +257,7 @@ export interface VcsOperations {
   // Tags
   listTags(owner: string, repo: string, page?: number, limit?: number): Promise<TagInfo[]>;
   getTag(owner: string, repo: string, tag: string): Promise<TagInfo>;
-  createTag(tagName: string, message: string, target: string): Promise<TagInfo>;
+  createTag(owner: string, repo: string, tagData: any): Promise<TagInfo>;
   deleteTag(owner: string, repo: string, tag: string): Promise<boolean>;
   
   // Users

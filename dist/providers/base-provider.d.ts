@@ -139,7 +139,7 @@ export declare abstract class BaseVcsProvider implements VcsOperations {
     deleteRelease(releaseId: number): Promise<boolean>;
     listTags(owner: string, repo: string, page?: number, limit?: number): Promise<any[]>;
     getTag(owner: string, repo: string, tag: string): Promise<any>;
-    createTag(tagName: string, message: string, target: string): Promise<any>;
+    createTag(owner: string, repo: string, tagData: any): Promise<any>;
     deleteTag(owner: string, repo: string, tag: string): Promise<boolean>;
     getCurrentUser(): Promise<any>;
     getUser(username: string): Promise<any>;
