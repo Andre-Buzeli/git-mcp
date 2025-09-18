@@ -1,6 +1,6 @@
 import { z } from 'zod';
-import { globalProviderFactory, VcsOperations } from '../providers/index.ts';
-import { applyAutoUserDetection } from '../utils/user-detection.ts';
+import { globalProviderFactory, VcsOperations } from '../providers/index.js';
+import { applyAutoUserDetection } from '../utils/user-detection.js';
 
 /**
  * Tool: tags
@@ -50,6 +50,7 @@ const TagsInputSchema = z.object({
   
   // Para multi-provider
   provider: z.enum(['gitea', 'github']).describe('Provider to use (gitea or github)'), // Provider específico: gitea, github ou both
+  projectPath: z.string().describe('Local project path for git operations'),
   
   // Para create
   tag_name: z.string().optional(),
@@ -171,7 +172,7 @@ export const tagsTool = {
       query: { type: 'string', description: 'Search query' },
       pattern: { type: 'string', description: 'Search pattern (e.g., v*.*.*)' }
     },
-    required: ['action', 'repo', 'provider']
+    required: ['action', 'repo', 'provider', 'projectPath']
   },
 
   /**
@@ -511,5 +512,6 @@ export const tagsTool = {
     }
   }
 };
+
 
 

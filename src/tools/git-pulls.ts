@@ -1,6 +1,6 @@
 import { z } from 'zod';
-import { globalProviderFactory, VcsOperations } from '../providers/index.ts';
-import { applyAutoUserDetection } from '../utils/user-detection.ts';
+import { globalProviderFactory, VcsOperations } from '../providers/index.js';
+import { applyAutoUserDetection } from '../utils/user-detection.js';
 
 /**
  * Tool: pulls
@@ -52,6 +52,7 @@ const PullsInputSchema = z.object({
   
   // Para multi-provider
   provider: z.enum(['gitea', 'github']).describe('Provider to use (gitea or github)'),
+  projectPath: z.string().describe('Local project path for git operations'),
   
   // Para create
   title: z.string().optional(),
@@ -252,7 +253,7 @@ export const pullsTool = {
       reviewer: { type: 'string', description: 'PR reviewer filter' },
       label: { type: 'string', description: 'PR label filter' }
     },
-    required: ['action', 'repo', 'provider']
+    required: ['action', 'repo', 'provider', 'projectPath']
   },
 
   /**
@@ -768,5 +769,6 @@ export const pullsTool = {
     }
   }
 };
+
 
 

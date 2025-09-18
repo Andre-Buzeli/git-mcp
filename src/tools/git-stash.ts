@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { runGitCommand } from '../utils/terminal-controller.ts';
+import { runGitCommand } from '../utils/terminal-controller.js';
 
 /**
  * Tool: git-stash
@@ -327,4 +327,5 @@ export const gitStashTool = {
     }
   }
 };
+
 

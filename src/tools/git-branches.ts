@@ -1,6 +1,6 @@
 import { z } from 'zod';
-import { globalProviderFactory, VcsOperations } from '../providers/index.ts';
-import { applyAutoUserDetection } from '../utils/user-detection.ts';
+import { globalProviderFactory, VcsOperations } from '../providers/index.js';
+import { applyAutoUserDetection } from '../utils/user-detection.js';
 
 /**
  * Tool: branches
@@ -671,3 +671,4 @@ export const branchesTool = {
     }
   }
 };
+

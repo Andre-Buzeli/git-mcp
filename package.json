@@ -1,7 +1,7 @@
 {
   "name": "@andrebuzeli/git-mcp",
-  "version": "2.27.4",
-  "description": "MCP server for Gitea and GitHub integration with 32 comprehensive DevOps tools - 100% AUTO-SUFFICIENT: Complete Git/GitHub functionality with ALL methods implemented, GitOperations class, FileOperations, TerminalOperations, Project Upload, Git Initialize - NO external dependencies, NO terminal commands, FULLY IMPLEMENTED",
+  "version": "2.28.2",
+  "description": "MCP server for Gitea and GitHub integration with 18 comprehensive DevOps tools - 100% AUTO-SUFFICIENT: Complete Git/GitHub functionality with ALL methods implemented, GitOperations class, FileOperations, TerminalOperations, Project Upload, Git Initialize - NO external dependencies, NO terminal commands, FULLY IMPLEMENTED - Enhanced validation with required projectPath and provider parameters",
   "main": "dist/index.js",
   "bin": {
     "git-mcp": "dist/index.js"
@@ -13,7 +13,7 @@
     "test": "node tests/basic.test.js",
     "lint": "echo \"No linting configured\" && exit 0",
     "prepublishOnly": "npm run build",
-    "postpublish": "echo 'Git MCP v2.17.0 published successfully with GitHub exclusive tools simplified!'"
+    "postpublish": "echo 'Git MCP v2.28.2 published successfully - Fixed tsconfig and build process!'"
   },
   "keywords": [
     "mcp",

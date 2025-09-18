@@ -1,7 +1,7 @@
 import { z } from 'zod';
-import { globalProviderFactory, VcsOperations } from '../providers/index.ts';
-import { applyAutoUserDetection } from '../utils/user-detection.ts';
-import { runGitCommand, gitPush, gitPull, gitAdd, gitCommit } from '../utils/terminal-controller.ts';
+import { globalProviderFactory, VcsOperations } from '../providers/index.js';
+import { applyAutoUserDetection } from '../utils/user-detection.js';
+import { runGitCommand, gitPush, gitPull, gitAdd, gitCommit } from '../utils/terminal-controller.js';
 
 /**
  * Tool: commits
@@ -186,7 +186,7 @@ export const commitsTool = {
       query: { type: 'string', description: 'Search query' },
       author: { type: 'string', description: 'Author filter for search' }
     },
-    required: ['action', 'repo', 'provider']
+    required: ['action', 'repo', 'provider', 'projectPath']
   },
 
   /**
@@ -794,5 +794,6 @@ export const commitsTool = {
     }
   }
 };
+
 
 

@@ -2,7 +2,7 @@
  * Utilitário para auto-detecção de usuário
  * Isolado para evitar dependências circulares
  */
-import { UserInfo } from '../providers/types.ts';
+import { UserInfo } from '../providers/types.js';
 /**
  * Obtém o usuário atual do provider ativo
  * @param provider Nome do provider (opcional)

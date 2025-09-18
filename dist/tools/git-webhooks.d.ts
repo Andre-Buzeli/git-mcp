@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { VcsOperations } from '../providers/index.ts';
+import { VcsOperations } from '../providers/index.js';
 /**
  * Tool: webhooks
  *
@@ -44,6 +44,7 @@ declare const WebhooksInputSchema: z.ZodObject<{
     action: z.ZodEnum<["create", "list", "get", "update", "delete", "test"]>;
     repo: z.ZodString;
     provider: z.ZodEnum<["gitea", "github"]>;
+    projectPath: z.ZodString;
     url: z.ZodOptional<z.ZodString>;
     content_type: z.ZodOptional<z.ZodEnum<["json", "form"]>>;
     secret: z.ZodOptional<z.ZodString>;
@@ -61,6 +62,7 @@ declare const WebhooksInputSchema: z.ZodObject<{
     provider: "gitea" | "github";
     repo: string;
     action: "delete" | "get" | "list" | "create" | "update" | "test";
+    projectPath: string;
     active?: boolean | undefined;
     url?: string | undefined;
     events?: string[] | undefined;
@@ -78,6 +80,7 @@ declare const WebhooksInputSchema: z.ZodObject<{
     provider: "gitea" | "github";
     repo: string;
     action: "delete" | "get" | "list" | "create" | "update" | "test";
+    projectPath: string;
     active?: boolean | undefined;
     url?: string | undefined;
     events?: string[] | undefined;

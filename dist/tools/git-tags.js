@@ -49,6 +49,7 @@ const TagsInputSchema = zod_1.z.object({
     repo: zod_1.z.string(),
     // Para multi-provider
     provider: zod_1.z.enum(['gitea', 'github']).describe('Provider to use (gitea or github)'), // Provider específico: gitea, github ou both
+    projectPath: zod_1.z.string().describe('Local project path for git operations'),
     // Para create
     tag_name: zod_1.z.string().optional(),
     message: zod_1.z.string().optional(),
@@ -160,7 +161,7 @@ exports.tagsTool = {
             query: { type: 'string', description: 'Search query' },
             pattern: { type: 'string', description: 'Search pattern (e.g., v*.*.*)' }
         },
-        required: ['action', 'repo', 'provider']
+        required: ['action', 'repo', 'provider', 'projectPath']
     },
     /**
      * Handler principal da tool tags

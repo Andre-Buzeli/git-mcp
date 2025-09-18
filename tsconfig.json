@@ -24,8 +24,7 @@
     "emitDecoratorMetadata": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "allowImportingTsExtensions": true,
-    "noEmit": true
+    "noEmit": false
   },
   "include": [
     "src/**/*"

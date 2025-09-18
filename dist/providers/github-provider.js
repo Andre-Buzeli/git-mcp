@@ -115,6 +115,19 @@ class GitHubProvider extends base_provider_js_1.BaseVcsProvider {
                 email: data.commit?.committer?.email,
                 date: data.commit?.committer?.date
             },
+            commit: {
+                author: {
+                    name: data.commit?.author?.name || '',
+                    email: data.commit?.author?.email || '',
+                    date: data.commit?.author?.date || ''
+                },
+                committer: {
+                    name: data.commit?.committer?.name || '',
+                    email: data.commit?.committer?.email || '',
+                    date: data.commit?.committer?.date || ''
+                },
+                message: data.commit?.message || data.message || ''
+            },
             url: data.url,
             html_url: data.html_url,
             raw: data
@@ -241,6 +254,7 @@ class GitHubProvider extends base_provider_js_1.BaseVcsProvider {
             type: data.type,
             name: data.name,
             active: data.active,
+            url: data.config?.url || data.url || '',
             events: data.events,
             config: {
                 url: data.config?.url,

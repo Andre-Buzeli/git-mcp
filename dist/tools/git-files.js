@@ -172,7 +172,7 @@ exports.filesTool = {
             page: { type: 'number', description: 'Page number', minimum: 1 },
             limit: { type: 'number', description: 'Items per page', minimum: 1, maximum: 100 }
         },
-        required: ['action', 'repo', 'provider']
+        required: ['action', 'repo', 'provider', 'projectPath']
     },
     /**
      * Handler principal da tool files

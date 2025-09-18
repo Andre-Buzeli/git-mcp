@@ -125,6 +125,19 @@ class GiteaProvider extends base_provider_js_1.BaseVcsProvider {
                 email: data.committer?.email,
                 date: data.committer?.date
             },
+            commit: {
+                author: {
+                    name: data.author?.name || data.commit?.author?.name || '',
+                    email: data.author?.email || data.commit?.author?.email || '',
+                    date: data.author?.date || data.commit?.author?.date || ''
+                },
+                committer: {
+                    name: data.committer?.name || data.commit?.committer?.name || '',
+                    email: data.committer?.email || data.commit?.committer?.email || '',
+                    date: data.committer?.date || data.commit?.committer?.date || ''
+                },
+                message: data.message || data.commit?.message || ''
+            },
             url: data.url,
             html_url: data.html_url,
             raw: data
@@ -251,6 +264,7 @@ class GiteaProvider extends base_provider_js_1.BaseVcsProvider {
             type: data.type,
             name: data.name,
             active: data.active,
+            url: data.config?.url || data.url || '',
             events: data.events,
             config: {
                 url: data.config?.url,
