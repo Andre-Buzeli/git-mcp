@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { runGitCommand, runTerminalCmd } from '../utils/terminal-controller.ts';
+import { runGitCommand, runTerminalCmd } from '../utils/terminal-controller.js';
 
 /**
  * Tool: git-reset
@@ -258,4 +258,5 @@ export const gitResetTool = {
     }
   }
 };
+
 

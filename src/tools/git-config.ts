@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { runGitCommand } from '../utils/terminal-controller.ts';
+import { runGitCommand } from '../utils/terminal-controller.js';
 
 /**
  * Tool: git-config
@@ -324,4 +324,5 @@ export const gitConfigTool = {
     }
   }
 };
+
 

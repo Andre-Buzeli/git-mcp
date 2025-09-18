@@ -1,6 +1,6 @@
 import { z } from 'zod';
-import { globalProviderFactory, VcsOperations } from '../providers/index.ts';
-import { applyAutoUserDetection } from '../utils/user-detection.ts';
+import { globalProviderFactory, VcsOperations } from '../providers/index.js';
+import { applyAutoUserDetection } from '../utils/user-detection.js';
 
 /**
  * Tool: issues
@@ -51,6 +51,7 @@ const IssuesInputSchema = z.object({
   
   // Para multi-provider
   provider: z.enum(['gitea', 'github']).describe('Provider to use (gitea or github)'), // Provider específico: gitea, github ou both
+  projectPath: z.string().describe('Local project path for git operations'),
   
   // Para create
   title: z.string().optional(),
@@ -215,7 +216,7 @@ export const issuesTool = {
       assignee: { type: 'string', description: 'Issue assignee filter' },
       label: { type: 'string', description: 'Issue label filter' }
     },
-    required: ['action', 'repo', 'provider']
+    required: ['action', 'repo', 'provider', 'projectPath']
   },
 
   /**
@@ -801,5 +802,6 @@ export const issuesTool = {
     }
   }
 };
+
 
 

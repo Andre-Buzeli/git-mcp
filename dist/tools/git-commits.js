@@ -174,7 +174,7 @@ exports.commitsTool = {
             query: { type: 'string', description: 'Search query' },
             author: { type: 'string', description: 'Author filter for search' }
         },
-        required: ['action', 'repo', 'provider']
+        required: ['action', 'repo', 'provider', 'projectPath']
     },
     /**
      * Handler principal da tool commits
@@ -601,8 +601,8 @@ exports.commitsTool = {
             else {
                 // Fallback: buscar todos os commits e filtrar localmente
                 const allCommits = await provider.listCommits(owner, params.repo, undefined, 1, 100);
-                searchResults = allCommits.filter((commit) => commit.message?.toLowerCase().includes(params.query.toLowerCase()) ||
-                    commit.commit?.message?.toLowerCase().includes(params.query.toLowerCase()));
+                searchResults = allCommits.filter((commit) => commit.message?.toLowerCase().includes(params.query?.toLowerCase() || '') ||
+                    commit.commit?.message?.toLowerCase().includes(params.query?.toLowerCase() || ''));
             }
             // Filtrar resultados por página e limite
             const startIndex = (page - 1) * limit;

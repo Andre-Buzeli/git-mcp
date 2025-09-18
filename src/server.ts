@@ -2,7 +2,7 @@ import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { CallToolRequestSchema, ListToolsRequestSchema } from '@modelcontextprotocol/sdk/types.js';
 import { config } from './config.js';
-import { globalProviderFactory, initializeFactoryFromEnv } from './providers/index.ts';
+import { globalProviderFactory, initializeFactoryFromEnv } from './providers/index.js';
 
 /**
  * Importação de todas as ferramentas MCP disponíveis (18 tools)
@@ -29,24 +29,24 @@ import { globalProviderFactory, initializeFactoryFromEnv } from './providers/ind
  */
 
 // Git Core Tools (18)
-import { gitRepositoriesTool } from './tools/git-repositories.ts';
-import { commitsTool } from './tools/git-commits.ts';
-import { branchesTool } from './tools/git-branches.ts';
-import { tagsTool } from './tools/git-tags.ts';
-import { filesTool } from './tools/git-files.ts';
-import { uploadProjectTool } from './tools/git-upload-project.ts';
-import { initializeTool } from './tools/git-initialize.ts';
-import { issuesTool } from './tools/git-issues.ts';
-import { pullsTool } from './tools/git-pulls.ts';
-import { releasesTool } from './tools/git-releases.ts';
-import { webhooksTool } from './tools/git-webhooks.ts';
-import { gitResetTool } from './tools/git-reset.ts';
-import { gitRevertTool } from './tools/git-revert.ts';
-import { gitStashTool } from './tools/git-stash.ts';
-import { gitConfigTool } from './tools/git-config.ts';
-import { gitRemoteTool } from './tools/git-remote.ts';
-import { gitArchiveTool } from './tools/git-archive.ts';
-import { gitSyncTool } from './tools/git-sync.ts';
+import { gitRepositoriesTool } from './tools/git-repositories.js';
+import { commitsTool } from './tools/git-commits.js';
+import { branchesTool } from './tools/git-branches.js';
+import { tagsTool } from './tools/git-tags.js';
+import { filesTool } from './tools/git-files.js';
+import { uploadProjectTool } from './tools/git-upload-project.js';
+import { initializeTool } from './tools/git-initialize.js';
+import { issuesTool } from './tools/git-issues.js';
+import { pullsTool } from './tools/git-pulls.js';
+import { releasesTool } from './tools/git-releases.js';
+import { webhooksTool } from './tools/git-webhooks.js';
+import { gitResetTool } from './tools/git-reset.js';
+import { gitRevertTool } from './tools/git-revert.js';
+import { gitStashTool } from './tools/git-stash.js';
+import { gitConfigTool } from './tools/git-config.js';
+import { gitRemoteTool } from './tools/git-remote.js';
+import { gitArchiveTool } from './tools/git-archive.js';
+import { gitSyncTool } from './tools/git-sync.js';
 
 /**
  * Array de todas as ferramentas disponíveis (18 tools)

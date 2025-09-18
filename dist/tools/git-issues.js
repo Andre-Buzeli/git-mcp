@@ -50,6 +50,7 @@ const IssuesInputSchema = zod_1.z.object({
     repo: zod_1.z.string(),
     // Para multi-provider
     provider: zod_1.z.enum(['gitea', 'github']).describe('Provider to use (gitea or github)'), // Provider específico: gitea, github ou both
+    projectPath: zod_1.z.string().describe('Local project path for git operations'),
     // Para create
     title: zod_1.z.string().optional(),
     body: zod_1.z.string().optional(),
@@ -202,7 +203,7 @@ exports.issuesTool = {
             assignee: { type: 'string', description: 'Issue assignee filter' },
             label: { type: 'string', description: 'Issue label filter' }
         },
-        required: ['action', 'repo', 'provider']
+        required: ['action', 'repo', 'provider', 'projectPath']
     },
     /**
      * Handler principal da tool issues
@@ -689,8 +690,8 @@ exports.issuesTool = {
             else {
                 // Fallback: buscar todas as issues e filtrar localmente
                 const allIssues = await provider.listIssues(owner, params.repo, 'all', 1, 100);
-                searchResults = allIssues.filter((issue) => issue.title?.toLowerCase().includes(params.query.toLowerCase()) ||
-                    issue.body?.toLowerCase().includes(params.query.toLowerCase()));
+                searchResults = allIssues.filter((issue) => issue.title?.toLowerCase().includes(params.query?.toLowerCase() || '') ||
+                    issue.body?.toLowerCase().includes(params.query?.toLowerCase() || ''));
             }
             // Filtrar resultados por página e limite
             const startIndex = (page - 1) * limit;

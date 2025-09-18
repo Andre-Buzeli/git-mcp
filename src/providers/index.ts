@@ -4,14 +4,14 @@
  */
 
 // Interfaces e tipos
-export * from './types.ts';
+export * from './types.js';
 
 // Classe base
-export { BaseVcsProvider } from './base-provider.ts';
+export { BaseVcsProvider } from './base-provider.js';
 
 // Providers específicos
-export { GiteaProvider } from './gitea-provider.ts';
-export { GitHubProvider } from './github-provider.ts';
+export { GiteaProvider } from './gitea-provider.js';
+export { GitHubProvider } from './github-provider.js';
 
 // Factory e helpers
 export { 
@@ -19,12 +19,12 @@ export {
   globalProviderFactory, 
   createProviderFromEnv, 
   initializeFactoryFromEnv 
-} from './provider-factory.ts';
+} from './provider-factory.js';
 
 // Error handling
-export { ErrorHandler } from './error-handler.ts';
-export type { StandardError } from './error-handler.ts';
+export { ErrorHandler } from './error-handler.js';
+export type { StandardError } from './error-handler.js';
 
 // Re-export para compatibilidade
-export type { VcsOperations as VcsProviderOperations } from './types.ts';
+export type { VcsOperations as VcsProviderOperations } from './types.js';
 
