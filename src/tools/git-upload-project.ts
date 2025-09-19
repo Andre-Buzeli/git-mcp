@@ -185,9 +185,14 @@ export const uploadProjectTool = {
       } catch (error) {
         repoExists = false;
         if (params.createRepo) {
-          // console.log('Criando repositório remoto...');
-          await provider.createRepository(params.repo, `Projeto ${params.repo}`, false);
-          repoExists = true;
+          try {
+            // console.log('Criando repositório remoto...');
+            await provider.createRepository(params.repo, `Projeto ${params.repo}`, false);
+            repoExists = true;
+          } catch (createError) {
+            // Se falhou ao criar, continuar mesmo assim (pode já existir)
+            console.warn(`Aviso: Não foi possível criar repositório: ${createError instanceof Error ? createError.message : String(createError)}`);
+          }
         } else {
           throw new Error(`Repositório '${params.repo}' não existe. Use createRepo: true para criar automaticamente.`);
         }
@@ -211,7 +216,7 @@ export const uploadProjectTool = {
           !statusResult.output.includes('new file:') && 
           !statusResult.output.includes('modified:') && 
           !statusResult.output.includes('deleted:')) {
-        console.log('Nenhuma mudança para commitar, pulando commit...');
+        // Nenhuma mudança para commitar, continuar sem commit
       } else {
         // Fazer commit
         // console.log('Fazendo commit...');
