@@ -2,8 +2,8 @@ import { z } from 'zod';
 /**
  * Tool: git-remote
  *
- * DESCRIÃ‡ÃƒO:
- * Gerenciamento de remotes Git (GitHub + Gitea) com mÃºltiplas aÃ§Ãµes
+ * DESCRIÇÃO:
+ * Gerenciamento de remotes Git (GitHub + Gitea) com múltiplas ações
  *
  * FUNCIONALIDADES:
  * - Adicionar remote
@@ -14,12 +14,12 @@ import { z } from 'zod';
  * - Prune remotes
  *
  * USO:
- * - Para configurar repositÃ³rios remotos
- * - Para gerenciar mÃºltiplos remotes
+ * - Para configurar repositórios remotos
+ * - Para gerenciar múltiplos remotes
  * - Para sincronizar com diferentes servidores
  * - Para configurar upstream
  *
- * RECOMENDAÃ‡Ã•ES:
+ * RECOMENDAÇÕES:
  * - Use 'origin' como remote principal
  * - Configure upstream para branches
  * - Mantenha URLs atualizadas
@@ -135,7 +135,7 @@ export declare const gitRemoteTool: {
     setUrl(params: GitRemoteInput): Promise<GitRemoteResult>;
     prune(params: GitRemoteInput): Promise<GitRemoteResult>;
     /**
-     * Verifica se erro Ã© relacionado a Git
+     * Verifica se erro é relacionado a Git
      */
     isGitRelatedError(errorMessage: string): boolean;
 };

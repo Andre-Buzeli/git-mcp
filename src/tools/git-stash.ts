@@ -1,15 +1,15 @@
-﻿import { z } from 'zod';
+import { z } from 'zod';
 import { runGitCommand } from '../utils/terminal-controller.js';
 import { ErrorHandler } from '../providers/error-handler.js';
 
 /**
  * Tool: git-stash
  * 
- * DESCRIÃ‡ÃƒO:
- * Gerenciamento de stash Git (GitHub + Gitea) com mÃºltiplas aÃ§Ãµes
+ * DESCRIÇÃO:
+ * Gerenciamento de stash Git (GitHub + Gitea) com múltiplas ações
  * 
  * FUNCIONALIDADES:
- * - Stash mudanÃ§as
+ * - Stash mudanças
  * - Listar stashes
  * - Aplicar stash
  * - Pop stash
@@ -18,12 +18,12 @@ import { ErrorHandler } from '../providers/error-handler.js';
  * - Limpar todos os stashes
  * 
  * USO:
- * - Para salvar mudanÃ§as temporariamente
+ * - Para salvar mudanças temporariamente
  * - Para trocar de branch rapidamente
  * - Para limpar working directory
- * - Para aplicar mudanÃ§as posteriormente
+ * - Para aplicar mudanças posteriormente
  * 
- * RECOMENDAÃ‡Ã•ES:
+ * RECOMENDAÇÕES:
  * - Use mensagens descritivas para stashes
  * - Aplique stashes em ordem
  * - Limpe stashes antigos regularmente
@@ -62,7 +62,7 @@ export type GitStashResult = z.infer<typeof GitStashResultSchema>;
 
 export const gitStashTool = {
   name: 'git-stash',
-  description: 'tool: Gerencia operaÃ§Ãµes Git stash para salvar mudanÃ§as temporariamente\nâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\naction stash: salva mudanÃ§as no stash\naction stash requires: repo, message, include_untracked, keep_index, provider, projectPath\nâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\naction pop: aplica e remove stash do topo\naction pop requires: repo, stash_index, provider, projectPath\nâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\naction apply: aplica stash sem remover\naction apply requires: repo, stash_index, provider, projectPath\nâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\naction list: lista stashes disponÃ­veis\naction list requires: repo, provider, projectPath\nâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\naction show: mostra detalhes do stash\naction show requires: repo, stash_index, show_patch, provider, projectPath\nâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\naction drop: remove stash especÃ­fico\naction drop requires: repo, stash_index, provider, projectPath\nâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\naction clear: remove todos os stashes\naction clear requires: repo, provider, projectPath',
+  description: 'tool: Gerencia operações Git stash para salvar mudanças temporariamente\n──────────────\naction stash: salva mudanças no stash\naction stash requires: repo, message, include_untracked, keep_index, provider, projectPath\n───────────────\naction pop: aplica e remove stash do topo\naction pop requires: repo, stash_index, provider, projectPath\n───────────────\naction apply: aplica stash sem remover\naction apply requires: repo, stash_index, provider, projectPath\n───────────────\naction list: lista stashes disponíveis\naction list requires: repo, provider, projectPath\n───────────────\naction show: mostra detalhes do stash\naction show requires: repo, stash_index, show_patch, provider, projectPath\n───────────────\naction drop: remove stash específico\naction drop requires: repo, stash_index, provider, projectPath\n───────────────\naction clear: remove todos os stashes\naction clear requires: repo, provider, projectPath',
   inputSchema: {
     type: 'object',
     properties: {
@@ -104,13 +104,13 @@ export const gitStashTool = {
         case 'clear':
           return await this.clear(validatedInput);
         default:
-          throw new Error(`AÃ§Ã£o nÃ£o suportada: ${validatedInput.action}`);
+          throw new Error(`Ação não suportada: ${validatedInput.action}`);
       }
     } catch (error) {
       return {
         success: false,
         action: input.action,
-        message: 'Erro na operaÃ§Ã£o de stash',
+        message: 'Erro na operação de stash',
         error: error instanceof Error ? error.message : String(error)
       };
     }
@@ -145,7 +145,7 @@ export const gitStashTool = {
       return {
         success: true,
         action: 'stash',
-        message: 'MudanÃ§as salvas no stash com sucesso',
+        message: 'Mudanças salvas no stash com sucesso',
         data: {
           message: params.message,
           include_untracked: params.include_untracked,
@@ -326,9 +326,10 @@ export const gitStashTool = {
     } catch (error) {
       throw new Error(`Falha ao limpar stashes: ${error instanceof Error ? error.message : String(error)}`);
     }
-  }
+  },
+
   /**
-   * Verifica se erro Ã© relacionado a Git
+   * Verifica se erro é relacionado a Git
    */
   isGitRelatedError(errorMessage: string): boolean {
     const gitKeywords = [

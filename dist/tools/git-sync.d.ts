@@ -2,22 +2,22 @@ import { z } from 'zod';
 /**
  * Tool: git-sync
  *
- * DESCRIÃ‡ÃƒO:
- * SincronizaÃ§Ã£o entre dois repositÃ³rios hospedados em provedores distintos (ex.: Gitea <-> GitHub).
+ * DESCRIÇÃO:
+ * Sincronização entre dois repositórios hospedados em provedores distintos (ex.: Gitea <-> GitHub).
  *
  * OBJETIVOS:
  * - Configurar espelhamento (quando suportado pelo backend) e registrar estado
- * - Executar sincronizaÃ§Ã£o pontual (one-shot) de cÃ³digo e/ou metadados
- * - Consultar status/diagnÃ³stico da sincronizaÃ§Ã£o
+ * - Executar sincronização pontual (one-shot) de código e/ou metadados
+ * - Consultar status/diagnóstico da sincronização
  *
- * LIMITAÃ‡Ã•ES:
- * - HistÃ³rico Git completo por API REST Ã© limitado; prioriza espelhamento nativo (push mirrors) quando disponÃ­vel
- * - Metadados (issues, labels, releases, PRs) tÃªm mapeamento best-effort com diferenÃ§as entre plataformas
+ * LIMITAÇÕES:
+ * - Histórico Git completo por API REST é limitado; prioriza espelhamento nativo (push mirrors) quando disponível
+ * - Metadados (issues, labels, releases, PRs) têm mapeamento best-effort com diferenças entre plataformas
  *
  * DICAS (solo):
  * - Use para manter um backup/em espelho entre provedores
- * - Prefira one-shot antes de configurar contÃ­nuo; verifique status e conflitos
- * - Defina estratÃ©gia de conflito e escopos explicitamente
+ * - Prefira one-shot antes de configurar contínuo; verifique status e conflitos
+ * - Defina estratégia de conflito e escopos explicitamente
  */
 declare const GitSyncInputSchema: z.ZodObject<{
     action: z.ZodEnum<["configure", "status", "one-shot"]>;
@@ -163,19 +163,19 @@ export declare const gitSyncTool: {
     };
     handler(input: GitSyncInput): Promise<GitSyncResult>;
     /**
-     * Configura sincronizaÃ§Ã£o entre dois repositÃ³rios
+     * Configura sincronização entre dois repositórios
      */
     configureSync(params: GitSyncInput): Promise<GitSyncResult>;
     /**
-     * ObtÃ©m status da sincronizaÃ§Ã£o
+     * Obtém status da sincronização
      */
     getSyncStatus(params: GitSyncInput): Promise<GitSyncResult>;
     /**
-     * Executa sincronizaÃ§Ã£o pontual
+     * Executa sincronização pontual
      */
     executeSync(params: GitSyncInput): Promise<GitSyncResult>;
     /**
-     * Verifica se erro Ã© relacionado a Git
+     * Verifica se erro é relacionado a Git
      */
     isGitRelatedError(errorMessage: string): boolean;
 };

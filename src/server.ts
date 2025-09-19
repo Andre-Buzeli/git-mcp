@@ -39,7 +39,7 @@ import { initializeTool } from './tools/git-initialize.js';
 import { issuesTool } from './tools/git-issues.js';
 import { pullsTool } from './tools/git-pulls.js';
 import { releasesTool } from './tools/git-releases.js';
-import { webhooksTool } from './tools/git-webhooks.js';
+// import { webhooksTool } from './tools/git-webhooks.js';
 import { gitResetTool } from './tools/git-reset.js';
 import { gitRevertTool } from './tools/git-revert.js';
 import { gitStashTool } from './tools/git-stash.js';
@@ -76,7 +76,7 @@ const tools = [
   issuesTool,
   pullsTool,
   releasesTool,
-  webhooksTool,
+  // webhooksTool,
   gitResetTool,
   gitRevertTool,
   gitStashTool,
@@ -220,30 +220,30 @@ export class GiteaMCPServer {
 
     // Inicializar provider factory com configuração
     try {
-      console.log('[SERVER] Inicializando provider factory...');
+      // console.log('[SERVER] Inicializando provider factory...');
       const factory = initializeFactoryFromEnv();
 
       // Log detalhado dos providers configurados
       try {
         const providersInfo = factory.getProvidersInfo();
-        console.log('[SERVER] Providers configurados:');
-        providersInfo.forEach(p => {
-          console.log(`  - ${p.name} (${p.type}) ${p.isDefault ? '[PADRÃO]' : ''}`);
-        });
+        // console.log('[SERVER] Providers configurados:');
+        // providersInfo.forEach(p => {
+        //   console.log(`  - ${p.name} (${p.type}) ${p.isDefault ? '[PADRÃO]' : ''}`);
+        // });
       } catch (infoError) {
-        console.log('[SERVER] Não foi possível obter informações detalhadas dos providers');
+        // console.log('[SERVER] Não foi possível obter informações detalhadas dos providers');
       }
 
       // Atualizar o globalProviderFactory com a configuração
       Object.assign(globalProviderFactory, factory);
 
-      console.log('[SERVER] Provider factory inicializado com sucesso');
+      // console.log('[SERVER] Provider factory inicializado com sucesso');
     } catch (error) {
       console.error('[SERVER] Erro ao inicializar providers:', error);
 
       // Tenta criar um provider fallback se houver falha completa
       try {
-        console.log('[SERVER] Tentando criar provider fallback...');
+        // console.log('[SERVER] Tentando criar provider fallback...');
 
         // Criar provider GitHub básico como fallback
         const fallbackConfig = {
@@ -258,7 +258,7 @@ export class GiteaMCPServer {
         const fallbackProvider = globalProviderFactory.createProvider(fallbackConfig);
         globalProviderFactory.setDefaultProvider('github-fallback');
 
-        console.log('[SERVER] Provider fallback criado com sucesso');
+        // console.log('[SERVER] Provider fallback criado com sucesso');
       } catch (fallbackError) {
         console.error('[SERVER] Falha ao criar provider fallback:', fallbackError);
         // Continua sem provider - algumas tools podem não funcionar

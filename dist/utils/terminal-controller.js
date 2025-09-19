@@ -19,9 +19,9 @@ const git_operations_js_1 = require("./git-operations.js");
 async function runTerminalCmd(params) {
     return new Promise((resolve, reject) => {
         const { command, is_background, explanation, projectPath } = params;
-        console.log(`[TERMINAL] Executando: ${explanation}`);
-        console.log(`[TERMINAL] Comando: ${command}`);
-        console.log(`[TERMINAL] Diretório: ${projectPath || process.cwd()}`);
+        // console.log(`[TERMINAL] Executando: ${explanation}`);
+        // console.log(`[TERMINAL] Comando: ${command}`);
+        // console.log(`[TERMINAL] Diretório: ${projectPath || process.cwd()}`);
         // Determina se é Windows ou Unix
         const isWindows = process.platform === 'win32';
         const shell = isWindows ? 'cmd' : 'bash';
@@ -52,7 +52,7 @@ async function runTerminalCmd(params) {
                 error: error.trim()
             };
             if (code === 0) {
-                console.log(`[TERMINAL] ✅ Sucesso: ${explanation}`);
+                // console.log(`[TERMINAL] ✅ Sucesso: ${explanation}`);
                 resolve(result);
             }
             else {
@@ -77,9 +77,9 @@ async function runTerminalCmd(params) {
  * @returns Promise com resultado
  */
 async function runGitCommand(gitCommand, projectPath, explanation) {
-    console.log(`[GIT] Executando: ${explanation}`);
-    console.log(`[GIT] Comando: git ${gitCommand}`);
-    console.log(`[GIT] Diretório: ${projectPath}`);
+    // console.log(`[GIT] Executando: ${explanation}`);
+    // console.log(`[GIT] Comando: git ${gitCommand}`);
+    // console.log(`[GIT] Diretório: ${projectPath}`);
     const gitOps = new git_operations_js_1.GitOperations(projectPath);
     try {
         // Parse do comando Git

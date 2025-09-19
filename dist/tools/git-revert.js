@@ -6,26 +6,26 @@ const terminal_controller_js_1 = require("../utils/terminal-controller.js");
 /**
  * Tool: git-revert
  *
- * DESCRIÃ‡ÃƒO:
- * Gerenciamento de revert Git (GitHub + Gitea) com mÃºltiplas aÃ§Ãµes
+ * DESCRIÇÃO:
+ * Gerenciamento de revert Git (GitHub + Gitea) com múltiplas ações
  *
  * FUNCIONALIDADES:
- * - Reverter commit especÃ­fico
+ * - Reverter commit específico
  * - Reverter merge commit
  * - Reverter range de commits
  * - Reverter com mensagem customizada
- * - Reverter sem commit automÃ¡tico
+ * - Reverter sem commit automático
  *
  * USO:
  * - Para desfazer commits de forma segura
- * - Para reverter mudanÃ§as em branches compartilhadas
- * - Para criar commits de reversÃ£o
- * - Para manter histÃ³rico limpo
+ * - Para reverter mudanças em branches compartilhadas
+ * - Para criar commits de reversão
+ * - Para manter histórico limpo
  *
- * RECOMENDAÃ‡Ã•ES:
+ * RECOMENDAÇÕES:
  * - Use revert em vez de reset para branches compartilhadas
- * - Teste reversÃµes em branches locais primeiro
- * - Documente motivos da reversÃ£o
+ * - Teste reversões em branches locais primeiro
+ * - Documente motivos da reversão
  */
 const GitRevertInputSchema = zod_1.z.object({
     action: zod_1.z.enum(['revert-commit', 'revert-merge', 'revert-range']),
@@ -53,7 +53,7 @@ const GitRevertResultSchema = zod_1.z.object({
 });
 exports.gitRevertTool = {
     name: 'git-revert',
-    description: 'tool: Gerencia operaÃ§Ãµes Git revert para desfazer mudanÃ§as de forma segura\nâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\naction revert-commit: reverte commit especÃ­fico\naction revert-commit requires: repo, commit_hash, message, no_commit, provider, projectPath\nâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\naction revert-merge: reverte merge commit\naction revert-merge requires: repo, merge_commit_hash, mainline, message, provider, projectPath\nâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\naction revert-range: reverte range de commits\naction revert-range requires: repo, commit_range, strategy, message, provider, projectPath',
+    description: 'tool: Gerencia operações Git revert para desfazer mudanças de forma segura\n──────────────\naction revert-commit: reverte commit específico\naction revert-commit requires: repo, commit_hash, message, no_commit, provider, projectPath\n───────────────\naction revert-merge: reverte merge commit\naction revert-merge requires: repo, merge_commit_hash, mainline, message, provider, projectPath\n───────────────\naction revert-range: reverte range de commits\naction revert-range requires: repo, commit_range, strategy, message, provider, projectPath',
     inputSchema: {
         type: 'object',
         properties: {
@@ -87,14 +87,14 @@ exports.gitRevertTool = {
                 case 'revert-range':
                     return await this.revertRange(validatedInput);
                 default:
-                    throw new Error(`AÃ§Ã£o nÃ£o suportada: ${validatedInput.action}`);
+                    throw new Error(`Ação não suportada: ${validatedInput.action}`);
             }
         }
         catch (error) {
             return {
                 success: false,
                 action: input.action,
-                message: 'Erro na operaÃ§Ã£o de revert',
+                message: 'Erro na operação de revert',
                 error: error instanceof Error ? error.message : String(error)
             };
         }
@@ -102,7 +102,7 @@ exports.gitRevertTool = {
     async revertCommit(params) {
         try {
             if (!params.commit_hash) {
-                throw new Error('commit_hash Ã© obrigatÃ³rio para revert-commit');
+                throw new Error('commit_hash é obrigatório para revert-commit');
             }
             let gitCommand = `revert ${params.commit_hash}`;
             if (params.no_commit) {
@@ -134,10 +134,10 @@ exports.gitRevertTool = {
     async revertMerge(params) {
         try {
             if (!params.merge_commit_hash) {
-                throw new Error('merge_commit_hash Ã© obrigatÃ³rio para revert-merge');
+                throw new Error('merge_commit_hash é obrigatório para revert-merge');
             }
             if (!params.mainline) {
-                throw new Error('mainline Ã© obrigatÃ³rio para revert de merge');
+                throw new Error('mainline é obrigatório para revert de merge');
             }
             let gitCommand = `revert -m ${params.mainline} ${params.merge_commit_hash}`;
             if (params.message) {
@@ -166,7 +166,7 @@ exports.gitRevertTool = {
     async revertRange(params) {
         try {
             if (!params.commit_range) {
-                throw new Error('commit_range Ã© obrigatÃ³rio para revert-range');
+                throw new Error('commit_range é obrigatório para revert-range');
             }
             let gitCommand = `revert ${params.commit_range}`;
             if (params.strategy) {
@@ -194,13 +194,9 @@ exports.gitRevertTool = {
         catch (error) {
             throw new Error(`Falha ao executar revert de range: ${error instanceof Error ? error.message : String(error)}`);
         }
-    }
+    },
     /**
-     * Verifica se erro Ã© relacionado a Git
-     */
-    ,
-    /**
-     * Verifica se erro Ã© relacionado a Git
+     * Verifica se erro é relacionado a Git
      */
     isGitRelatedError(errorMessage) {
         const gitKeywords = [

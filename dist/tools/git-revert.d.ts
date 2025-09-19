@@ -2,26 +2,26 @@ import { z } from 'zod';
 /**
  * Tool: git-revert
  *
- * DESCRIÃ‡ÃƒO:
- * Gerenciamento de revert Git (GitHub + Gitea) com mÃºltiplas aÃ§Ãµes
+ * DESCRIÇÃO:
+ * Gerenciamento de revert Git (GitHub + Gitea) com múltiplas ações
  *
  * FUNCIONALIDADES:
- * - Reverter commit especÃ­fico
+ * - Reverter commit específico
  * - Reverter merge commit
  * - Reverter range de commits
  * - Reverter com mensagem customizada
- * - Reverter sem commit automÃ¡tico
+ * - Reverter sem commit automático
  *
  * USO:
  * - Para desfazer commits de forma segura
- * - Para reverter mudanÃ§as em branches compartilhadas
- * - Para criar commits de reversÃ£o
- * - Para manter histÃ³rico limpo
+ * - Para reverter mudanças em branches compartilhadas
+ * - Para criar commits de reversão
+ * - Para manter histórico limpo
  *
- * RECOMENDAÃ‡Ã•ES:
+ * RECOMENDAÇÕES:
  * - Use revert em vez de reset para branches compartilhadas
- * - Teste reversÃµes em branches locais primeiro
- * - Documente motivos da reversÃ£o
+ * - Teste reversões em branches locais primeiro
+ * - Documente motivos da reversão
  */
 declare const GitRevertInputSchema: z.ZodObject<{
     action: z.ZodEnum<["revert-commit", "revert-merge", "revert-range"]>;
@@ -146,7 +146,7 @@ export declare const gitRevertTool: {
     revertMerge(params: GitRevertInput): Promise<GitRevertResult>;
     revertRange(params: GitRevertInput): Promise<GitRevertResult>;
     /**
-     * Verifica se erro Ã© relacionado a Git
+     * Verifica se erro é relacionado a Git
      */
     isGitRelatedError(errorMessage: string): boolean;
 };

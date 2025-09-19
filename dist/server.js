@@ -40,7 +40,7 @@ const git_initialize_js_1 = require("./tools/git-initialize.js");
 const git_issues_js_1 = require("./tools/git-issues.js");
 const git_pulls_js_1 = require("./tools/git-pulls.js");
 const git_releases_js_1 = require("./tools/git-releases.js");
-const git_webhooks_js_1 = require("./tools/git-webhooks.js");
+// import { webhooksTool } from './tools/git-webhooks.js';
 const git_reset_js_1 = require("./tools/git-reset.js");
 const git_revert_js_1 = require("./tools/git-revert.js");
 const git_stash_js_1 = require("./tools/git-stash.js");
@@ -76,7 +76,7 @@ const tools = [
     git_issues_js_1.issuesTool,
     git_pulls_js_1.pullsTool,
     git_releases_js_1.releasesTool,
-    git_webhooks_js_1.webhooksTool,
+    // webhooksTool,
     git_reset_js_1.gitResetTool,
     git_revert_js_1.gitRevertTool,
     git_stash_js_1.gitStashTool,
@@ -207,28 +207,28 @@ class GiteaMCPServer {
         }
         // Inicializar provider factory com configuração
         try {
-            console.log('[SERVER] Inicializando provider factory...');
+            // // console.log('[SERVER] Inicializando provider factory...');
             const factory = (0, index_js_2.initializeFactoryFromEnv)();
             // Log detalhado dos providers configurados
             try {
                 const providersInfo = factory.getProvidersInfo();
-                console.log('[SERVER] Providers configurados:');
-                providersInfo.forEach(p => {
-                    console.log(`  - ${p.name} (${p.type}) ${p.isDefault ? '[PADRÃO]' : ''}`);
-                });
+                // // console.log('[SERVER] Providers configurados:');
+                // providersInfo.forEach(p => {
+                //   // console.log(`  - ${p.name} (${p.type}) ${p.isDefault ? '[PADRÃO]' : ''}`);
+                // });
             }
             catch (infoError) {
-                console.log('[SERVER] Não foi possível obter informações detalhadas dos providers');
+                // // console.log('[SERVER] Não foi possível obter informações detalhadas dos providers');
             }
             // Atualizar o globalProviderFactory com a configuração
             Object.assign(index_js_2.globalProviderFactory, factory);
-            console.log('[SERVER] Provider factory inicializado com sucesso');
+            // // console.log('[SERVER] Provider factory inicializado com sucesso');
         }
         catch (error) {
             console.error('[SERVER] Erro ao inicializar providers:', error);
             // Tenta criar um provider fallback se houver falha completa
             try {
-                console.log('[SERVER] Tentando criar provider fallback...');
+                // // console.log('[SERVER] Tentando criar provider fallback...');
                 // Criar provider GitHub básico como fallback
                 const fallbackConfig = {
                     name: 'github-fallback',
@@ -240,7 +240,7 @@ class GiteaMCPServer {
                 };
                 const fallbackProvider = index_js_2.globalProviderFactory.createProvider(fallbackConfig);
                 index_js_2.globalProviderFactory.setDefaultProvider('github-fallback');
-                console.log('[SERVER] Provider fallback criado com sucesso');
+                // // console.log('[SERVER] Provider fallback criado com sucesso');
             }
             catch (fallbackError) {
                 console.error('[SERVER] Falha ao criar provider fallback:', fallbackError);

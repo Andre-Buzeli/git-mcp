@@ -92,7 +92,7 @@ export class ProviderFactory implements VcsProviderFactory {
     // Fallback: usa o primeiro provider disponível
     const firstKey = this.providers.keys().next().value;
     if (firstKey) {
-      console.log(`[PROVIDER FACTORY] Usando provider '${firstKey}' como fallback padrão`);
+      // console.log(`[PROVIDER FACTORY] Usando provider '${firstKey}' como fallback padrão`);
       this.defaultProviderName = firstKey;
       return this.providers.get(firstKey)!;
     }
@@ -282,7 +282,7 @@ export function initializeFactoryFromEnv(): ProviderFactory {
           username: process.env.GITHUB_USERNAME
         });
         defaultProvider = 'github';
-        console.log('[PROVIDER FACTORY] Provider GitHub configurado');
+        // console.log('[PROVIDER FACTORY] Provider GitHub configurado');
       }
 
           // Tenta Gitea se disponível
@@ -304,7 +304,7 @@ export function initializeFactoryFromEnv(): ProviderFactory {
           if (!defaultProvider) {
             defaultProvider = 'gitea';
           }
-          console.log('[PROVIDER FACTORY] Provider Gitea configurado');
+          // console.log('[PROVIDER FACTORY] Provider Gitea configurado');
         }
       }
     }

@@ -3,43 +3,43 @@ import { VcsOperations } from '../providers/index.js';
 /**
  * Tool: pulls
  *
- * DESCRIÃ‡ÃƒO:
+ * DESCRIÇÃO:
  * Gerenciamento completo de pull requests com suporte multi-provider (GitHub e Gitea)
  *
  * FUNCIONALIDADES:
- * - CriaÃ§Ã£o de novos pull requests
+ * - Criação de novos pull requests
  * - Listagem e busca de PRs
- * - ObtenÃ§Ã£o de detalhes especÃ­ficos
- * - AtualizaÃ§Ã£o de PRs existentes
+ * - Obtenção de detalhes específicos
+ * - Atualização de PRs existentes
  * - Merge de pull requests
  * - Fechamento de PRs
- * - RevisÃ£o e aprovaÃ§Ã£o
- * - Busca por conteÃºdo e status
+ * - Revisão e aprovação
+ * - Busca por conteúdo e status
  *
  * USO:
- * - Para gerenciar integraÃ§Ã£o de cÃ³digo
- * - Para revisÃ£o de cÃ³digo
+ * - Para gerenciar integração de código
+ * - Para revisão de código
  * - Para controle de qualidade
- * - Para colaboraÃ§Ã£o em equipe
+ * - Para colaboração em equipe
  *
- * RECOMENDAÃ‡Ã•ES:
- * - Use tÃ­tulos descritivos
- * - Documente mudanÃ§as detalhadamente
+ * RECOMENDAÇÕES:
+ * - Use títulos descritivos
+ * - Documente mudanças detalhadamente
  * - Revise antes de fazer merge
  * - Mantenha PRs pequenos e focados
  */
 /**
- * Schema de validaÃ§Ã£o para entrada da tool pulls
+ * Schema de validação para entrada da tool pulls
  *
- * VALIDAÃ‡Ã•ES:
- * - action: AÃ§Ã£o obrigatÃ³ria (create, list, get, update, merge, close, review, search)
- * - ParÃ¢metros especÃ­ficos por aÃ§Ã£o
- * - ValidaÃ§Ã£o de tipos e formatos
+ * VALIDAÇÕES:
+ * - action: Ação obrigatória (create, list, get, update, merge, close, review, search)
+ * - Parâmetros específicos por ação
+ * - Validação de tipos e formatos
  *
- * RECOMENDAÃ‡Ã•ES:
+ * RECOMENDAÇÕES:
  * - Sempre valide entrada antes de usar
- * - Use parÃ¢metros opcionais adequadamente
- * - Documente parÃ¢metros obrigatÃ³rios
+ * - Use parâmetros opcionais adequadamente
+ * - Documente parâmetros obrigatórios
  */
 declare const PullsInputSchema: z.ZodObject<{
     action: z.ZodEnum<["create", "list", "get", "update", "merge", "close", "review", "search"]>;
@@ -146,11 +146,11 @@ declare const PullsInputSchema: z.ZodObject<{
 }>;
 export type PullsInput = z.infer<typeof PullsInputSchema>;
 /**
- * Schema de saÃ­da padronizado
+ * Schema de saída padronizado
  *
  * ESTRUTURA:
- * - success: Status da operaÃ§Ã£o
- * - action: AÃ§Ã£o executada
+ * - success: Status da operação
+ * - action: Ação executada
  * - message: Mensagem descritiva
  * - data: Dados retornados (opcional)
  * - error: Detalhes do erro (opcional)
@@ -178,92 +178,92 @@ export type PullsResult = z.infer<typeof PullsResultSchema>;
 /**
  * Tool: pulls
  *
- * DESCRIÃ‡ÃƒO:
- * Gerenciamento completo de Pull Requests Gitea com mÃºltiplas aÃ§Ãµes
+ * DESCRIÇÃO:
+ * Gerenciamento completo de Pull Requests Gitea com múltiplas ações
  *
- * ACTIONS DISPONÃVEIS:
+ * ACTIONS DISPONÍVEIS:
  *
  * 1. create - Criar novo Pull Request
- *    ParÃ¢metros:
- *    - owner (obrigatÃ³rio): ProprietÃ¡rio do repositÃ³rio
- *    - repo (obrigatÃ³rio): Nome do repositÃ³rio
- *    - title (obrigatÃ³rio): TÃ­tulo do PR
- *    - body (opcional): DescriÃ§Ã£o detalhada
- *    - head (obrigatÃ³rio): Branch de origem
- *    - base (obrigatÃ³rio): Branch de destino
- *    - draft (opcional): Se Ã© um draft PR
+ *    Parâmetros:
+ *    - owner (obrigatório): Proprietário do repositório
+ *    - repo (obrigatório): Nome do repositório
+ *    - title (obrigatório): Título do PR
+ *    - body (opcional): Descrição detalhada
+ *    - head (obrigatório): Branch de origem
+ *    - base (obrigatório): Branch de destino
+ *    - draft (opcional): Se é um draft PR
  *    - labels (opcional): Array de labels
- *    - assignees (opcional): Array de usuÃ¡rios responsÃ¡veis
+ *    - assignees (opcional): Array de usuários responsáveis
  *    - reviewers (opcional): Array de revisores
  *    - milestone (opcional): ID do milestone
  *
  * 2. list - Listar Pull Requests
- *    ParÃ¢metros:
- *    - owner (obrigatÃ³rio): ProprietÃ¡rio do repositÃ³rio
- *    - repo (obrigatÃ³rio): Nome do repositÃ³rio
- *    - state (opcional): Estado dos PRs (open, closed, merged, all) - padrÃ£o: open
- *    - page (opcional): PÃ¡gina da listagem (padrÃ£o: 1)
- *    - limit (opcional): Itens por pÃ¡gina (padrÃ£o: 30, mÃ¡ximo: 100)
+ *    Parâmetros:
+ *    - owner (obrigatório): Proprietário do repositório
+ *    - repo (obrigatório): Nome do repositório
+ *    - state (opcional): Estado dos PRs (open, closed, merged, all) - padrão: open
+ *    - page (opcional): Página da listagem (padrão: 1)
+ *    - limit (opcional): Itens por página (padrão: 30, máximo: 100)
  *
  * 3. get - Obter detalhes do Pull Request
- *    ParÃ¢metros:
- *    - owner (obrigatÃ³rio): ProprietÃ¡rio do repositÃ³rio
- *    - repo (obrigatÃ³rio): Nome do repositÃ³rio
- *    - pull_number (obrigatÃ³rio): NÃºmero do PR
+ *    Parâmetros:
+ *    - owner (obrigatório): Proprietário do repositório
+ *    - repo (obrigatório): Nome do repositório
+ *    - pull_number (obrigatório): Número do PR
  *
  * 4. update - Atualizar Pull Request existente
- *    ParÃ¢metros:
- *    - owner (obrigatÃ³rio): ProprietÃ¡rio do repositÃ³rio
- *    - repo (obrigatÃ³rio): Nome do repositÃ³rio
- *    - pull_number (obrigatÃ³rio): NÃºmero do PR
- *    - new_title (opcional): Novo tÃ­tulo
- *    - new_body (opcional): Nova descriÃ§Ã£o
+ *    Parâmetros:
+ *    - owner (obrigatório): Proprietário do repositório
+ *    - repo (obrigatório): Nome do repositório
+ *    - pull_number (obrigatório): Número do PR
+ *    - new_title (opcional): Novo título
+ *    - new_body (opcional): Nova descrição
  *    - new_base (opcional): Nova branch base
  *    - new_labels (opcional): Novos labels
- *    - new_assignees (opcional): Novos responsÃ¡veis
+ *    - new_assignees (opcional): Novos responsáveis
  *    - new_milestone (opcional): Novo milestone
  *
  * 5. merge - Fazer merge do Pull Request
- *    ParÃ¢metros:
- *    - owner (obrigatÃ³rio): ProprietÃ¡rio do repositÃ³rio
- *    - repo (obrigatÃ³rio): Nome do repositÃ³rio
- *    - pull_number (obrigatÃ³rio): NÃºmero do PR
- *    - merge_method (opcional): MÃ©todo de merge (merge, rebase, squash)
- *    - merge_commit_title (opcional): TÃ­tulo do commit de merge
+ *    Parâmetros:
+ *    - owner (obrigatório): Proprietário do repositório
+ *    - repo (obrigatório): Nome do repositório
+ *    - pull_number (obrigatório): Número do PR
+ *    - merge_method (opcional): Método de merge (merge, rebase, squash)
+ *    - merge_commit_title (opcional): Título do commit de merge
  *    - merge_commit_message (opcional): Mensagem do commit de merge
  *
  * 6. close - Fechar Pull Request
- *    ParÃ¢metros:
- *    - owner (obrigatÃ³rio): ProprietÃ¡rio do repositÃ³rio
- *    - repo (obrigatÃ³rio): Nome do repositÃ³rio
- *    - pull_number (obrigatÃ³rio): NÃºmero do PR
+ *    Parâmetros:
+ *    - owner (obrigatório): Proprietário do repositório
+ *    - repo (obrigatório): Nome do repositório
+ *    - pull_number (obrigatório): Número do PR
  *
  * 7. review - Adicionar review ao Pull Request
- *    ParÃ¢metros:
- *    - owner (obrigatÃ³rio): ProprietÃ¡rio do repositÃ³rio
- *    - repo (obrigatÃ³rio): Nome do repositÃ³rio
- *    - pull_number (obrigatÃ³rio): NÃºmero do PR
- *    - review_event (obrigatÃ³rio): Tipo de review (APPROVE, REQUEST_CHANGES, COMMENT)
- *    - review_body (opcional): ComentÃ¡rio do review
+ *    Parâmetros:
+ *    - owner (obrigatório): Proprietário do repositório
+ *    - repo (obrigatório): Nome do repositório
+ *    - pull_number (obrigatório): Número do PR
+ *    - review_event (obrigatório): Tipo de review (APPROVE, REQUEST_CHANGES, COMMENT)
+ *    - review_body (opcional): Comentário do review
  *
  * 8. search - Buscar Pull Requests
- *    ParÃ¢metros:
- *    - owner (obrigatÃ³rio): ProprietÃ¡rio do repositÃ³rio
- *    - repo (obrigatÃ³rio): Nome do repositÃ³rio
- *    - query (obrigatÃ³rio): Termo de busca
+ *    Parâmetros:
+ *    - owner (obrigatório): Proprietário do repositório
+ *    - repo (obrigatório): Nome do repositório
+ *    - query (obrigatório): Termo de busca
  *    - author (opcional): Autor dos PRs
- *    - assignee (opcional): ResponsÃ¡vel pelos PRs
+ *    - assignee (opcional): Responsável pelos PRs
  *    - reviewer (opcional): Revisor dos PRs
- *    - label (opcional): Label especÃ­fico
+ *    - label (opcional): Label específico
  *
- * RECOMENDAÃ‡Ã•ES DE USO:
- * - Use tÃ­tulos descritivos e claros
- * - Documente mudanÃ§as detalhadamente
+ * RECOMENDAÇÕES DE USO:
+ * - Use títulos descritivos e claros
+ * - Documente mudanças detalhadamente
  * - Solicite reviews adequados
  * - Mantenha PRs pequenos e focados
- * - Use labels para categorizaÃ§Ã£o
- * - Atribua responsÃ¡veis adequadamente
- * - Escolha mÃ©todo de merge apropriado
+ * - Use labels para categorização
+ * - Atribua responsáveis adequadamente
+ * - Escolha método de merge apropriado
  */
 export declare const pullsTool: {
     name: string;
@@ -429,119 +429,119 @@ export declare const pullsTool: {
      *
      * FUNCIONALIDADE:
      * - Valida entrada usando Zod schema
-     * - Roteia para mÃ©todo especÃ­fico baseado na aÃ§Ã£o
+     * - Roteia para método específico baseado na ação
      * - Trata erros de forma uniforme
      * - Retorna resultado padronizado
      *
      * FLUXO:
-     * 1. ValidaÃ§Ã£o de entrada
-     * 2. SeleÃ§Ã£o do provider
-     * 3. Roteamento por aÃ§Ã£o
-     * 4. ExecuÃ§Ã£o do mÃ©todo especÃ­fico
+     * 1. Validação de entrada
+     * 2. Seleção do provider
+     * 3. Roteamento por ação
+     * 4. Execução do método específico
      * 5. Tratamento de erros
      * 6. Retorno de resultado
      *
      * TRATAMENTO DE ERROS:
-     * - ValidaÃ§Ã£o: erro de schema
-     * - ExecuÃ§Ã£o: erro da operaÃ§Ã£o
-     * - Roteamento: aÃ§Ã£o nÃ£o suportada
+     * - Validação: erro de schema
+     * - Execução: erro da operação
+     * - Roteamento: ação não suportada
      *
-     * RECOMENDAÃ‡Ã•ES:
+     * RECOMENDAÇÕES:
      * - Sempre valide entrada antes de processar
-     * - Trate erros especÃ­ficos adequadamente
+     * - Trate erros específicos adequadamente
      * - Log detalhes de erro para debug
-     * - Retorne mensagens de erro Ãºteis
+     * - Retorne mensagens de erro úteis
      */
     handler(input: PullsInput): Promise<PullsResult>;
     /**
      * Cria um novo Pull Request
      *
      * FUNCIONALIDADE:
-     * - Cria PR com tÃ­tulo e descriÃ§Ã£o
-     * - Suporta configuraÃ§Ã£o de branches
-     * - Permite configuraÃ§Ã£o de draft, labels, assignees
+     * - Cria PR com título e descrição
+     * - Suporta configuração de branches
+     * - Permite configuração de draft, labels, assignees
      *
-     * PARÃ‚METROS OBRIGATÃ“RIOS:
-     * - owner: ProprietÃ¡rio do repositÃ³rio
-     * - repo: Nome do repositÃ³rio
-     * - title: TÃ­tulo do PR
+     * PARÂMETROS OBRIGATÓRIOS:
+     * - owner: Proprietário do repositório
+     * - repo: Nome do repositório
+     * - title: Título do PR
      * - head: Branch de origem
      * - base: Branch de destino
      *
-     * PARÃ‚METROS OPCIONAIS:
-     * - body: DescriÃ§Ã£o detalhada
-     * - draft: Se Ã© um draft PR
-     * - labels: Array de labels para categorizaÃ§Ã£o
-     * - assignees: Array de usuÃ¡rios responsÃ¡veis
+     * PARÂMETROS OPCIONAIS:
+     * - body: Descrição detalhada
+     * - draft: Se é um draft PR
+     * - labels: Array de labels para categorização
+     * - assignees: Array de usuários responsáveis
      * - reviewers: Array de revisores
      * - milestone: ID do milestone associado
      *
-     * VALIDAÃ‡Ã•ES:
-     * - Todos os parÃ¢metros obrigatÃ³rios
+     * VALIDAÇÕES:
+     * - Todos os parâmetros obrigatórios
      * - Branches devem existir
      * - Head e base devem ser diferentes
-     * - UsuÃ¡rio deve ter permissÃ£o de escrita
+     * - Usuário deve ter permissão de escrita
      *
-     * RECOMENDAÃ‡Ã•ES:
-     * - Use tÃ­tulos descritivos e claros
-     * - Documente mudanÃ§as detalhadamente
+     * RECOMENDAÇÕES:
+     * - Use títulos descritivos e claros
+     * - Documente mudanças detalhadamente
      * - Solicite reviews adequados
      * - Mantenha PRs pequenos e focados
      */
     createPullRequest(params: PullsInput, provider: VcsOperations, owner: string): Promise<PullsResult>;
     /**
-     * Lista Pull Requests do repositÃ³rio
+     * Lista Pull Requests do repositório
      *
      * FUNCIONALIDADE:
      * - Lista PRs com filtros de estado
-     * - Suporta paginaÃ§Ã£o
-     * - Retorna informaÃ§Ãµes bÃ¡sicas de cada PR
+     * - Suporta paginação
+     * - Retorna informações básicas de cada PR
      *
-     * PARÃ‚METROS OBRIGATÃ“RIOS:
-     * - owner: ProprietÃ¡rio do repositÃ³rio
-     * - repo: Nome do repositÃ³rio
+     * PARÂMETROS OBRIGATÓRIOS:
+     * - owner: Proprietário do repositório
+     * - repo: Nome do repositório
      *
-     * PARÃ‚METROS OPCIONAIS:
-     * - state: Estado dos PRs (open, closed, merged, all) - padrÃ£o: open
-     * - page: PÃ¡gina da listagem (padrÃ£o: 1)
-     * - limit: Itens por pÃ¡gina (padrÃ£o: 30, mÃ¡ximo: 100)
+     * PARÂMETROS OPCIONAIS:
+     * - state: Estado dos PRs (open, closed, merged, all) - padrão: open
+     * - page: Página da listagem (padrão: 1)
+     * - limit: Itens por página (padrão: 30, máximo: 100)
      *
-     * VALIDAÃ‡Ã•ES:
-     * - e repo obrigatÃ³rios
-     * - State deve ser um dos valores vÃ¡lidos
+     * VALIDAÇÕES:
+     * - e repo obrigatórios
+     * - State deve ser um dos valores válidos
      * - Page deve ser >= 1
      * - Limit deve ser entre 1 e 100
      *
-     * RECOMENDAÃ‡Ã•ES:
-     * - Use paginaÃ§Ã£o para repositÃ³rios com muitos PRs
-     * - Monitore nÃºmero total de PRs
-     * - Filtre por estado para organizaÃ§Ã£o
+     * RECOMENDAÇÕES:
+     * - Use paginação para repositórios com muitos PRs
+     * - Monitore número total de PRs
+     * - Filtre por estado para organização
      * - Mantenha PRs organizados
      */
     listPullRequests(params: PullsInput, provider: VcsOperations, owner: string): Promise<PullsResult>;
     /**
-     * ObtÃ©m detalhes de um Pull Request especÃ­fico
+     * Obtém detalhes de um Pull Request específico
      *
      * FUNCIONALIDADE:
-     * - Retorna informaÃ§Ãµes completas do PR
-     * - Inclui tÃ­tulo, descriÃ§Ã£o, branches, labels
+     * - Retorna informações completas do PR
+     * - Inclui título, descrição, branches, labels
      * - Mostra status de merge e conflitos
      *
-     * PARÃ‚METROS OBRIGATÃ“RIOS:
-     * - owner: ProprietÃ¡rio do repositÃ³rio
-     * - repo: Nome do repositÃ³rio
-     * - pull_number: NÃºmero do PR
+     * PARÂMETROS OBRIGATÓRIOS:
+     * - owner: Proprietário do repositório
+     * - repo: Nome do repositório
+     * - pull_number: Número do PR
      *
-     * VALIDAÃ‡Ã•ES:
-     * - Todos os parÃ¢metros obrigatÃ³rios
-     * - PR deve existir no repositÃ³rio
-     * - NÃºmero deve ser vÃ¡lido
+     * VALIDAÇÕES:
+     * - Todos os parâmetros obrigatórios
+     * - PR deve existir no repositório
+     * - Número deve ser válido
      *
-     * RECOMENDAÃ‡Ã•ES:
+     * RECOMENDAÇÕES:
      * - Use para obter detalhes completos
      * - Verifique status de merge
      * - Analise conflitos se houver
-     * - Monitore mudanÃ§as importantes
+     * - Monitore mudanças importantes
      */
     getPullRequest(params: PullsInput, provider: VcsOperations, owner: string): Promise<PullsResult>;
     /**
@@ -549,32 +549,32 @@ export declare const pullsTool: {
      *
      * FUNCIONALIDADE:
      * - Atualiza campos do PR
-     * - Suporta mudanÃ§a de branch base
-     * - Permite alteraÃ§Ã£o de labels e assignees
+     * - Suporta mudança de branch base
+     * - Permite alteração de labels e assignees
      *
-     * PARÃ‚METROS OBRIGATÃ“RIOS:
-     * - owner: ProprietÃ¡rio do repositÃ³rio
-     * - repo: Nome do repositÃ³rio
-     * - pull_number: NÃºmero do PR
+     * PARÂMETROS OBRIGATÓRIOS:
+     * - owner: Proprietário do repositório
+     * - repo: Nome do repositório
+     * - pull_number: Número do PR
      *
-     * PARÃ‚METROS OPCIONAIS:
-     * - new_title: Novo tÃ­tulo
-     * - new_body: Nova descriÃ§Ã£o
+     * PARÂMETROS OPCIONAIS:
+     * - new_title: Novo título
+     * - new_body: Nova descrição
      * - new_base: Nova branch base
      * - new_labels: Novos labels
-     * - new_assignees: Novos responsÃ¡veis
+     * - new_assignees: Novos responsáveis
      * - new_milestone: Novo milestone
      *
-     * VALIDAÃ‡Ã•ES:
-     * - Todos os parÃ¢metros obrigatÃ³rios
+     * VALIDAÇÕES:
+     * - Todos os parâmetros obrigatórios
      * - PR deve existir
      * - Pelo menos um campo deve ser atualizado
      *
-     * RECOMENDAÃ‡Ã•ES:
-     * - Atualize apenas campos necessÃ¡rios
+     * RECOMENDAÇÕES:
+     * - Atualize apenas campos necessários
      * - Use mensagens de commit descritivas
-     * - Documente mudanÃ§as importantes
-     * - Notifique responsÃ¡veis sobre mudanÃ§as
+     * - Documente mudanças importantes
+     * - Notifique responsáveis sobre mudanças
      */
     updatePullRequest(params: PullsInput, provider: VcsOperations, owner: string): Promise<PullsResult>;
     /**
@@ -582,30 +582,30 @@ export declare const pullsTool: {
      *
      * FUNCIONALIDADE:
      * - Merge do PR na branch base
-     * - Suporta diferentes mÃ©todos de merge
-     * - Permite customizaÃ§Ã£o de commit de merge
+     * - Suporta diferentes métodos de merge
+     * - Permite customização de commit de merge
      *
-     * PARÃ‚METROS OBRIGATÃ“RIOS:
-     * - owner: ProprietÃ¡rio do repositÃ³rio
-     * - repo: Nome do repositÃ³rio
-     * - pull_number: NÃºmero do PR
+     * PARÂMETROS OBRIGATÓRIOS:
+     * - owner: Proprietário do repositório
+     * - repo: Nome do repositório
+     * - pull_number: Número do PR
      *
-     * PARÃ‚METROS OPCIONAIS:
-     * - merge_method: MÃ©todo de merge (merge, rebase, squash)
-     * - merge_commit_title: TÃ­tulo do commit de merge
+     * PARÂMETROS OPCIONAIS:
+     * - merge_method: Método de merge (merge, rebase, squash)
+     * - merge_commit_title: Título do commit de merge
      * - merge_commit_message: Mensagem do commit de merge
      *
-     * VALIDAÃ‡Ã•ES:
-     * - Todos os parÃ¢metros obrigatÃ³rios
+     * VALIDAÇÕES:
+     * - Todos os parâmetros obrigatórios
      * - PR deve existir e estar aberto
-     * - NÃ£o deve haver conflitos
+     * - Não deve haver conflitos
      * - PR deve ser mergeable
      *
-     * RECOMENDAÃ‡Ã•ES:
+     * RECOMENDAÇÕES:
      * - Resolva conflitos antes do merge
-     * - Escolha mÃ©todo de merge adequado
-     * - Use tÃ­tulos e mensagens descritivas
-     * - Teste apÃ³s o merge
+     * - Escolha método de merge adequado
+     * - Use títulos e mensagens descritivas
+     * - Teste após o merge
      */
     mergePullRequest(params: PullsInput, provider: VcsOperations, owner: string): Promise<PullsResult>;
     /**
@@ -613,24 +613,24 @@ export declare const pullsTool: {
      *
      * FUNCIONALIDADE:
      * - Altera estado do PR para closed
-     * - MantÃ©m histÃ³rico e comentÃ¡rios
+     * - Mantém histórico e comentários
      * - Permite reabertura posterior
      *
-     * PARÃ‚METROS OBRIGATÃ“RIOS:
-     * - owner: ProprietÃ¡rio do repositÃ³rio
-     * - repo: Nome do repositÃ³rio
-     * - pull_number: NÃºmero do PR
+     * PARÂMETROS OBRIGATÓRIOS:
+     * - owner: Proprietário do repositório
+     * - repo: Nome do repositório
+     * - pull_number: Número do PR
      *
-     * VALIDAÃ‡Ã•ES:
-     * - Todos os parÃ¢metros obrigatÃ³rios
+     * VALIDAÇÕES:
+     * - Todos os parâmetros obrigatórios
      * - PR deve existir
      * - PR deve estar aberto
      *
-     * RECOMENDAÃ‡Ã•ES:
-     * - Confirme que PR nÃ£o Ã© mais necessÃ¡rio
+     * RECOMENDAÇÕES:
+     * - Confirme que PR não é mais necessário
      * - Documente motivo do fechamento
-     * - Use comentÃ¡rio explicativo
-     * - Verifique se nÃ£o hÃ¡ dependÃªncias
+     * - Use comentário explicativo
+     * - Verifique se não há dependências
      */
     closePullRequest(params: PullsInput, provider: VcsOperations, owner: string): Promise<PullsResult>;
     /**
@@ -639,23 +639,23 @@ export declare const pullsTool: {
      * FUNCIONALIDADE:
      * - Cria novo review no PR
      * - Suporta diferentes tipos de review
-     * - MantÃ©m histÃ³rico de revisÃµes
+     * - Mantém histórico de revisões
      *
-     * PARÃ‚METROS OBRIGATÃ“RIOS:
-     * - owner: ProprietÃ¡rio do repositÃ³rio
-     * - repo: Nome do repositÃ³rio
-     * - pull_number: NÃºmero do PR
+     * PARÂMETROS OBRIGATÓRIOS:
+     * - owner: Proprietário do repositório
+     * - repo: Nome do repositório
+     * - pull_number: Número do PR
      * - review_event: Tipo de review (APPROVE, REQUEST_CHANGES, COMMENT)
      *
-     * PARÃ‚METROS OPCIONAIS:
-     * - review_body: ComentÃ¡rio do review
+     * PARÂMETROS OPCIONAIS:
+     * - review_body: Comentário do review
      *
-     * VALIDAÃ‡Ã•ES:
-     * - Todos os parÃ¢metros obrigatÃ³rios
+     * VALIDAÇÕES:
+     * - Todos os parâmetros obrigatórios
      * - PR deve existir
-     * - Review event deve ser vÃ¡lido
+     * - Review event deve ser válido
      *
-     * RECOMENDAÃ‡Ã•ES:
+     * RECOMENDAÇÕES:
      * - Use reviews para controle de qualidade
      * - Documente feedback adequadamente
      * - Use tipos de review apropriados
@@ -663,38 +663,38 @@ export declare const pullsTool: {
      */
     addReview(params: PullsInput, provider: VcsOperations, owner: string): Promise<PullsResult>;
     /**
-     * Busca Pull Requests por critÃ©rios especÃ­ficos
+     * Busca Pull Requests por critérios específicos
      *
      * FUNCIONALIDADE:
-     * - Busca PRs por conteÃºdo
+     * - Busca PRs por conteúdo
      * - Filtra por autor, assignee, reviewer e label
      * - Retorna resultados relevantes
      *
-     * PARÃ‚METROS OBRIGATÃ“RIOS:
-     * - owner: ProprietÃ¡rio do repositÃ³rio
-     * - repo: Nome do repositÃ³rio
+     * PARÂMETROS OBRIGATÓRIOS:
+     * - owner: Proprietário do repositório
+     * - repo: Nome do repositório
      * - query: Termo de busca
      *
-     * PARÃ‚METROS OPCIONAIS:
+     * PARÂMETROS OPCIONAIS:
      * - author: Autor dos PRs
-     * - assignee: ResponsÃ¡vel pelos PRs
+     * - assignee: Responsável pelos PRs
      * - reviewer: Revisor dos PRs
-     * - label: Label especÃ­fico
+     * - label: Label específico
      *
-     * VALIDAÃ‡Ã•ES:
-     * - Todos os parÃ¢metros obrigatÃ³rios
+     * VALIDAÇÕES:
+     * - Todos os parâmetros obrigatórios
      * - Query deve ter pelo menos 3 caracteres
-     * - RepositÃ³rio deve existir
+     * - Repositório deve existir
      *
-     * RECOMENDAÃ‡Ã•ES:
-     * - Use termos de busca especÃ­ficos
+     * RECOMENDAÇÕES:
+     * - Use termos de busca específicos
      * - Combine filtros para resultados precisos
-     * - Analise relevÃ¢ncia dos resultados
+     * - Analise relevância dos resultados
      * - Use para encontrar PRs relacionados
      */
     searchPullRequests(params: PullsInput, provider: VcsOperations, owner: string): Promise<PullsResult>;
     /**
-     * Verifica se erro Ã© relacionado a Git
+     * Verifica se erro é relacionado a Git
      */
     isGitRelatedError(errorMessage: string): boolean;
 };

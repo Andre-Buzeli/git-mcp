@@ -7,49 +7,49 @@ const user_detection_js_1 = require("../utils/user-detection.js");
 /**
  * Tool: issues
  *
- * DESCRIÃ‡ÃƒO:
+ * DESCRIÇÃO:
  * Gerenciamento completo de issues com suporte multi-provider (GitHub e Gitea)
  *
  * FUNCIONALIDADES:
- * - CriaÃ§Ã£o de novas issues
+ * - Criação de novas issues
  * - Listagem e busca de issues
- * - ObtenÃ§Ã£o de detalhes especÃ­ficos
- * - AtualizaÃ§Ã£o de issues existentes
+ * - Obtenção de detalhes específicos
+ * - Atualização de issues existentes
  * - Fechamento de issues
- * - AdiÃ§Ã£o de comentÃ¡rios
- * - Busca por conteÃºdo e status
+ * - Adição de comentários
+ * - Busca por conteúdo e status
  *
  * USO:
  * - Para gerenciar bugs e features
  * - Para acompanhar progresso de desenvolvimento
- * - Para comunicaÃ§Ã£o entre equipe
+ * - Para comunicação entre equipe
  * - Para controle de qualidade
  *
- * RECOMENDAÃ‡Ã•ES:
- * - Use tÃ­tulos descritivos
+ * RECOMENDAÇÕES:
+ * - Use títulos descritivos
  * - Documente detalhes completos
  * - Atualize status regularmente
  * - Use labels adequadamente
  */
 /**
- * Schema de validaÃ§Ã£o para entrada da tool issues
+ * Schema de validação para entrada da tool issues
  *
- * VALIDAÃ‡Ã•ES:
- * - action: AÃ§Ã£o obrigatÃ³ria (create, list, get, update, close, comment, search)
- * - ParÃ¢metros especÃ­ficos por aÃ§Ã£o
- * - ValidaÃ§Ã£o de tipos e formatos
+ * VALIDAÇÕES:
+ * - action: Ação obrigatória (create, list, get, update, close, comment, search)
+ * - Parâmetros específicos por ação
+ * - Validação de tipos e formatos
  *
- * RECOMENDAÃ‡Ã•ES:
+ * RECOMENDAÇÕES:
  * - Sempre valide entrada antes de usar
- * - Use parÃ¢metros opcionais adequadamente
- * - Documente parÃ¢metros obrigatÃ³rios
+ * - Use parâmetros opcionais adequadamente
+ * - Documente parâmetros obrigatórios
  */
 const IssuesInputSchema = zod_1.z.object({
     action: zod_1.z.enum(['create', 'list', 'get', 'update', 'close', 'comment', 'search']),
-    // ParÃ¢metros comuns
+    // Parâmetros comuns
     repo: zod_1.z.string(),
     // Para multi-provider
-    provider: zod_1.z.enum(['gitea', 'github']).describe('Provider to use (gitea or github)'), // Provider especÃ­fico: gitea, github ou both
+    provider: zod_1.z.enum(['gitea', 'github']).describe('Provider to use (gitea or github)'), // Provider específico: gitea, github ou both
     projectPath: zod_1.z.string().describe('Local project path for git operations'),
     // Para create
     title: zod_1.z.string().optional(),
@@ -79,11 +79,11 @@ const IssuesInputSchema = zod_1.z.object({
     label: zod_1.z.string().optional(),
 });
 /**
- * Schema de saÃ­da padronizado
+ * Schema de saída padronizado
  *
  * ESTRUTURA:
- * - success: Status da operaÃ§Ã£o
- * - action: AÃ§Ã£o executada
+ * - success: Status da operação
+ * - action: Ação executada
  * - message: Mensagem descritiva
  * - data: Dados retornados (opcional)
  * - error: Detalhes do erro (opcional)
@@ -98,80 +98,80 @@ const IssuesResultSchema = zod_1.z.object({
 /**
  * Tool: issues
  *
- * DESCRIÃ‡ÃƒO:
- * Gerenciamento completo de issues Gitea com mÃºltiplas aÃ§Ãµes
+ * DESCRIÇÃO:
+ * Gerenciamento completo de issues Gitea com múltiplas ações
  *
- * ACTIONS DISPONÃVEIS:
+ * ACTIONS DISPONÍVEIS:
  *
  * 1. create - Criar nova issue
- *    ParÃ¢metros:
- *    - owner (obrigatÃ³rio): ProprietÃ¡rio do repositÃ³rio
- *    - repo (obrigatÃ³rio): Nome do repositÃ³rio
- *    - title (obrigatÃ³rio): TÃ­tulo da issue
- *    - body (opcional): DescriÃ§Ã£o detalhada
+ *    Parâmetros:
+ *    - owner (obrigatório): Proprietário do repositório
+ *    - repo (obrigatório): Nome do repositório
+ *    - title (obrigatório): Título da issue
+ *    - body (opcional): Descrição detalhada
  *    - labels (opcional): Array de labels
- *    - assignees (opcional): Array de usuÃ¡rios responsÃ¡veis
+ *    - assignees (opcional): Array de usuários responsáveis
  *    - milestone (opcional): ID do milestone
  *
  * 2. list - Listar issues
- *    ParÃ¢metros:
- *    - owner (obrigatÃ³rio): ProprietÃ¡rio do repositÃ³rio
- *    - repo (obrigatÃ³rio): Nome do repositÃ³rio
- *    - state (opcional): Estado das issues (open, closed, all) - padrÃ£o: open
- *    - page (opcional): PÃ¡gina da listagem (padrÃ£o: 1)
- *    - limit (opcional): Itens por pÃ¡gina (padrÃ£o: 30, mÃ¡ximo: 100)
+ *    Parâmetros:
+ *    - owner (obrigatório): Proprietário do repositório
+ *    - repo (obrigatório): Nome do repositório
+ *    - state (opcional): Estado das issues (open, closed, all) - padrão: open
+ *    - page (opcional): Página da listagem (padrão: 1)
+ *    - limit (opcional): Itens por página (padrão: 30, máximo: 100)
  *
  * 3. get - Obter detalhes da issue
- *    ParÃ¢metros:
- *    - owner (obrigatÃ³rio): ProprietÃ¡rio do repositÃ³rio
- *    - repo (obrigatÃ³rio): Nome do repositÃ³rio
- *    - issue_number (obrigatÃ³rio): NÃºmero da issue
+ *    Parâmetros:
+ *    - owner (obrigatório): Proprietário do repositório
+ *    - repo (obrigatório): Nome do repositório
+ *    - issue_number (obrigatório): Número da issue
  *
  * 4. update - Atualizar issue existente
- *    ParÃ¢metros:
- *    - owner (obrigatÃ³rio): ProprietÃ¡rio do repositÃ³rio
- *    - repo (obrigatÃ³rio): Nome do repositÃ³rio
- *    - issue_number (obrigatÃ³rio): NÃºmero da issue
- *    - new_title (opcional): Novo tÃ­tulo
- *    - new_body (opcional): Nova descriÃ§Ã£o
+ *    Parâmetros:
+ *    - owner (obrigatório): Proprietário do repositório
+ *    - repo (obrigatório): Nome do repositório
+ *    - issue_number (obrigatório): Número da issue
+ *    - new_title (opcional): Novo título
+ *    - new_body (opcional): Nova descrição
  *    - new_state (opcional): Novo estado
  *    - new_labels (opcional): Novos labels
- *    - new_assignees (opcional): Novos responsÃ¡veis
+ *    - new_assignees (opcional): Novos responsáveis
  *    - new_milestone (opcional): Novo milestone
  *
  * 5. close - Fechar issue
- *    ParÃ¢metros:
- *    - owner (obrigatÃ³rio): ProprietÃ¡rio do repositÃ³rio
- *    - repo (obrigatÃ³rio): Nome do repositÃ³rio
- *    - issue_number (obrigatÃ³rio): NÃºmero da issue
+ *    Parâmetros:
+ *    - owner (obrigatório): Proprietário do repositório
+ *    - repo (obrigatório): Nome do repositório
+ *    - issue_number (obrigatório): Número da issue
  *
- * 6. comment - Adicionar comentÃ¡rio
- *    ParÃ¢metros:
- *    - owner (obrigatÃ³rio): ProprietÃ¡rio do repositÃ³rio
- *    - repo (obrigatÃ³rio): Nome do repositÃ³rio
- *    - issue_number (obrigatÃ³rio): NÃºmero da issue
- *    - comment_body (obrigatÃ³rio): ConteÃºdo do comentÃ¡rio
+ * 6. comment - Adicionar comentário
+ *    Parâmetros:
+ *    - owner (obrigatório): Proprietário do repositório
+ *    - repo (obrigatório): Nome do repositório
+ *    - issue_number (obrigatório): Número da issue
+ *    - comment_body (obrigatório): Conteúdo do comentário
  *
  * 7. search - Buscar issues
- *    ParÃ¢metros:
- *    - owner (obrigatÃ³rio): ProprietÃ¡rio do repositÃ³rio
- *    - repo (obrigatÃ³rio): Nome do repositÃ³rio
- *    - query (obrigatÃ³rio): Termo de busca
+ *    Parâmetros:
+ *    - owner (obrigatório): Proprietário do repositório
+ *    - repo (obrigatório): Nome do repositório
+ *    - query (obrigatório): Termo de busca
  *    - author (opcional): Autor das issues
- *    - assignee (opcional): ResponsÃ¡vel pelas issues
- *    - label (opcional): Label especÃ­fico
+ *    - assignee (opcional): Responsável pelas issues
+ *    - label (opcional): Label específico
  *
- * RECOMENDAÃ‡Ã•ES DE USO:
- * - Use tÃ­tulos descritivos e claros
- * - Documente detalhes completos na descriÃ§Ã£o
+ * RECOMENDAÇÕES DE USO:
+ * - Use títulos descritivos e claros
+ * - Documente detalhes completos na descrição
  * - Atualize status regularmente
- * - Use labels para categorizaÃ§Ã£o
- * - Atribua responsÃ¡veis adequadamente
+ * - Use labels para categorização
+ * - Atribua responsáveis adequadamente
  * - Mantenha issues organizadas
  */
 exports.issuesTool = {
     name: 'git-issues',
-    description: 'tool: Gerencia issues Git, bugs, features e tarefas\nâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\naction create: cria nova issue\naction create requires: repo, title, body, labels, assignees, milestone, provider\nâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\naction list: lista issues do repositÃ³rio\naction list requires: repo, state, page, limit, provider\nâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\naction get: obtÃ©m detalhes de issue\naction get requires: repo, issue_number, provider\nâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\naction update: atualiza issue existente\naction update requires: repo, issue_number, new_title, new_body, new_state, new_labels, new_assignees, new_milestone, provider\nâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\naction close: fecha issue\naction close requires: repo, issue_number, provider\nâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\naction comment: adiciona comentÃ¡rio\naction comment requires: repo, issue_number, comment_body, provider\nâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\naction search: busca issues por critÃ©rios\naction search requires: repo, query, author, assignee, label, provider',
+    description: 'tool: Gerencia issues Git, bugs, features e tarefas\n──────────────\naction create: cria nova issue\naction create requires: repo, title, body, labels, assignees, milestone, provider\n───────────────\naction list: lista issues do repositório\naction list requires: repo, state, page, limit, provider\n───────────────\naction get: obtém detalhes de issue\naction get requires: repo, issue_number, provider\n───────────────\naction update: atualiza issue existente\naction update requires: repo, issue_number, new_title, new_body, new_state, new_labels, new_assignees, new_milestone, provider\n───────────────\naction close: fecha issue\naction close requires: repo, issue_number, provider\n───────────────\naction comment: adiciona comentário\naction comment requires: repo, issue_number, comment_body, provider\n───────────────\naction search: busca issues por critérios\naction search requires: repo, query, author, assignee, label, provider',
     inputSchema: {
         type: 'object',
         properties: {
@@ -210,33 +210,33 @@ exports.issuesTool = {
      *
      * FUNCIONALIDADE:
      * - Valida entrada usando Zod schema
-     * - Roteia para mÃ©todo especÃ­fico baseado na aÃ§Ã£o
+     * - Roteia para método específico baseado na ação
      * - Trata erros de forma uniforme
      * - Retorna resultado padronizado
      *
      * FLUXO:
-     * 1. ValidaÃ§Ã£o de entrada
-     * 2. SeleÃ§Ã£o do provider
-     * 3. Roteamento por aÃ§Ã£o
-     * 4. ExecuÃ§Ã£o do mÃ©todo especÃ­fico
+     * 1. Validação de entrada
+     * 2. Seleção do provider
+     * 3. Roteamento por ação
+     * 4. Execução do método específico
      * 5. Tratamento de erros
      * 6. Retorno de resultado
      *
      * TRATAMENTO DE ERROS:
-     * - ValidaÃ§Ã£o: erro de schema
-     * - ExecuÃ§Ã£o: erro da operaÃ§Ã£o
-     * - Roteamento: aÃ§Ã£o nÃ£o suportada
+     * - Validação: erro de schema
+     * - Execução: erro da operação
+     * - Roteamento: ação não suportada
      *
-     * RECOMENDAÃ‡Ã•ES:
+     * RECOMENDAÇÕES:
      * - Sempre valide entrada antes de processar
-     * - Trate erros especÃ­ficos adequadamente
+     * - Trate erros específicos adequadamente
      * - Log detalhes de erro para debug
-     * - Retorne mensagens de erro Ãºteis
+     * - Retorne mensagens de erro úteis
      */
     async handler(input) {
         try {
             const validatedInput = IssuesInputSchema.parse(input);
-            // Aplicar auto-detecÃ§Ã£o de usuÃ¡rio/owner
+            // Aplicar auto-detecção de usuário/owner
             const processedInput = await (0, user_detection_js_1.applyAutoUserDetection)(validatedInput, validatedInput.provider);
             // Obter o provider correto
             let provider;
@@ -244,7 +244,7 @@ exports.issuesTool = {
                 if (processedInput.provider) {
                     const requestedProvider = index_js_1.globalProviderFactory.getProvider(processedInput.provider);
                     if (!requestedProvider) {
-                        console.warn(`[ISSUES] Provider '${processedInput.provider}' nÃ£o encontrado, usando padrÃ£o`);
+                        console.warn(`[ISSUES] Provider '${processedInput.provider}' não encontrado, usando padrão`);
                         provider = index_js_1.globalProviderFactory.getDefaultProvider();
                     }
                     else {
@@ -255,12 +255,12 @@ exports.issuesTool = {
                     provider = index_js_1.globalProviderFactory.getDefaultProvider();
                 }
                 if (!provider) {
-                    throw new Error('Nenhum provider disponÃ­vel');
+                    throw new Error('Nenhum provider disponível');
                 }
             }
             catch (providerError) {
                 console.error('[ISSUES] Erro ao obter provider:', providerError);
-                throw new Error(`Erro de configuraÃ§Ã£o do provider: ${providerError instanceof Error ? providerError.message : 'Provider nÃ£o disponÃ­vel'}`);
+                throw new Error(`Erro de configuração do provider: ${providerError instanceof Error ? providerError.message : 'Provider não disponível'}`);
             }
             // Obter o owner do provider
             const owner = (await provider.getCurrentUser()).login;
@@ -280,59 +280,59 @@ exports.issuesTool = {
                 case 'search':
                     return await this.searchIssues(processedInput, provider, owner);
                 default:
-                    throw new Error(`AÃ§Ã£o nÃ£o suportada: ${processedInput.action}`);
+                    throw new Error(`Ação não suportada: ${processedInput.action}`);
             }
         }
         catch (error) {
             return {
                 success: false,
                 action: input.action,
-                message: 'Erro na operaÃ§Ã£o de issues',
+                message: 'Erro na operação de issues',
                 error: error instanceof Error ? error.message : String(error)
             };
         }
     },
     /**
-     * Cria uma nova issue no repositÃ³rio
+     * Cria uma nova issue no repositório
      *
      * FUNCIONALIDADE:
-     * - Cria issue com tÃ­tulo e descriÃ§Ã£o
+     * - Cria issue com título e descrição
      * - Suporta labels, assignees e milestone
      * - Retorna detalhes da issue criada
      *
-     * PARÃ‚METROS OBRIGATÃ“RIOS:
-     * - owner: ProprietÃ¡rio do repositÃ³rio
-     * - repo: Nome do repositÃ³rio
-     * - title: TÃ­tulo da issue
+     * PARÂMETROS OBRIGATÓRIOS:
+     * - owner: Proprietário do repositório
+     * - repo: Nome do repositório
+     * - title: Título da issue
      *
-     * PARÃ‚METROS OPCIONAIS:
-     * - body: DescriÃ§Ã£o detalhada
-     * - labels: Array de labels para categorizaÃ§Ã£o
-     * - assignees: Array de usuÃ¡rios responsÃ¡veis
+     * PARÂMETROS OPCIONAIS:
+     * - body: Descrição detalhada
+     * - labels: Array de labels para categorização
+     * - assignees: Array de usuários responsáveis
      * - milestone: ID do milestone associado
      *
-     * VALIDAÃ‡Ã•ES:
-     * - Todos os parÃ¢metros obrigatÃ³rios
-     * - TÃ­tulo deve ser Ãºnico no repositÃ³rio
-     * - Labels devem existir no repositÃ³rio
-     * - Assignees devem ser usuÃ¡rios vÃ¡lidos
+     * VALIDAÇÕES:
+     * - Todos os parâmetros obrigatórios
+     * - Título deve ser único no repositório
+     * - Labels devem existir no repositório
+     * - Assignees devem ser usuários válidos
      *
-     * RECOMENDAÃ‡Ã•ES:
-     * - Use tÃ­tulos descritivos e claros
+     * RECOMENDAÇÕES:
+     * - Use títulos descritivos e claros
      * - Documente detalhes completos
-     * - Use labels para categorizaÃ§Ã£o
-     * - Atribua responsÃ¡veis adequadamente
+     * - Use labels para categorização
+     * - Atribua responsáveis adequadamente
      */
     async createIssue(params, provider, owner) {
         try {
             if (!owner) {
-                throw new Error('Ã© obrigatÃ³rio');
+                throw new Error('é obrigatório');
             }
             if (!params.repo) {
-                throw new Error('Repo Ã© obrigatÃ³rio');
+                throw new Error('Repo é obrigatório');
             }
             if (!params.title) {
-                throw new Error('Title Ã© obrigatÃ³rio');
+                throw new Error('Title é obrigatório');
             }
             const issue = await provider.createIssue(owner, params.repo, params.title, params.body, params.assignees, params.labels);
             return {
@@ -347,41 +347,41 @@ exports.issuesTool = {
         }
     },
     /**
-     * Lista issues do repositÃ³rio
+     * Lista issues do repositório
      *
      * FUNCIONALIDADE:
      * - Lista issues com filtros de estado
-     * - Suporta paginaÃ§Ã£o
-     * - Retorna informaÃ§Ãµes bÃ¡sicas de cada issue
+     * - Suporta paginação
+     * - Retorna informações básicas de cada issue
      *
-     * PARÃ‚METROS OBRIGATÃ“RIOS:
-     * - owner: ProprietÃ¡rio do repositÃ³rio
-     * - repo: Nome do repositÃ³rio
+     * PARÂMETROS OBRIGATÓRIOS:
+     * - owner: Proprietário do repositório
+     * - repo: Nome do repositório
      *
-     * PARÃ‚METROS OPCIONAIS:
-     * - state: Estado das issues (open, closed, all) - padrÃ£o: open
-     * - page: PÃ¡gina da listagem (padrÃ£o: 1)
-     * - limit: Itens por pÃ¡gina (padrÃ£o: 30, mÃ¡ximo: 100)
+     * PARÂMETROS OPCIONAIS:
+     * - state: Estado das issues (open, closed, all) - padrão: open
+     * - page: Página da listagem (padrão: 1)
+     * - limit: Itens por página (padrão: 30, máximo: 100)
      *
-     * VALIDAÃ‡Ã•ES:
-     * - e repo obrigatÃ³rios
-     * - State deve ser um dos valores vÃ¡lidos
+     * VALIDAÇÕES:
+     * - e repo obrigatórios
+     * - State deve ser um dos valores válidos
      * - Page deve ser >= 1
      * - Limit deve ser entre 1 e 100
      *
-     * RECOMENDAÃ‡Ã•ES:
-     * - Use paginaÃ§Ã£o para repositÃ³rios com muitas issues
-     * - Monitore nÃºmero total de issues
-     * - Filtre por estado para organizaÃ§Ã£o
+     * RECOMENDAÇÕES:
+     * - Use paginação para repositórios com muitas issues
+     * - Monitore número total de issues
+     * - Filtre por estado para organização
      * - Mantenha issues organizadas
      */
     async listIssues(params, provider, owner) {
         try {
             if (!owner) {
-                throw new Error('Ã© obrigatÃ³rio');
+                throw new Error('é obrigatório');
             }
             if (!params.repo) {
-                throw new Error('Repo Ã© obrigatÃ³rio');
+                throw new Error('Repo é obrigatório');
             }
             const state = params.state || 'open';
             const page = params.page || 1;
@@ -405,40 +405,40 @@ exports.issuesTool = {
         }
     },
     /**
-     * ObtÃ©m detalhes de uma issue especÃ­fica
+     * Obtém detalhes de uma issue específica
      *
      * FUNCIONALIDADE:
-     * - Retorna informaÃ§Ãµes completas da issue
-     * - Inclui tÃ­tulo, descriÃ§Ã£o, labels, assignees
-     * - Mostra histÃ³rico de comentÃ¡rios
+     * - Retorna informações completas da issue
+     * - Inclui título, descrição, labels, assignees
+     * - Mostra histórico de comentários
      *
-     * PARÃ‚METROS OBRIGATÃ“RIOS:
-     * - owner: ProprietÃ¡rio do repositÃ³rio
-     * - repo: Nome do repositÃ³rio
-     * - issue_number: NÃºmero da issue
+     * PARÂMETROS OBRIGATÓRIOS:
+     * - owner: Proprietário do repositório
+     * - repo: Nome do repositório
+     * - issue_number: Número da issue
      *
-     * VALIDAÃ‡Ã•ES:
-     * - Todos os parÃ¢metros obrigatÃ³rios
-     * - Issue deve existir no repositÃ³rio
-     * - NÃºmero deve ser vÃ¡lido
+     * VALIDAÇÕES:
+     * - Todos os parâmetros obrigatórios
+     * - Issue deve existir no repositório
+     * - Número deve ser válido
      *
-     * RECOMENDAÃ‡Ã•ES:
+     * RECOMENDAÇÕES:
      * - Use para obter detalhes completos
      * - Verifique status e labels
-     * - Analise comentÃ¡rios e histÃ³rico
-     * - Monitore mudanÃ§as importantes
+     * - Analise comentários e histórico
+     * - Monitore mudanças importantes
      */
     async getIssue(params, provider, owner) {
         try {
-            // Aplicar auto-detecÃ§Ã£o se necessÃ¡rio
+            // Aplicar auto-detecção se necessário
             if (!owner) {
-                throw new Error('Ã© obrigatÃ³rio');
+                throw new Error('é obrigatório');
             }
             if (!params.repo) {
-                throw new Error('Repo Ã© obrigatÃ³rio');
+                throw new Error('Repo é obrigatório');
             }
             if (!params.issue_number) {
-                throw new Error('Issue_number Ã© obrigatÃ³rio');
+                throw new Error('Issue_number é obrigatório');
             }
             const issue = await provider.getIssue((await provider.getCurrentUser()).login, params.repo, params.issue_number);
             return {
@@ -457,43 +457,43 @@ exports.issuesTool = {
      *
      * FUNCIONALIDADE:
      * - Atualiza campos da issue
-     * - Suporta mudanÃ§a de estado
-     * - Permite alteraÃ§Ã£o de labels e assignees
+     * - Suporta mudança de estado
+     * - Permite alteração de labels e assignees
      *
-     * PARÃ‚METROS OBRIGATÃ“RIOS:
-     * - owner: ProprietÃ¡rio do repositÃ³rio
-     * - repo: Nome do repositÃ³rio
-     * - issue_number: NÃºmero da issue
+     * PARÂMETROS OBRIGATÓRIOS:
+     * - owner: Proprietário do repositório
+     * - repo: Nome do repositório
+     * - issue_number: Número da issue
      *
-     * PARÃ‚METROS OPCIONAIS:
-     * - new_title: Novo tÃ­tulo
-     * - new_body: Nova descriÃ§Ã£o
+     * PARÂMETROS OPCIONAIS:
+     * - new_title: Novo título
+     * - new_body: Nova descrição
      * - new_state: Novo estado
      * - new_labels: Novos labels
-     * - new_assignees: Novos responsÃ¡veis
+     * - new_assignees: Novos responsáveis
      * - new_milestone: Novo milestone
      *
-     * VALIDAÃ‡Ã•ES:
-     * - Todos os parÃ¢metros obrigatÃ³rios
+     * VALIDAÇÕES:
+     * - Todos os parâmetros obrigatórios
      * - Issue deve existir
      * - Pelo menos um campo deve ser atualizado
      *
-     * RECOMENDAÃ‡Ã•ES:
-     * - Atualize apenas campos necessÃ¡rios
+     * RECOMENDAÇÕES:
+     * - Atualize apenas campos necessários
      * - Use mensagens de commit descritivas
-     * - Documente mudanÃ§as importantes
-     * - Notifique responsÃ¡veis sobre mudanÃ§as
+     * - Documente mudanças importantes
+     * - Notifique responsáveis sobre mudanças
      */
     async updateIssue(params, provider, owner) {
         try {
             if (!owner) {
-                throw new Error('Ã© obrigatÃ³rio');
+                throw new Error('é obrigatório');
             }
             if (!params.repo) {
-                throw new Error('Repo Ã© obrigatÃ³rio');
+                throw new Error('Repo é obrigatório');
             }
             if (!params.issue_number) {
-                throw new Error('Issue_number Ã© obrigatÃ³rio');
+                throw new Error('Issue_number é obrigatório');
             }
             const updateData = {};
             if (params.new_title)
@@ -528,35 +528,35 @@ exports.issuesTool = {
      *
      * FUNCIONALIDADE:
      * - Altera estado da issue para closed
-     * - MantÃ©m histÃ³rico e comentÃ¡rios
+     * - Mantém histórico e comentários
      * - Permite reabertura posterior
      *
-     * PARÃ‚METROS OBRIGATÃ“RIOS:
-     * - owner: ProprietÃ¡rio do repositÃ³rio
-     * - repo: Nome do repositÃ³rio
-     * - issue_number: NÃºmero da issue
+     * PARÂMETROS OBRIGATÓRIOS:
+     * - owner: Proprietário do repositório
+     * - repo: Nome do repositório
+     * - issue_number: Número da issue
      *
-     * VALIDAÃ‡Ã•ES:
-     * - Todos os parÃ¢metros obrigatÃ³rios
+     * VALIDAÇÕES:
+     * - Todos os parâmetros obrigatórios
      * - Issue deve existir
      * - Issue deve estar aberta
      *
-     * RECOMENDAÃ‡Ã•ES:
+     * RECOMENDAÇÕES:
      * - Confirme que issue foi resolvida
-     * - Documente soluÃ§Ã£o aplicada
-     * - Use comentÃ¡rio explicativo
-     * - Verifique se nÃ£o hÃ¡ dependÃªncias
+     * - Documente solução aplicada
+     * - Use comentário explicativo
+     * - Verifique se não há dependências
      */
     async closeIssue(params, provider, owner) {
         try {
             if (!owner) {
-                throw new Error('Ã© obrigatÃ³rio');
+                throw new Error('é obrigatório');
             }
             if (!params.repo) {
-                throw new Error('Repo Ã© obrigatÃ³rio');
+                throw new Error('Repo é obrigatório');
             }
             if (!params.issue_number) {
-                throw new Error('Issue_number Ã© obrigatÃ³rio');
+                throw new Error('Issue_number é obrigatório');
             }
             const issue = await provider.updateIssue((await provider.getCurrentUser()).login, params.repo, params.issue_number, { state: 'closed' });
             return {
@@ -571,57 +571,57 @@ exports.issuesTool = {
         }
     },
     /**
-     * Adiciona comentÃ¡rio a uma issue
+     * Adiciona comentário a uma issue
      *
      * FUNCIONALIDADE:
-     * - Cria novo comentÃ¡rio na issue
-     * - MantÃ©m histÃ³rico de discussÃ£o
-     * - Suporta formataÃ§Ã£o Markdown
+     * - Cria novo comentário na issue
+     * - Mantém histórico de discussão
+     * - Suporta formatação Markdown
      *
-     * PARÃ‚METROS OBRIGATÃ“RIOS:
-     * - owner: ProprietÃ¡rio do repositÃ³rio
-     * - repo: Nome do repositÃ³rio
-     * - issue_number: NÃºmero da issue
-     * - comment_body: ConteÃºdo do comentÃ¡rio
+     * PARÂMETROS OBRIGATÓRIOS:
+     * - owner: Proprietário do repositório
+     * - repo: Nome do repositório
+     * - issue_number: Número da issue
+     * - comment_body: Conteúdo do comentário
      *
-     * VALIDAÃ‡Ã•ES:
-     * - Todos os parÃ¢metros obrigatÃ³rios
+     * VALIDAÇÕES:
+     * - Todos os parâmetros obrigatórios
      * - Issue deve existir
-     * - ComentÃ¡rio nÃ£o pode estar vazio
+     * - Comentário não pode estar vazio
      *
-     * RECOMENDAÃ‡Ã•ES:
-     * - Use comentÃ¡rios para atualizaÃ§Ãµes
-     * - Documente progresso e decisÃµes
-     * - Use formataÃ§Ã£o Markdown adequadamente
-     * - Mantenha comentÃ¡rios relevantes
+     * RECOMENDAÇÕES:
+     * - Use comentários para atualizações
+     * - Documente progresso e decisões
+     * - Use formatação Markdown adequadamente
+     * - Mantenha comentários relevantes
      */
     async addComment(params, provider, owner) {
         try {
             if (!owner) {
-                throw new Error('Ã© obrigatÃ³rio');
+                throw new Error('é obrigatório');
             }
             if (!params.repo) {
-                throw new Error('Repo Ã© obrigatÃ³rio');
+                throw new Error('Repo é obrigatório');
             }
             if (!params.issue_number) {
-                throw new Error('Issue_number Ã© obrigatÃ³rio');
+                throw new Error('Issue_number é obrigatório');
             }
             if (!params.comment_body) {
-                throw new Error('Comment_body Ã© obrigatÃ³rio');
+                throw new Error('Comment_body é obrigatório');
             }
             // Verificar se a issue existe
             try {
                 await provider.getIssue(owner, params.repo, params.issue_number);
             }
             catch (error) {
-                throw new Error(`Issue #${params.issue_number} nÃ£o encontrada no repositÃ³rio`);
+                throw new Error(`Issue #${params.issue_number} não encontrada no repositório`);
             }
-            // Adicionar comentÃ¡rio usando o provider
+            // Adicionar comentário usando o provider
             const comment = await provider.addComment(owner, params.repo, params.issue_number, params.comment_body);
             return {
                 success: true,
                 action: 'comment',
-                message: `ComentÃ¡rio adicionado Ã  issue #${params.issue_number} com sucesso`,
+                message: `Comentário adicionado à issue #${params.issue_number} com sucesso`,
                 data: {
                     issue_number: params.issue_number,
                     comment: comment,
@@ -634,48 +634,48 @@ exports.issuesTool = {
             };
         }
         catch (error) {
-            throw new Error(`Falha ao adicionar comentÃ¡rio: ${error instanceof Error ? error.message : String(error)}`);
+            throw new Error(`Falha ao adicionar comentário: ${error instanceof Error ? error.message : String(error)}`);
         }
     },
     /**
-     * Busca issues por critÃ©rios especÃ­ficos
+     * Busca issues por critérios específicos
      *
      * FUNCIONALIDADE:
-     * - Busca issues por conteÃºdo
+     * - Busca issues por conteúdo
      * - Filtra por autor, assignee e label
      * - Retorna resultados relevantes
      *
-     * PARÃ‚METROS OBRIGATÃ“RIOS:
-     * - owner: ProprietÃ¡rio do repositÃ³rio
-     * - repo: Nome do repositÃ³rio
+     * PARÂMETROS OBRIGATÓRIOS:
+     * - owner: Proprietário do repositório
+     * - repo: Nome do repositório
      * - query: Termo de busca
      *
-     * PARÃ‚METROS OPCIONAIS:
+     * PARÂMETROS OPCIONAIS:
      * - author: Autor das issues
-     * - assignee: ResponsÃ¡vel pelas issues
-     * - label: Label especÃ­fico
+     * - assignee: Responsável pelas issues
+     * - label: Label específico
      *
-     * VALIDAÃ‡Ã•ES:
-     * - Todos os parÃ¢metros obrigatÃ³rios
+     * VALIDAÇÕES:
+     * - Todos os parâmetros obrigatórios
      * - Query deve ter pelo menos 3 caracteres
-     * - RepositÃ³rio deve existir
+     * - Repositório deve existir
      *
-     * RECOMENDAÃ‡Ã•ES:
-     * - Use termos de busca especÃ­ficos
+     * RECOMENDAÇÕES:
+     * - Use termos de busca específicos
      * - Combine filtros para resultados precisos
-     * - Analise relevÃ¢ncia dos resultados
+     * - Analise relevância dos resultados
      * - Use para encontrar issues relacionadas
      */
     async searchIssues(params, provider, owner) {
         try {
             if (!owner) {
-                throw new Error('Ã© obrigatÃ³rio');
+                throw new Error('é obrigatório');
             }
             if (!params.repo) {
-                throw new Error('Repo Ã© obrigatÃ³rio');
+                throw new Error('Repo é obrigatório');
             }
             if (!params.query) {
-                throw new Error('Query Ã© obrigatÃ³rio');
+                throw new Error('Query é obrigatório');
             }
             if (params.query.length < 3) {
                 throw new Error('Query deve ter pelo menos 3 caracteres');
@@ -693,7 +693,7 @@ exports.issuesTool = {
                 searchResults = allIssues.filter((issue) => issue.title?.toLowerCase().includes(params.query?.toLowerCase() || '') ||
                     issue.body?.toLowerCase().includes(params.query?.toLowerCase() || ''));
             }
-            // Filtrar resultados por pÃ¡gina e limite
+            // Filtrar resultados por página e limite
             const startIndex = (page - 1) * limit;
             const endIndex = startIndex + limit;
             const paginatedResults = searchResults.slice(startIndex, endIndex);
@@ -737,13 +737,9 @@ exports.issuesTool = {
         catch (error) {
             throw new Error(`Falha ao buscar issues: ${error instanceof Error ? error.message : String(error)}`);
         }
-    }
+    },
     /**
-     * Verifica se erro Ã© relacionado a Git
-     */
-    ,
-    /**
-     * Verifica se erro Ã© relacionado a Git
+     * Verifica se erro é relacionado a Git
      */
     isGitRelatedError(errorMessage) {
         const gitKeywords = [

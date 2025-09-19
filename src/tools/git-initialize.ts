@@ -195,7 +195,7 @@ export const initializeTool = {
       }
 
       // 1. Inicializar repositÃ³rio Git
-      console.log('Inicializando repositÃ³rio Git...');
+      // console.log('Inicializando repositÃ³rio Git...');
       const initResult = await gitOps.initRepository();
       if (!initResult.success) {
         throw new Error(`Falha ao inicializar repositÃ³rio Git: ${initResult.error}`);
@@ -443,7 +443,8 @@ temp/
     }
 
     return filesCreated;
-  }
+  },
+
   /**
    * Verifica se erro Ã© relacionado a Git
    */

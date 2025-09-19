@@ -82,7 +82,7 @@ class ProviderFactory {
         // Fallback: usa o primeiro provider disponível
         const firstKey = this.providers.keys().next().value;
         if (firstKey) {
-            console.log(`[PROVIDER FACTORY] Usando provider '${firstKey}' como fallback padrão`);
+            // console.log(`[PROVIDER FACTORY] Usando provider '${firstKey}' como fallback padrão`);
             this.defaultProviderName = firstKey;
             return this.providers.get(firstKey);
         }
@@ -257,7 +257,7 @@ function initializeFactoryFromEnv() {
                     username: process.env.GITHUB_USERNAME
                 });
                 defaultProvider = 'github';
-                console.log('[PROVIDER FACTORY] Provider GitHub configurado');
+                // console.log('[PROVIDER FACTORY] Provider GitHub configurado');
             }
             // Tenta Gitea se disponível
             if (process.env.GITEA_URL && process.env.GITEA_TOKEN) {
@@ -279,7 +279,7 @@ function initializeFactoryFromEnv() {
                     if (!defaultProvider) {
                         defaultProvider = 'gitea';
                     }
-                    console.log('[PROVIDER FACTORY] Provider Gitea configurado');
+                    // console.log('[PROVIDER FACTORY] Provider Gitea configurado');
                 }
             }
         }

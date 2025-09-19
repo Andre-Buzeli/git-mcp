@@ -2,28 +2,28 @@ import { z } from 'zod';
 /**
  * Tool: git-config
  *
- * DESCRIÃ‡ÃƒO:
- * Gerenciamento de configuraÃ§Ã£o Git (GitHub + Gitea) com mÃºltiplas aÃ§Ãµes
+ * DESCRIÇÃO:
+ * Gerenciamento de configuração Git (GitHub + Gitea) com múltiplas ações
  *
  * FUNCIONALIDADES:
- * - Obter configuraÃ§Ãµes
- * - Definir configuraÃ§Ãµes
- * - Remover configuraÃ§Ãµes
- * - Listar configuraÃ§Ãµes
- * - Editar configuraÃ§Ã£o
- * - Mostrar configuraÃ§Ãµes
+ * - Obter configurações
+ * - Definir configurações
+ * - Remover configurações
+ * - Listar configurações
+ * - Editar configuração
+ * - Mostrar configurações
  *
  * USO:
- * - Para configurar usuÃ¡rio e email
+ * - Para configurar usuário e email
  * - Para configurar aliases
- * - Para configurar branches padrÃ£o
+ * - Para configurar branches padrão
  * - Para configurar merge tools
  * - Para configurar credenciais
  *
- * RECOMENDAÃ‡Ã•ES:
- * - Use configuraÃ§Ãµes globais para usuÃ¡rio
- * - Use configuraÃ§Ãµes locais para projeto
- * - Documente configuraÃ§Ãµes customizadas
+ * RECOMENDAÇÕES:
+ * - Use configurações globais para usuário
+ * - Use configurações locais para projeto
+ * - Documente configurações customizadas
  */
 declare const GitConfigInputSchema: z.ZodObject<{
     action: z.ZodEnum<["get", "set", "unset", "list", "edit", "show"]>;
@@ -137,7 +137,7 @@ export declare const gitConfigTool: {
     edit(params: GitConfigInput): Promise<GitConfigResult>;
     show(params: GitConfigInput): Promise<GitConfigResult>;
     /**
-     * Verifica se erro Ã© relacionado a Git
+     * Verifica se erro é relacionado a Git
      */
     isGitRelatedError(errorMessage: string): boolean;
 };

@@ -2,11 +2,11 @@ import { z } from 'zod';
 /**
  * Tool: git-stash
  *
- * DESCRIÃ‡ÃƒO:
- * Gerenciamento de stash Git (GitHub + Gitea) com mÃºltiplas aÃ§Ãµes
+ * DESCRIÇÃO:
+ * Gerenciamento de stash Git (GitHub + Gitea) com múltiplas ações
  *
  * FUNCIONALIDADES:
- * - Stash mudanÃ§as
+ * - Stash mudanças
  * - Listar stashes
  * - Aplicar stash
  * - Pop stash
@@ -15,12 +15,12 @@ import { z } from 'zod';
  * - Limpar todos os stashes
  *
  * USO:
- * - Para salvar mudanÃ§as temporariamente
+ * - Para salvar mudanças temporariamente
  * - Para trocar de branch rapidamente
  * - Para limpar working directory
- * - Para aplicar mudanÃ§as posteriormente
+ * - Para aplicar mudanças posteriormente
  *
- * RECOMENDAÃ‡Ã•ES:
+ * RECOMENDAÇÕES:
  * - Use mensagens descritivas para stashes
  * - Aplique stashes em ordem
  * - Limpe stashes antigos regularmente
@@ -137,7 +137,7 @@ export declare const gitStashTool: {
     drop(params: GitStashInput): Promise<GitStashResult>;
     clear(params: GitStashInput): Promise<GitStashResult>;
     /**
-     * Verifica se erro Ã© relacionado a Git
+     * Verifica se erro é relacionado a Git
      */
     isGitRelatedError(errorMessage: string): boolean;
 };

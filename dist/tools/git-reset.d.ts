@@ -2,25 +2,25 @@ import { z } from 'zod';
 /**
  * Tool: git-reset
  *
- * DESCRIÃ‡ÃƒO:
- * Gerenciamento de reset Git (GitHub + Gitea) com mÃºltiplas aÃ§Ãµes
+ * DESCRIÇÃO:
+ * Gerenciamento de reset Git (GitHub + Gitea) com múltiplas ações
  *
  * FUNCIONALIDADES:
- * - Reset soft (mantÃ©m mudanÃ§as no staging)
- * - Reset mixed (padrÃ£o, remove do staging)
- * - Reset hard (remove todas as mudanÃ§as)
- * - Reset para commit especÃ­fico
+ * - Reset soft (mantém mudanças no staging)
+ * - Reset mixed (padrão, remove do staging)
+ * - Reset hard (remove todas as mudanças)
+ * - Reset para commit específico
  * - Reset de branch
  *
  * USO:
  * - Para desfazer commits
  * - Para limpar staging area
  * - Para voltar a estado anterior
- * - Para remover mudanÃ§as nÃ£o commitadas
+ * - Para remover mudanças não commitadas
  *
- * RECOMENDAÃ‡Ã•ES:
+ * RECOMENDAÇÕES:
  * - Use com cuidado, especialmente reset hard
- * - FaÃ§a backup antes de resets destrutivos
+ * - Faça backup antes de resets destrutivos
  * - Teste em branches locais primeiro
  */
 declare const GitResetInputSchema: z.ZodObject<{
@@ -127,7 +127,7 @@ export declare const gitResetTool: {
     resetToCommit(params: GitResetInput): Promise<GitResetResult>;
     resetBranch(params: GitResetInput): Promise<GitResetResult>;
     /**
-     * Verifica se erro Ã© relacionado a Git
+     * Verifica se erro é relacionado a Git
      */
     isGitRelatedError(errorMessage: string): boolean;
 };

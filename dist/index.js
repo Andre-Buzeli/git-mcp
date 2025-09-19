@@ -56,7 +56,11 @@ var __importStar = (this && this.__importStar) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 // Carregar variáveis de ambiente do arquivo .env
 const dotenv = __importStar(require("dotenv"));
+// Redirecionar output do dotenv para evitar interferência com MCP
+const originalConsoleLog = console.log;
+console.log = () => { };
 dotenv.config();
+console.log = originalConsoleLog;
 const server_1 = require("./server");
 /**
  * Função principal que inicializa o servidor MCP
@@ -77,14 +81,14 @@ async function main() {
         await server.run();
     }
     catch (error) {
-        console.error('Failed to start Gitea MCP Server:', error);
+        // console.error('Failed to start Gitea MCP Server:', error);
         process.exit(1);
     }
 }
 // Inicializa o servidor e gerencia erros fatais
 // Esta é a última linha de defesa para erros não tratados
 main().catch((error) => {
-    console.error('Fatal error:', error);
+    // console.error('Fatal error:', error);
     process.exit(1);
 });
 //# sourceMappingURL=index.js.map

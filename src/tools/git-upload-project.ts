@@ -185,7 +185,7 @@ export const uploadProjectTool = {
       
       // 1. Inicializar repositório Git se necessário
       if (!isGitRepo) {
-        console.log('Inicializando repositório Git...');
+        // console.log('Inicializando repositório Git...');
         const initResult = await gitOps.initRepository();
         if (!initResult.success) {
           throw new Error(`Falha ao inicializar repositório Git: ${initResult.error}`);
@@ -199,7 +199,7 @@ export const uploadProjectTool = {
       } catch (error) {
         repoExists = false;
         if (params.createRepo) {
-          console.log('Criando repositório remoto...');
+          // console.log('Criando repositório remoto...');
           await provider.createRepository(params.repo, `Projeto ${params.repo}`, false);
           repoExists = true;
         } else {
@@ -208,21 +208,21 @@ export const uploadProjectTool = {
       }
 
       // 3. Adicionar todos os arquivos ao staging
-      console.log('Adicionando arquivos ao staging...');
+      // console.log('Adicionando arquivos ao staging...');
       const addResult = await gitOps.addFiles(['.']);
       if (!addResult.success) {
         throw new Error(`Falha ao adicionar arquivos: ${addResult.error}`);
       }
 
       // 4. Fazer commit
-      console.log('Fazendo commit...');
+      // console.log('Fazendo commit...');
       const commitResult = await gitOps.commit(params.message);
       if (!commitResult.success) {
         throw new Error(`Falha ao fazer commit: ${commitResult.error}`);
       }
 
       // 5. Configurar remote origin se necessário
-      console.log('Configurando remote origin...');
+      // console.log('Configurando remote origin...');
       const remoteUrl = provider.getRepositoryUrl(owner, params.repo);
       
       // Verificar se remote origin já existe
@@ -236,7 +236,7 @@ export const uploadProjectTool = {
       }
 
       // 6. Fazer push para o repositório remoto
-      console.log('Fazendo push para repositório remoto...');
+      // console.log('Fazendo push para repositório remoto...');
       const pushOptions = params.forcePush ? { force: true, setUpstream: true } : { setUpstream: true };
       const pushResult = await gitOps.push('origin', branch, pushOptions);
       
@@ -245,7 +245,7 @@ export const uploadProjectTool = {
         if (params.forcePush) {
           throw new Error(`Falha ao fazer push: ${pushResult.error}`);
         } else {
-          console.log('Push falhou, tentando com --force...');
+          // console.log('Push falhou, tentando com --force...');
           const forcePushResult = await gitOps.push('origin', branch, { force: true, setUpstream: true });
           if (!forcePushResult.success) {
             throw new Error(`Falha ao fazer push (mesmo com --force): ${forcePushResult.error}`);
