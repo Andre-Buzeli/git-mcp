@@ -217,7 +217,21 @@ export const uploadProjectTool = {
         // Adicionar remote origin
         const addRemoteResult = await gitOps.remote('add', 'origin', remoteUrl);
         if (!addRemoteResult.success) {
-          throw new Error(`Falha ao adicionar remote origin: ${addRemoteResult.error}`);
+          // Se falhou porque já existe, tentar atualizar a URL
+          if (addRemoteResult.error?.includes('already exists')) {
+            const setUrlResult = await gitOps.remote('set-url', 'origin', remoteUrl);
+            if (!setUrlResult.success) {
+              throw new Error(`Falha ao atualizar remote origin: ${setUrlResult.error}`);
+            }
+          } else {
+            throw new Error(`Falha ao adicionar remote origin: ${addRemoteResult.error}`);
+          }
+        }
+      } else {
+        // Remote já existe, atualizar URL se necessário
+        const setUrlResult = await gitOps.remote('set-url', 'origin', remoteUrl);
+        if (!setUrlResult.success) {
+          console.warn(`Aviso: Não foi possível atualizar URL do remote origin: ${setUrlResult.error}`);
         }
       }
 

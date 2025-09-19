@@ -612,17 +612,11 @@ class GiteaProvider extends base_provider_js_1.BaseVcsProvider {
             };
         }
     }
-    async updateRelease(releaseId, updates) {
-        // Para Gitea, precisamos especificar o owner e repo no caminho
-        const owner = 'current_user'; // Em uma implementação real, isso viria da configuração
-        const repo = 'current_repo'; // Em uma implementação real, isso viria da configuração
+    async updateRelease(owner, repo, releaseId, updates) {
         const data = await this.patch(`/repos/${owner}/${repo}/releases/${releaseId}`, updates);
         return this.normalizeRelease(data);
     }
-    async deleteRelease(releaseId) {
-        // Para Gitea, precisamos especificar o owner e repo no caminho
-        const owner = 'current_user'; // Em uma implementação real, isso viria da configuração
-        const repo = 'current_repo'; // Em uma implementação real, isso viria da configuração
+    async deleteRelease(owner, repo, releaseId) {
         await this.delete(`/repos/${owner}/${repo}/releases/${releaseId}`);
         return true;
     }
@@ -1010,6 +1004,38 @@ class GiteaProvider extends base_provider_js_1.BaseVcsProvider {
      */
     getRepositoryUrl(owner, repo) {
         return `${this.config.apiUrl.replace('/api/v1', '')}/${owner}/${repo}.git`;
+    }
+    /**
+     * Compara commits entre duas referências
+     */
+    async compareCommits(owner, repo, base, head) {
+        try {
+            const response = await this.get(`/repos/${owner}/${repo}/compare/${base}...${head}`);
+            return {
+                status: response.status,
+                ahead_by: response.ahead_by || 0,
+                behind_by: response.behind_by || 0,
+                total_commits: response.total_commits || 0,
+                commits: response.commits || [],
+                files: response.files || [],
+                merge_base_commit: response.merge_base_commit || null
+            };
+        }
+        catch (error) {
+            throw new Error(`Erro ao comparar commits: ${error instanceof Error ? error.message : String(error)}`);
+        }
+    }
+    /**
+     * Compara branches
+     */
+    async compareBranches(owner, repo, baseBranch, headBranch) {
+        try {
+            // Para Gitea, usamos a mesma API de comparação de commits
+            return await this.compareCommits(owner, repo, baseBranch, headBranch);
+        }
+        catch (error) {
+            throw new Error(`Erro ao comparar branches: ${error instanceof Error ? error.message : String(error)}`);
+        }
     }
 }
 exports.GiteaProvider = GiteaProvider;

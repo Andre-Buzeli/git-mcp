@@ -570,13 +570,6 @@ export declare const issuesTool: {
      * - Use para encontrar issues relacionadas
      */
     searchIssues(params: IssuesInput, provider: VcsOperations, owner: string): Promise<IssuesResult>;
-<<<<<<< HEAD
-    /**
-     * Verifica se erro é relacionado a Git
-     */
-    isGitRelatedError(errorMessage: string): boolean;
-=======
->>>>>>> parent of 6dfc0a9 (error handleing)
 };
 export {};
 //# sourceMappingURL=git-issues.d.ts.map

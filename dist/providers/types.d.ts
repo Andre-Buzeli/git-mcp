@@ -246,8 +246,8 @@ export interface VcsOperations {
     listReleases(owner: string, repo: string, page?: number, limit?: number): Promise<ReleaseInfo[]>;
     getRelease(owner: string, repo: string, releaseId: number): Promise<ReleaseInfo>;
     createRelease(owner: string, repo: string, releaseData: any): Promise<ReleaseInfo>;
-    updateRelease(releaseId: number, updates: Partial<ReleaseInfo>): Promise<ReleaseInfo>;
-    deleteRelease(releaseId: number): Promise<boolean>;
+    updateRelease(owner: string, repo: string, releaseId: number, updates: Partial<ReleaseInfo>): Promise<ReleaseInfo>;
+    deleteRelease(owner: string, repo: string, releaseId: number): Promise<boolean>;
     listTags(owner: string, repo: string, page?: number, limit?: number): Promise<TagInfo[]>;
     getTag(owner: string, repo: string, tag: string): Promise<TagInfo>;
     createTag(owner: string, repo: string, tagData: any): Promise<TagInfo>;

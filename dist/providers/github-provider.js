@@ -534,12 +534,12 @@ class GitHubProvider extends base_provider_js_1.BaseVcsProvider {
             };
         }
     }
-    async updateRelease(releaseId, updates) {
-        const data = await this.patch(`/repos/releases/${releaseId}`, updates);
+    async updateRelease(owner, repo, releaseId, updates) {
+        const data = await this.patch(`/repos/${owner}/${repo}/releases/${releaseId}`, updates);
         return this.normalizeRelease(data);
     }
-    async deleteRelease(releaseId) {
-        await this.delete(`/repos/releases/${releaseId}`);
+    async deleteRelease(owner, repo, releaseId) {
+        await this.delete(`/repos/${owner}/${repo}/releases/${releaseId}`);
         return true;
     }
     async listTags(owner, repo, page = 1, limit = 30) {

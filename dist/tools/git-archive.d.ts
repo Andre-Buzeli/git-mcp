@@ -161,13 +161,6 @@ export declare const gitArchiveTool: {
     extract(params: GitArchiveInput): Promise<GitArchiveResult>;
     list(params: GitArchiveInput): Promise<GitArchiveResult>;
     verify(params: GitArchiveInput): Promise<GitArchiveResult>;
-<<<<<<< HEAD
-    /**
-     * Verifica se erro é relacionado a Git
-     */
-    isGitRelatedError(errorMessage: string): boolean;
-=======
->>>>>>> parent of 6dfc0a9 (error handleing)
 };
 export {};
 //# sourceMappingURL=git-archive.d.ts.map

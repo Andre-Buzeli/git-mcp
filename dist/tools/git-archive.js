@@ -150,7 +150,7 @@ exports.gitArchiveTool = {
                 throw new Error('archive_file e extract_path são obrigatórios para extract');
             }
             const result = await (0, terminal_controller_js_1.runTerminalCmd)({
-                command: `tar -xf ${params.archive_file} -C ${params.extract_path}`,
+                command: `tar -xf "${params.archive_file}" -C "${params.extract_path}"`,
                 is_background: false,
                 explanation: 'Extraindo arquivo',
                 projectPath: params.projectPath
@@ -229,22 +229,6 @@ exports.gitArchiveTool = {
         catch (error) {
             throw new Error(`Falha ao verificar arquivo: ${error instanceof Error ? error.message : String(error)}`);
         }
-<<<<<<< HEAD
-    },
-    /**
-     * Verifica se erro é relacionado a Git
-     */
-    isGitRelatedError(errorMessage) {
-        const gitKeywords = [
-            'git', 'commit', 'push', 'pull', 'merge', 'conflict', 'branch',
-            'remote', 'repository', 'authentication', 'permission', 'unauthorized',
-            'divergent', 'non-fast-forward', 'fetch first', 'working tree',
-            'uncommitted', 'stash', 'rebase', 'reset', 'checkout'
-        ];
-        const errorLower = errorMessage.toLowerCase();
-        return gitKeywords.some(keyword => errorLower.includes(keyword));
-=======
->>>>>>> parent of 6dfc0a9 (error handleing)
     }
 };
 //# sourceMappingURL=git-archive.js.map

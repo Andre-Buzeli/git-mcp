@@ -216,10 +216,10 @@ class BaseVcsProvider {
     async searchIssues(owner, repo, query, author, assignee, label) {
         throw new Error('searchIssues not implemented');
     }
-    async updateRelease(releaseId, updates) {
+    async updateRelease(owner, repo, releaseId, updates) {
         throw new Error('updateRelease not implemented');
     }
-    async deleteRelease(releaseId) {
+    async deleteRelease(owner, repo, releaseId) {
         throw new Error('deleteRelease not implemented');
     }
     async listTags(owner, repo, page = 1, limit = 30) {

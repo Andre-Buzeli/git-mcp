@@ -47,6 +47,7 @@ const ReleasesInputSchema = z.object({
   action: z.enum(['create', 'list', 'get', 'update', 'delete', 'publish']),
   
   // Parâmetros comuns
+  owner: z.string().optional(),
   repo: z.string(),
   
   // Para multi-provider
@@ -486,7 +487,8 @@ export const releasesTool = {
         throw new Error('Nenhum campo para atualizar foi fornecido');
       }
 
-      const release = await provider.updateRelease(params.release_id, updateData);
+      const owner = params.owner || (await provider.getCurrentUser()).login;
+      const release = await provider.updateRelease(owner, params.repo, params.release_id, updateData);
 
       return {
         success: true,
@@ -529,7 +531,8 @@ export const releasesTool = {
         throw new Error('repo e release_id são obrigatórios');
       }
 
-      await provider.deleteRelease(params.release_id);
+      const owner = params.owner || (await provider.getCurrentUser()).login;
+      await provider.deleteRelease(owner, params.repo, params.release_id);
 
       return {
         success: true,
@@ -573,7 +576,8 @@ export const releasesTool = {
       }
 
       // Publicar release alterando status de draft para false
-      const release = await provider.updateRelease(params.release_id, { draft: false });
+      const owner = params.owner || (await provider.getCurrentUser()).login;
+      const release = await provider.updateRelease(owner, params.repo, params.release_id, { draft: false });
 
       return {
         success: true,
@@ -584,26 +588,7 @@ export const releasesTool = {
     } catch (error) {
       throw new Error(`Falha ao publicar release: ${error instanceof Error ? error.message : String(error)}`);
     }
-<<<<<<< HEAD
-  },
 
-  /**
-   * Verifica se erro é relacionado a Git
-   */
-  isGitRelatedError(errorMessage: string): boolean {
-    const gitKeywords = [
-      'git', 'commit', 'push', 'pull', 'merge', 'conflict', 'branch',
-      'remote', 'repository', 'authentication', 'permission', 'unauthorized',
-      'divergent', 'non-fast-forward', 'fetch first', 'working tree',
-      'uncommitted', 'stash', 'rebase', 'reset', 'checkout'
-    ];
-    
-    const errorLower = errorMessage.toLowerCase();
-    return gitKeywords.some(keyword => errorLower.includes(keyword));
-=======
->>>>>>> parent of 6dfc0a9 (error handleing)
   }
 };
-
-
 

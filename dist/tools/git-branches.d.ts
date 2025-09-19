@@ -426,13 +426,6 @@ export declare const branchesTool: {
      * - Documente diferenças importantes
      */
     compareBranches(params: BranchesInput, provider: VcsOperations): Promise<BranchesResult>;
-<<<<<<< HEAD
-    /**
-     * Verifica se erro é relacionado a Git
-     */
-    isGitRelatedError(errorMessage: string): boolean;
-=======
->>>>>>> parent of 6dfc0a9 (error handleing)
 };
 export {};
 //# sourceMappingURL=git-branches.d.ts.map

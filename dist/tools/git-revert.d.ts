@@ -145,13 +145,6 @@ export declare const gitRevertTool: {
     revertCommit(params: GitRevertInput): Promise<GitRevertResult>;
     revertMerge(params: GitRevertInput): Promise<GitRevertResult>;
     revertRange(params: GitRevertInput): Promise<GitRevertResult>;
-<<<<<<< HEAD
-    /**
-     * Verifica se erro é relacionado a Git
-     */
-    isGitRelatedError(errorMessage: string): boolean;
-=======
->>>>>>> parent of 6dfc0a9 (error handleing)
 };
 export {};
 //# sourceMappingURL=git-revert.d.ts.map

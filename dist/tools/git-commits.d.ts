@@ -481,13 +481,6 @@ export declare const commitsTool: {
      * - Use branch específica se necessário
      */
     pullCommits(params: CommitsInput, provider?: VcsOperations): Promise<CommitsResult>;
-<<<<<<< HEAD
-    /**
-     * Verifica se erro é relacionado a Git
-     */
-    isGitRelatedError(errorMessage: string): boolean;
-=======
->>>>>>> parent of 6dfc0a9 (error handleing)
 };
 export {};
 //# sourceMappingURL=git-commits.d.ts.map

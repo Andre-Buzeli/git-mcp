@@ -265,22 +265,6 @@ exports.gitStashTool = {
         catch (error) {
             throw new Error(`Falha ao limpar stashes: ${error instanceof Error ? error.message : String(error)}`);
         }
-<<<<<<< HEAD
-    },
-    /**
-     * Verifica se erro é relacionado a Git
-     */
-    isGitRelatedError(errorMessage) {
-        const gitKeywords = [
-            'git', 'commit', 'push', 'pull', 'merge', 'conflict', 'branch',
-            'remote', 'repository', 'authentication', 'permission', 'unauthorized',
-            'divergent', 'non-fast-forward', 'fetch first', 'working tree',
-            'uncommitted', 'stash', 'rebase', 'reset', 'checkout'
-        ];
-        const errorLower = errorMessage.toLowerCase();
-        return gitKeywords.some(keyword => errorLower.includes(keyword));
-=======
->>>>>>> parent of 6dfc0a9 (error handleing)
     }
 };
 //# sourceMappingURL=git-stash.js.map

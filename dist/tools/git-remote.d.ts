@@ -37,7 +37,7 @@ declare const GitRemoteInputSchema: z.ZodObject<{
 }, "strip", z.ZodTypeAny, {
     provider: "gitea" | "github";
     repo: string;
-    action: "add" | "show" | "remove" | "prune" | "rename" | "set-url";
+    action: "add" | "show" | "remove" | "prune" | "set-url" | "rename";
     projectPath: string;
     remote?: string | undefined;
     new_name?: string | undefined;
@@ -47,7 +47,7 @@ declare const GitRemoteInputSchema: z.ZodObject<{
 }, {
     provider: "gitea" | "github";
     repo: string;
-    action: "add" | "show" | "remove" | "prune" | "rename" | "set-url";
+    action: "add" | "show" | "remove" | "prune" | "set-url" | "rename";
     projectPath: string;
     remote?: string | undefined;
     new_name?: string | undefined;
@@ -134,13 +134,6 @@ export declare const gitRemoteTool: {
     show(params: GitRemoteInput): Promise<GitRemoteResult>;
     setUrl(params: GitRemoteInput): Promise<GitRemoteResult>;
     prune(params: GitRemoteInput): Promise<GitRemoteResult>;
-<<<<<<< HEAD
-    /**
-     * Verifica se erro é relacionado a Git
-     */
-    isGitRelatedError(errorMessage: string): boolean;
-=======
->>>>>>> parent of 6dfc0a9 (error handleing)
 };
 export {};
 //# sourceMappingURL=git-remote.d.ts.map

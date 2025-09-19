@@ -174,13 +174,6 @@ export declare const gitSyncTool: {
      * Executa sincronização pontual
      */
     executeSync(params: GitSyncInput): Promise<GitSyncResult>;
-<<<<<<< HEAD
-    /**
-     * Verifica se erro é relacionado a Git
-     */
-    isGitRelatedError(errorMessage: string): boolean;
-=======
->>>>>>> parent of 6dfc0a9 (error handleing)
 };
 export {};
 //# sourceMappingURL=git-sync.d.ts.map

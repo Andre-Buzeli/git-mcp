@@ -410,13 +410,6 @@ export declare const tagsTool: {
      * - Use para encontrar tags relacionadas
      */
     searchTags(params: TagsInput, provider: VcsOperations): Promise<TagsResult>;
-<<<<<<< HEAD
-    /**
-     * Verifica se erro é relacionado a Git
-     */
-    isGitRelatedError(errorMessage: string): boolean;
-=======
->>>>>>> parent of 6dfc0a9 (error handleing)
 };
 export {};
 //# sourceMappingURL=git-tags.d.ts.map

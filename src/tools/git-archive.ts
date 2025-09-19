@@ -174,7 +174,7 @@ export const gitArchiveTool = {
       }
 
       const result = await runTerminalCmd({
-        command: `tar -xf ${params.archive_file} -C ${params.extract_path}`,
+        command: `tar -xf "${params.archive_file}" -C "${params.extract_path}"`,
         is_background: false,
         explanation: 'Extraindo arquivo',
         projectPath: params.projectPath
@@ -261,25 +261,6 @@ export const gitArchiveTool = {
     } catch (error) {
       throw new Error(`Falha ao verificar arquivo: ${error instanceof Error ? error.message : String(error)}`);
     }
-<<<<<<< HEAD
-  },
-
-  /**
-   * Verifica se erro é relacionado a Git
-   */
-  isGitRelatedError(errorMessage: string): boolean {
-    const gitKeywords = [
-      'git', 'commit', 'push', 'pull', 'merge', 'conflict', 'branch',
-      'remote', 'repository', 'authentication', 'permission', 'unauthorized',
-      'divergent', 'non-fast-forward', 'fetch first', 'working tree',
-      'uncommitted', 'stash', 'rebase', 'reset', 'checkout'
-    ];
-    
-    const errorLower = errorMessage.toLowerCase();
-    return gitKeywords.some(keyword => errorLower.includes(keyword));
-=======
->>>>>>> parent of 6dfc0a9 (error handleing)
   }
 };
-
 

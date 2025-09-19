@@ -207,28 +207,28 @@ class GiteaMCPServer {
         }
         // Inicializar provider factory com configuração
         try {
-            // // console.log('[SERVER] Inicializando provider factory...');
+            // console.log('[SERVER] Inicializando provider factory...');
             const factory = (0, index_js_2.initializeFactoryFromEnv)();
             // Log detalhado dos providers configurados
             try {
                 const providersInfo = factory.getProvidersInfo();
-                // // console.log('[SERVER] Providers configurados:');
+                // console.log('[SERVER] Providers configurados:');
                 // providersInfo.forEach(p => {
-                //   // console.log(`  - ${p.name} (${p.type}) ${p.isDefault ? '[PADRÃO]' : ''}`);
+                //   console.log(`  - ${p.name} (${p.type}) ${p.isDefault ? '[PADRÃO]' : ''}`);
                 // });
             }
             catch (infoError) {
-                // // console.log('[SERVER] Não foi possível obter informações detalhadas dos providers');
+                // console.log('[SERVER] Não foi possível obter informações detalhadas dos providers');
             }
             // Atualizar o globalProviderFactory com a configuração
             Object.assign(index_js_2.globalProviderFactory, factory);
-            // // console.log('[SERVER] Provider factory inicializado com sucesso');
+            // console.log('[SERVER] Provider factory inicializado com sucesso');
         }
         catch (error) {
             console.error('[SERVER] Erro ao inicializar providers:', error);
             // Tenta criar um provider fallback se houver falha completa
             try {
-                // // console.log('[SERVER] Tentando criar provider fallback...');
+                // console.log('[SERVER] Tentando criar provider fallback...');
                 // Criar provider GitHub básico como fallback
                 const fallbackConfig = {
                     name: 'github-fallback',
@@ -240,7 +240,7 @@ class GiteaMCPServer {
                 };
                 const fallbackProvider = index_js_2.globalProviderFactory.createProvider(fallbackConfig);
                 index_js_2.globalProviderFactory.setDefaultProvider('github-fallback');
-                // // console.log('[SERVER] Provider fallback criado com sucesso');
+                // console.log('[SERVER] Provider fallback criado com sucesso');
             }
             catch (fallbackError) {
                 console.error('[SERVER] Falha ao criar provider fallback:', fallbackError);

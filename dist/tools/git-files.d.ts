@@ -482,13 +482,6 @@ export declare const filesTool: {
      * - Monitore erros de upload
      */
     uploadProject(params: FilesInput, provider: VcsOperations, owner: string): Promise<FilesResult>;
-<<<<<<< HEAD
-    /**
-     * Verifica se erro é relacionado a Git
-     */
-    isGitRelatedError(errorMessage: string): boolean;
-=======
->>>>>>> parent of 6dfc0a9 (error handleing)
 };
 export {};
 //# sourceMappingURL=git-files.d.ts.map

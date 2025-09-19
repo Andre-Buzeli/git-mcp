@@ -47,6 +47,7 @@ const user_detection_js_1 = require("../utils/user-detection.js");
 const ReleasesInputSchema = zod_1.z.object({
     action: zod_1.z.enum(['create', 'list', 'get', 'update', 'delete', 'publish']),
     // Parâmetros comuns
+    owner: zod_1.z.string().optional(),
     repo: zod_1.z.string(),
     // Para multi-provider
     provider: zod_1.z.enum(['gitea', 'github']).describe('Provider to use (gitea or github)'), // Provider específico: gitea, github ou both
@@ -460,7 +461,8 @@ exports.releasesTool = {
             if (Object.keys(updateData).length === 0) {
                 throw new Error('Nenhum campo para atualizar foi fornecido');
             }
-            const release = await provider.updateRelease(params.release_id, updateData);
+            const owner = params.owner || (await provider.getCurrentUser()).login;
+            const release = await provider.updateRelease(owner, params.repo, params.release_id, updateData);
             return {
                 success: true,
                 action: 'update',
@@ -501,7 +503,8 @@ exports.releasesTool = {
             if (!params.repo || !params.release_id) {
                 throw new Error('repo e release_id são obrigatórios');
             }
-            await provider.deleteRelease(params.release_id);
+            const owner = params.owner || (await provider.getCurrentUser()).login;
+            await provider.deleteRelease(owner, params.repo, params.release_id);
             return {
                 success: true,
                 action: 'delete',
@@ -543,7 +546,8 @@ exports.releasesTool = {
                 throw new Error('repo e release_id são obrigatórios');
             }
             // Publicar release alterando status de draft para false
-            const release = await provider.updateRelease(params.release_id, { draft: false });
+            const owner = params.owner || (await provider.getCurrentUser()).login;
+            const release = await provider.updateRelease(owner, params.repo, params.release_id, { draft: false });
             return {
                 success: true,
                 action: 'publish',
@@ -554,22 +558,6 @@ exports.releasesTool = {
         catch (error) {
             throw new Error(`Falha ao publicar release: ${error instanceof Error ? error.message : String(error)}`);
         }
-<<<<<<< HEAD
-    },
-    /**
-     * Verifica se erro é relacionado a Git
-     */
-    isGitRelatedError(errorMessage) {
-        const gitKeywords = [
-            'git', 'commit', 'push', 'pull', 'merge', 'conflict', 'branch',
-            'remote', 'repository', 'authentication', 'permission', 'unauthorized',
-            'divergent', 'non-fast-forward', 'fetch first', 'working tree',
-            'uncommitted', 'stash', 'rebase', 'reset', 'checkout'
-        ];
-        const errorLower = errorMessage.toLowerCase();
-        return gitKeywords.some(keyword => errorLower.includes(keyword));
-=======
->>>>>>> parent of 6dfc0a9 (error handleing)
     }
 };
 //# sourceMappingURL=git-releases.js.map

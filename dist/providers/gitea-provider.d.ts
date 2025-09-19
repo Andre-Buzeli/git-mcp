@@ -55,8 +55,8 @@ export declare class GiteaProvider extends BaseVcsProvider {
     listReleases(owner: string, repo: string, page?: number, limit?: number): Promise<ReleaseInfo[]>;
     getRelease(owner: string, repo: string, releaseId: number): Promise<ReleaseInfo>;
     createRelease(owner: string, repo: string, releaseData: any): Promise<ReleaseInfo>;
-    updateRelease(releaseId: number, updates: any): Promise<ReleaseInfo>;
-    deleteRelease(releaseId: number): Promise<boolean>;
+    updateRelease(owner: string, repo: string, releaseId: number, updates: any): Promise<ReleaseInfo>;
+    deleteRelease(owner: string, repo: string, releaseId: number): Promise<boolean>;
     listTags(owner: string, repo: string, page?: number, limit?: number): Promise<TagInfo[]>;
     getTag(owner: string, repo: string, tag: string): Promise<TagInfo>;
     createTag(owner: string, repo: string, tagData: any): Promise<TagInfo>;
@@ -94,5 +94,13 @@ export declare class GiteaProvider extends BaseVcsProvider {
      * Obtém URL do repositório Gitea
      */
     getRepositoryUrl(owner: string, repo: string): string;
+    /**
+     * Compara commits entre duas referências
+     */
+    compareCommits(owner: string, repo: string, base: string, head: string): Promise<any>;
+    /**
+     * Compara branches
+     */
+    compareBranches(owner: string, repo: string, baseBranch: string, headBranch: string): Promise<any>;
 }
 //# sourceMappingURL=gitea-provider.d.ts.map

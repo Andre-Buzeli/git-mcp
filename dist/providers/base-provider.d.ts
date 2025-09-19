@@ -139,8 +139,8 @@ export declare abstract class BaseVcsProvider implements VcsOperations {
     searchCommits(owner: string, repo: string, query: string, author?: string): Promise<any>;
     addComment(owner: string, repo: string, issueNumber: number, commentBody: string): Promise<any>;
     searchIssues(owner: string, repo: string, query: string, author?: string, assignee?: string, label?: string): Promise<any>;
-    updateRelease(releaseId: number, updates: any): Promise<any>;
-    deleteRelease(releaseId: number): Promise<boolean>;
+    updateRelease(owner: string, repo: string, releaseId: number, updates: any): Promise<any>;
+    deleteRelease(owner: string, repo: string, releaseId: number): Promise<boolean>;
     listTags(owner: string, repo: string, page?: number, limit?: number): Promise<any[]>;
     getTag(owner: string, repo: string, tag: string): Promise<any>;
     createTag(owner: string, repo: string, tagData: any): Promise<any>;

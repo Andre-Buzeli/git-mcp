@@ -555,13 +555,13 @@ export class GitHubProvider extends BaseVcsProvider {
     }
   }
 
-  async updateRelease(releaseId: number, updates: any): Promise<ReleaseInfo> {
-    const data = await this.patch<any>(`/repos/releases/${releaseId}`, updates);
+  async updateRelease(owner: string, repo: string, releaseId: number, updates: any): Promise<ReleaseInfo> {
+    const data = await this.patch<any>(`/repos/${owner}/${repo}/releases/${releaseId}`, updates);
     return this.normalizeRelease(data);
   }
 
-  async deleteRelease(releaseId: number): Promise<boolean> {
-    await this.delete(`/repos/releases/${releaseId}`);
+  async deleteRelease(owner: string, repo: string, releaseId: number): Promise<boolean> {
+    await this.delete(`/repos/${owner}/${repo}/releases/${releaseId}`);
     return true;
   }
 

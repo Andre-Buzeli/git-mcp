@@ -136,13 +136,6 @@ export declare const gitStashTool: {
     show(params: GitStashInput): Promise<GitStashResult>;
     drop(params: GitStashInput): Promise<GitStashResult>;
     clear(params: GitStashInput): Promise<GitStashResult>;
-<<<<<<< HEAD
-    /**
-     * Verifica se erro é relacionado a Git
-     */
-    isGitRelatedError(errorMessage: string): boolean;
-=======
->>>>>>> parent of 6dfc0a9 (error handleing)
 };
 export {};
 //# sourceMappingURL=git-stash.d.ts.map

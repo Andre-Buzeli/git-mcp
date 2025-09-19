@@ -126,13 +126,6 @@ export declare const gitResetTool: {
     hardReset(params: GitResetInput): Promise<GitResetResult>;
     resetToCommit(params: GitResetInput): Promise<GitResetResult>;
     resetBranch(params: GitResetInput): Promise<GitResetResult>;
-<<<<<<< HEAD
-    /**
-     * Verifica se erro é relacionado a Git
-     */
-    isGitRelatedError(errorMessage: string): boolean;
-=======
->>>>>>> parent of 6dfc0a9 (error handleing)
 };
 export {};
 //# sourceMappingURL=git-reset.d.ts.map

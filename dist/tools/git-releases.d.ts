@@ -42,6 +42,7 @@ import { VcsOperations } from '../providers/index.js';
  */
 declare const ReleasesInputSchema: z.ZodObject<{
     action: z.ZodEnum<["create", "list", "get", "update", "delete", "publish"]>;
+    owner: z.ZodOptional<z.ZodString>;
     repo: z.ZodString;
     provider: z.ZodEnum<["gitea", "github"]>;
     projectPath: z.ZodString;
@@ -67,6 +68,7 @@ declare const ReleasesInputSchema: z.ZodObject<{
     action: "delete" | "get" | "list" | "create" | "update" | "publish";
     projectPath: string;
     name?: string | undefined;
+    owner?: string | undefined;
     body?: string | undefined;
     tag_name?: string | undefined;
     draft?: boolean | undefined;
@@ -88,6 +90,7 @@ declare const ReleasesInputSchema: z.ZodObject<{
     action: "delete" | "get" | "list" | "create" | "update" | "publish";
     projectPath: string;
     name?: string | undefined;
+    owner?: string | undefined;
     body?: string | undefined;
     tag_name?: string | undefined;
     draft?: boolean | undefined;
@@ -486,13 +489,6 @@ export declare const releasesTool: {
      * - Notifique usuários sobre nova versão
      */
     publishRelease(params: ReleasesInput, provider: VcsOperations): Promise<ReleasesResult>;
-<<<<<<< HEAD
-    /**
-     * Verifica se erro é relacionado a Git
-     */
-    isGitRelatedError(errorMessage: string): boolean;
-=======
->>>>>>> parent of 6dfc0a9 (error handleing)
 };
 export {};
 //# sourceMappingURL=git-releases.d.ts.map

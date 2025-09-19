@@ -575,7 +575,7 @@ export const gitRepositoriesTool = {
 
       // Executa git init no diretório especificado
       const initResult = await runTerminalCmd({
-        command: `git init "${params.projectPath}"`,
+        command: `git init`,
         is_background: false,
         explanation: 'Inicializando repositório Git local'
       });
@@ -658,7 +658,7 @@ export const gitRepositoriesTool = {
 
       // Executa git clone
       const cloneResult = await runTerminalCmd({
-        command: `git clone "${repoUrl}" "${params.projectPath}"`,
+        command: `git clone "${repoUrl}"`,
         is_background: false,
         explanation: 'Clonando repositório remoto'
       });
@@ -681,24 +681,7 @@ export const gitRepositoriesTool = {
     } catch (error) {
       throw new Error(`Falha ao clonar repositório: ${error instanceof Error ? error.message : String(error)}`);
     }
-<<<<<<< HEAD
-  },
 
-  /**
-   * Verifica se erro é relacionado a Git
-   */
-  isGitRelatedError(errorMessage: string): boolean {
-    const gitKeywords = [
-      'git', 'commit', 'push', 'pull', 'merge', 'conflict', 'branch',
-      'remote', 'repository', 'authentication', 'permission', 'unauthorized',
-      'divergent', 'non-fast-forward', 'fetch first', 'working tree',
-      'uncommitted', 'stash', 'rebase', 'reset', 'checkout'
-    ];
-    
-    const errorLower = errorMessage.toLowerCase();
-    return gitKeywords.some(keyword => errorLower.includes(keyword));
-=======
->>>>>>> parent of 6dfc0a9 (error handleing)
   }
 };
 

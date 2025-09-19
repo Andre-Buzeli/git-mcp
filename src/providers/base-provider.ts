@@ -339,11 +339,11 @@ export abstract class BaseVcsProvider implements VcsOperations {
     throw new Error('searchIssues not implemented');
   }
 
-  async updateRelease(releaseId: number, updates: any): Promise<any> {
+  async updateRelease(owner: string, repo: string, releaseId: number, updates: any): Promise<any> {
     throw new Error('updateRelease not implemented');
   }
 
-  async deleteRelease(releaseId: number): Promise<boolean> {
+  async deleteRelease(owner: string, repo: string, releaseId: number): Promise<boolean> {
     throw new Error('deleteRelease not implemented');
   }
 

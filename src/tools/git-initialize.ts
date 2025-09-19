@@ -193,13 +193,6 @@ export const initializeTool = {
         };
       }
 
-<<<<<<< HEAD
-      // 1. Inicializar repositÃ³rio Git
-      // console.log('Inicializando repositÃ³rio Git...');
-=======
-      // 1. Inicializar repositório Git
-      console.log('Inicializando repositório Git...');
->>>>>>> parent of 6dfc0a9 (error handleing)
       const initResult = await gitOps.initRepository();
       if (!initResult.success) {
         throw new Error(`Falha ao inicializar repositório Git: ${initResult.error}`);
@@ -447,25 +440,7 @@ temp/
     }
 
     return filesCreated;
-<<<<<<< HEAD
-  },
 
-  /**
-   * Verifica se erro Ã© relacionado a Git
-   */
-  isGitRelatedError(errorMessage: string): boolean {
-    const gitKeywords = [
-      'git', 'commit', 'push', 'pull', 'merge', 'conflict', 'branch',
-      'remote', 'repository', 'authentication', 'permission', 'unauthorized',
-      'divergent', 'non-fast-forward', 'fetch first', 'working tree',
-      'uncommitted', 'stash', 'rebase', 'reset', 'checkout'
-    ];
-    
-    const errorLower = errorMessage.toLowerCase();
-    return gitKeywords.some(keyword => errorLower.includes(keyword));
-=======
->>>>>>> parent of 6dfc0a9 (error handleing)
   }
 };
-
 
