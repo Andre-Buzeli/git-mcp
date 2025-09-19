@@ -2,7 +2,6 @@ import { z } from 'zod';
 import { globalProviderFactory, VcsOperations } from '../providers/index.js';
 import { applyAutoUserDetection } from '../utils/user-detection.js';
 import { GitOperations } from '../utils/git-operations.js';
-import { ErrorHandler } from '../providers/error-handler.js';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 
@@ -140,24 +139,11 @@ export const uploadProjectTool = {
           throw new Error(`Ação não suportada: ${processedInput.action}`);
       }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      
-      // Usar error handling inteligente para erros Git
-      if (this.isGitRelatedError(errorMessage)) {
-        return ErrorHandler.createIntelligentGitError(
-          input.action,
-          errorMessage,
-          input.provider,
-          'upload-project'
-        );
-      }
-      
-      // Erro genérico
       return {
         success: false,
         action: input.action,
         message: 'Erro na operação de upload de projeto',
-        error: errorMessage
+        error: error instanceof Error ? error.message : String(error)
       };
     }
   },
@@ -310,21 +296,6 @@ export const uploadProjectTool = {
     
     await processDirectory(projectPath);
     return count;
-  },
-
-  /**
-   * Verifica se erro é relacionado a Git
-   */
-  isGitRelatedError(errorMessage: string): boolean {
-    const gitKeywords = [
-      'git', 'commit', 'push', 'pull', 'merge', 'conflict', 'branch',
-      'remote', 'repository', 'authentication', 'permission', 'unauthorized',
-      'divergent', 'non-fast-forward', 'fetch first', 'working tree',
-      'uncommitted', 'stash', 'rebase', 'reset', 'checkout'
-    ];
-    
-    const errorLower = errorMessage.toLowerCase();
-    return gitKeywords.some(keyword => errorLower.includes(keyword));
   }
 };
 

@@ -134,10 +134,13 @@ export declare const gitRemoteTool: {
     show(params: GitRemoteInput): Promise<GitRemoteResult>;
     setUrl(params: GitRemoteInput): Promise<GitRemoteResult>;
     prune(params: GitRemoteInput): Promise<GitRemoteResult>;
+<<<<<<< HEAD
     /**
      * Verifica se erro é relacionado a Git
      */
     isGitRelatedError(errorMessage: string): boolean;
+=======
+>>>>>>> parent of 6dfc0a9 (error handleing)
 };
 export {};
 //# sourceMappingURL=git-remote.d.ts.map

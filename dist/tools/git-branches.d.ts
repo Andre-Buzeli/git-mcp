@@ -59,11 +59,11 @@ declare const BranchesInputSchema: z.ZodObject<{
     repo: string;
     action: "merge" | "delete" | "get" | "list" | "create" | "compare";
     projectPath: string;
-    branch?: string | undefined;
     head?: string | undefined;
     base?: string | undefined;
     page?: number | undefined;
     limit?: number | undefined;
+    branch?: string | undefined;
     branch_name?: string | undefined;
     from_branch?: string | undefined;
     merge_method?: "merge" | "rebase" | "squash" | undefined;
@@ -74,11 +74,11 @@ declare const BranchesInputSchema: z.ZodObject<{
     repo: string;
     action: "merge" | "delete" | "get" | "list" | "create" | "compare";
     projectPath: string;
-    branch?: string | undefined;
     head?: string | undefined;
     base?: string | undefined;
     page?: number | undefined;
     limit?: number | undefined;
+    branch?: string | undefined;
     branch_name?: string | undefined;
     from_branch?: string | undefined;
     merge_method?: "merge" | "rebase" | "squash" | undefined;
@@ -426,10 +426,13 @@ export declare const branchesTool: {
      * - Documente diferenças importantes
      */
     compareBranches(params: BranchesInput, provider: VcsOperations): Promise<BranchesResult>;
+<<<<<<< HEAD
     /**
      * Verifica se erro é relacionado a Git
      */
     isGitRelatedError(errorMessage: string): boolean;
+=======
+>>>>>>> parent of 6dfc0a9 (error handleing)
 };
 export {};
 //# sourceMappingURL=git-branches.d.ts.map

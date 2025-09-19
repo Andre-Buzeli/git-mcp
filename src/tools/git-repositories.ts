@@ -2,7 +2,6 @@ import { z } from 'zod';
 import { globalProviderFactory, VcsOperations } from '../providers/index.js';
 import { applyAutoUserDetection } from '../utils/user-detection.js';
 import { runTerminalCmd } from '../utils/terminal-controller.js';
-import { ErrorHandler } from '../providers/error-handler.js';
 
 /**
  * Tool: git-repositories
@@ -682,6 +681,7 @@ export const gitRepositoriesTool = {
     } catch (error) {
       throw new Error(`Falha ao clonar repositório: ${error instanceof Error ? error.message : String(error)}`);
     }
+<<<<<<< HEAD
   },
 
   /**
@@ -697,6 +697,8 @@ export const gitRepositoriesTool = {
     
     const errorLower = errorMessage.toLowerCase();
     return gitKeywords.some(keyword => errorLower.includes(keyword));
+=======
+>>>>>>> parent of 6dfc0a9 (error handleing)
   }
 };
 

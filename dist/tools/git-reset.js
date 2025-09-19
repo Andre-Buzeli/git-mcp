@@ -219,6 +219,7 @@ exports.gitResetTool = {
         catch (error) {
             throw new Error(`Falha ao executar reset para branch: ${error instanceof Error ? error.message : String(error)}`);
         }
+<<<<<<< HEAD
     },
     /**
      * Verifica se erro é relacionado a Git
@@ -232,6 +233,8 @@ exports.gitResetTool = {
         ];
         const errorLower = errorMessage.toLowerCase();
         return gitKeywords.some(keyword => errorLower.includes(keyword));
+=======
+>>>>>>> parent of 6dfc0a9 (error handleing)
     }
 };
 //# sourceMappingURL=git-reset.js.map

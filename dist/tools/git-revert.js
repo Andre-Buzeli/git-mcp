@@ -194,6 +194,7 @@ exports.gitRevertTool = {
         catch (error) {
             throw new Error(`Falha ao executar revert de range: ${error instanceof Error ? error.message : String(error)}`);
         }
+<<<<<<< HEAD
     },
     /**
      * Verifica se erro é relacionado a Git
@@ -207,6 +208,8 @@ exports.gitRevertTool = {
         ];
         const errorLower = errorMessage.toLowerCase();
         return gitKeywords.some(keyword => errorLower.includes(keyword));
+=======
+>>>>>>> parent of 6dfc0a9 (error handleing)
     }
 };
 //# sourceMappingURL=git-revert.js.map

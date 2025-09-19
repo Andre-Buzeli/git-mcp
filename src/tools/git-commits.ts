@@ -2,7 +2,6 @@ import { z } from 'zod';
 import { globalProviderFactory, VcsOperations } from '../providers/index.js';
 import { applyAutoUserDetection } from '../utils/user-detection.js';
 import { runGitCommand, gitPush, gitPull, gitAdd, gitCommit } from '../utils/terminal-controller.js';
-import { ErrorHandler } from '../providers/error-handler.js';
 
 /**
  * Tool: commits
@@ -793,6 +792,7 @@ export const commitsTool = {
     } catch (error) {
       throw new Error(`Falha ao fazer pull: ${error instanceof Error ? error.message : String(error)}`);
     }
+<<<<<<< HEAD
   },
 
   /**
@@ -808,6 +808,10 @@ export const commitsTool = {
     
     const errorLower = errorMessage.toLowerCase();
     return gitKeywords.some(keyword => errorLower.includes(keyword));
+=======
+>>>>>>> parent of 6dfc0a9 (error handleing)
   }
 };
+
+
 

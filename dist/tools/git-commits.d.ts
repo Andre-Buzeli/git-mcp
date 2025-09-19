@@ -64,12 +64,12 @@ declare const CommitsInputSchema: z.ZodObject<{
     action: "push" | "get" | "search" | "pull" | "list" | "create" | "compare";
     projectPath: string;
     message?: string | undefined;
-    branch?: string | undefined;
     head?: string | undefined;
     base?: string | undefined;
     page?: number | undefined;
     limit?: number | undefined;
     sha?: string | undefined;
+    branch?: string | undefined;
     query?: string | undefined;
     commit_sha?: string | undefined;
     author_name?: string | undefined;
@@ -83,12 +83,12 @@ declare const CommitsInputSchema: z.ZodObject<{
     action: "push" | "get" | "search" | "pull" | "list" | "create" | "compare";
     projectPath: string;
     message?: string | undefined;
-    branch?: string | undefined;
     head?: string | undefined;
     base?: string | undefined;
     page?: number | undefined;
     limit?: number | undefined;
     sha?: string | undefined;
+    branch?: string | undefined;
     query?: string | undefined;
     commit_sha?: string | undefined;
     author_name?: string | undefined;
@@ -481,10 +481,13 @@ export declare const commitsTool: {
      * - Use branch específica se necessário
      */
     pullCommits(params: CommitsInput, provider?: VcsOperations): Promise<CommitsResult>;
+<<<<<<< HEAD
     /**
      * Verifica se erro é relacionado a Git
      */
     isGitRelatedError(errorMessage: string): boolean;
+=======
+>>>>>>> parent of 6dfc0a9 (error handleing)
 };
 export {};
 //# sourceMappingURL=git-commits.d.ts.map

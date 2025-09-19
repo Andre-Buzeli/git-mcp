@@ -729,6 +729,7 @@ exports.pullsTool = {
         catch (error) {
             throw new Error(`Falha ao buscar Pull Requests: ${error instanceof Error ? error.message : String(error)}`);
         }
+<<<<<<< HEAD
     },
     /**
      * Verifica se erro é relacionado a Git
@@ -742,6 +743,8 @@ exports.pullsTool = {
         ];
         const errorLower = errorMessage.toLowerCase();
         return gitKeywords.some(keyword => errorLower.includes(keyword));
+=======
+>>>>>>> parent of 6dfc0a9 (error handleing)
     }
 };
 //# sourceMappingURL=git-pulls.js.map

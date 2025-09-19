@@ -693,10 +693,13 @@ export declare const pullsTool: {
      * - Use para encontrar PRs relacionados
      */
     searchPullRequests(params: PullsInput, provider: VcsOperations, owner: string): Promise<PullsResult>;
+<<<<<<< HEAD
     /**
      * Verifica se erro é relacionado a Git
      */
     isGitRelatedError(errorMessage: string): boolean;
+=======
+>>>>>>> parent of 6dfc0a9 (error handleing)
 };
 export {};
 //# sourceMappingURL=git-pulls.d.ts.map

@@ -1,6 +1,5 @@
 import { z } from 'zod';
 import { runGitCommand } from '../utils/terminal-controller.js';
-import { ErrorHandler } from '../providers/error-handler.js';
 
 /**
  * Tool: git-stash
@@ -326,6 +325,7 @@ export const gitStashTool = {
     } catch (error) {
       throw new Error(`Falha ao limpar stashes: ${error instanceof Error ? error.message : String(error)}`);
     }
+<<<<<<< HEAD
   },
 
   /**
@@ -341,6 +341,9 @@ export const gitStashTool = {
     
     const errorLower = errorMessage.toLowerCase();
     return gitKeywords.some(keyword => errorLower.includes(keyword));
+=======
+>>>>>>> parent of 6dfc0a9 (error handleing)
   }
 };
+
 

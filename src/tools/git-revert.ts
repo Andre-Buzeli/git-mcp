@@ -1,6 +1,5 @@
 import { z } from 'zod';
 import { runGitCommand } from '../utils/terminal-controller.js';
-import { ErrorHandler } from '../providers/error-handler.js';
 
 /**
  * Tool: git-revert
@@ -234,6 +233,7 @@ export const gitRevertTool = {
     } catch (error) {
       throw new Error(`Falha ao executar revert de range: ${error instanceof Error ? error.message : String(error)}`);
     }
+<<<<<<< HEAD
   },
 
   /**
@@ -249,6 +249,9 @@ export const gitRevertTool = {
     
     const errorLower = errorMessage.toLowerCase();
     return gitKeywords.some(keyword => errorLower.includes(keyword));
+=======
+>>>>>>> parent of 6dfc0a9 (error handleing)
   }
 };
+
 

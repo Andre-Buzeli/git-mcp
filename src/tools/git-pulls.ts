@@ -1,7 +1,6 @@
 import { z } from 'zod';
 import { globalProviderFactory, VcsOperations } from '../providers/index.js';
 import { applyAutoUserDetection } from '../utils/user-detection.js';
-import { ErrorHandler } from '../providers/error-handler.js';
 
 /**
  * Tool: pulls
@@ -768,6 +767,7 @@ export const pullsTool = {
     } catch (error) {
       throw new Error(`Falha ao buscar Pull Requests: ${error instanceof Error ? error.message : String(error)}`);
     }
+<<<<<<< HEAD
   },
 
   /**
@@ -783,6 +783,10 @@ export const pullsTool = {
     
     const errorLower = errorMessage.toLowerCase();
     return gitKeywords.some(keyword => errorLower.includes(keyword));
+=======
+>>>>>>> parent of 6dfc0a9 (error handleing)
   }
 };
+
+
 

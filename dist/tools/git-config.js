@@ -264,6 +264,7 @@ exports.gitConfigTool = {
         catch (error) {
             throw new Error(`Falha ao mostrar configurações: ${error instanceof Error ? error.message : String(error)}`);
         }
+<<<<<<< HEAD
     },
     /**
      * Verifica se erro é relacionado a Git
@@ -277,6 +278,8 @@ exports.gitConfigTool = {
         ];
         const errorLower = errorMessage.toLowerCase();
         return gitKeywords.some(keyword => errorLower.includes(keyword));
+=======
+>>>>>>> parent of 6dfc0a9 (error handleing)
     }
 };
 //# sourceMappingURL=git-config.js.map

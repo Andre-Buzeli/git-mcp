@@ -3,42 +3,42 @@ import { VcsOperations } from '../providers/index.js';
 /**
  * Tool: webhooks
  *
- * DESCRIÃ‡ÃƒO:
+ * DESCRIÇÃO:
  * Gerenciamento completo de webhooks com suporte multi-provider (GitHub e Gitea)
  *
  * FUNCIONALIDADES:
- * - CriaÃ§Ã£o de novos webhooks
+ * - Criação de novos webhooks
  * - Listagem e busca de webhooks
- * - ObtenÃ§Ã£o de detalhes especÃ­ficos
- * - AtualizaÃ§Ã£o de webhooks existentes
- * - ExclusÃ£o de webhooks
+ * - Obtenção de detalhes específicos
+ * - Atualização de webhooks existentes
+ * - Exclusão de webhooks
  * - Teste de webhooks
- * - ConfiguraÃ§Ã£o de eventos
+ * - Configuração de eventos
  *
  * USO:
- * - Para integraÃ§Ã£o com CI/CD
- * - Para notificaÃ§Ãµes automÃ¡ticas
- * - Para sincronizaÃ§Ã£o de dados
- * - Para automaÃ§Ã£o de workflows
+ * - Para integração com CI/CD
+ * - Para notificações automáticas
+ * - Para sincronização de dados
+ * - Para automação de workflows
  *
- * RECOMENDAÃ‡Ã•ES:
- * - Use HTTPS sempre que possÃ­vel
+ * RECOMENDAÇÕES:
+ * - Use HTTPS sempre que possível
  * - Mantenha secrets seguros
  * - Monitore falhas de entrega
- * - Configure apenas eventos necessÃ¡rios
+ * - Configure apenas eventos necessários
  */
 /**
- * Schema de validaÃ§Ã£o para entrada da tool webhooks
+ * Schema de validação para entrada da tool webhooks
  *
- * VALIDAÃ‡Ã•ES:
- * - action: AÃ§Ã£o obrigatÃ³ria (create, list, get, update, delete, test)
- * - ParÃ¢metros especÃ­ficos por aÃ§Ã£o
- * - ValidaÃ§Ã£o de tipos e formatos
+ * VALIDAÇÕES:
+ * - action: Ação obrigatória (create, list, get, update, delete, test)
+ * - Parâmetros específicos por ação
+ * - Validação de tipos e formatos
  *
- * RECOMENDAÃ‡Ã•ES:
+ * RECOMENDAÇÕES:
  * - Sempre valide entrada antes de usar
- * - Use parÃ¢metros opcionais adequadamente
- * - Documente parÃ¢metros obrigatÃ³rios
+ * - Use parâmetros opcionais adequadamente
+ * - Documente parâmetros obrigatórios
  */
 declare const WebhooksInputSchema: z.ZodObject<{
     action: z.ZodEnum<["create", "list", "get", "update", "delete", "test"]>;
@@ -97,11 +97,11 @@ declare const WebhooksInputSchema: z.ZodObject<{
 }>;
 export type WebhooksInput = z.infer<typeof WebhooksInputSchema>;
 /**
- * Schema de saÃ­da padronizado
+ * Schema de saída padronizado
  *
  * ESTRUTURA:
- * - success: Status da operaÃ§Ã£o
- * - action: AÃ§Ã£o executada
+ * - success: Status da operação
+ * - action: Ação executada
  * - message: Mensagem descritiva
  * - data: Dados retornados (opcional)
  * - error: Detalhes do erro (opcional)
@@ -129,58 +129,58 @@ export type WebhooksResult = z.infer<typeof WebhooksResultSchema>;
 /**
  * Tool: webhooks
  *
- * DESCRIÃ‡ÃƒO:
- * Gerenciamento completo de webhooks Gitea com mÃºltiplas aÃ§Ãµes
+ * DESCRIÇÃO:
+ * Gerenciamento completo de webhooks Gitea com múltiplas ações
  *
- * ACTIONS DISPONÃVEIS:
+ * ACTIONS DISPONÍVEIS:
  *
  * 1. create - Criar novo webhook
- *    ParÃ¢metros:
- *    - owner (obrigatÃ³rio): ProprietÃ¡rio do repositÃ³rio
- *    - repo (obrigatÃ³rio): Nome do repositÃ³rio
- *    - url (obrigatÃ³rio): URL de destino do webhook
- *    - content_type (opcional): Tipo de conteÃºdo (json, form) - padrÃ£o: json
+ *    Parâmetros:
+ *    - owner (obrigatório): Proprietário do repositório
+ *    - repo (obrigatório): Nome do repositório
+ *    - url (obrigatório): URL de destino do webhook
+ *    - content_type (opcional): Tipo de conteúdo (json, form) - padrão: json
  *    - secret (opcional): Secret para assinatura
  *    - events (opcional): Array de eventos a serem monitorados
- *    - active (opcional): Se webhook estÃ¡ ativo (padrÃ£o: true)
+ *    - active (opcional): Se webhook está ativo (padrão: true)
  *
  * 2. list - Listar webhooks
- *    ParÃ¢metros:
- *    - owner (obrigatÃ³rio): ProprietÃ¡rio do repositÃ³rio
- *    - repo (obrigatÃ³rio): Nome do repositÃ³rio
- *    - page (opcional): PÃ¡gina da listagem (padrÃ£o: 1)
- *    - limit (opcional): Itens por pÃ¡gina (padrÃ£o: 30, mÃ¡ximo: 100)
+ *    Parâmetros:
+ *    - owner (obrigatório): Proprietário do repositório
+ *    - repo (obrigatório): Nome do repositório
+ *    - page (opcional): Página da listagem (padrão: 1)
+ *    - limit (opcional): Itens por página (padrão: 30, máximo: 100)
  *
  * 3. get - Obter detalhes do webhook
- *    ParÃ¢metros:
- *    - owner (obrigatÃ³rio): ProprietÃ¡rio do repositÃ³rio
- *    - repo (obrigatÃ³rio): Nome do repositÃ³rio
- *    - webhook_id (obrigatÃ³rio): ID do webhook
+ *    Parâmetros:
+ *    - owner (obrigatório): Proprietário do repositório
+ *    - repo (obrigatório): Nome do repositório
+ *    - webhook_id (obrigatório): ID do webhook
  *
  * 4. update - Atualizar webhook existente
- *    ParÃ¢metros:
- *    - owner (obrigatÃ³rio): ProprietÃ¡rio do repositÃ³rio
- *    - repo (obrigatÃ³rio): Nome do repositÃ³rio
- *    - webhook_id (obrigatÃ³rio): ID do webhook
+ *    Parâmetros:
+ *    - owner (obrigatório): Proprietário do repositório
+ *    - repo (obrigatório): Nome do repositório
+ *    - webhook_id (obrigatório): ID do webhook
  *    - new_url (opcional): Nova URL
- *    - new_content_type (opcional): Novo tipo de conteÃºdo
+ *    - new_content_type (opcional): Novo tipo de conteúdo
  *    - new_secret (opcional): Novo secret
  *    - new_events (opcional): Novos eventos
  *    - new_active (opcional): Novo status ativo
  *
  * 5. delete - Deletar webhook
- *    ParÃ¢metros:
- *    - owner (obrigatÃ³rio): ProprietÃ¡rio do repositÃ³rio
- *    - repo (obrigatÃ³rio): Nome do repositÃ³rio
- *    - webhook_id (obrigatÃ³rio): ID do webhook
+ *    Parâmetros:
+ *    - owner (obrigatório): Proprietário do repositório
+ *    - repo (obrigatório): Nome do repositório
+ *    - webhook_id (obrigatório): ID do webhook
  *
  * 6. test - Testar webhook
- *    ParÃ¢metros:
- *    - owner (obrigatÃ³rio): ProprietÃ¡rio do repositÃ³rio
- *    - repo (obrigatÃ³rio): Nome do repositÃ³rio
- *    - webhook_id (obrigatÃ³rio): ID do webhook
+ *    Parâmetros:
+ *    - owner (obrigatório): Proprietário do repositório
+ *    - repo (obrigatório): Nome do repositório
+ *    - webhook_id (obrigatório): ID do webhook
  *
- * RECOMENDAÃ‡Ã•ES DE USO:
+ * RECOMENDAÇÕES DE USO:
  * - Use URLs seguras (HTTPS)
  * - Configure eventos adequadamente
  * - Monitore falhas de entrega
@@ -279,55 +279,55 @@ export declare const webhooksTool: {
      *
      * FUNCIONALIDADE:
      * - Valida entrada usando Zod schema
-     * - Roteia para mÃ©todo especÃ­fico baseado na aÃ§Ã£o
+     * - Roteia para método específico baseado na ação
      * - Trata erros de forma uniforme
      * - Retorna resultado padronizado
      *
      * FLUXO:
-     * 1. ValidaÃ§Ã£o de entrada
-     * 2. SeleÃ§Ã£o do provider
-     * 3. Roteamento por aÃ§Ã£o
-     * 4. ExecuÃ§Ã£o do mÃ©todo especÃ­fico
+     * 1. Validação de entrada
+     * 2. Seleção do provider
+     * 3. Roteamento por ação
+     * 4. Execução do método específico
      * 5. Tratamento de erros
      * 6. Retorno de resultado
      *
      * TRATAMENTO DE ERROS:
-     * - ValidaÃ§Ã£o: erro de schema
-     * - ExecuÃ§Ã£o: erro da operaÃ§Ã£o
-     * - Roteamento: aÃ§Ã£o nÃ£o suportada
+     * - Validação: erro de schema
+     * - Execução: erro da operação
+     * - Roteamento: ação não suportada
      *
-     * RECOMENDAÃ‡Ã•ES:
+     * RECOMENDAÇÕES:
      * - Sempre valide entrada antes de processar
-     * - Trate erros especÃ­ficos adequadamente
+     * - Trate erros específicos adequadamente
      * - Log detalhes de erro para debug
-     * - Retorne mensagens de erro Ãºteis
+     * - Retorne mensagens de erro úteis
      */
     handler(input: WebhooksInput): Promise<WebhooksResult>;
     /**
-     * Cria um novo webhook no repositÃ³rio
+     * Cria um novo webhook no repositório
      *
      * FUNCIONALIDADE:
-     * - Cria webhook com URL e configuraÃ§Ãµes
-     * - Suporta diferentes tipos de conteÃºdo
-     * - Permite configuraÃ§Ã£o de eventos
+     * - Cria webhook com URL e configurações
+     * - Suporta diferentes tipos de conteúdo
+     * - Permite configuração de eventos
      *
-     * PARÃ‚METROS OBRIGATÃ“RIOS:
-     * - owner: ProprietÃ¡rio do repositÃ³rio
-     * - repo: Nome do repositÃ³rio
+     * PARÂMETROS OBRIGATÓRIOS:
+     * - owner: Proprietário do repositório
+     * - repo: Nome do repositório
      * - url: URL de destino do webhook
      *
-     * PARÃ‚METROS OPCIONAIS:
-     * - content_type: Tipo de conteÃºdo (json, form) - padrÃ£o: json
+     * PARÂMETROS OPCIONAIS:
+     * - content_type: Tipo de conteúdo (json, form) - padrão: json
      * - secret: Secret para assinatura
      * - events: Array de eventos a serem monitorados
-     * - active: Se webhook estÃ¡ ativo (padrÃ£o: true)
+     * - active: Se webhook está ativo (padrão: true)
      *
-     * VALIDAÃ‡Ã•ES:
-     * - Todos os parÃ¢metros obrigatÃ³rios
-     * - URL deve ser vÃ¡lida e acessÃ­vel
-     * - UsuÃ¡rio deve ter permissÃ£o de escrita
+     * VALIDAÇÕES:
+     * - Todos os parâmetros obrigatórios
+     * - URL deve ser válida e acessível
+     * - Usuário deve ter permissão de escrita
      *
-     * RECOMENDAÃ‡Ã•ES:
+     * RECOMENDAÇÕES:
      * - Use URLs seguras (HTTPS)
      * - Configure eventos adequadamente
      * - Mantenha secrets seguros
@@ -335,54 +335,54 @@ export declare const webhooksTool: {
      */
     createWebhook(params: WebhooksInput, provider: VcsOperations, owner: string): Promise<WebhooksResult>;
     /**
-     * Lista webhooks do repositÃ³rio
+     * Lista webhooks do repositório
      *
      * FUNCIONALIDADE:
-     * - Lista webhooks com paginaÃ§Ã£o
-     * - Retorna informaÃ§Ãµes bÃ¡sicas de cada webhook
+     * - Lista webhooks com paginação
+     * - Retorna informações básicas de cada webhook
      * - Inclui status ativo e eventos configurados
      *
-     * PARÃ‚METROS OBRIGATÃ“RIOS:
-     * - owner: ProprietÃ¡rio do repositÃ³rio
-     * - repo: Nome do repositÃ³rio
+     * PARÂMETROS OBRIGATÓRIOS:
+     * - owner: Proprietário do repositório
+     * - repo: Nome do repositório
      *
-     * PARÃ‚METROS OPCIONAIS:
-     * - page: PÃ¡gina da listagem (padrÃ£o: 1)
-     * - limit: Itens por pÃ¡gina (padrÃ£o: 30, mÃ¡ximo: 100)
+     * PARÂMETROS OPCIONAIS:
+     * - page: Página da listagem (padrão: 1)
+     * - limit: Itens por página (padrão: 30, máximo: 100)
      *
-     * VALIDAÃ‡Ã•ES:
-     * - e repo obrigatÃ³rios
+     * VALIDAÇÕES:
+     * - e repo obrigatórios
      * - Page deve ser >= 1
      * - Limit deve ser entre 1 e 100
      *
-     * RECOMENDAÃ‡Ã•ES:
-     * - Use paginaÃ§Ã£o para repositÃ³rios com muitos webhooks
-     * - Monitore nÃºmero total de webhooks
+     * RECOMENDAÇÕES:
+     * - Use paginação para repositórios com muitos webhooks
+     * - Monitore número total de webhooks
      * - Verifique status ativo de cada webhook
      * - Mantenha webhooks organizados
      */
     listWebhooks(params: WebhooksInput, provider: VcsOperations, owner: string): Promise<WebhooksResult>;
     /**
-     * ObtÃ©m detalhes de um webhook especÃ­fico
+     * Obtém detalhes de um webhook específico
      *
      * FUNCIONALIDADE:
-     * - Retorna informaÃ§Ãµes completas do webhook
-     * - Inclui URL, tipo de conteÃºdo, eventos e status
-     * - Mostra configuraÃ§Ãµes de seguranÃ§a
+     * - Retorna informações completas do webhook
+     * - Inclui URL, tipo de conteúdo, eventos e status
+     * - Mostra configurações de segurança
      *
-     * PARÃ‚METROS OBRIGATÃ“RIOS:
-     * - owner: ProprietÃ¡rio do repositÃ³rio
-     * - repo: Nome do repositÃ³rio
+     * PARÂMETROS OBRIGATÓRIOS:
+     * - owner: Proprietário do repositório
+     * - repo: Nome do repositório
      * - webhook_id: ID do webhook
      *
-     * VALIDAÃ‡Ã•ES:
-     * - Todos os parÃ¢metros obrigatÃ³rios
-     * - Webhook deve existir no repositÃ³rio
-     * - ID deve ser vÃ¡lido
+     * VALIDAÇÕES:
+     * - Todos os parâmetros obrigatórios
+     * - Webhook deve existir no repositório
+     * - ID deve ser válido
      *
-     * RECOMENDAÃ‡Ã•ES:
+     * RECOMENDAÇÕES:
      * - Use para obter detalhes completos
-     * - Verifique configuraÃ§Ãµes de seguranÃ§a
+     * - Verifique configurações de segurança
      * - Analise eventos configurados
      * - Monitore status ativo
      */
@@ -392,56 +392,56 @@ export declare const webhooksTool: {
      *
      * FUNCIONALIDADE:
      * - Atualiza campos do webhook
-     * - Suporta mudanÃ§a de URL e eventos
-     * - Permite alteraÃ§Ã£o de status ativo
+     * - Suporta mudança de URL e eventos
+     * - Permite alteração de status ativo
      *
-     * PARÃ‚METROS OBRIGATÃ“RIOS:
-     * - owner: ProprietÃ¡rio do repositÃ³rio
-     * - repo: Nome do repositÃ³rio
+     * PARÂMETROS OBRIGATÓRIOS:
+     * - owner: Proprietário do repositório
+     * - repo: Nome do repositório
      * - webhook_id: ID do webhook
      *
-     * PARÃ‚METROS OPCIONAIS:
+     * PARÂMETROS OPCIONAIS:
      * - new_url: Nova URL
-     * - new_content_type: Novo tipo de conteÃºdo
+     * - new_content_type: Novo tipo de conteúdo
      * - new_secret: Novo secret
      * - new_events: Novos eventos
      * - new_active: Novo status ativo
      *
-     * VALIDAÃ‡Ã•ES:
-     * - Todos os parÃ¢metros obrigatÃ³rios
+     * VALIDAÇÕES:
+     * - Todos os parâmetros obrigatórios
      * - Webhook deve existir
      * - Pelo menos um campo deve ser atualizado
      *
-     * RECOMENDAÃ‡Ã•ES:
-     * - Atualize apenas campos necessÃ¡rios
+     * RECOMENDAÇÕES:
+     * - Atualize apenas campos necessários
      * - Use mensagens de commit descritivas
-     * - Documente mudanÃ§as importantes
-     * - Teste webhook apÃ³s atualizaÃ§Ã£o
+     * - Documente mudanças importantes
+     * - Teste webhook após atualização
      */
     updateWebhook(params: WebhooksInput, provider: VcsOperations, owner: string): Promise<WebhooksResult>;
     /**
-     * Deleta um webhook do repositÃ³rio
+     * Deleta um webhook do repositório
      *
      * FUNCIONALIDADE:
      * - Remove webhook especificado
-     * - Confirma exclusÃ£o bem-sucedida
-     * - Limpa configuraÃ§Ãµes associadas
+     * - Confirma exclusão bem-sucedida
+     * - Limpa configurações associadas
      *
-     * PARÃ‚METROS OBRIGATÃ“RIOS:
-     * - owner: ProprietÃ¡rio do repositÃ³rio
-     * - repo: Nome do repositÃ³rio
+     * PARÂMETROS OBRIGATÓRIOS:
+     * - owner: Proprietário do repositório
+     * - repo: Nome do repositório
      * - webhook_id: ID do webhook
      *
-     * VALIDAÃ‡Ã•ES:
-     * - Todos os parÃ¢metros obrigatÃ³rios
+     * VALIDAÇÕES:
+     * - Todos os parâmetros obrigatórios
      * - Webhook deve existir
-     * - UsuÃ¡rio deve ter permissÃ£o de exclusÃ£o
+     * - Usuário deve ter permissão de exclusão
      *
-     * RECOMENDAÃ‡Ã•ES:
-     * - Confirme exclusÃ£o antes de executar
-     * - Verifique se webhook nÃ£o estÃ¡ sendo usado
-     * - Mantenha backup se necessÃ¡rio
-     * - Documente motivo da exclusÃ£o
+     * RECOMENDAÇÕES:
+     * - Confirme exclusão antes de executar
+     * - Verifique se webhook não está sendo usado
+     * - Mantenha backup se necessário
+     * - Documente motivo da exclusão
      */
     deleteWebhook(params: WebhooksInput, provider: VcsOperations, owner: string): Promise<WebhooksResult>;
     /**
@@ -452,27 +452,23 @@ export declare const webhooksTool: {
      * - Verifica conectividade e resposta
      * - Retorna resultado do teste
      *
-     * PARÃ‚METROS OBRIGATÃ“RIOS:
-     * - owner: ProprietÃ¡rio do repositÃ³rio
-     * - repo: Nome do repositÃ³rio
+     * PARÂMETROS OBRIGATÓRIOS:
+     * - owner: Proprietário do repositório
+     * - repo: Nome do repositório
      * - webhook_id: ID do webhook
      *
-     * VALIDAÃ‡Ã•ES:
-     * - Todos os parÃ¢metros obrigatÃ³rios
+     * VALIDAÇÕES:
+     * - Todos os parâmetros obrigatórios
      * - Webhook deve existir
      * - Webhook deve estar ativo
      *
-     * RECOMENDAÃ‡Ã•ES:
-     * - Teste webhooks apÃ³s criaÃ§Ã£o
+     * RECOMENDAÇÕES:
+     * - Teste webhooks após criação
      * - Monitore respostas de teste
      * - Verifique logs de entrega
      * - Configure retry adequado
      */
     testWebhook(params: WebhooksInput, provider: VcsOperations, owner: string): Promise<WebhooksResult>;
-    /**
-     * Verifica se erro Ã© relacionado a Git
-     */
-    isGitRelatedError(errorMessage: string): boolean;
 };
 export {};
 //# sourceMappingURL=git-webhooks.d.ts.map

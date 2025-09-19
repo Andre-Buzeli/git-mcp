@@ -265,6 +265,7 @@ exports.gitStashTool = {
         catch (error) {
             throw new Error(`Falha ao limpar stashes: ${error instanceof Error ? error.message : String(error)}`);
         }
+<<<<<<< HEAD
     },
     /**
      * Verifica se erro é relacionado a Git
@@ -278,6 +279,8 @@ exports.gitStashTool = {
         ];
         const errorLower = errorMessage.toLowerCase();
         return gitKeywords.some(keyword => errorLower.includes(keyword));
+=======
+>>>>>>> parent of 6dfc0a9 (error handleing)
     }
 };
 //# sourceMappingURL=git-stash.js.map

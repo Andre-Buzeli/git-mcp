@@ -554,6 +554,7 @@ exports.releasesTool = {
         catch (error) {
             throw new Error(`Falha ao publicar release: ${error instanceof Error ? error.message : String(error)}`);
         }
+<<<<<<< HEAD
     },
     /**
      * Verifica se erro é relacionado a Git
@@ -567,6 +568,8 @@ exports.releasesTool = {
         ];
         const errorLower = errorMessage.toLowerCase();
         return gitKeywords.some(keyword => errorLower.includes(keyword));
+=======
+>>>>>>> parent of 6dfc0a9 (error handleing)
     }
 };
 //# sourceMappingURL=git-releases.js.map

@@ -1,7 +1,6 @@
 import { z } from 'zod';
 import { globalProviderFactory, VcsOperations } from '../providers/index.js';
 import { applyAutoUserDetection } from '../utils/user-detection.js';
-import { ErrorHandler } from '../providers/error-handler.js';
 
 /**
  * Tool: tags
@@ -511,6 +510,7 @@ export const tagsTool = {
     } catch (error) {
       throw new Error(`Falha ao buscar tags: ${error instanceof Error ? error.message : String(error)}`);
     }
+<<<<<<< HEAD
   },
 
   /**
@@ -526,6 +526,10 @@ export const tagsTool = {
     
     const errorLower = errorMessage.toLowerCase();
     return gitKeywords.some(keyword => errorLower.includes(keyword));
+=======
+>>>>>>> parent of 6dfc0a9 (error handleing)
   }
 };
+
+
 

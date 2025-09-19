@@ -1,13 +1,7 @@
 /**
  * Classe utilitária para padronizar tratamento de erros entre providers
  * Fornece métodos consistentes para normalização e formatação de erros
- *
- * NOVA FUNCIONALIDADE:
- * - Análise inteligente de erros Git
- * - Sugestões automáticas de solução
- * - Integração com GitErrorAnalyzer
  */
-import { IntelligentErrorResponse } from '../utils/git-error-analyzer.js';
 export interface StandardError {
     code: string;
     message: string;
@@ -15,8 +9,6 @@ export interface StandardError {
     originalError?: any;
     statusCode?: number;
     retryable?: boolean;
-    analysis?: any;
-    suggestedSolutions?: string[];
 }
 export declare class ErrorHandler {
     /**
@@ -55,21 +47,5 @@ export declare class ErrorHandler {
      * Verifica se um erro é retryable
      */
     static isRetryableError(error: any): boolean;
-    /**
-     * NOVO: Cria resposta inteligente de erro com análise Git
-     */
-    static createIntelligentGitError(action: string, error: string, provider?: string, context?: string): IntelligentErrorResponse;
-    /**
-     * NOVO: Gera próximos passos inteligentes baseados na análise
-     */
-    private static generateIntelligentNextSteps;
-    /**
-     * NOVO: Verifica se erro Git pode ser resolvido automaticamente
-     */
-    static isGitErrorAutoFixable(error: string): boolean;
-    /**
-     * NOVO: Retorna tools que podem resolver o erro Git
-     */
-    static getGitErrorRelatedTools(error: string): string[];
 }
 //# sourceMappingURL=error-handler.d.ts.map

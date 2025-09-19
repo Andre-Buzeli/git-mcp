@@ -486,10 +486,13 @@ export declare const releasesTool: {
      * - Notifique usuários sobre nova versão
      */
     publishRelease(params: ReleasesInput, provider: VcsOperations): Promise<ReleasesResult>;
+<<<<<<< HEAD
     /**
      * Verifica se erro é relacionado a Git
      */
     isGitRelatedError(errorMessage: string): boolean;
+=======
+>>>>>>> parent of 6dfc0a9 (error handleing)
 };
 export {};
 //# sourceMappingURL=git-releases.d.ts.map

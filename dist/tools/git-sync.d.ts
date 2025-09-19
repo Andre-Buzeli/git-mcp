@@ -57,7 +57,7 @@ declare const GitSyncInputSchema: z.ZodObject<{
     };
     strategy?: "timestamp" | "source-wins" | "skip-conflicts" | undefined;
     direction?: "one-way" | "two-way" | undefined;
-    include?: ("issues" | "git" | "labels" | "milestones" | "releases" | "pulls")[] | undefined;
+    include?: ("issues" | "labels" | "git" | "milestones" | "releases" | "pulls")[] | undefined;
     dry_run?: boolean | undefined;
 }, {
     action: "status" | "configure" | "one-shot";
@@ -71,7 +71,7 @@ declare const GitSyncInputSchema: z.ZodObject<{
     };
     strategy?: "timestamp" | "source-wins" | "skip-conflicts" | undefined;
     direction?: "one-way" | "two-way" | undefined;
-    include?: ("issues" | "git" | "labels" | "milestones" | "releases" | "pulls")[] | undefined;
+    include?: ("issues" | "labels" | "git" | "milestones" | "releases" | "pulls")[] | undefined;
     dry_run?: boolean | undefined;
 }>;
 export type GitSyncInput = z.infer<typeof GitSyncInputSchema>;
@@ -174,10 +174,13 @@ export declare const gitSyncTool: {
      * Executa sincronização pontual
      */
     executeSync(params: GitSyncInput): Promise<GitSyncResult>;
+<<<<<<< HEAD
     /**
      * Verifica se erro é relacionado a Git
      */
     isGitRelatedError(errorMessage: string): boolean;
+=======
+>>>>>>> parent of 6dfc0a9 (error handleing)
 };
 export {};
 //# sourceMappingURL=git-sync.d.ts.map

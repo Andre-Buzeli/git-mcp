@@ -479,10 +479,13 @@ export declare const gitRepositoriesTool: {
      * - Considere profundidade de clone para repositórios grandes
      */
     cloneRepository(params: GitRepositoriesInput, provider: VcsOperations): Promise<GitRepositoriesResult>;
+<<<<<<< HEAD
     /**
      * Verifica se erro é relacionado a Git
      */
     isGitRelatedError(errorMessage: string): boolean;
+=======
+>>>>>>> parent of 6dfc0a9 (error handleing)
 };
 export {};
 //# sourceMappingURL=git-repositories.d.ts.map

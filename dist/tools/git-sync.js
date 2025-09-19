@@ -308,6 +308,7 @@ exports.gitSyncTool = {
         catch (error) {
             throw new Error(`Falha na sincronização: ${error instanceof Error ? error.message : String(error)}`);
         }
+<<<<<<< HEAD
     },
     /**
      * Verifica se erro é relacionado a Git
@@ -321,6 +322,8 @@ exports.gitSyncTool = {
         ];
         const errorLower = errorMessage.toLowerCase();
         return gitKeywords.some(keyword => errorLower.includes(keyword));
+=======
+>>>>>>> parent of 6dfc0a9 (error handleing)
     }
 };
 //# sourceMappingURL=git-sync.js.map

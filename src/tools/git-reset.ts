@@ -1,6 +1,5 @@
 import { z } from 'zod';
 import { runGitCommand, runTerminalCmd } from '../utils/terminal-controller.js';
-import { ErrorHandler } from '../providers/error-handler.js';
 
 /**
  * Tool: git-reset
@@ -257,6 +256,7 @@ export const gitResetTool = {
     } catch (error) {
       throw new Error(`Falha ao executar reset para branch: ${error instanceof Error ? error.message : String(error)}`);
     }
+<<<<<<< HEAD
   },
 
   /**
@@ -272,6 +272,9 @@ export const gitResetTool = {
     
     const errorLower = errorMessage.toLowerCase();
     return gitKeywords.some(keyword => errorLower.includes(keyword));
+=======
+>>>>>>> parent of 6dfc0a9 (error handleing)
   }
 };
+
 

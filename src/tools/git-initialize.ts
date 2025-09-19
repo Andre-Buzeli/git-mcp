@@ -1,43 +1,42 @@
-﻿import { z } from 'zod';
+import { z } from 'zod';
 import { globalProviderFactory, VcsOperations } from '../providers/index.js';
 import { applyAutoUserDetection } from '../utils/user-detection.js';
 import { GitOperations } from '../utils/git-operations.js';
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import { ErrorHandler } from '../providers/error-handler.js';
 
 /**
  * Tool: git-initialize
  * 
- * DESCRIÃ‡ÃƒO:
- * InicializaÃ§Ã£o completa de repositÃ³rio Git - 100% AUTÃ”NOMO
+ * DESCRIÇÃO:
+ * Inicialização completa de repositório Git - 100% AUTÔNOMO
  * 
  * FUNCIONALIDADES:
- * - InicializaÃ§Ã£o de repositÃ³rio Git local
- * - ConfiguraÃ§Ã£o automÃ¡tica de usuÃ¡rio Git
- * - CriaÃ§Ã£o de repositÃ³rio remoto (GitHub/Gitea)
- * - ConfiguraÃ§Ã£o de remote origin
- * - CriaÃ§Ã£o de arquivos iniciais (.gitignore, README.md)
- * - Primeiro commit automÃ¡tico
- * - ConfiguraÃ§Ã£o de branch padrÃ£o
+ * - Inicialização de repositório Git local
+ * - Configuração automática de usuário Git
+ * - Criação de repositório remoto (GitHub/Gitea)
+ * - Configuração de remote origin
+ * - Criação de arquivos iniciais (.gitignore, README.md)
+ * - Primeiro commit automático
+ * - Configuração de branch padrão
  * - Suporte a GitHub e Gitea
- * - NÃ£o depende de outras tools
+ * - Não depende de outras tools
  * 
  * USO:
  * - Para inicializar projeto do zero
- * - Para configurar repositÃ³rio Git completo
- * - Para setup automÃ¡tico de projeto
- * - Para migraÃ§Ã£o de projeto nÃ£o-Git
+ * - Para configurar repositório Git completo
+ * - Para setup automático de projeto
+ * - Para migração de projeto não-Git
  * 
- * RECOMENDAÃ‡Ã•ES:
+ * RECOMENDAÇÕES:
  * - Use mensagens de commit descritivas
  * - A tool faz todo o processo automaticamente
- * - Funciona mesmo sem configuraÃ§Ã£o Git prÃ©via
- * - Cria repositÃ³rio remoto se nÃ£o existir
+ * - Funciona mesmo sem configuração Git prévia
+ * - Cria repositório remoto se não existir
  */
 
 /**
- * Schema de validaÃ§Ã£o para entrada da tool git-initialize
+ * Schema de validação para entrada da tool git-initialize
  */
 const InitializeInputSchema = z.object({
   action: z.enum(['init']),
@@ -58,7 +57,7 @@ const InitializeInputSchema = z.object({
 export type InitializeInput = z.infer<typeof InitializeInputSchema>;
 
 /**
- * Schema de saÃ­da padronizado
+ * Schema de saída padronizado
  */
 const InitializeResultSchema = z.object({
   success: z.boolean(),
@@ -73,35 +72,35 @@ export type InitializeResult = z.infer<typeof InitializeResultSchema>;
 /**
  * Tool: git-initialize
  * 
- * DESCRIÃ‡ÃƒO:
- * InicializaÃ§Ã£o completa de repositÃ³rio Git - 100% AUTÃ”NOMO
+ * DESCRIÇÃO:
+ * Inicialização completa de repositório Git - 100% AUTÔNOMO
  * 
- * ACTIONS DISPONÃVEIS:
+ * ACTIONS DISPONÍVEIS:
  * 
- * 1. init - InicializaÃ§Ã£o completa de repositÃ³rio
- *    ParÃ¢metros:
- *    - projectPath (obrigatÃ³rio): Caminho do projeto local
- *    - repo (opcional): Nome do repositÃ³rio remoto
- *    - provider (opcional): Provider (gitea/github, padrÃ£o: gitea)
- *    - message (opcional): Mensagem do commit inicial (padrÃ£o: "Initial commit")
- *    - branch (opcional): Branch padrÃ£o (padrÃ£o: main)
- *    - createRemote (opcional): Criar repositÃ³rio remoto (padrÃ£o: false)
- *    - createReadme (opcional): Criar README.md (padrÃ£o: true)
- *    - createGitignore (opcional): Criar .gitignore (padrÃ£o: true)
- *    - userName (opcional): Nome do usuÃ¡rio Git
- *    - userEmail (opcional): Email do usuÃ¡rio Git
- *    - description (opcional): DescriÃ§Ã£o do repositÃ³rio
- *    - private (opcional): RepositÃ³rio privado (padrÃ£o: false)
+ * 1. init - Inicialização completa de repositório
+ *    Parâmetros:
+ *    - projectPath (obrigatório): Caminho do projeto local
+ *    - repo (opcional): Nome do repositório remoto
+ *    - provider (opcional): Provider (gitea/github, padrão: gitea)
+ *    - message (opcional): Mensagem do commit inicial (padrão: "Initial commit")
+ *    - branch (opcional): Branch padrão (padrão: main)
+ *    - createRemote (opcional): Criar repositório remoto (padrão: false)
+ *    - createReadme (opcional): Criar README.md (padrão: true)
+ *    - createGitignore (opcional): Criar .gitignore (padrão: true)
+ *    - userName (opcional): Nome do usuário Git
+ *    - userEmail (opcional): Email do usuário Git
+ *    - description (opcional): Descrição do repositório
+ *    - private (opcional): Repositório privado (padrão: false)
  * 
- * RECOMENDAÃ‡Ã•ES DE USO:
+ * RECOMENDAÇÕES DE USO:
  * - Use para inicializar projetos do zero
- * - Configure usuÃ¡rio Git automaticamente
- * - Crie repositÃ³rios remotos quando necessÃ¡rio
- * - Personalize arquivos iniciais conforme necessÃ¡rio
+ * - Configure usuário Git automaticamente
+ * - Crie repositórios remotos quando necessário
+ * - Personalize arquivos iniciais conforme necessário
  */
 export const initializeTool = {
   name: 'git-initialize',
-  description: 'tool: InicializaÃ§Ã£o completa de repositÃ³rio Git - 100% AUTÃ”NOMO\nâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\naction init: inicializa repositÃ³rio Git com configuraÃ§Ã£o completa\naction init requires: projectPath, repo, provider, message, branch, createRemote, createReadme, createGitignore, userName, userEmail, description, private',
+  description: 'tool: Inicialização completa de repositório Git - 100% AUTÔNOMO\n──────────────\naction init: inicializa repositório Git com configuração completa\naction init requires: projectPath, repo, provider, message, branch, createRemote, createReadme, createGitignore, userName, userEmail, description, private',
   inputSchema: {
     type: 'object',
     properties: {
@@ -133,59 +132,59 @@ export const initializeTool = {
     try {
       const validatedInput = InitializeInputSchema.parse(input);
       
-      // Aplicar auto-detecÃ§Ã£o apenas para owner dentro do provider especificado
+      // Aplicar auto-detecção apenas para owner dentro do provider especificado
       const processedInput = await applyAutoUserDetection(validatedInput, validatedInput.provider);
       
-      // Usar o provider especificado pelo usuÃ¡rio
+      // Usar o provider especificado pelo usuário
       const provider = globalProviderFactory.getProvider(processedInput.provider);
       
       if (!provider) {
-        throw new Error(`Provider '${processedInput.provider}' nÃ£o encontrado`);
+        throw new Error(`Provider '${processedInput.provider}' não encontrado`);
       }
       
       switch (processedInput.action) {
         case 'init':
           return await initializeTool.initializeRepository(processedInput, provider);
         default:
-          throw new Error(`AÃ§Ã£o nÃ£o suportada: ${processedInput.action}`);
+          throw new Error(`Ação não suportada: ${processedInput.action}`);
       }
     } catch (error) {
       return {
         success: false,
         action: input.action,
-        message: 'Erro na operaÃ§Ã£o de inicializaÃ§Ã£o Git',
+        message: 'Erro na operação de inicialização Git',
         error: error instanceof Error ? error.message : String(error)
       };
     }
   },
 
   /**
-   * Inicializa repositÃ³rio Git completo - 100% AUTÃ”NOMO
+   * Inicializa repositório Git completo - 100% AUTÔNOMO
    * Processo completo: init -> config -> files -> commit -> remote -> push
    */
   async initializeRepository(params: InitializeInput, provider: VcsOperations): Promise<InitializeResult> {
     try {
       if (!params.projectPath) {
-        throw new Error('projectPath Ã© obrigatÃ³rio');
+        throw new Error('projectPath é obrigatório');
       }
 
-      // owner jÃ¡ foi auto-detectado em applyAutoUserDetection e estÃ¡ disponÃ­vel via provider.getCurrentUser
+      // owner já foi auto-detectado em applyAutoUserDetection e está disponível via provider.getCurrentUser
       const currentUser = await provider.getCurrentUser();
       const owner = currentUser.login;
       const branch = params.branch || 'main';
       const repoName = params.repo || path.basename(params.projectPath);
 
-      // Inicializar operaÃ§Ãµes Git locais
+      // Inicializar operações Git locais
       const gitOps = new GitOperations(params.projectPath);
       
-      // Verificar se jÃ¡ Ã© um repositÃ³rio Git
+      // Verificar se já é um repositório Git
       const isGitRepo = await gitOps.isGitRepository();
       
       if (isGitRepo) {
         return {
           success: true,
           action: 'init',
-          message: 'RepositÃ³rio Git jÃ¡ existe neste diretÃ³rio',
+          message: 'Repositório Git já existe neste diretório',
           data: {
             alreadyInitialized: true,
             projectPath: params.projectPath,
@@ -194,15 +193,20 @@ export const initializeTool = {
         };
       }
 
+<<<<<<< HEAD
       // 1. Inicializar repositÃ³rio Git
       // console.log('Inicializando repositÃ³rio Git...');
+=======
+      // 1. Inicializar repositório Git
+      console.log('Inicializando repositório Git...');
+>>>>>>> parent of 6dfc0a9 (error handleing)
       const initResult = await gitOps.initRepository();
       if (!initResult.success) {
-        throw new Error(`Falha ao inicializar repositÃ³rio Git: ${initResult.error}`);
+        throw new Error(`Falha ao inicializar repositório Git: ${initResult.error}`);
       }
 
-      // 2. Configurar usuÃ¡rio Git
-      console.log('Configurando usuÃ¡rio Git...');
+      // 2. Configurar usuário Git
+      console.log('Configurando usuário Git...');
       if (params.userName) {
         const nameResult = await gitOps.config('user.name', params.userName, { local: true });
         if (!nameResult.success) {
@@ -217,8 +221,8 @@ export const initializeTool = {
         }
       }
 
-      // 3. Configurar branch padrÃ£o
-      console.log('Configurando branch padrÃ£o...');
+      // 3. Configurar branch padrão
+      console.log('Configurando branch padrão...');
       const branchResult = await gitOps.checkout(branch, { create: true });
       if (!branchResult.success) {
         throw new Error(`Falha ao criar branch ${branch}: ${branchResult.error}`);
@@ -245,9 +249,9 @@ export const initializeTool = {
       let remoteCreated = false;
       let remoteUrl = '';
 
-      // 7. Criar repositÃ³rio remoto se solicitado
+      // 7. Criar repositório remoto se solicitado
       if (params.createRemote) {
-        console.log('Criando repositÃ³rio remoto...');
+        console.log('Criando repositório remoto...');
         try {
           await provider.createRepository(repoName, params.description || `Projeto ${repoName}`, params.private);
           remoteCreated = true;
@@ -266,14 +270,14 @@ export const initializeTool = {
             console.warn(`Aviso: Falha ao fazer push inicial: ${pushResult.error}`);
           }
         } catch (error) {
-          console.warn(`Aviso: Falha ao criar repositÃ³rio remoto: ${error instanceof Error ? error.message : String(error)}`);
+          console.warn(`Aviso: Falha ao criar repositório remoto: ${error instanceof Error ? error.message : String(error)}`);
         }
       }
       
       return {
         success: true,
         action: 'init',
-        message: `RepositÃ³rio Git inicializado com sucesso! ${filesCreated} arquivos criados`,
+        message: `Repositório Git inicializado com sucesso! ${filesCreated} arquivos criados`,
         data: {
           projectPath: params.projectPath,
           branch: branch,
@@ -286,7 +290,7 @@ export const initializeTool = {
         }
       };
     } catch (error) {
-      throw new Error(`Falha ao inicializar repositÃ³rio Git: ${error instanceof Error ? error.message : String(error)}`);
+      throw new Error(`Falha ao inicializar repositório Git: ${error instanceof Error ? error.message : String(error)}`);
     }
   },
 
@@ -302,16 +306,16 @@ export const initializeTool = {
       const readmePath = path.join(projectPath, 'README.md');
       try {
         await fs.access(readmePath);
-        // Arquivo jÃ¡ existe, nÃ£o sobrescrever
+        // Arquivo já existe, não sobrescrever
       } catch {
         const readmeContent = `# ${params.repo || path.basename(projectPath)}
 
 ${params.description || 'Projeto inicializado com git-initialize'}
 
-## InstalaÃ§Ã£o
+## Instalação
 
 \`\`\`bash
-# Instalar dependÃªncias
+# Instalar dependências
 npm install
 \`\`\`
 
@@ -329,7 +333,7 @@ npm start
 npm run dev
 \`\`\`
 
-## LicenÃ§a
+## Licença
 
 MIT
 `;
@@ -343,7 +347,7 @@ MIT
       const gitignorePath = path.join(projectPath, '.gitignore');
       try {
         await fs.access(gitignorePath);
-        // Arquivo jÃ¡ existe, nÃ£o sobrescrever
+        // Arquivo já existe, não sobrescrever
       } catch {
         const gitignoreContent = `# Dependencies
 node_modules/
@@ -443,6 +447,7 @@ temp/
     }
 
     return filesCreated;
+<<<<<<< HEAD
   },
 
   /**
@@ -458,6 +463,9 @@ temp/
     
     const errorLower = errorMessage.toLowerCase();
     return gitKeywords.some(keyword => errorLower.includes(keyword));
+=======
+>>>>>>> parent of 6dfc0a9 (error handleing)
   }
 };
+
 
