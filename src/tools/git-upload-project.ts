@@ -200,11 +200,25 @@ export const uploadProjectTool = {
         throw new Error(`Falha ao adicionar arquivos: ${addResult.error}`);
       }
 
-      // 4. Fazer commit
-      // console.log('Fazendo commit...');
-      const commitResult = await gitOps.commit(params.message);
-      if (!commitResult.success) {
-        throw new Error(`Falha ao fazer commit: ${commitResult.error}`);
+      // 4. Verificar se há arquivos para commitar
+      const statusResult = await gitOps.status();
+      if (!statusResult.success) {
+        throw new Error(`Falha ao verificar status: ${statusResult.error}`);
+      }
+
+      // Verificar se há mudanças para commitar
+      if (!statusResult.output.includes('Changes to be committed:') && 
+          !statusResult.output.includes('new file:') && 
+          !statusResult.output.includes('modified:') && 
+          !statusResult.output.includes('deleted:')) {
+        console.log('Nenhuma mudança para commitar, pulando commit...');
+      } else {
+        // Fazer commit
+        // console.log('Fazendo commit...');
+        const commitResult = await gitOps.commit(params.message);
+        if (!commitResult.success) {
+          throw new Error(`Falha ao fazer commit: ${commitResult.error}`);
+        }
       }
 
       // 5. Configurar remote origin se necessário

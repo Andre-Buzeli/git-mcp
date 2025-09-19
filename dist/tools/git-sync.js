@@ -116,8 +116,20 @@ exports.gitSyncTool = {
             // Obter informações dos repositórios
             const sourceOwner = (await sourceProvider.getCurrentUser()).login;
             const targetOwner = (await targetProvider.getCurrentUser()).login;
-            const sourceRepo = await sourceProvider.getRepository(sourceOwner, params.source.repo);
-            const targetRepo = await targetProvider.getRepository(targetOwner, params.target.repo);
+            // Verificar se os repositórios existem
+            let sourceRepo, targetRepo;
+            try {
+                sourceRepo = await sourceProvider.getRepository(sourceOwner, params.source.repo);
+            }
+            catch (error) {
+                throw new Error(`Repositório de origem não encontrado: ${params.source.repo} (${params.source.provider})`);
+            }
+            try {
+                targetRepo = await targetProvider.getRepository(targetOwner, params.target.repo);
+            }
+            catch (error) {
+                throw new Error(`Repositório de destino não encontrado: ${params.target.repo} (${params.target.provider})`);
+            }
             // Configurar webhook para sincronização automática se suportado
             const targetConfig = targetProvider.getConfig?.();
             const webhookUrl = `${targetConfig?.baseUrl || 'http://localhost'}/webhook/sync`;
@@ -169,11 +181,21 @@ exports.gitSyncTool = {
             const sourceOwner = (await sourceProvider.getCurrentUser()).login;
             const targetOwner = (await targetProvider.getCurrentUser()).login;
             // Verificar se repositórios existem
-            const sourceRepo = await sourceProvider.getRepository(sourceOwner, params.source.repo);
-            const targetRepo = await targetProvider.getRepository(targetOwner, params.target.repo);
-            // Verificar última atividade
-            const sourceCommits = await sourceProvider.listCommits(sourceOwner, params.source.repo, undefined, 1, 1);
-            const targetCommits = await targetProvider.listCommits(targetOwner, params.target.repo, undefined, 1, 1);
+            let sourceRepo, targetRepo, sourceCommits, targetCommits;
+            try {
+                sourceRepo = await sourceProvider.getRepository(sourceOwner, params.source.repo);
+                sourceCommits = await sourceProvider.listCommits(sourceOwner, params.source.repo, undefined, 1, 1);
+            }
+            catch (error) {
+                throw new Error(`Repositório de origem não encontrado: ${params.source.repo} (${params.source.provider})`);
+            }
+            try {
+                targetRepo = await targetProvider.getRepository(targetOwner, params.target.repo);
+                targetCommits = await targetProvider.listCommits(targetOwner, params.target.repo, undefined, 1, 1);
+            }
+            catch (error) {
+                throw new Error(`Repositório de destino não encontrado: ${params.target.repo} (${params.target.provider})`);
+            }
             // Verificar webhooks
             const webhooks = await sourceProvider.listWebhooks(sourceOwner, params.source.repo, 1, 10);
             const syncWebhooks = webhooks.filter((w) => w.url && w.url.includes('/webhook/sync'));
