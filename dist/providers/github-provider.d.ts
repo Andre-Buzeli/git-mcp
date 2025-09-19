@@ -98,6 +98,14 @@ export declare class GitHubProvider extends BaseVcsProvider {
     listSecrets(params: any): Promise<any>;
     listJobs(params: any): Promise<any>;
     /**
+     * Compara dois commits
+     */
+    compareCommits(owner: string, repo: string, base: string, head: string): Promise<any>;
+    /**
+     * Compara duas branches
+     */
+    compareBranches(owner: string, repo: string, baseBranch: string, headBranch: string): Promise<any>;
+    /**
      * Obtém URL do repositório GitHub
      */
     getRepositoryUrl(owner: string, repo: string): string;

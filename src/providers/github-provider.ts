@@ -1290,6 +1290,37 @@ export class GitHubProvider extends BaseVcsProvider {
   }
 
   /**
+   * Compara dois commits
+   */
+  async compareCommits(owner: string, repo: string, base: string, head: string): Promise<any> {
+    try {
+      const response = await this.get<any>(`/repos/${owner}/${repo}/compare/${base}...${head}`);
+      return {
+        status: response.status,
+        ahead_by: response.ahead_by || 0,
+        behind_by: response.behind_by || 0,
+        total_commits: response.total_commits || 0,
+        commits: response.commits || [],
+        files: response.files || [],
+        merge_base_commit: response.merge_base_commit || null
+      };
+    } catch (error) {
+      throw new Error(`Erro ao comparar commits: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  }
+
+  /**
+   * Compara duas branches
+   */
+  async compareBranches(owner: string, repo: string, baseBranch: string, headBranch: string): Promise<any> {
+    try {
+      return await this.compareCommits(owner, repo, baseBranch, headBranch);
+    } catch (error) {
+      throw new Error(`Erro ao comparar branches: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  }
+
+  /**
    * Obtém URL do repositório GitHub
    */
   getRepositoryUrl(owner: string, repo: string): string {
