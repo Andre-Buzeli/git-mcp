@@ -7,9 +7,9 @@ const types_js_1 = require("@modelcontextprotocol/sdk/types.js");
 const config_js_1 = require("./config.js");
 const index_js_2 = require("./providers/index.js");
 /**
- * Importação de todas as ferramentas MCP disponíveis (21 tools)
+ * Importação de todas as ferramentas MCP disponíveis (20 tools)
  *
- * GIT CORE (21 tools) - Funcionam com GitHub + Gitea:
+ * GIT CORE (20 tools) - Funcionam com GitHub + Gitea:
  * - git-repositories: Gerenciamento de repositórios
  * - git-commits: Operações com commits
  * - git-pulls: Pull requests e merges
@@ -38,7 +38,6 @@ const git_commits_js_1 = require("./tools/git-commits.js");
 const git_branches_js_1 = require("./tools/git-branches.js");
 const git_tags_js_1 = require("./tools/git-tags.js");
 const git_files_js_1 = require("./tools/git-files.js");
-const git_upload_project_js_1 = require("./tools/git-upload-project.js");
 const git_update_project_js_1 = require("./tools/git-update-project.js");
 const git_initialize_js_1 = require("./tools/git-initialize.js");
 const git_issues_js_1 = require("./tools/git-issues.js");
@@ -55,7 +54,7 @@ const git_sync_js_1 = require("./tools/git-sync.js");
 const git_packages_js_1 = require("./tools/git-packages.js");
 const git_projects_js_1 = require("./tools/git-projects.js");
 /**
- * Array de todas as ferramentas disponíveis (21 tools)
+ * Array de todas as ferramentas disponíveis (20 tools)
  *
  * ESTRUTURA:
  * - Cada tool deve implementar a interface Tool
@@ -77,7 +76,6 @@ const tools = [
     git_branches_js_1.branchesTool,
     git_tags_js_1.tagsTool,
     git_files_js_1.filesTool,
-    git_upload_project_js_1.uploadProjectTool,
     git_update_project_js_1.gitUpdateProjectTool,
     git_initialize_js_1.initializeTool,
     git_issues_js_1.issuesTool,

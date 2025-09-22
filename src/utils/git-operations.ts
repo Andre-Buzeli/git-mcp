@@ -282,12 +282,12 @@ export class GitOperations {
    */
   async reset(target: string, options: any = {}): Promise<GitResult> {
     const args = [];
-    
-    if (options.mode) args.push(`--${options.mode}`);
-    if (options.soft) args.push('--soft');
-    if (options.mixed) args.push('--mixed');
-    if (options.hard) args.push('--hard');
-    
+
+    // Adicionar flags de modo
+    if (options.mode === 'soft' || options.soft) args.push('--soft');
+    else if (options.mode === 'hard' || options.hard) args.push('--hard');
+    else args.push('--mixed'); // padrão
+
     args.push(target);
 
     return await this.runGitCommand('reset', args);
@@ -699,6 +699,13 @@ export class GitOperations {
 
   async changeDirectory(newPath: string): Promise<void> {
     this.projectPath = newPath;
+  }
+
+  /**
+   * Obtém a branch atual
+   */
+  async getCurrentBranch(): Promise<GitResult> {
+    return await this.runGitCommand('branch', ['--show-current']);
   }
 
   async getGitInfo(): Promise<any> {

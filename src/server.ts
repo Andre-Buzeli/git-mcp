@@ -5,9 +5,9 @@ import { config } from './config.js';
 import { globalProviderFactory, initializeFactoryFromEnv } from './providers/index.js';
 
 /**
- * Importação de todas as ferramentas MCP disponíveis (21 tools)
+ * Importação de todas as ferramentas MCP disponíveis (20 tools)
  *
- * GIT CORE (21 tools) - Funcionam com GitHub + Gitea:
+ * GIT CORE (20 tools) - Funcionam com GitHub + Gitea:
  * - git-repositories: Gerenciamento de repositórios
  * - git-commits: Operações com commits
  * - git-pulls: Pull requests e merges
@@ -37,7 +37,6 @@ import { commitsTool } from './tools/git-commits.js';
 import { branchesTool } from './tools/git-branches.js';
 import { tagsTool } from './tools/git-tags.js';
 import { filesTool } from './tools/git-files.js';
-import { uploadProjectTool } from './tools/git-upload-project.js';
 import { gitUpdateProjectTool } from './tools/git-update-project.js';
 import { initializeTool } from './tools/git-initialize.js';
 import { issuesTool } from './tools/git-issues.js';
@@ -55,7 +54,7 @@ import { gitPackagesTool } from './tools/git-packages.js';
 import { gitProjectsTool } from './tools/git-projects.js';
 
 /**
- * Array de todas as ferramentas disponíveis (21 tools)
+ * Array de todas as ferramentas disponíveis (20 tools)
  *
  * ESTRUTURA:
  * - Cada tool deve implementar a interface Tool
@@ -77,7 +76,6 @@ const tools = [
   branchesTool,
   tagsTool,
   filesTool,
-  uploadProjectTool,
   gitUpdateProjectTool,
   initializeTool,
   issuesTool,

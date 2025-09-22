@@ -35,20 +35,20 @@ declare const GitResetInputSchema: z.ZodObject<{
 }, "strip", z.ZodTypeAny, {
     provider: "gitea" | "github";
     repo: string;
-    action: "soft" | "mixed" | "hard" | "reset-to-commit" | "reset-branch";
+    action: "soft" | "hard" | "mixed" | "reset-to-commit" | "reset-branch";
     projectPath: string;
     branch_name?: string | undefined;
     commit_hash?: string | undefined;
-    reset_type?: "soft" | "mixed" | "hard" | undefined;
+    reset_type?: "soft" | "hard" | "mixed" | undefined;
     target_branch?: string | undefined;
 }, {
     provider: "gitea" | "github";
     repo: string;
-    action: "soft" | "mixed" | "hard" | "reset-to-commit" | "reset-branch";
+    action: "soft" | "hard" | "mixed" | "reset-to-commit" | "reset-branch";
     projectPath: string;
     branch_name?: string | undefined;
     commit_hash?: string | undefined;
-    reset_type?: "soft" | "mixed" | "hard" | undefined;
+    reset_type?: "soft" | "hard" | "mixed" | undefined;
     target_branch?: string | undefined;
 }>;
 export type GitResetInput = z.infer<typeof GitResetInputSchema>;
