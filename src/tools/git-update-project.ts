@@ -67,6 +67,7 @@ export const gitUpdateProjectTool = {
     try {
       const { repo, projectPath, message, branch = 'main', forcePush = false, provider: providerName } = params;
 
+
       // Inicializar operações Git locais
       const gitOps = new GitOperations(projectPath);
 
@@ -96,6 +97,7 @@ export const gitUpdateProjectTool = {
             message,
             changesDetected: false,
             filesChanged: 0,
+            implementation: 'REAL_GIT_OPERATIONS_v2.38.0',
             note: 'Nenhuma mudança para commitar'
           }
         };
@@ -132,6 +134,7 @@ export const gitUpdateProjectTool = {
             changesDetected: true,
             filesChanged: filesCount,
             stagedChanges: false,
+            implementation: 'REAL_GIT_OPERATIONS_v2.38.0',
             note: 'Arquivos adicionados mas não há mudanças válidas para commit'
           }
         };
