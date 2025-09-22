@@ -410,4 +410,70 @@ export abstract class BaseVcsProvider implements VcsOperations {
   async getUserRepositories(username: string, page: number = 1, limit: number = 30): Promise<any[]> {
     throw new Error('getUserRepositories not implemented');
   }
+
+  // Packages
+  async listPackages(owner: string, repo: string, page: number = 1, limit: number = 30): Promise<any[]> {
+    throw new Error('listPackages not implemented');
+  }
+
+  async getPackage(owner: string, repo: string, packageId: string): Promise<any> {
+    throw new Error('getPackage not implemented');
+  }
+
+  async createPackage(owner: string, repo: string, packageData: any): Promise<any> {
+    throw new Error('createPackage not implemented');
+  }
+
+  async updatePackage(owner: string, repo: string, packageId: string, updates: any): Promise<any> {
+    throw new Error('updatePackage not implemented');
+  }
+
+  async deletePackage(owner: string, repo: string, packageId: string): Promise<boolean> {
+    throw new Error('deletePackage not implemented');
+  }
+
+  async publishPackage(owner: string, repo: string, packageId: string): Promise<boolean> {
+    throw new Error('publishPackage not implemented');
+  }
+
+  async downloadPackage(owner: string, repo: string, packageId: string): Promise<string> {
+    throw new Error('downloadPackage not implemented');
+  }
+
+  // Projects
+  async listProjects(owner: string, repo: string, page: number = 1, limit: number = 30): Promise<any[]> {
+    throw new Error('listProjects not implemented');
+  }
+
+  async getProject(owner: string, repo: string, projectId: string): Promise<any> {
+    throw new Error('getProject not implemented');
+  }
+
+  async createProject(owner: string, repo: string, projectData: any): Promise<any> {
+    throw new Error('createProject not implemented');
+  }
+
+  async updateProject(owner: string, repo: string, projectId: string, updates: any): Promise<any> {
+    throw new Error('updateProject not implemented');
+  }
+
+  async deleteProject(owner: string, repo: string, projectId: string): Promise<boolean> {
+    throw new Error('deleteProject not implemented');
+  }
+
+  async addProjectItem(owner: string, repo: string, projectId: string, item: any): Promise<any> {
+    throw new Error('addProjectItem not implemented');
+  }
+
+  async updateProjectItem(owner: string, repo: string, projectId: string, itemId: string, updates: any): Promise<any> {
+    throw new Error('updateProjectItem not implemented');
+  }
+
+  async deleteProjectItem(owner: string, repo: string, projectId: string, itemId: string): Promise<boolean> {
+    throw new Error('deleteProjectItem not implemented');
+  }
+
+  async listProjectItems(owner: string, repo: string, projectId: string, page: number = 1, limit: number = 30): Promise<any[]> {
+    throw new Error('listProjectItems not implemented');
+  }
 }

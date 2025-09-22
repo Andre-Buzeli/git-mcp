@@ -1,0 +1,348 @@
+1. GIT-REPOSITORIES (Gerenciamento de Repositórios)
+QUANDO USAR:
+- Quando quiser criar um novo projeto
+- Para fazer backup de projetos existentes
+- Para organizar seus códigos
+- Para trabalhar em equipe
+AÇÕES DISPONÍVEIS:
+- create: Criar novo repositório
+- list: Listar repositórios existentes
+- get: Obter detalhes de um repositório
+- update: Atualizar configurações do repositório
+- delete: Deletar repositório
+- fork: Criar fork (cópia) de outro repositório
+- search: Buscar repositórios
+- init: Inicializar repositório Git local
+- clone: Clonar repositório remoto
+
+2. GIT-COMMITS (Gerenciamento de Commits)
+QUANDO USAR:
+- Para salvar mudanças no código
+- Para ver histórico de modificações
+- Para sincronizar código com o servidor
+- Para colaborar com outros desenvolvedores
+AÇÕES DISPONÍVEIS:
+- list: Listar commits do repositório
+- get: Obter detalhes de um commit específico
+- create: Criar novo commit
+- compare: Comparar dois commits
+- search: Buscar commits por mensagem ou autor
+- push: Enviar commits para o repositório remoto
+- pull: Baixar commits do repositório remoto
+
+3. GIT-BRANCHES (Gerenciamento de Branches)
+QUANDO USAR:
+- Para desenvolver novas funcionalidades
+- Para experimentar sem afetar o código principal
+- Para trabalhar em equipe em features diferentes
+- Para organizar desenvolvimento
+AÇÕES DISPONÍVEIS:
+- create: Criar nova branch
+- list: Listar branches existentes
+- get: Obter detalhes de uma branch
+- delete: Deletar branch
+- merge: Fazer merge (juntar) branches
+- compare: Comparar branches
+
+4. GIT-FILES (Gerenciamento de Arquivos)
+QUANDO USAR:
+- Para criar/editar arquivos específicos
+- Para fazer backup de arquivos
+- Para organizar estrutura do projeto
+- Para fazer upload completo do projeto
+AÇÕES DISPONÍVEIS:
+- get: Obter arquivo específico
+- create: Criar novo arquivo
+- update: Atualizar arquivo existente
+- delete: Deletar arquivo
+- list: Listar arquivos de um diretório
+- search: Buscar conteúdo em arquivos
+- upload-project: Upload completo do projeto
+
+
+
+
+
+5. GIT-ISSUES (Gerenciamento de Issues)
+QUANDO USAR:
+- Para reportar bugs
+- Para solicitar novas funcionalidades
+- Para organizar tarefas do projeto
+- Para comunicar com a equipe
+AÇÕES DISPONÍVEIS:
+- create: Criar nova issue
+- list: Listar issues existentes
+- get: Obter detalhes de uma issue
+- update: Atualizar issue existente
+- close: Fechar issue
+- comment: Adicionar comentário
+- search: Buscar issues
+
+6. GIT-PULLS (Gerenciamento de Pull Requests)
+QUANDO USAR:
+- Para propor mudanças no código
+- Para revisar código antes de integrar
+- Para colaborar em equipe
+- Para manter qualidade do código
+AÇÕES DISPONÍVEIS:
+- create: Criar pull request
+- list: Listar pull requests
+- get: Obter detalhes de um PR
+- update: Atualizar pull request
+- merge: Fazer merge do pull request
+- close: Fechar pull request
+- review: Adicionar review
+- search: Buscar pull requests
+
+7. GIT-RELEASES (Gerenciamento de Releases)
+QUANDO USAR:
+- Para marcar versões estáveis
+- Para distribuir o software
+- Para organizar lançamentos
+- Para versionamento semântico
+AÇÕES DISPONÍVEIS:
+- create: Criar nova release
+- list: Listar releases existentes
+- get: Obter detalhes de uma release
+- update: Atualizar release
+- delete: Deletar release
+- publish: Publicar release
+
+8. GIT-TAGS (Gerenciamento de Tags)
+QUANDO USAR:
+- Para marcar commits importantes
+- Para versionamento
+- Para organizar releases
+- Para referenciar versões específicas
+AÇÕES DISPONÍVEIS:
+- create: Criar nova tag
+- list: Listar tags existentes
+- get: Obter detalhes de uma tag
+- delete: Deletar tag
+- search: Buscar tags
+
+9. GIT-UPLOAD-PROJECT (Upload Completo)
+QUANDO USAR:
+- Para fazer backup completo do projeto
+- Para enviar projeto novo para repositório
+- Para sincronizar projeto local com remoto
+- Para migração de código
+AÇÕES DISPONÍVEIS:
+- upload: Upload completo do projeto
+
+10. GIT-INITIALIZE (Inicialização de Repositório)
+QUANDO USAR:
+- Para começar um novo projeto Git
+- Para configurar projeto existente
+- Para setup inicial completo
+AÇÕES DISPONÍVEIS:
+- init: Inicializar repositório Git
+
+11. GIT-CONFIG (Configuração Git)
+QUANDO USAR:
+- Para configurar usuário Git
+- Para definir configurações de comportamento
+- Para personalizar ambiente Git
+AÇÕES DISPONÍVEIS:
+- get: Obter configuração
+- set: Definir configuração
+- unset: Remover configuração
+- list: Listar configurações
+- edit: Editar arquivo de configuração
+- show: Mostrar configurações com origem
+
+12. GIT-REMOTE (Gerenciamento de Remotes)
+QUANDO USAR:
+- Para conectar com repositórios remotos
+- Para configurar múltiplos repositórios
+- Para sincronização
+AÇÕES DISPONÍVEIS:
+- add: Adicionar remote
+- remove: Remover remote
+- rename: Renomear remote
+- show: Mostrar informações do remote
+- set-url: Atualizar URL do remote
+- prune: Remover referências obsoletas
+
+13. GIT-RESET (Reset de Commits)
+QUANDO USAR:
+- Para desfazer commits recentes
+- Para limpar mudanças não desejadas
+- Para voltar a estado anterior
+- Para corrigir histórico
+AÇÕES DISPONÍVEIS:
+- soft: Reset soft (mantém mudanças no staging)
+- mixed: Reset mixed (limpa staging area)
+- hard: Reset hard (remove todas as mudanças)
+- reset-to-commit: Reset para commit específico
+- reset-branch: Reset branch específica
+
+14. GIT-REVERT (Reverter Commits)
+QUANDO USAR:
+- Para desfazer mudanças de forma segura
+- Para reverter bugs introduzidos
+- Para manter histórico limpo
+AÇÕES DISPONÍVEIS:
+- revert-commit: Reverter commit específico
+- revert-merge: Reverter merge commit
+- revert-range: Reverter range de commits
+
+15. GIT-STASH (Stash de Mudanças)
+QUANDO USAR:
+- Para salvar trabalho temporário
+- Para trocar de branch rapidamente
+- Para limpar working directory
+AÇÕES DISPONÍVEIS:
+- stash: Salvar mudanças no stash
+- pop: Aplicar e remover stash do topo
+- apply: Aplicar stash sem remover
+- list: Listar stashes disponíveis
+- show: Mostrar detalhes do stash
+- drop: Remover stash específico
+- clear: Remover todos os stashes
+
+16. GIT-ARCHIVE (Arquivos Compactados)
+QUANDO USAR:
+- Para backup do projeto
+- Para distribuição
+- Para arquivamento
+AÇÕES DISPONÍVEIS:
+- create: Criar arquivo compactado
+- extract: Extrair arquivo compactado
+- list: Listar conteúdo do arquivo
+- verify: Verificar integridade do arquivo
+
+17. GIT-SYNC (Sincronização)
+QUANDO USAR:
+- Para manter repositórios sincronizados
+- Para backup automático
+- Para migração entre providers
+AÇÕES DISPONÍVEIS:
+- configure: Configurar sincronização
+- status: Ver status da sincronização
+- one-shot: Executar sincronização pontual
+
+================================================================================
+                           FLUXOS DE TRABALHO COMUNS
+================================================================================
+
+1. CRIANDO UM NOVO PROJETO:
+===========================
+1. Use git-repositories → action: "create" para criar repositório
+2. Use git-initialize → action: "init" para inicializar Git local
+3. Use git-upload-project → action: "upload" para enviar código inicial
+
+2. TRABALHANDO EM UMA FEATURE:
+=============================
+1. Use git-branches → action: "create" para criar branch de feature
+2. Faça suas mudanças no código
+3. Use git-commits → action: "create" para salvar mudanças
+4. Use git-pulls → action: "create" para criar pull request
+5. Use git-branches → action: "merge" para integrar mudanças
+
+3. GERENCIANDO BUGS:
+===================
+1. Use git-issues → action: "create" para reportar bug
+2. Use git-branches → action: "create" para branch de correção
+3. Faça correções e commits
+4. Use git-pulls → action: "create" para pull request
+5. Use git-issues → action: "close" para fechar issue
+
+4. FAZENDO BACKUP:
+=================
+1. Use git-upload-project → action: "upload" para backup completo
+2. Use git-archive → action: "create" para arquivo compactado
+3. Use git-sync → action: "configure" para backup automático
+
+5. COLABORANDO EM EQUIPE:
+========================
+1. Use git-issues → action: "create" para organizar tarefas
+2. Use git-branches → action: "create" para cada desenvolvedor
+3. Use git-pulls → action: "create" para revisar código
+4. Use git-commits → action: "push/pull" para sincronizar
+
+================================================================================
+                           DICAS E BOAS PRÁTICAS
+================================================================================
+
+1. MENSAGENS DE COMMIT:
+- Use mensagens claras e descritivas
+- Exemplo: "Adiciona validação de email no formulário"
+- Evite: "fix" ou "update"
+
+2. NOMENCLATURA DE BRANCHES:
+- feature/nome-da-funcionalidade
+- bugfix/nome-do-bug
+- hotfix/correcao-urgente
+- release/versao-x.x.x
+
+3. ORGANIZAÇÃO DE ISSUES:
+- Use labels para categorizar
+- Atribua responsáveis
+- Mantenha descrições detalhadas
+
+4. VERSIONAMENTO:
+- Use tags para marcar releases
+- Siga versionamento semântico (v1.0.0)
+- Mantenha changelog atualizado
+
+5. SEGURANÇA:
+- Nunca commite senhas ou tokens
+- Use arquivos .env para configurações sensíveis
+- Configure repositórios privados quando necessário
+
+================================================================================
+                           SOLUÇÃO DE PROBLEMAS
+================================================================================
+
+PROBLEMA: "Repository not found"
+SOLUÇÃO: Verifique se o repositório existe e se você tem permissão
+
+PROBLEMA: "Authentication failed"
+SOLUÇÃO: Verifique se o token está correto e não expirou
+
+PROBLEMA: "Branch already exists"
+SOLUÇÃO: Use um nome diferente para a branch ou delete a existente
+
+PROBLEMA: "Merge conflict"
+SOLUÇÃO: Resolva conflitos manualmente e faça novo commit
+
+PROBLEMA: "Push rejected"
+SOLUÇÃO: Faça pull primeiro para sincronizar mudanças
+
+================================================================================
+                           RECURSOS ADICIONAIS
+================================================================================
+
+- Todas as ferramentas são 100% auto-suficientes
+- Suporte completo a GitHub e Gitea
+- Não requer comandos Git externos
+- Funciona via MCP (Model Context Protocol)
+- Validação automática de parâmetros
+- Detecção automática de usuário
+- Controle de terminal integrado
+
+================================================================================
+                           VERSÃO E SUPORTE
+================================================================================
+
+Versão: 2.31.10
+Autor: Andre Buzeli
+Licença: MIT
+Repositório: https://github.com/andrebuzeli/gitea-mcp-v2
+
+Para suporte e dúvidas:
+- Consulte a documentação oficial
+- Verifique os exemplos de uso
+- Teste com DEMO_MODE=true para aprendizado
+
+================================================================================
+                           FIM DO MANUAL
+================================================================================
+
+Este manual cobre todas as funcionalidades do Git MCP. Use como referência
+para suas operações Git diárias e para aprender conceitos fundamentais.
+
+Lembre-se: O Git é uma ferramenta poderosa que melhora significativamente
+o desenvolvimento de software. Com o Git MCP, você tem acesso a todas essas
+funcionalidades de forma simplificada e automatizada.

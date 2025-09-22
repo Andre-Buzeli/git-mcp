@@ -5,18 +5,19 @@ import { config } from './config.js';
 import { globalProviderFactory, initializeFactoryFromEnv } from './providers/index.js';
 
 /**
- * Importação de todas as ferramentas MCP disponíveis (18 tools)
- * 
- * GIT CORE (18 tools) - Funcionam com GitHub + Gitea:
+ * Importação de todas as ferramentas MCP disponíveis (21 tools)
+ *
+ * GIT CORE (21 tools) - Funcionam com GitHub + Gitea:
  * - git-repositories: Gerenciamento de repositórios
  * - git-commits: Operações com commits
+ * - git-pulls: Pull requests e merges
  * - git-branches: Operações com branches
  * - git-tags: Gerenciamento de tags
  * - git-files: Gerenciamento de arquivos
  * - git-upload-project: Upload completo de projeto
+ * - git-update-project: Atualização incremental de projeto
  * - git-initialize: Inicialização completa de repositório
  * - git-issues: Gerenciamento de issues
- * - git-pulls: Pull requests e merges
  * - git-releases: Gerenciamento de releases
  * - git-webhooks: Gerenciamento de webhooks
  * - git-reset: Operações de reset
@@ -26,15 +27,18 @@ import { globalProviderFactory, initializeFactoryFromEnv } from './providers/ind
  * - git-remote: Gerenciamento de remotes
  * - git-archive: Criação de arquivos
  * - git-sync: Sincronização de repositórios
+ * - git-packages: Gerenciamento de pacotes
+ * - git-projects: Gerenciamento de projetos
  */
 
-// Git Core Tools (18)
+// Git Core Tools (21)
 import { gitRepositoriesTool } from './tools/git-repositories.js';
 import { commitsTool } from './tools/git-commits.js';
 import { branchesTool } from './tools/git-branches.js';
 import { tagsTool } from './tools/git-tags.js';
 import { filesTool } from './tools/git-files.js';
 import { uploadProjectTool } from './tools/git-upload-project.js';
+import { gitUpdateProjectTool } from './tools/git-update-project.js';
 import { initializeTool } from './tools/git-initialize.js';
 import { issuesTool } from './tools/git-issues.js';
 import { pullsTool } from './tools/git-pulls.js';
@@ -47,31 +51,34 @@ import { gitConfigTool } from './tools/git-config.js';
 import { gitRemoteTool } from './tools/git-remote.js';
 import { gitArchiveTool } from './tools/git-archive.js';
 import { gitSyncTool } from './tools/git-sync.js';
+import { gitPackagesTool } from './tools/git-packages.js';
+import { gitProjectsTool } from './tools/git-projects.js';
 
 /**
- * Array de todas as ferramentas disponíveis (18 tools)
- * 
+ * Array de todas as ferramentas disponíveis (21 tools)
+ *
  * ESTRUTURA:
  * - Cada tool deve implementar a interface Tool
  * - Nome, descrição e schema são obrigatórios
  * - Handler deve ser assíncrono e retornar resultado
- * 
+ *
  * ORGANIZAÇÃO:
- * - Git Core (18): Funcionam com GitHub + Gitea
- * 
+ * - Git Core (21): Funcionam com GitHub + Gitea
+ *
  * USO:
  * - Para listagem de tools disponíveis
  * - Para execução de tools específicas
  * - Para validação de parâmetros
  */
 const tools = [
-  // Git Core Tools (18) - GitHub + Gitea
+  // Git Core Tools (21) - GitHub + Gitea
   gitRepositoriesTool,
   commitsTool,
   branchesTool,
   tagsTool,
   filesTool,
   uploadProjectTool,
+  gitUpdateProjectTool,
   initializeTool,
   issuesTool,
   pullsTool,
@@ -83,7 +90,9 @@ const tools = [
   gitConfigTool,
   gitRemoteTool,
   gitArchiveTool,
-  gitSyncTool
+  gitSyncTool,
+  gitPackagesTool,
+  gitProjectsTool
 ];
 
 /**
@@ -112,7 +121,7 @@ export class GiteaMCPServer {
     this.server = new Server(
         {
           name: 'git-mcp',
-          version: '2.16.0',
+          version: '2.37.0',
         }
     );
 
@@ -327,4 +336,3 @@ process.on('uncaughtException', (error) => {
   console.error('Uncaught Exception:', error);
   process.exit(1);
 });
-

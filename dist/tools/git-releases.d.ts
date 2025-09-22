@@ -75,6 +75,7 @@ declare const ReleasesInputSchema: z.ZodObject<{
     prerelease?: boolean | undefined;
     page?: number | undefined;
     limit?: number | undefined;
+    latest?: boolean | undefined;
     new_name?: string | undefined;
     new_body?: string | undefined;
     target_commitish?: string | undefined;
@@ -83,7 +84,6 @@ declare const ReleasesInputSchema: z.ZodObject<{
     new_draft?: boolean | undefined;
     new_prerelease?: boolean | undefined;
     new_target_commitish?: string | undefined;
-    latest?: boolean | undefined;
 }, {
     provider: "gitea" | "github";
     repo: string;
@@ -97,6 +97,7 @@ declare const ReleasesInputSchema: z.ZodObject<{
     prerelease?: boolean | undefined;
     page?: number | undefined;
     limit?: number | undefined;
+    latest?: boolean | undefined;
     new_name?: string | undefined;
     new_body?: string | undefined;
     target_commitish?: string | undefined;
@@ -105,7 +106,6 @@ declare const ReleasesInputSchema: z.ZodObject<{
     new_draft?: boolean | undefined;
     new_prerelease?: boolean | undefined;
     new_target_commitish?: string | undefined;
-    latest?: boolean | undefined;
 }>;
 export type ReleasesInput = z.infer<typeof ReleasesInputSchema>;
 /**

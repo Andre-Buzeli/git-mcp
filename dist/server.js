@@ -7,18 +7,19 @@ const types_js_1 = require("@modelcontextprotocol/sdk/types.js");
 const config_js_1 = require("./config.js");
 const index_js_2 = require("./providers/index.js");
 /**
- * Importação de todas as ferramentas MCP disponíveis (18 tools)
+ * Importação de todas as ferramentas MCP disponíveis (21 tools)
  *
- * GIT CORE (18 tools) - Funcionam com GitHub + Gitea:
+ * GIT CORE (21 tools) - Funcionam com GitHub + Gitea:
  * - git-repositories: Gerenciamento de repositórios
  * - git-commits: Operações com commits
+ * - git-pulls: Pull requests e merges
  * - git-branches: Operações com branches
  * - git-tags: Gerenciamento de tags
  * - git-files: Gerenciamento de arquivos
  * - git-upload-project: Upload completo de projeto
+ * - git-update-project: Atualização incremental de projeto
  * - git-initialize: Inicialização completa de repositório
  * - git-issues: Gerenciamento de issues
- * - git-pulls: Pull requests e merges
  * - git-releases: Gerenciamento de releases
  * - git-webhooks: Gerenciamento de webhooks
  * - git-reset: Operações de reset
@@ -28,14 +29,17 @@ const index_js_2 = require("./providers/index.js");
  * - git-remote: Gerenciamento de remotes
  * - git-archive: Criação de arquivos
  * - git-sync: Sincronização de repositórios
+ * - git-packages: Gerenciamento de pacotes
+ * - git-projects: Gerenciamento de projetos
  */
-// Git Core Tools (18)
+// Git Core Tools (21)
 const git_repositories_js_1 = require("./tools/git-repositories.js");
 const git_commits_js_1 = require("./tools/git-commits.js");
 const git_branches_js_1 = require("./tools/git-branches.js");
 const git_tags_js_1 = require("./tools/git-tags.js");
 const git_files_js_1 = require("./tools/git-files.js");
 const git_upload_project_js_1 = require("./tools/git-upload-project.js");
+const git_update_project_js_1 = require("./tools/git-update-project.js");
 const git_initialize_js_1 = require("./tools/git-initialize.js");
 const git_issues_js_1 = require("./tools/git-issues.js");
 const git_pulls_js_1 = require("./tools/git-pulls.js");
@@ -48,8 +52,10 @@ const git_config_js_1 = require("./tools/git-config.js");
 const git_remote_js_1 = require("./tools/git-remote.js");
 const git_archive_js_1 = require("./tools/git-archive.js");
 const git_sync_js_1 = require("./tools/git-sync.js");
+const git_packages_js_1 = require("./tools/git-packages.js");
+const git_projects_js_1 = require("./tools/git-projects.js");
 /**
- * Array de todas as ferramentas disponíveis (18 tools)
+ * Array de todas as ferramentas disponíveis (21 tools)
  *
  * ESTRUTURA:
  * - Cada tool deve implementar a interface Tool
@@ -57,7 +63,7 @@ const git_sync_js_1 = require("./tools/git-sync.js");
  * - Handler deve ser assíncrono e retornar resultado
  *
  * ORGANIZAÇÃO:
- * - Git Core (18): Funcionam com GitHub + Gitea
+ * - Git Core (21): Funcionam com GitHub + Gitea
  *
  * USO:
  * - Para listagem de tools disponíveis
@@ -65,13 +71,14 @@ const git_sync_js_1 = require("./tools/git-sync.js");
  * - Para validação de parâmetros
  */
 const tools = [
-    // Git Core Tools (18) - GitHub + Gitea
+    // Git Core Tools (21) - GitHub + Gitea
     git_repositories_js_1.gitRepositoriesTool,
     git_commits_js_1.commitsTool,
     git_branches_js_1.branchesTool,
     git_tags_js_1.tagsTool,
     git_files_js_1.filesTool,
     git_upload_project_js_1.uploadProjectTool,
+    git_update_project_js_1.gitUpdateProjectTool,
     git_initialize_js_1.initializeTool,
     git_issues_js_1.issuesTool,
     git_pulls_js_1.pullsTool,
@@ -83,7 +90,9 @@ const tools = [
     git_config_js_1.gitConfigTool,
     git_remote_js_1.gitRemoteTool,
     git_archive_js_1.gitArchiveTool,
-    git_sync_js_1.gitSyncTool
+    git_sync_js_1.gitSyncTool,
+    git_packages_js_1.gitPackagesTool,
+    git_projects_js_1.gitProjectsTool
 ];
 /**
  * Servidor MCP principal para Gitea
@@ -109,7 +118,7 @@ class GiteaMCPServer {
     constructor() {
         this.server = new index_js_1.Server({
             name: 'git-mcp',
-            version: '2.16.0',
+            version: '2.37.0',
         });
         this.setupHandlers();
     }

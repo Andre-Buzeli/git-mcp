@@ -204,6 +204,43 @@ export interface WebhookInfo {
     updated_at: string;
     raw?: any;
 }
+export interface PackageInfo {
+    id: string;
+    name: string;
+    version: string;
+    description?: string;
+    type: string;
+    html_url?: string;
+    created_at: string;
+    updated_at: string;
+    downloads_count?: number;
+    size?: number;
+    raw?: any;
+}
+export interface ProjectInfo {
+    id: string;
+    name: string;
+    description?: string;
+    state: 'open' | 'closed';
+    html_url?: string;
+    created_at: string;
+    updated_at: string;
+    columns_count?: number;
+    items_count?: number;
+    raw?: any;
+}
+export interface ProjectItemInfo {
+    id: string;
+    content_type: string;
+    content_id?: number;
+    content_title?: string;
+    content_body?: string;
+    content_url?: string;
+    state?: string;
+    created_at: string;
+    updated_at: string;
+    raw?: any;
+}
 export interface VcsOperations {
     listRepositories(username?: string, page?: number, limit?: number): Promise<RepositoryInfo[]>;
     getRepository(owner: string, repo: string): Promise<RepositoryInfo>;
@@ -308,6 +345,22 @@ export interface VcsOperations {
     reviewCommit?(params: any): Promise<any>;
     generateReviewReport?(params: any): Promise<any>;
     applyReviewSuggestions?(params: any): Promise<any>;
+    listPackages(owner: string, repo: string, page?: number, limit?: number): Promise<PackageInfo[]>;
+    getPackage(owner: string, repo: string, packageId: string): Promise<PackageInfo>;
+    createPackage(owner: string, repo: string, packageData: any): Promise<PackageInfo>;
+    updatePackage(owner: string, repo: string, packageId: string, updates: any): Promise<PackageInfo>;
+    deletePackage(owner: string, repo: string, packageId: string): Promise<boolean>;
+    publishPackage(owner: string, repo: string, packageId: string): Promise<boolean>;
+    downloadPackage(owner: string, repo: string, packageId: string): Promise<string>;
+    listProjects(owner: string, repo: string, page?: number, limit?: number): Promise<ProjectInfo[]>;
+    getProject(owner: string, repo: string, projectId: string): Promise<ProjectInfo>;
+    createProject(owner: string, repo: string, projectData: any): Promise<ProjectInfo>;
+    updateProject(owner: string, repo: string, projectId: string, updates: any): Promise<ProjectInfo>;
+    deleteProject(owner: string, repo: string, projectId: string): Promise<boolean>;
+    addProjectItem(owner: string, repo: string, projectId: string, item: any): Promise<ProjectItemInfo>;
+    updateProjectItem(owner: string, repo: string, projectId: string, itemId: string, updates: any): Promise<ProjectItemInfo>;
+    deleteProjectItem(owner: string, repo: string, projectId: string, itemId: string): Promise<boolean>;
+    listProjectItems(owner: string, repo: string, projectId: string, page?: number, limit?: number): Promise<ProjectItemInfo[]>;
     getConfig?(): VcsProvider;
 }
 export interface VcsProviderFactory {

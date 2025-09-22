@@ -270,6 +270,56 @@ class BaseVcsProvider {
     async getUserRepositories(username, page = 1, limit = 30) {
         throw new Error('getUserRepositories not implemented');
     }
+    // Packages
+    async listPackages(owner, repo, page = 1, limit = 30) {
+        throw new Error('listPackages not implemented');
+    }
+    async getPackage(owner, repo, packageId) {
+        throw new Error('getPackage not implemented');
+    }
+    async createPackage(owner, repo, packageData) {
+        throw new Error('createPackage not implemented');
+    }
+    async updatePackage(owner, repo, packageId, updates) {
+        throw new Error('updatePackage not implemented');
+    }
+    async deletePackage(owner, repo, packageId) {
+        throw new Error('deletePackage not implemented');
+    }
+    async publishPackage(owner, repo, packageId) {
+        throw new Error('publishPackage not implemented');
+    }
+    async downloadPackage(owner, repo, packageId) {
+        throw new Error('downloadPackage not implemented');
+    }
+    // Projects
+    async listProjects(owner, repo, page = 1, limit = 30) {
+        throw new Error('listProjects not implemented');
+    }
+    async getProject(owner, repo, projectId) {
+        throw new Error('getProject not implemented');
+    }
+    async createProject(owner, repo, projectData) {
+        throw new Error('createProject not implemented');
+    }
+    async updateProject(owner, repo, projectId, updates) {
+        throw new Error('updateProject not implemented');
+    }
+    async deleteProject(owner, repo, projectId) {
+        throw new Error('deleteProject not implemented');
+    }
+    async addProjectItem(owner, repo, projectId, item) {
+        throw new Error('addProjectItem not implemented');
+    }
+    async updateProjectItem(owner, repo, projectId, itemId, updates) {
+        throw new Error('updateProjectItem not implemented');
+    }
+    async deleteProjectItem(owner, repo, projectId, itemId) {
+        throw new Error('deleteProjectItem not implemented');
+    }
+    async listProjectItems(owner, repo, projectId, page = 1, limit = 30) {
+        throw new Error('listProjectItems not implemented');
+    }
 }
 exports.BaseVcsProvider = BaseVcsProvider;
 //# sourceMappingURL=base-provider.js.map

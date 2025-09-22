@@ -109,5 +109,21 @@ export declare class GitHubProvider extends BaseVcsProvider {
      * Obtém URL do repositório GitHub
      */
     getRepositoryUrl(owner: string, repo: string): string;
+    listPackages(owner: string, repo: string, page?: number, limit?: number): Promise<any[]>;
+    getPackage(owner: string, repo: string, packageId: string): Promise<any>;
+    createPackage(owner: string, repo: string, packageData: any): Promise<any>;
+    updatePackage(owner: string, repo: string, packageId: string, updates: any): Promise<any>;
+    deletePackage(owner: string, repo: string, packageId: string): Promise<boolean>;
+    publishPackage(owner: string, repo: string, packageId: string): Promise<boolean>;
+    downloadPackage(owner: string, repo: string, packageId: string): Promise<string>;
+    listProjects(owner: string, repo: string, page?: number, limit?: number): Promise<any[]>;
+    getProject(owner: string, repo: string, projectId: string): Promise<any>;
+    createProject(owner: string, repo: string, projectData: any): Promise<any>;
+    updateProject(owner: string, repo: string, projectId: string, updates: any): Promise<any>;
+    deleteProject(owner: string, repo: string, projectId: string): Promise<boolean>;
+    addProjectItem(owner: string, repo: string, projectId: string, item: any): Promise<any>;
+    updateProjectItem(owner: string, repo: string, projectId: string, itemId: string, updates: any): Promise<any>;
+    deleteProjectItem(owner: string, repo: string, projectId: string, itemId: string): Promise<boolean>;
+    listProjectItems(owner: string, repo: string, projectId: string, page?: number, limit?: number): Promise<any[]>;
 }
 //# sourceMappingURL=github-provider.d.ts.map

@@ -1037,6 +1037,301 @@ class GiteaProvider extends base_provider_js_1.BaseVcsProvider {
             throw new Error(`Erro ao comparar branches: ${error instanceof Error ? error.message : String(error)}`);
         }
     }
+    // Packages - Gitea tem suporte completo via API REST
+    async listPackages(owner, repo, page = 1, limit = 30) {
+        try {
+            const data = await this.get(`/packages/${owner}`, {
+                page,
+                limit
+            });
+            return data.map((pkg) => ({
+                id: pkg.id.toString(),
+                name: pkg.name,
+                version: pkg.version || 'latest',
+                description: pkg.description || '',
+                type: pkg.type,
+                html_url: `${this.config.baseUrl}/packages/${owner}/${pkg.type}/${pkg.name}`,
+                created_at: pkg.created_at,
+                updated_at: pkg.updated_at,
+                downloads_count: pkg.downloads_count || 0,
+                size: pkg.size || 0,
+                raw: pkg
+            }));
+        }
+        catch (error) {
+            console.warn('[GITEA] Erro ao listar packages:', error.message);
+            return [];
+        }
+    }
+    async getPackage(owner, repo, packageId) {
+        try {
+            // Tentar buscar por ID - primeiro listar e encontrar
+            const packages = await this.listPackages(owner, repo);
+            const pkg = packages.find(p => p.id === packageId);
+            if (!pkg) {
+                throw new Error('Pacote não encontrado');
+            }
+            // Buscar versões específicas se disponível
+            try {
+                const versions = await this.get(`/packages/${owner}/${pkg.type}/${pkg.name}`);
+                return {
+                    ...pkg,
+                    versions: versions
+                };
+            }
+            catch {
+                // Se não conseguir versões, retorna o pacote básico
+                return pkg;
+            }
+        }
+        catch (error) {
+            throw new Error(`Pacote não encontrado: ${error.message}`);
+        }
+    }
+    async createPackage(owner, repo, packageData) {
+        try {
+            // Gitea não permite criação direta de packages via API
+            // Packages são criados automaticamente quando publicados via package managers
+            throw new Error('Gitea não permite criação direta de packages via API. Use seu package manager (npm, etc.)');
+        }
+        catch (error) {
+            throw new Error(`Não foi possível criar pacote: ${error.message}`);
+        }
+    }
+    async updatePackage(owner, repo, packageId, updates) {
+        try {
+            // Gitea não permite atualização direta de packages via API
+            throw new Error('Gitea não permite atualização direta de packages via API');
+        }
+        catch (error) {
+            throw new Error(`Não foi possível atualizar pacote: ${error.message}`);
+        }
+    }
+    async deletePackage(owner, repo, packageId) {
+        try {
+            // Primeiro encontrar o pacote
+            const packages = await this.listPackages(owner, repo);
+            const pkg = packages.find(p => p.id === packageId);
+            if (!pkg) {
+                throw new Error('Pacote não encontrado');
+            }
+            // Deletar versão específica
+            await this.delete(`/packages/${owner}/${pkg.type}/${pkg.name}/${pkg.version}`);
+            return true;
+        }
+        catch (error) {
+            throw new Error(`Não foi possível deletar pacote: ${error.message}`);
+        }
+    }
+    async publishPackage(owner, repo, packageId) {
+        try {
+            // Linkar pacote ao repositório
+            const packages = await this.listPackages(owner, repo);
+            const pkg = packages.find(p => p.id === packageId);
+            if (!pkg) {
+                throw new Error('Pacote não encontrado');
+            }
+            await this.post(`/packages/${owner}/${pkg.type}/${pkg.name}/-/link/${repo}`);
+            return true;
+        }
+        catch (error) {
+            throw new Error(`Não foi possível publicar pacote: ${error.message}`);
+        }
+    }
+    async downloadPackage(owner, repo, packageId) {
+        try {
+            // Primeiro encontrar o pacote
+            const packages = await this.listPackages(owner, repo);
+            const pkg = packages.find(p => p.id === packageId);
+            if (!pkg) {
+                throw new Error('Pacote não encontrado');
+            }
+            // Buscar arquivos do pacote
+            const files = await this.get(`/packages/${owner}/${pkg.type}/${pkg.name}/${pkg.version}/files`);
+            // Retornar URL de download (normalmente o primeiro arquivo)
+            if (files && files.length > 0) {
+                return `${this.config.baseUrl}/packages/${owner}/${pkg.type}/${pkg.name}/${pkg.version}/files/${files[0].filename}`;
+            }
+            throw new Error('Nenhum arquivo encontrado para download');
+        }
+        catch (error) {
+            throw new Error(`Não foi possível baixar pacote: ${error.message}`);
+        }
+    }
+    // Projects - Gitea tem suporte básico para projetos
+    async listProjects(owner, repo, page = 1, limit = 30) {
+        try {
+            const data = await this.get(`/repos/${owner}/${repo}/projects`, {
+                page,
+                limit
+            });
+            return data.map((project) => ({
+                id: project.id.toString(),
+                name: project.title,
+                description: project.description,
+                state: project.closed ? 'closed' : 'open',
+                html_url: `${this.config.baseUrl}/${owner}/${repo}/projects/${project.id}`,
+                created_at: project.created_at,
+                updated_at: project.updated_at,
+                columns_count: project.columns_count || 0,
+                items_count: project.cards_count || 0,
+                raw: project
+            }));
+        }
+        catch (error) {
+            // Gitea pode não ter projetos habilitados, retornamos lista vazia
+            console.warn('[GITEA] Erro ao listar projetos (podem não estar habilitados):', error.message);
+            return [];
+        }
+    }
+    async getProject(owner, repo, projectId) {
+        try {
+            const data = await this.get(`/repos/${owner}/${repo}/projects/${projectId}`);
+            return {
+                id: data.id.toString(),
+                name: data.title,
+                description: data.description,
+                state: data.closed ? 'closed' : 'open',
+                html_url: `${this.config.baseUrl}/${owner}/${repo}/projects/${data.id}`,
+                created_at: data.created_at,
+                updated_at: data.updated_at,
+                columns_count: data.columns_count || 0,
+                items_count: data.cards_count || 0,
+                raw: data
+            };
+        }
+        catch (error) {
+            throw new Error(`Projeto não encontrado: ${error.message}`);
+        }
+    }
+    async createProject(owner, repo, projectData) {
+        try {
+            const payload = {
+                title: projectData.name,
+                description: projectData.description || '',
+                body: projectData.body || projectData.description || ''
+            };
+            const data = await this.post(`/repos/${owner}/${repo}/projects`, payload);
+            return {
+                id: data.id.toString(),
+                name: data.title,
+                description: data.description,
+                state: data.closed ? 'closed' : 'open',
+                html_url: `${this.config.baseUrl}/${owner}/${repo}/projects/${data.id}`,
+                created_at: data.created_at,
+                updated_at: data.updated_at,
+                columns_count: data.columns_count || 0,
+                items_count: data.cards_count || 0,
+                raw: data
+            };
+        }
+        catch (error) {
+            throw new Error(`Não foi possível criar projeto: ${error.message}`);
+        }
+    }
+    async updateProject(owner, repo, projectId, updates) {
+        try {
+            const payload = {};
+            if (updates.name)
+                payload.title = updates.name;
+            if (updates.description)
+                payload.description = updates.description;
+            if (updates.body)
+                payload.body = updates.body;
+            if (updates.state)
+                payload.closed = updates.state === 'closed';
+            const data = await this.patch(`/repos/${owner}/${repo}/projects/${projectId}`, payload);
+            return {
+                id: data.id.toString(),
+                name: data.title,
+                description: data.description,
+                state: data.closed ? 'closed' : 'open',
+                html_url: `${this.config.baseUrl}/${owner}/${repo}/projects/${data.id}`,
+                created_at: data.created_at,
+                updated_at: data.updated_at,
+                columns_count: data.columns_count || 0,
+                items_count: data.cards_count || 0,
+                raw: data
+            };
+        }
+        catch (error) {
+            throw new Error(`Não foi possível atualizar projeto: ${error.message}`);
+        }
+    }
+    async deleteProject(owner, repo, projectId) {
+        try {
+            await this.delete(`/repos/${owner}/${repo}/projects/${projectId}`);
+            return true;
+        }
+        catch (error) {
+            throw new Error(`Não foi possível deletar projeto: ${error.message}`);
+        }
+    }
+    async addProjectItem(owner, repo, projectId, item) {
+        try {
+            // Gitea usa cards em vez de items diretos
+            console.warn('[GITEA] Gitea usa cards ao invés de items diretos. Funcionalidade limitada.');
+            throw new Error('Gitea não suporta adição direta de items. Use cards.');
+        }
+        catch (error) {
+            throw new Error(`Não foi possível adicionar item: ${error instanceof Error ? error.message : String(error)}`);
+        }
+    }
+    async updateProjectItem(owner, repo, projectId, itemId, updates) {
+        try {
+            console.warn('[GITEA] Gitea usa cards ao invés de items diretos. Funcionalidade limitada.');
+            throw new Error('Gitea não suporta atualização direta de items. Use cards.');
+        }
+        catch (error) {
+            throw new Error(`Não foi possível atualizar item: ${error instanceof Error ? error.message : String(error)}`);
+        }
+    }
+    async deleteProjectItem(owner, repo, projectId, itemId) {
+        try {
+            console.warn('[GITEA] Gitea usa cards ao invés de items diretos. Funcionalidade limitada.');
+            throw new Error('Gitea não suporta remoção direta de items. Use cards.');
+        }
+        catch (error) {
+            throw new Error(`Não foi possível deletar item: ${error instanceof Error ? error.message : String(error)}`);
+        }
+    }
+    async listProjectItems(owner, repo, projectId, page = 1, limit = 30) {
+        try {
+            console.warn('[GITEA] Gitea usa cards ao invés de items diretos. Funcionalidade limitada.');
+            // Tentar listar cards se possível
+            try {
+                const data = await this.get(`/repos/${owner}/${repo}/projects/${projectId}/columns`);
+                const allCards = [];
+                for (const column of data) {
+                    try {
+                        const cards = await this.get(`/repos/${owner}/${repo}/projects/columns/${column.id}/cards`);
+                        allCards.push(...cards.map((card) => ({
+                            id: card.id.toString(),
+                            content_type: 'issue', // Gitea cards geralmente são issues
+                            content_id: card.content_id,
+                            content_title: card.title,
+                            content_body: card.content,
+                            state: card.state || 'open',
+                            created_at: card.created_at,
+                            updated_at: card.updated_at,
+                            raw: card
+                        })));
+                    }
+                    catch (cardError) {
+                        // Ignorar erro ao listar cards de uma coluna
+                    }
+                }
+                return allCards;
+            }
+            catch (columnError) {
+                return [];
+            }
+        }
+        catch (error) {
+            console.warn('[GITEA] Erro ao listar items do projeto:', error.message);
+            return [];
+        }
+    }
 }
 exports.GiteaProvider = GiteaProvider;
 //# sourceMappingURL=gitea-provider.js.map

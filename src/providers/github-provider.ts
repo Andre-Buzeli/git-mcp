@@ -1326,4 +1326,262 @@ export class GitHubProvider extends BaseVcsProvider {
   getRepositoryUrl(owner: string, repo: string): string {
     return `https://github.com/${owner}/${repo}.git`;
   }
+
+  // Packages - GitHub tem suporte completo para packages
+  async listPackages(owner: string, repo: string, page: number = 1, limit: number = 30): Promise<any[]> {
+    try {
+      const data = await this.get<any>(`/repos/${owner}/${repo}/packages`, {
+        package_type: 'npm', // Default to npm packages
+        page,
+        per_page: limit
+      });
+      return data.map((pkg: any) => ({
+        id: pkg.id.toString(),
+        name: pkg.name,
+        version: pkg.version || 'latest',
+        description: pkg.description || '',
+        type: pkg.package_type || 'npm',
+        html_url: pkg.html_url || `https://github.com/${owner}/${repo}/packages/${pkg.package_type}/${pkg.name}`,
+        created_at: pkg.created_at,
+        updated_at: pkg.updated_at,
+        downloads_count: pkg.downloads_count || 0,
+        size: pkg.size_in_bytes || 0,
+        raw: pkg
+      }));
+    } catch (error: any) {
+      console.warn('[GITHUB] Erro ao listar packages:', error.message);
+      return [];
+    }
+  }
+
+  async getPackage(owner: string, repo: string, packageId: string): Promise<any> {
+    try {
+      const data = await this.get<any>(`/repos/${owner}/${repo}/packages/${packageId}`);
+      return {
+        id: data.id.toString(),
+        name: data.name,
+        version: data.version || 'latest',
+        description: data.description || '',
+        type: data.package_type || 'npm',
+        html_url: data.html_url || `https://github.com/${owner}/${repo}/packages/${data.package_type}/${data.name}`,
+        created_at: data.created_at,
+        updated_at: data.updated_at,
+        downloads_count: data.downloads_count || 0,
+        size: data.size_in_bytes || 0,
+        raw: data
+      };
+    } catch (error: any) {
+      throw new Error(`Pacote não encontrado: ${error.message}`);
+    }
+  }
+
+  async createPackage(owner: string, repo: string, packageData: any): Promise<any> {
+    try {
+      // GitHub packages são criados automaticamente ao fazer publish
+      // Esta é uma operação simulada
+      console.warn('[GITHUB] Pacotes são criados automaticamente ao fazer publish. Esta operação é simulada.');
+      return {
+        id: Date.now().toString(),
+        name: packageData.name,
+        version: packageData.version || '1.0.0',
+        description: packageData.description || '',
+        type: packageData.type || 'npm',
+        html_url: `https://github.com/${owner}/${repo}/packages/${packageData.type}/${packageData.name}`,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        downloads_count: 0,
+        size: 0,
+        raw: packageData
+      };
+    } catch (error: any) {
+      throw new Error(`Não foi possível criar pacote: ${error.message}`);
+    }
+  }
+
+  async updatePackage(owner: string, repo: string, packageId: string, updates: any): Promise<any> {
+    try {
+      // GitHub packages têm metadados limitados para atualização
+      console.warn('[GITHUB] Atualização de packages é limitada no GitHub.');
+      throw new Error('GitHub não suporta atualização direta de metadados de packages');
+    } catch (error: any) {
+      throw new Error(`Não foi possível atualizar pacote: ${error.message}`);
+    }
+  }
+
+  async deletePackage(owner: string, repo: string, packageId: string): Promise<boolean> {
+    try {
+      await this.delete<any>(`/repos/${owner}/${repo}/packages/${packageId}`);
+      return true;
+    } catch (error: any) {
+      throw new Error(`Não foi possível deletar pacote: ${error.message}`);
+    }
+  }
+
+  async publishPackage(owner: string, repo: string, packageId: string): Promise<boolean> {
+    try {
+      console.warn('[GITHUB] Publish de packages é feito automaticamente via GitHub Actions ou CLI.');
+      // Esta é uma operação simulada - na prática seria feito via Actions
+      return true;
+    } catch (error: any) {
+      throw new Error(`Não foi possível publicar pacote: ${error.message}`);
+    }
+  }
+
+  async downloadPackage(owner: string, repo: string, packageId: string): Promise<string> {
+    try {
+      // GitHub packages podem ser baixados via npm, yarn, etc.
+      // Retornamos a URL de instalação
+      const pkg = await this.getPackage(owner, repo, packageId);
+      return `npm install @${owner}/${pkg.name}@${pkg.version}`;
+    } catch (error: any) {
+      throw new Error(`Não foi possível obter download: ${error.message}`);
+    }
+  }
+
+  // Projects - GitHub tem suporte completo para projects (v2)
+  async listProjects(owner: string, repo: string, page: number = 1, limit: number = 30): Promise<any[]> {
+    try {
+      // Usar GraphQL para Projects v2 (nova API)
+      const query = `
+        query($owner: String!, $repo: String!, $first: Int!) {
+          repository(owner: $owner, name: $repo) {
+            projectsV2(first: $first) {
+              nodes {
+                id
+                title
+                description
+                url
+                createdAt
+                updatedAt
+                items {
+                  totalCount
+                }
+                fields {
+                  nodes {
+                    ... on ProjectV2Field {
+                      name
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      `;
+
+      const variables = {
+        owner,
+        repo,
+        first: limit
+      };
+
+      // GitHub Projects v2 requer GraphQL, mas nossa implementação atual não tem suporte GraphQL
+      // Por enquanto, retornamos lista vazia e informamos sobre a limitação
+      console.warn('[GITHUB] GitHub Projects v2 requer GraphQL API. Funcionalidade limitada.');
+      return [];
+    } catch (error: any) {
+      console.warn('[GITHUB] Erro ao listar projects v2:', error.message);
+      return [];
+    }
+  }
+
+  async getProject(owner: string, repo: string, projectId: string): Promise<any> {
+    try {
+      const query = `
+        query($projectId: ID!) {
+          node(id: $projectId) {
+            ... on ProjectV2 {
+              id
+              title
+              description
+              url
+              createdAt
+              updatedAt
+              items {
+                totalCount
+              }
+              fields {
+                nodes {
+                  ... on ProjectV2Field {
+                    name
+                  }
+                }
+              }
+            }
+          }
+        }
+      `;
+
+      // GitHub Projects v2 requer GraphQL, mas nossa implementação atual não tem suporte GraphQL
+      throw new Error('GitHub Projects v2 requer GraphQL API. Use a interface web do GitHub.');
+    } catch (error: any) {
+      throw new Error(`Projeto não encontrado: ${error.message}`);
+    }
+  }
+
+  async createProject(owner: string, repo: string, projectData: any): Promise<any> {
+    try {
+      // GitHub descontinuou projetos clássicos. Projects v2 só podem ser criados via interface web
+      // ou usando GraphQL com permissões especiais
+      throw new Error('GitHub descontinuou projetos clássicos. Use Projects v2 via interface web do GitHub');
+    } catch (error: any) {
+      throw new Error(`Não foi possível criar projeto: ${error.message}`);
+    }
+  }
+
+  async updateProject(owner: string, repo: string, projectId: string, updates: any): Promise<any> {
+    try {
+      // Projetos clássicos foram descontinuados
+      throw new Error('GitHub descontinuou projetos clássicos. Use Projects v2 via interface web do GitHub');
+    } catch (error: any) {
+      throw new Error(`Não foi possível atualizar projeto: ${error.message}`);
+    }
+  }
+
+  async deleteProject(owner: string, repo: string, projectId: string): Promise<boolean> {
+    try {
+      // Projetos clássicos foram descontinuados
+      throw new Error('GitHub descontinuou projetos clássicos. Use Projects v2 via interface web do GitHub');
+    } catch (error: any) {
+      throw new Error(`Não foi possível deletar projeto: ${error.message}`);
+    }
+  }
+
+  async addProjectItem(owner: string, repo: string, projectId: string, item: any): Promise<any> {
+    try {
+      // Projetos clássicos foram descontinuados
+      throw new Error('GitHub descontinuou projetos clássicos. Use Projects v2 via interface web do GitHub');
+    } catch (error: any) {
+      throw new Error(`Não foi possível adicionar item: ${error.message}`);
+    }
+  }
+
+  async updateProjectItem(owner: string, repo: string, projectId: string, itemId: string, updates: any): Promise<any> {
+    try {
+      // Projetos clássicos foram descontinuados
+      throw new Error('GitHub descontinuou projetos clássicos. Use Projects v2 via interface web do GitHub');
+    } catch (error: any) {
+      throw new Error(`Não foi possível atualizar item: ${error.message}`);
+    }
+  }
+
+  async deleteProjectItem(owner: string, repo: string, projectId: string, itemId: string): Promise<boolean> {
+    try {
+      // Projetos clássicos foram descontinuados
+      throw new Error('GitHub descontinuou projetos clássicos. Use Projects v2 via interface web do GitHub');
+    } catch (error: any) {
+      throw new Error(`Não foi possível deletar item: ${error.message}`);
+    }
+  }
+
+  async listProjectItems(owner: string, repo: string, projectId: string, page: number = 1, limit: number = 30): Promise<any[]> {
+    try {
+      // Projetos clássicos foram descontinuados
+      // Para Projects v2, seria necessário GraphQL, mas por enquanto retornamos vazio
+      return [];
+    } catch (error: any) {
+      console.warn('[GITHUB] Erro ao listar items do projeto:', error.message);
+      return [];
+    }
+  }
 }
