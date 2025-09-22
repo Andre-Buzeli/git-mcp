@@ -50,7 +50,7 @@ export const gitUpdateProjectTool = {
 
       const provider = globalProviderFactory.getProvider(processedInput.provider);
 
-      const result = await this.updateProject(validatedInput);
+      const result = await this.handleUpdate(validatedInput);
 
       return GitUpdateProjectResultSchema.parse(result);
     } catch (error) {
@@ -63,7 +63,7 @@ export const gitUpdateProjectTool = {
     }
   },
 
-  async updateProject(params: GitUpdateProjectInput): Promise<GitUpdateProjectResult> {
+  async handleUpdate(params: GitUpdateProjectInput & { action: 'update' }): Promise<GitUpdateProjectResult> {
     try {
       const { repo, projectPath, message, branch = 'main', forcePush = false, provider: providerName } = params;
 
